@@ -1,0 +1,14 @@
+---
+description: Project libraries and dependency conventions.
+alwaysApply: true
+---
+
+# Libraries
+
+- **HTTP**: Use Axios for all HTTP requests.
+- **Server State**: Use TanStack Query for server state management.
+- **Forms & Validation**: Use React Hook Form with Zod.
+- **Date Handling**: Use date-fns for date manipulation and formatting.
+- **Charts**: Use Recharts for charts and data visualization.
+- **Calendar**: Use React Day Picker for calendar components.
+- **Dependencies**: Reuse existing project libraries before introducing new dependencies. Do not add alternative libraries unless explicitly requested.
