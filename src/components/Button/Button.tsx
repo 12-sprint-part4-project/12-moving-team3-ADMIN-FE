@@ -8,13 +8,13 @@
  * (색상은 src/app/globals.css 의 @theme 토큰을 사용합니다.
  *  Tailwind 기본 색상(bg-blue-500 등)은 이 프로젝트에 정의되어 있지 않아 적용되지 않습니다.)
  */
-type ButtonProps = {
+interface ButtonProps {
   variant?: 'primary' | 'secondary';
   size?: 'small' | 'large';
   disabled?: boolean;
   children: React.ReactNode;
-  onClick?: () => void;
-};
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+}
 
 export const Button = ({
   variant = 'primary',
