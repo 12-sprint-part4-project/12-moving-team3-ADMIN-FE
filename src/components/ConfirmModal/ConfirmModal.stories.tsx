@@ -14,7 +14,7 @@ const ConfirmModalDemo = ({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="flex min-h-48 items-center justify-center bg-background-200 p-8">
+    <div className="flex min-h-80 items-center justify-center bg-background-200 p-8">
       <button
         type="button"
         className="rounded-lg bg-blue-300 px-4 py-2 text-md-semibold text-white"
@@ -47,6 +47,7 @@ const meta: Meta<typeof ConfirmModal> = {
     docs: {
       story: {
         inline: false,
+        iframeHeight: 400,
       },
     },
   },
