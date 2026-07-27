@@ -1,4 +1,5 @@
 import type { StorybookConfig } from '@storybook/nextjs-vite';
+import svgr from 'vite-plugin-svgr';
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
@@ -7,7 +8,22 @@ const config: StorybookConfig = {
     '@storybook/addon-a11y',
     '@storybook/addon-docs',
   ],
-  framework: '@storybook/nextjs-vite',
+  framework: {
+    name: '@storybook/nextjs-vite',
+    options: {
+      image: {
+        excludeFiles: ['**/*.svg'],
+      },
+    },
+  },
   staticDirs: ['../public'],
+  async viteFinal(viteConfig) {
+    viteConfig.plugins ??= [];
+    viteConfig.plugins.push(
+      svgr({ include: '**/*.svg', svgrOptions: { icon: true } })
+    );
+    return viteConfig;
+  },
 };
+
 export default config;

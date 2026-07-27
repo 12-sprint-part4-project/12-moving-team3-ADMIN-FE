@@ -35,7 +35,14 @@
   --color-blue-400: #242945;
 
   /* Secondary-Yellow */
+  /* yellow-50: 관리자 StatusBadge warning 배경 (시안 soft cream). Figma Secondary-Yellow 계열 확장 */
+  --color-yellow-50: #fff0e0;
   --color-yellow-100: #ffc149;
+
+  /* Secondary-Green */
+  /* 관리자 StatusBadge success용. 코어/메인 FE에 green 토큰 없음 → 시안 샘플 값 사용 */
+  --color-green-100: #e4f8ef;
+  --color-green-200: #0aaa60;
 
   /* Secondary-Red */
   --color-red-100: #ffeef0;
