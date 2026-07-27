@@ -1,12 +1,12 @@
 import { cn } from '@/lib/utils';
 
-export type LoadingStateProps = {
+export interface LoadingStateProps {
   /** 안내 문구. 기본값: '불러오는 중...' */
   message?: string;
   /** 스피너 표시 여부. 기본값: true */
   showSpinner?: boolean;
   className?: string;
-};
+}
 
 export const LoadingState = ({
   message = '불러오는 중...',

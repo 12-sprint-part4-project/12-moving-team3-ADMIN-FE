@@ -7,7 +7,7 @@ import ChevronDownIcon from '@/assets/icons/chevron-down.svg';
 import UserIcon from '@/assets/icons/user.svg';
 import { cn } from '@/lib/utils';
 
-export type AdminHeaderProps = {
+export interface AdminHeaderProps {
   /** 로고 우측 타이틀. 기본값: '관리자 페이지' */
   title?: string;
   /** 좌측 로고. 미지정 시 기본 무빙 로고 */
@@ -19,7 +19,7 @@ export type AdminHeaderProps = {
   /** 유저 영역 클릭 핸들러 */
   onUserMenuClick?: () => void;
   className?: string;
-};
+}
 
 const DefaultLogo = () => (
   <Image
