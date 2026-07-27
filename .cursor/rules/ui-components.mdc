@@ -10,12 +10,53 @@ alwaysApply: false
 - **Exports**: Use `default export` ONLY for Next.js App Router special files (`page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`, `global-error.tsx`, `template.tsx`, `default.tsx`). Use `named export` for all regular components.
 - **App Router**: Separate Server/Client Components. Use `"use client"` strictly only when necessary.
 - **A11y**: Use semantic HTML. Use `<button>`/`<a>` for clickables, not `<div>`.
-- **Tailwind CSS v4**:
-  - Sort classes using `prettier-plugin-tailwindcss`.
-  - Use `rem` by default. Use `px` ONLY for `max-width` and `border` thickness.
-- **Design Tokens (globals.css)**:
-  - ALWAYS prioritize `globals.css` tokens. NEVER use arbitrary values (e.g., `bg-[#ff0000]`).
-  - Colors: Use `--color-{name}-{shade}` format.
-  - Typography: Use predefined classes like `text-{size}-{weight}`. Do not string multiple text utilities together.
-- **Fonts**: **Pretendard** is the ONLY font. No custom letter-spacing.
-- **Assets**: Use SVGR for vector icons. Static SVG for logos/banners.
+
+# Tailwind CSS
+
+- Sort classes using `prettier-plugin-tailwindcss`.
+- Use `rem` by default. Use `px` ONLY for `max-width` and `border` thickness.
+- Merge class names using the project's `cn()` utility.
+- Never concatenate Tailwind classes using template literals or string arrays.
+
+# Component Variants
+
+- Components with variants (e.g. Button, Badge, Input, Modal) MUST use `class-variance-authority (cva)`.
+- Define variants with `cva()`.
+- Define default values with `defaultVariants`.
+- Use `VariantProps<typeof variants>` to infer variant types.
+- Always merge external `className` last using `cn()`.
+
+# Design Tokens (globals.css)
+
+- ALWAYS prioritize `globals.css` tokens.
+- NEVER use arbitrary values (e.g. `bg-[#ff0000]`) inside components.
+- Colors must use the `--color-{name}-{shade}` format.
+- If a required semantic color does not exist, define it in `globals.css` before using it.
+- Typography must use predefined classes such as `text-{size}-{weight}`.
+- Do not combine multiple typography utilities.
+
+# Component Design
+
+- Every reusable component must support `className`.
+- Keep components presentation-only.
+- Never include API calls, React Query, or business logic.
+- Never hardcode domain-specific values.
+- Prefer reusable props over duplicated implementations.
+
+# Storybook
+
+- Every reusable component should include a Storybook story.
+- Stories should cover every supported variant and major state.
+
+# Figma
+
+- Analyze the relevant Figma design before implementation whenever available.
+- Reuse existing design tokens whenever possible.
+- Do not introduce new visual styles without confirming they are not already defined in the design system.
+
+# Fonts & Assets
+
+- **Pretendard** is the ONLY font.
+- Do not apply custom letter-spacing.
+- Use SVGR for vector icons.
+- Use static SVG files for logos and banners.
