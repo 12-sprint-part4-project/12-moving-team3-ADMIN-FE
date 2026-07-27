@@ -10,6 +10,7 @@ const meta: Meta<typeof AdminHeader> = {
     layout: 'fullscreen',
   },
   argTypes: {
+    showUserMenu: { control: 'boolean' },
     onUserMenuClick: { action: 'user menu clicked' },
   },
 };
@@ -18,9 +19,19 @@ export default meta;
 
 type Story = StoryObj<typeof AdminHeader>;
 
-export const Default: Story = {
+/** 로그인 화면: 로고 + 타이틀만, 우측 메뉴 숨김 */
+export const Login: Story = {
   args: {
     title: '관리자 페이지',
+    showUserMenu: false,
+  },
+};
+
+/** 관리자 내부 화면: 로고 + 타이틀 + 우측 관리자 메뉴 */
+export const Admin: Story = {
+  args: {
+    title: '관리자 페이지',
+    showUserMenu: true,
     userName: '관리자',
   },
 };
@@ -28,22 +39,7 @@ export const Default: Story = {
 export const CustomUserName: Story = {
   args: {
     title: '관리자 페이지',
+    showUserMenu: true,
     userName: '홍길동',
-  },
-};
-
-export const WithLeftSlot: Story = {
-  args: {
-    title: '관리자 페이지',
-    userName: '관리자',
-    leftSlot: (
-      <button
-        type="button"
-        className="text-md-medium text-gray-500"
-        aria-label="메뉴 열기"
-      >
-        메뉴
-      </button>
-    ),
   },
 };
