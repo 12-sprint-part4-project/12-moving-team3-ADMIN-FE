@@ -56,9 +56,12 @@ export const SearchInput = ({
   name,
   autoComplete,
   'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
   ...rest
 }: SearchInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const resolvedAriaLabel =
+    ariaLabel ?? (ariaLabelledBy ? undefined : placeholder || '검색');
 
   const handleSearch = (searchValue?: string) => {
     if (disabled) {
@@ -110,7 +113,8 @@ export const SearchInput = ({
         placeholder={placeholder}
         disabled={disabled}
         autoComplete={autoComplete ?? 'off'}
-        aria-label={ariaLabel ?? placeholder}
+        aria-label={resolvedAriaLabel}
+        aria-labelledby={ariaLabelledBy}
         onChange={onChange}
         onKeyDown={handleKeyDown}
         className={cn(

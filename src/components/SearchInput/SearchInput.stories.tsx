@@ -25,15 +25,18 @@ const ControlledSearchInput = (args: SearchInputProps) => {
   );
 };
 
+const FILTER_TRIGGER_CLASS =
+  'flex items-center rounded-lg border border-line-200 bg-white px-3.5 py-1.5 text-md-medium text-black-400';
+
 const InFilterBarSearchInput = (args: SearchInputProps) => (
   <div className="flex flex-wrap items-center gap-2">
     <SearchInput {...args} className="min-w-64 flex-1" />
-    <div className="flex items-center rounded-lg border border-line-200 bg-white px-3.5 py-1.5 text-md-medium text-black-400">
+    <button type="button" className={FILTER_TRIGGER_CLASS} aria-pressed={false}>
       상태 전체
-    </div>
-    <div className="flex items-center rounded-lg border border-line-200 bg-white px-3.5 py-1.5 text-md-medium text-black-400">
+    </button>
+    <button type="button" className={FILTER_TRIGGER_CLASS} aria-pressed={false}>
       가입일 전체
-    </div>
+    </button>
   </div>
 );
 
