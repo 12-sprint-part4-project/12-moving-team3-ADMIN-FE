@@ -1,0 +1,62 @@
+---
+description: Figma-based UI design system rules
+globs: **/*.tsx, src/app/globals.css
+alwaysApply: false
+---
+
+# Design System
+
+- **Tokens**: Always use the existing `globals.css` tokens and follow the Figma design system.
+- **Restrictions**: Never introduce arbitrary colors, undefined states, or new component variants unless they are defined in the design system.
+
+## Color
+
+- **Tokens**: Use `--color-*` tokens only.
+- **Semantics**: Use blue tokens for primary actions, red tokens for errors, yellow tokens for warnings, black tokens for primary text, gray tokens for secondary text, background tokens for surfaces, and line tokens for borders.
+- **Extensions**: Do not introduce new semantic colors unless they are defined in the design system.
+
+## Button
+
+- **Variants**: Use `solid` for the primary CTA and `outlined` for secondary actions.
+- **States**: Use the defined interaction state tokens for each button variant.
+- **Icons**: Prefer icon-only buttons for utility actions. Use icon-and-label buttons only when the icon reinforces the action.
+- **Restrictions**: Never create Ghost, Text, Loading, or Pressed button variants.
+- Apply full-width behavior through layout or `className`, not as a dedicated button variant.
+
+## Input
+
+- **Variants**: Use Outlined Input for single-line values and Text Area for long-form content.
+- **States**: Use the defined focus and error states for inputs.
+- **Search**: Use the icon Input variant for search. Show the clear action only while typing.
+- **Restrictions**: Do not introduce undefined input variants or states.
+
+## Card
+
+- **Variants**: Prefer domain-specific Card-list templates over generic Cards.
+- **Layout**: Use the existing card surface, border, radius, and spacing tokens.
+- **Structure**: Place status and chips in the header, core details in the body, and actions in the footer.
+- **Actions**: Use a full-width CTA for one action and equal-width CTAs for paired actions.
+- **States**: Use the address Card active state only for selectable addresses.
+- **Restrictions**: Never add generic Empty, Hover, or Selected Card states.
+
+## Navigation
+
+- **Variants**: Use the existing navigation variants defined in the design system.
+- **Responsive**: Keep desktop navigation inline. Use the existing menu-triggered side navigation on smaller screens.
+- **States**: Use the defined active and inactive navigation states.
+- **Restrictions**: Never add undefined navigation patterns such as Breadcrumbs, Badge/Count indicators, or Accordion menus.
+
+## Modal
+
+- **Usage**: Use Modals for confirmation, input, and selection workflows.
+- **Layout**: Use the existing modal surface, radius, spacing, and shadow tokens.
+- **Structure**: Use the existing header, body, and footer layout.
+- **Interactions**: Follow the existing modal interaction patterns.
+- **Restrictions**: Never add undefined modal variants or interaction patterns.
+
+## Dropdown
+
+- **Variants**: Use Outlined Select for single-value selection, Filter Trigger for compact filtering, and Dropdown for menus.
+- **States**: Use the defined dropdown tokens and interaction states.
+- **Selection**: Use Checkbox Filter Modal for multi-selection.
+- **Restrictions**: Do not introduce undefined dropdown variants.
