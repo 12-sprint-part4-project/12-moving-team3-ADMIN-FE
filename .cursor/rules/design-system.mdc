@@ -17,11 +17,11 @@ alwaysApply: false
 
 ## Button
 
-- **Variants**: Use `solid` for the primary CTA and `outlined` for secondary actions.
-- **States**: Use the defined interaction state tokens for each button variant.
-- **Icons**: Prefer icon-only buttons for utility actions. Use icon-and-label buttons only when the icon reinforces the action.
-- **Restrictions**: Never create Ghost, Text, Loading, or Pressed button variants.
-- Apply full-width behavior through layout or `className`, not as a dedicated button variant.
+- **Variants**: Use only the button variants defined in the design system (`solid`, `outlined`, `secondary`, `danger`, and any future approved variants).
+- **States**: Use the defined interaction state tokens for each button variant. Loading is a button state, not a button variant.
+- **Icons**: Support icon-only buttons when required by the design. Icon-only buttons must provide an accessible name (e.g. `aria-label`).
+- **Restrictions**: Never create Text or Pressed button variants. Do not introduce new variants unless they are added to the design system.
+- **Layout**: Apply full-width behavior through layout or `className`, not as a dedicated button variant.
 
 ## Input
 
