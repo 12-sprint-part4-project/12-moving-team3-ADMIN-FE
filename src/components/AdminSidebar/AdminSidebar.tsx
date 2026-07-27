@@ -48,7 +48,7 @@ export const AdminSidebar = ({ className, onLogout }: AdminSidebarProps) => {
   return (
     <aside
       className={cn(
-        'flex h-full w-52 shrink-0 flex-col border-r border-line-200 bg-white px-2 py-4',
+        'flex h-full w-44 shrink-0 flex-col border-r border-line-200 bg-white px-2 py-4',
         className
       )}
     >
