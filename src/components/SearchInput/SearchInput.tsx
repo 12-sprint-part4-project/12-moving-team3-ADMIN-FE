@@ -11,7 +11,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import SearchIcon from '@/assets/icons/search.svg';
 import { cn } from '@/lib/utils';
 
-export const searchInputVariants = cva(
+export const SEARCH_INPUT_VARIANTS = cva(
   'flex w-full items-center gap-2 rounded-lg border bg-white px-3 py-1.5 text-md-medium transition-colors',
   {
     variants: {
@@ -32,7 +32,7 @@ export interface SearchInputProps
       InputHTMLAttributes<HTMLInputElement>,
       'type' | 'size' | 'disabled' | 'className' | 'onChange' | 'value' | 'defaultValue'
     >,
-    VariantProps<typeof searchInputVariants> {
+    VariantProps<typeof SEARCH_INPUT_VARIANTS> {
   value?: string;
   defaultValue?: string;
   placeholder?: string;
@@ -50,6 +50,7 @@ export const SearchInput = ({
   disabled = false,
   onChange,
   onSearch,
+  onKeyDown,
   className,
   id,
   name,
@@ -59,31 +60,35 @@ export const SearchInput = ({
 }: SearchInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleSearch = () => {
+  const handleSearch = (searchValue?: string) => {
     if (disabled) {
       return;
     }
 
-    onSearch?.(inputRef.current?.value ?? '');
+    onSearch?.(searchValue ?? inputRef.current?.value ?? '');
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key !== 'Enter') {
-      return;
-    }
+    onKeyDown?.(event);
 
-    event.preventDefault();
-    handleSearch();
+    if (
+      event.key === 'Enter' &&
+      !event.defaultPrevented &&
+      !event.nativeEvent.isComposing
+    ) {
+      event.preventDefault();
+      handleSearch(event.currentTarget.value);
+    }
   };
 
   return (
     <div
-      className={cn(searchInputVariants({ disabled }), className)}
+      className={cn(SEARCH_INPUT_VARIANTS({ disabled }), className)}
       data-disabled={disabled || undefined}
     >
       <button
         type="button"
-        onClick={handleSearch}
+        onClick={() => handleSearch()}
         disabled={disabled}
         className={cn(
           'flex size-5 shrink-0 items-center justify-center text-gray-400',

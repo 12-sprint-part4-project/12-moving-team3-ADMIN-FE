@@ -1,9 +1,43 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { useState, type ChangeEvent } from 'react';
+import { useState, type ChangeEvent, type ComponentProps } from 'react';
 
 import { SearchInput } from './SearchInput';
 
-const meta: Meta<typeof SearchInput> = {
+type SearchInputProps = ComponentProps<typeof SearchInput>;
+
+const ControlledSearchInput = (args: SearchInputProps) => {
+  const [value, setValue] = useState('홍길동');
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setValue(event.target.value);
+    args.onChange?.(event);
+  };
+
+  return (
+    <SearchInput
+      {...args}
+      value={value}
+      onChange={handleChange}
+      onSearch={(nextValue) => {
+        args.onSearch?.(nextValue);
+      }}
+    />
+  );
+};
+
+const InFilterBarSearchInput = (args: SearchInputProps) => (
+  <div className="flex flex-wrap items-center gap-2">
+    <SearchInput {...args} className="min-w-64 flex-1" />
+    <div className="flex items-center rounded-lg border border-line-200 bg-white px-3.5 py-1.5 text-md-medium text-black-400">
+      상태 전체
+    </div>
+    <div className="flex items-center rounded-lg border border-line-200 bg-white px-3.5 py-1.5 text-md-medium text-black-400">
+      가입일 전체
+    </div>
+  </div>
+);
+
+const META: Meta<typeof SearchInput> = {
   title: 'Admin/SearchInput',
   component: SearchInput,
   tags: ['autodocs'],
@@ -17,7 +51,7 @@ const meta: Meta<typeof SearchInput> = {
   },
 };
 
-export default meta;
+export default META;
 
 type Story = StoryObj<typeof SearchInput>;
 
@@ -44,37 +78,9 @@ export const Disabled: Story = {
 };
 
 export const Controlled: Story = {
-  render: function ControlledSearchInput(args) {
-    const [value, setValue] = useState('홍길동');
-
-    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-      setValue(event.target.value);
-      args.onChange?.(event);
-    };
-
-    return (
-      <SearchInput
-        {...args}
-        value={value}
-        onChange={handleChange}
-        onSearch={(nextValue) => {
-          args.onSearch?.(nextValue);
-        }}
-      />
-    );
-  },
+  render: (args) => <ControlledSearchInput {...args} />,
 };
 
 export const InFilterBar: Story = {
-  render: (args) => (
-    <div className="flex flex-wrap items-center gap-2">
-      <SearchInput {...args} className="min-w-64 flex-1" />
-      <div className="flex items-center rounded-lg border border-line-200 bg-white px-3.5 py-1.5 text-md-medium text-black-400">
-        상태 전체
-      </div>
-      <div className="flex items-center rounded-lg border border-line-200 bg-white px-3.5 py-1.5 text-md-medium text-black-400">
-        가입일 전체
-      </div>
-    </div>
-  ),
+  render: (args) => <InFilterBarSearchInput {...args} />,
 };
