@@ -1,9 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { useState, type ChangeEvent, type ComponentProps } from 'react';
+import { useState, type ChangeEvent } from 'react';
 
-import { SearchInput } from './SearchInput';
-
-type SearchInputProps = ComponentProps<typeof SearchInput>;
+import { SearchInput, type SearchInputProps } from './SearchInput';
 
 const ControlledSearchInput = (args: SearchInputProps) => {
   const [value, setValue] = useState('홍길동');

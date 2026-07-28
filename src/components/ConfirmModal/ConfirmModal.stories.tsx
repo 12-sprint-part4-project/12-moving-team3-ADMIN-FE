@@ -6,7 +6,6 @@ import { ConfirmModal } from './ConfirmModal';
 type ConfirmModalProps = ComponentProps<typeof ConfirmModal>;
 
 const ConfirmModalDemo = ({
-  open: _open,
   onConfirm,
   onCancel,
   ...props
