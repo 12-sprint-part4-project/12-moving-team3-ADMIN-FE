@@ -40,7 +40,9 @@ const ADMIN_MENU_ITEMS: AdminMenuItem[] = [
 ];
 
 const isActiveMenu = (pathname: string, href: string) =>
-  href === '/' ? pathname === href : pathname.startsWith(href);
+  href === '/'
+    ? pathname === href
+    : pathname === href || pathname.startsWith(`${href}/`);
 
 export const AdminSidebar = ({ className, onLogout }: AdminSidebarProps) => {
   const pathname = usePathname();

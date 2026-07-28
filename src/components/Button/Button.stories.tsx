@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from './Button';
 
 const meta: Meta<typeof Button> = {
@@ -57,5 +58,13 @@ export const Disabled: Story = {
   args: {
     disabled: true,
     children: '이사일 이후 견적 요청 불가',
+  },
+};
+
+export const WithAuxiliaryIcons: Story = {
+  args: {
+    children: '이전 단계',
+    leftIcon: <ArrowLeft aria-hidden />,
+    rightIcon: <ArrowRight aria-hidden />,
   },
 };
