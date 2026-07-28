@@ -1,19 +1,68 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { useState, type ComponentProps } from 'react';
+import {
+  Children,
+  cloneElement,
+  isValidElement,
+  useState,
+  type ComponentProps,
+  type MouseEvent,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 
 import { DetailDrawer } from './DetailDrawer';
 
-type DetailDrawerProps = ComponentProps<typeof DetailDrawer>;
+interface DetailDrawerDemoProps extends ComponentProps<typeof DetailDrawer> {
+  open: boolean;
+}
+
+const withCloseHandler = (
+  node: ReactNode,
+  handleClose: () => void
+): ReactNode => {
+  if (!isValidElement(node)) {
+    return node;
+  }
+
+  const element = node as ReactElement<{
+    children?: ReactNode;
+    onClick?: (event: MouseEvent<HTMLButtonElement>) => void;
+  }>;
+
+  if (element.type === 'button') {
+    return cloneElement(element, {
+      onClick: (event: MouseEvent<HTMLButtonElement>) => {
+        element.props.onClick?.(event);
+        handleClose();
+      },
+    });
+  }
+
+  if (element.props.children == null) {
+    return element;
+  }
+
+  return cloneElement(element, {
+    children: Children.map(element.props.children, (child) =>
+      withCloseHandler(child, handleClose)
+    ),
+  });
+};
 
 const DetailDrawerDemo = ({
   onClose,
   children,
   footer,
   ...props
-}: DetailDrawerProps) => {
+}: DetailDrawerDemoProps) => {
   const [open, setOpen] = useState(false);
+
+  const handleClose = () => {
+    setOpen(false);
+    onClose();
+  };
 
   return (
     <div className="flex min-h-80 items-center justify-center bg-background-200 p-8">
@@ -27,11 +76,10 @@ const DetailDrawerDemo = ({
       <DetailDrawer
         {...props}
         open={open}
-        onClose={() => {
-          setOpen(false);
-          onClose();
-        }}
-        footer={footer}
+        onClose={handleClose}
+        footer={
+          footer == null ? undefined : withCloseHandler(footer, handleClose)
+        }
       >
         {children}
       </DetailDrawer>

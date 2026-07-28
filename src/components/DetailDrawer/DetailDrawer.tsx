@@ -17,6 +17,7 @@ const FOCUSABLE_SELECTOR =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 const DEFAULT_ARIA_LABEL = '상세 정보';
+const OVERLAY_ARIA_LABEL = '상세 패널 닫기';
 
 const subscribe = () => () => undefined;
 const getClientSnapshot = () => true;
@@ -25,7 +26,7 @@ const getServerSnapshot = () => false;
 export const detailDrawerRootVariants = cva('fixed inset-0 z-50');
 
 export const detailDrawerOverlayVariants = cva(
-  'absolute inset-0 bg-black-500/50'
+  'absolute inset-0 cursor-pointer border-0 bg-black-500/50 p-0'
 );
 
 export const detailDrawerPanelVariants = cva(
@@ -100,6 +101,16 @@ export const DetailDrawer = ({
     const panel = panelRef.current;
     panel?.focus();
 
+    const getFocusableChildren = () => {
+      if (!panel) {
+        return [];
+      }
+
+      return Array.from(
+        panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+      ).filter((element) => element !== panel && element.offsetParent !== null);
+    };
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
@@ -111,9 +122,7 @@ export const DetailDrawer = ({
         return;
       }
 
-      const focusable = Array.from(
-        panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
-      ).filter((element) => element.offsetParent !== null);
+      const focusable = getFocusableChildren();
 
       if (focusable.length === 0) {
         event.preventDefault();
@@ -124,14 +133,18 @@ export const DetailDrawer = ({
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
       const active = document.activeElement;
+      const isOnPanel = active === panel;
+      const isOutside = !(active instanceof Node) || !panel.contains(active);
 
-      if (event.shiftKey && active === first) {
-        event.preventDefault();
-        last?.focus();
+      if (event.shiftKey) {
+        if (active === first || isOnPanel || isOutside) {
+          event.preventDefault();
+          last?.focus();
+        }
         return;
       }
 
-      if (!event.shiftKey && active === last) {
+      if (active === last || isOnPanel || isOutside) {
         event.preventDefault();
         first?.focus();
       }
@@ -156,10 +169,12 @@ export const DetailDrawer = ({
 
   return createPortal(
     <div className={cn(detailDrawerRootVariants())}>
-      <div
+      <button
+        type="button"
+        tabIndex={-1}
         className={cn(detailDrawerOverlayVariants())}
         onClick={handleOverlayClick}
-        role="presentation"
+        aria-label={OVERLAY_ARIA_LABEL}
       />
 
       <div

@@ -46,9 +46,9 @@ type Story = StoryObj<typeof DetailSection>;
 export const Default: Story = {};
 
 export const MultipleSections: Story = {
-  render: () => (
+  render: (args) => (
     <div className="flex flex-col gap-4">
-      <DetailSection title="기본 정보">
+      <DetailSection padding={args.padding} title="기본 정보">
         <dl className="flex flex-col gap-2 text-md-medium">
           <div className="flex justify-between gap-4">
             <dt className="text-gray-500">이름</dt>
@@ -60,12 +60,12 @@ export const MultipleSections: Story = {
           </div>
         </dl>
       </DetailSection>
-      <DetailSection title="경력 및 소개">
+      <DetailSection padding={args.padding} title="경력 및 소개">
         <p className="text-md-regular text-black-300">
           5년 경력의 이사 전문가입니다. 안전하고 신속한 서비스를 제공합니다.
         </p>
       </DetailSection>
-      <DetailSection title="제공 서비스">
+      <DetailSection padding={args.padding} title="제공 서비스">
         <ul className="list-disc pl-5 text-md-medium text-black-300">
           <li>소형 이사</li>
           <li>가정 이사</li>
