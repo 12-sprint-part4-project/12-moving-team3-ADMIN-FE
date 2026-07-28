@@ -1,62 +1,70 @@
-/**
- * ⚠️ TEMPORARY EXAMPLE STORY
- *
- * Storybook + Chromatic 세팅 검증 및 팀 첫 예시용으로 작성된 임시 스토리입니다.
- * Figma 디자인 기준의 실제 공통 Button 컴포넌트가 만들어지면 이 파일과
- * Button.tsx는 삭제해도 됩니다.
- */
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from './Button';
 
 const meta: Meta<typeof Button> = {
-  title: 'Example/Button',
+  title: 'Components/Button',
   component: Button,
   tags: ['autodocs'],
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'secondary'],
-    },
-    size: {
-      control: 'select',
-      options: ['small', 'large'],
+      options: ['solid', 'outlined', 'secondary', 'danger'],
     },
     disabled: { control: 'boolean' },
+    loading: { control: 'boolean' },
   },
 };
 export default meta;
 
 type Story = StoryObj<typeof Button>;
 
-export const Primary: Story = {
+export const Solid: Story = {
   args: {
-    variant: 'primary',
-    size: 'large',
+    variant: 'solid',
     children: '견적 요청하기',
+  },
+};
+
+export const Outlined: Story = {
+  args: {
+    variant: 'outlined',
+    children: '취소',
   },
 };
 
 export const Secondary: Story = {
   args: {
     variant: 'secondary',
-    size: 'large',
-    children: '취소',
+    children: '이전',
   },
 };
 
-export const Small: Story = {
+export const Danger: Story = {
   args: {
-    variant: 'primary',
-    size: 'small',
-    children: '찜하기',
+    variant: 'danger',
+    children: '삭제',
+  },
+};
+
+export const Loading: Story = {
+  args: {
+    loading: true,
+    children: '견적 요청하기',
   },
 };
 
 export const Disabled: Story = {
   args: {
-    variant: 'primary',
-    size: 'large',
     disabled: true,
     children: '이사일 이후 견적 요청 불가',
+  },
+};
+
+export const WithAuxiliaryIcons: Story = {
+  args: {
+    children: '이전 단계',
+    leftIcon: <ArrowLeft aria-hidden />,
+    rightIcon: <ArrowRight aria-hidden />,
   },
 };

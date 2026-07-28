@@ -13,18 +13,27 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import CloseIcon from '@/assets/icons/close.svg';
 import { cn } from '@/lib/utils';
 
+/** Tab 순환에 쓸 포커스 가능 요소를 찾기 위한 셀렉터. 비활성·tabIndex=-1 요소는 제외한다. */
 const FOCUSABLE_SELECTOR =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+/** title이 없을 때 dialog에 붙이는 기본 접근성 이름 */
 const DEFAULT_ARIA_LABEL = '상세 정보';
+/** Overlay 버튼의 접근성 이름 */
 const OVERLAY_ARIA_LABEL = '상세 패널 닫기';
 
-/** Portal SSR 안전용: 서버에서는 false, 클라이언트에서는 true를 반환한다. */
+/**
+ * Portal은 브라우저 DOM이 준비된 뒤에만 생성할 수 있어 hydration 완료 여부를 확인한다.
+ * useSyncExternalStore로 서버(false)와 클라이언트(true) 스냅샷을 나눈다.
+ */
 const subscribe = () => () => undefined;
 const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
 
-/** 패널 내부에서 실제 Tab 이동 대상이 되는 요소만 수집한다. */
+/**
+ * Drawer 패널 안에서 Tab으로 이동할 실제 자식 요소만 모은다.
+ * 패널 자신과 화면에 보이지 않는 요소는 목록에서 제외한다.
+ */
 const getFocusableChildren = (panel: HTMLElement) =>
   Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
     (element) => element !== panel && element.offsetParent !== null
@@ -63,20 +72,23 @@ export const detailDrawerFooterVariants = cva(
   'flex shrink-0 flex-col gap-2 border-t border-line-200 bg-white px-6 py-4'
 );
 
-/** 우측 상세 Drawer의 열림 상태·콘텐츠·닫기 동작을 정의한다. */
+/** 관리자 상세 Drawer의 열림 상태, 본문, 하단 액션, 닫기 콜백을 정의한다. */
 export interface DetailDrawerProps extends VariantProps<
   typeof detailDrawerPanelVariants
 > {
   open: boolean;
   title?: string;
   children: ReactNode;
-  /** 하단 고정 액션 영역. 없으면 Footer를 렌더하지 않는다. */
+  /** 하단 고정 액션 슬롯. 없으면 Footer를 렌더하지 않는다. */
   footer?: ReactNode;
   onClose: () => void;
   className?: string;
 }
 
-/** 목록 화면 위에서 우측으로 열리는 상세 Drawer. Portal·포커스 트랩·스크롤 잠금을 처리한다. */
+/**
+ * 관리자 상세 정보를 화면 오른쪽에 표시하는 공통 Drawer다.
+ * document.body Portal, Overlay 닫기, ESC/포커스 트랩, body 스크롤 잠금을 담당한다.
+ */
 export const DetailDrawer = ({
   open,
   title,
@@ -88,29 +100,41 @@ export const DetailDrawer = ({
 }: DetailDrawerProps) => {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
+  /** Drawer가 열리기 전 포커스 요소. 닫힐 때 복원에 사용한다. */
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+  /** ESC 핸들러가 항상 최신 onClose를 쓰도록 보관한다. */
   const onCloseRef = useRef(onClose);
+  // Portal은 클라이언트 마운트 이후에만 그린다. (hydration 불일치 방지)
   const mounted = useSyncExternalStore(
     subscribe,
     getClientSnapshot,
     getServerSnapshot
   );
 
+  // onClose 참조가 바뀌어도 포커스 effect를 다시 돌리지 않도록 ref만 갱신한다.
   useEffect(() => {
     onCloseRef.current = onClose;
   }, [onClose]);
 
-  /** hydration 이후 포커스 트랩·body 스크롤 잠금을 걸고, 닫힐 때 이전 포커스를 복원한다. */
+  /**
+   * open과 hydration(mounted)이 모두 true일 때 실행한다.
+   * body 스크롤 잠금, 초기 포커스, ESC/Tab 포커스 트랩을 설정하고
+   * cleanup에서 스크롤·이전 포커스를 복원한다.
+   */
   useEffect(() => {
     if (!mounted || !open) {
       return;
     }
 
+    // Drawer가 열리기 전에 선택되어 있던 요소를 저장하고,
+    // 닫힐 때 해당 요소로 포커스를 돌려 사용 흐름을 유지한다.
     previouslyFocusedRef.current =
       document.activeElement instanceof HTMLElement
         ? document.activeElement
         : null;
 
+    // Drawer가 열린 동안 배경 페이지가 함께 스크롤되지 않도록 body 스크롤을 잠근다.
+    // cleanup에서는 Drawer가 열리기 전의 overflow 값을 복원한다.
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
@@ -119,11 +143,13 @@ export const DetailDrawer = ({
       return;
     }
 
+    // 열릴 때 첫 포커스 가능 요소로 이동하고, 없으면 패널 자체에 포커스한다.
     const focusable = getFocusableChildren(panel);
     const firstFocusable = focusable[0];
     (firstFocusable ?? panel).focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      // ESC로 Drawer를 닫는다. onCloseRef로 최신 콜백을 호출한다.
       if (event.key === 'Escape') {
         event.preventDefault();
         onCloseRef.current();
@@ -136,6 +162,7 @@ export const DetailDrawer = ({
 
       const currentFocusable = getFocusableChildren(panel);
 
+      // 포커스 가능한 자식이 없으면 Tab이 밖으로 나가지 않도록 패널에 유지한다.
       if (currentFocusable.length === 0) {
         event.preventDefault();
         panel.focus();
@@ -148,6 +175,8 @@ export const DetailDrawer = ({
       const isOnPanel = active === panel;
       const isOutside = !(active instanceof Node) || !panel.contains(active);
 
+      // Tab과 Shift+Tab이 Drawer 밖으로 빠져나가지 않도록
+      // 첫 요소와 마지막 요소 사이에서 포커스를 순환시킨다.
       if (event.shiftKey) {
         if (active === first || isOnPanel || isOutside) {
           event.preventDefault();
@@ -171,16 +200,20 @@ export const DetailDrawer = ({
     };
   }, [open, mounted]);
 
+  // 서버 렌더이거나 닫힌 상태면 Portal을 만들지 않는다.
   if (!mounted || !open) {
     return null;
   }
 
+  // Overlay 클릭 시 Drawer를 닫는다.
   const handleOverlayClick = () => {
     onClose();
   };
 
+  // 레이아웃 overflow와 무관하게 최상단에 보이도록 document.body에 Portal로 붙인다.
   return createPortal(
     <div className={cn(detailDrawerRootVariants())}>
+      {/* Overlay: 배경 dim + 클릭 시 닫기. Tab 순서에는 넣지 않는다. */}
       <button
         type="button"
         tabIndex={-1}
@@ -189,6 +222,7 @@ export const DetailDrawer = ({
         aria-label={OVERLAY_ARIA_LABEL}
       />
 
+      {/* Panel: 우측에서 슬라이드되는 상세 영역 */}
       <div
         ref={panelRef}
         role="dialog"
@@ -198,6 +232,7 @@ export const DetailDrawer = ({
         tabIndex={-1}
         className={cn(detailDrawerPanelVariants({ size }), className)}
       >
+        {/* Header: 제목 + 닫기 버튼 */}
         <header className={cn(detailDrawerHeaderVariants())}>
           {title ? (
             <h2 id={titleId} className="text-xl-bold text-black-400">
@@ -217,8 +252,10 @@ export const DetailDrawer = ({
           </button>
         </header>
 
+        {/* Body: 스크롤 가능한 상세 콘텐츠 */}
         <div className={cn(detailDrawerBodyVariants())}>{children}</div>
 
+        {/* Footer: 선택적 하단 액션 슬롯 */}
         {footer ? (
           <footer className={cn(detailDrawerFooterVariants())}>{footer}</footer>
         ) : null}
