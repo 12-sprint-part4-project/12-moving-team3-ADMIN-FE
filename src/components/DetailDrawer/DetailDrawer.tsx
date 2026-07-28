@@ -13,9 +13,12 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import CloseIcon from '@/assets/icons/close.svg';
 import { cn } from '@/lib/utils';
 
-/** Tab 순환에 쓸 포커스 가능 요소를 찾기 위한 셀렉터. 비활성·tabIndex=-1 요소는 제외한다. */
+/**
+ * 프로그램적으로 포커스 가능한 요소를 찾기 위한 셀렉터.
+ * tabindex="-1"도 포함하며, Tab 순환 순서는 별도로 계산한다.
+ */
 const FOCUSABLE_SELECTOR =
-  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]';
 
 /** title이 없을 때 dialog에 붙이는 기본 접근성 이름 */
 const DEFAULT_ARIA_LABEL = '상세 정보';
@@ -30,14 +33,82 @@ const subscribe = () => () => undefined;
 const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
 
+/** 동시에 열린 DetailDrawer가 여러 개여도 body 스크롤 잠금이 조기 해제되지 않도록 센다. */
+let bodyScrollLockCount = 0;
+/** 첫 번째 잠금 직전에 저장한 body overflow 값 */
+let previousBodyOverflow: string | null = null;
+
+/** body 스크롤을 잠근다. 첫 잠금에서만 overflow를 hidden으로 바꾼다. */
+const lockBodyScroll = () => {
+  if (bodyScrollLockCount === 0) {
+    previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+  }
+  bodyScrollLockCount += 1;
+};
+
+/** body 스크롤 잠금을 하나 해제한다. 마지막 Drawer가 닫힐 때만 overflow를 복원한다. */
+const unlockBodyScroll = () => {
+  bodyScrollLockCount = Math.max(0, bodyScrollLockCount - 1);
+  if (bodyScrollLockCount === 0 && previousBodyOverflow !== null) {
+    document.body.style.overflow = previousBodyOverflow;
+    previousBodyOverflow = null;
+  }
+};
+
+/** 요소의 tabindex 숫자 값을 읽는다. 속성이 없으면 자연 포커스 가능 요소로 0으로 본다. */
+const getTabIndex = (element: HTMLElement) => {
+  const raw = element.getAttribute('tabindex');
+  if (raw == null || raw === '') {
+    return 0;
+  }
+
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isNaN(parsed) ? 0 : parsed;
+};
+
 /**
- * Drawer 패널 안에서 Tab으로 이동할 실제 자식 요소만 모은다.
- * 패널 자신과 화면에 보이지 않는 요소는 목록에서 제외한다.
+ * Drawer 패널 안에서 Tab으로 이동할 요소를 모은다.
+ * tabindex="-1"도 수집 대상에 포함하되, 실제 Tab 순환에서는
+ * 순차 포커스 대상(tabindex >= 0)만 tabindex·DOM 순서로 정렬한다.
  */
-const getFocusableChildren = (panel: HTMLElement) =>
-  Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
-    (element) => element !== panel && element.offsetParent !== null
-  );
+const getFocusableChildren = (panel: HTMLElement) => {
+  const candidates = Array.from(
+    panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+  ).filter((element) => element !== panel && element.offsetParent !== null);
+
+  const sequential = candidates
+    .map((element, domIndex) => ({
+      element,
+      tabIndex: getTabIndex(element),
+      domIndex,
+    }))
+    .filter(({ tabIndex }) => tabIndex >= 0);
+
+  sequential.sort((a, b) => {
+    const aPositive = a.tabIndex > 0;
+    const bPositive = b.tabIndex > 0;
+
+    if (aPositive && bPositive) {
+      if (a.tabIndex !== b.tabIndex) {
+        return a.tabIndex - b.tabIndex;
+      }
+      return a.domIndex - b.domIndex;
+    }
+
+    if (aPositive) {
+      return -1;
+    }
+
+    if (bPositive) {
+      return 1;
+    }
+
+    return a.domIndex - b.domIndex;
+  });
+
+  return sequential.map(({ element }) => element);
+};
 
 export const detailDrawerRootVariants = cva('fixed inset-0 z-50');
 
@@ -79,7 +150,7 @@ export interface DetailDrawerProps extends VariantProps<
   open: boolean;
   title?: string;
   children: ReactNode;
-  /** 하단 고정 액션 슬롯. 없으면 Footer를 렌더하지 않는다. */
+  /** 하단 고정 액션 슬롯. null/undefined일 때만 Footer를 생략한다. */
   footer?: ReactNode;
   onClose: () => void;
   className?: string;
@@ -133,15 +204,14 @@ export const DetailDrawer = ({
         ? document.activeElement
         : null;
 
-    // Drawer가 열린 동안 배경 페이지가 함께 스크롤되지 않도록 body 스크롤을 잠근다.
-    // cleanup에서는 Drawer가 열리기 전의 overflow 값을 복원한다.
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
     const panel = panelRef.current;
     if (!panel) {
       return;
     }
+
+    // Drawer가 열린 동안 배경 페이지가 함께 스크롤되지 않도록 body 스크롤을 잠근다.
+    // 여러 Drawer가 동시에 열려도 ref-count로 관리해 마지막이 닫힐 때만 복원한다.
+    lockBodyScroll();
 
     // 열릴 때 첫 포커스 가능 요소로 이동하고, 없으면 패널 자체에 포커스한다.
     const focusable = getFocusableChildren(panel);
@@ -195,7 +265,7 @@ export const DetailDrawer = ({
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = previousOverflow;
+      unlockBodyScroll();
       previouslyFocusedRef.current?.focus();
     };
   }, [open, mounted]);
@@ -255,8 +325,8 @@ export const DetailDrawer = ({
         {/* Body: 스크롤 가능한 상세 콘텐츠 */}
         <div className={cn(detailDrawerBodyVariants())}>{children}</div>
 
-        {/* Footer: 선택적 하단 액션 슬롯 */}
-        {footer ? (
+        {/* Footer: null/undefined가 아니면 0·빈 문자열 등도 유효한 ReactNode로 렌더한다. */}
+        {footer != null ? (
           <footer className={cn(detailDrawerFooterVariants())}>{footer}</footer>
         ) : null}
       </div>

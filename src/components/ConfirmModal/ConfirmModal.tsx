@@ -160,10 +160,10 @@ export const ConfirmModal = ({
         ) : null}
 
         <div className="flex justify-end gap-2">
-          <Button variant="secondary" size="small" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel}>
             {cancelText}
           </Button>
-          <Button variant="primary" size="small" onClick={onConfirm}>
+          <Button variant="solid" onClick={onConfirm}>
             {confirmText}
           </Button>
         </div>
