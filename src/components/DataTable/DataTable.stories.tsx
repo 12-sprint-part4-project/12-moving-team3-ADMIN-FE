@@ -125,3 +125,10 @@ export const Empty: Story = {
     emptyMessage: '등록된 회원이 없습니다.',
   },
 };
+
+/** 필드명 대신 함수형 rowKey 경로가 정상 렌더되는지 확인한다. */
+export const FunctionRowKey: Story = {
+  args: {
+    rowKey: (row) => row.id,
+  },
+};
