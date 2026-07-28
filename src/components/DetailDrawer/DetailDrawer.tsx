@@ -91,7 +91,7 @@ export const DetailDrawer = ({
   }, [onClose]);
 
   useEffect(() => {
-    if (!open) {
+    if (!mounted || !open) {
       return;
     }
 
@@ -104,7 +104,6 @@ export const DetailDrawer = ({
     document.body.style.overflow = 'hidden';
 
     const panel = panelRef.current;
-    panel?.focus();
 
     const getFocusableChildren = () => {
       if (!panel) {
@@ -115,6 +114,10 @@ export const DetailDrawer = ({
         panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
       ).filter((element) => element !== panel && element.offsetParent !== null);
     };
+
+    const focusable = getFocusableChildren();
+    const firstFocusable = focusable[0];
+    (firstFocusable ?? panel)?.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -127,16 +130,16 @@ export const DetailDrawer = ({
         return;
       }
 
-      const focusable = getFocusableChildren();
+      const currentFocusable = getFocusableChildren();
 
-      if (focusable.length === 0) {
+      if (currentFocusable.length === 0) {
         event.preventDefault();
         panel.focus();
         return;
       }
 
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
+      const first = currentFocusable[0];
+      const last = currentFocusable[currentFocusable.length - 1];
       const active = document.activeElement;
       const isOnPanel = active === panel;
       const isOutside = !(active instanceof Node) || !panel.contains(active);
@@ -162,7 +165,7 @@ export const DetailDrawer = ({
       document.body.style.overflow = previousOverflow;
       previouslyFocusedRef.current?.focus();
     };
-  }, [open]);
+  }, [open, mounted]);
 
   if (!mounted || !open) {
     return null;
