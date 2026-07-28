@@ -19,9 +19,16 @@ const FOCUSABLE_SELECTOR =
 const DEFAULT_ARIA_LABEL = '상세 정보';
 const OVERLAY_ARIA_LABEL = '상세 패널 닫기';
 
+/** Portal SSR 안전용: 서버에서는 false, 클라이언트에서는 true를 반환한다. */
 const subscribe = () => () => undefined;
 const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
+
+/** 패널 내부에서 실제 Tab 이동 대상이 되는 요소만 수집한다. */
+const getFocusableChildren = (panel: HTMLElement) =>
+  Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+    (element) => element !== panel && element.offsetParent !== null
+  );
 
 export const detailDrawerRootVariants = cva('fixed inset-0 z-50');
 
@@ -56,17 +63,20 @@ export const detailDrawerFooterVariants = cva(
   'flex shrink-0 flex-col gap-2 border-t border-line-200 bg-white px-6 py-4'
 );
 
+/** 우측 상세 Drawer의 열림 상태·콘텐츠·닫기 동작을 정의한다. */
 export interface DetailDrawerProps extends VariantProps<
   typeof detailDrawerPanelVariants
 > {
   open: boolean;
   title?: string;
   children: ReactNode;
+  /** 하단 고정 액션 영역. 없으면 Footer를 렌더하지 않는다. */
   footer?: ReactNode;
   onClose: () => void;
   className?: string;
 }
 
+/** 목록 화면 위에서 우측으로 열리는 상세 Drawer. Portal·포커스 트랩·스크롤 잠금을 처리한다. */
 export const DetailDrawer = ({
   open,
   title,
@@ -90,6 +100,7 @@ export const DetailDrawer = ({
     onCloseRef.current = onClose;
   }, [onClose]);
 
+  /** hydration 이후 포커스 트랩·body 스크롤 잠금을 걸고, 닫힐 때 이전 포커스를 복원한다. */
   useEffect(() => {
     if (!mounted || !open) {
       return;
@@ -104,20 +115,13 @@ export const DetailDrawer = ({
     document.body.style.overflow = 'hidden';
 
     const panel = panelRef.current;
+    if (!panel) {
+      return;
+    }
 
-    const getFocusableChildren = () => {
-      if (!panel) {
-        return [];
-      }
-
-      return Array.from(
-        panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
-      ).filter((element) => element !== panel && element.offsetParent !== null);
-    };
-
-    const focusable = getFocusableChildren();
+    const focusable = getFocusableChildren(panel);
     const firstFocusable = focusable[0];
-    (firstFocusable ?? panel)?.focus();
+    (firstFocusable ?? panel).focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -126,11 +130,11 @@ export const DetailDrawer = ({
         return;
       }
 
-      if (event.key !== 'Tab' || !panel) {
+      if (event.key !== 'Tab') {
         return;
       }
 
-      const currentFocusable = getFocusableChildren();
+      const currentFocusable = getFocusableChildren(panel);
 
       if (currentFocusable.length === 0) {
         event.preventDefault();

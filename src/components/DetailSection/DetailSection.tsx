@@ -18,6 +18,7 @@ export const detailSectionVariants = cva(
   }
 );
 
+/** DetailDrawer Body에서 구역별 정보를 표시할 때 쓰는 섹션 Props. */
 export interface DetailSectionProps extends VariantProps<
   typeof detailSectionVariants
 > {
@@ -26,6 +27,7 @@ export interface DetailSectionProps extends VariantProps<
   className?: string;
 }
 
+/** 제목·구분선·본문으로 상세 정보를 구역 단위로 묶어 보여준다. */
 export const DetailSection = ({
   title,
   children,
