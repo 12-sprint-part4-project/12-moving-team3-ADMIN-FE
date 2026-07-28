@@ -1,8 +1,11 @@
 import type { ReactNode } from 'react';
 
+import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { cn } from '@/lib/utils';
 
 type CellAlign = 'left' | 'center' | 'right';
+
+const DEFAULT_EMPTY_MESSAGE = '데이터가 없습니다.';
 
 /**
  * 한 열의 표시 규칙.
@@ -22,6 +25,10 @@ export interface DataTableProps<T> {
   data: T[];
   /** 각 행의 안정적인 React key. 필드명 또는 추출 함수. */
   rowKey: keyof T | ((row: T) => string | number);
+  /** true면 데이터 행 대신 LoadingState를 표시한다. */
+  loading?: boolean;
+  /** data가 비어 있을 때 빈 상태 행에 표시할 문구. */
+  emptyMessage?: string;
   caption?: string;
   className?: string;
 }
@@ -95,52 +102,76 @@ export const DataTable = <T,>({
   columns,
   data,
   rowKey,
+  loading = false,
+  emptyMessage = DEFAULT_EMPTY_MESSAGE,
   caption,
   className,
-}: DataTableProps<T>) => (
-  <div className={cn('w-full overflow-x-auto', className)}>
-    <table className="w-full border-collapse text-left">
-      {caption ? (
-        <caption className="sr-only">{caption}</caption>
-      ) : null}
-      <thead>
-        <tr className="border-b border-line-200 bg-background-200">
-          {columns.map((column) => (
-            <th
-              key={column.key}
-              scope="col"
-              className={cn(
-                'px-4 py-3 text-md-semibold whitespace-nowrap text-black-400',
-                CELL_ALIGN_CLASS[column.align ?? 'left'],
-                column.className
-              )}
-            >
-              {column.header}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((row, index) => (
-          <tr
-            key={resolveRowKey(row, rowKey)}
-            className="border-b border-line-200 bg-white"
-          >
+}: DataTableProps<T>) => {
+  const columnCount = columns.length;
+
+  return (
+    <div className={cn('w-full overflow-x-auto', className)}>
+      <table className="w-full border-collapse text-left">
+        {caption ? (
+          <caption className="sr-only">{caption}</caption>
+        ) : null}
+        <thead>
+          <tr className="border-b border-line-200 bg-background-200">
             {columns.map((column) => (
-              <td
+              <th
                 key={column.key}
+                scope="col"
                 className={cn(
-                  'px-4 py-3 text-md-medium text-black-400',
+                  'px-4 py-3 text-md-semibold whitespace-nowrap text-black-400',
                   CELL_ALIGN_CLASS[column.align ?? 'left'],
                   column.className
                 )}
               >
-                {resolveCellContent(column, row, index)}
-              </td>
+                {column.header}
+              </th>
             ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-);
+        </thead>
+        <tbody>
+          {/* 헤더를 유지한 채 tbody만 교체해 로딩·빈 목록에서도 레이아웃이 흔들리지 않게 한다. */}
+          {loading ? (
+            <tr>
+              <td colSpan={columnCount}>
+                <LoadingState />
+              </td>
+            </tr>
+          ) : data.length === 0 ? (
+            <tr className="border-b border-line-200 bg-white">
+              <td
+                colSpan={columnCount}
+                className="px-4 py-10 text-center text-md-medium text-gray-500"
+              >
+                {emptyMessage}
+              </td>
+            </tr>
+          ) : (
+            data.map((row, index) => (
+              <tr
+                key={resolveRowKey(row, rowKey)}
+                className="border-b border-line-200 bg-white"
+              >
+                {columns.map((column) => (
+                  <td
+                    key={column.key}
+                    className={cn(
+                      'px-4 py-3 text-md-medium text-black-400',
+                      CELL_ALIGN_CLASS[column.align ?? 'left'],
+                      column.className
+                    )}
+                  >
+                    {resolveCellContent(column, row, index)}
+                  </td>
+                ))}
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+};
