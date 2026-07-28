@@ -79,11 +79,16 @@ export const DetailDrawer = ({
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
   const mounted = useSyncExternalStore(
     subscribe,
     getClientSnapshot,
     getServerSnapshot
   );
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!open) {
@@ -114,7 +119,7 @@ export const DetailDrawer = ({
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
-        onClose();
+        onCloseRef.current();
         return;
       }
 
@@ -157,7 +162,7 @@ export const DetailDrawer = ({
       document.body.style.overflow = previousOverflow;
       previouslyFocusedRef.current?.focus();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!mounted || !open) {
     return null;
