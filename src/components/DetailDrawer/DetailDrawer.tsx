@@ -33,29 +33,6 @@ const subscribe = () => () => undefined;
 const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
 
-/** 동시에 열린 DetailDrawer가 여러 개여도 body 스크롤 잠금이 조기 해제되지 않도록 센다. */
-let bodyScrollLockCount = 0;
-/** 첫 번째 잠금 직전에 저장한 body overflow 값 */
-let previousBodyOverflow: string | null = null;
-
-/** body 스크롤을 잠근다. 첫 잠금에서만 overflow를 hidden으로 바꾼다. */
-const lockBodyScroll = () => {
-  if (bodyScrollLockCount === 0) {
-    previousBodyOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-  }
-  bodyScrollLockCount += 1;
-};
-
-/** body 스크롤 잠금을 하나 해제한다. 마지막 Drawer가 닫힐 때만 overflow를 복원한다. */
-const unlockBodyScroll = () => {
-  bodyScrollLockCount = Math.max(0, bodyScrollLockCount - 1);
-  if (bodyScrollLockCount === 0 && previousBodyOverflow !== null) {
-    document.body.style.overflow = previousBodyOverflow;
-    previousBodyOverflow = null;
-  }
-};
-
 /** 요소의 tabindex 숫자 값을 읽는다. 속성이 없으면 자연 포커스 가능 요소로 0으로 본다. */
 const getTabIndex = (element: HTMLElement) => {
   const raw = element.getAttribute('tabindex');
@@ -71,6 +48,7 @@ const getTabIndex = (element: HTMLElement) => {
  * Drawer 패널 안에서 Tab으로 이동할 요소를 모은다.
  * tabindex="-1"도 수집 대상에 포함하되, 실제 Tab 순환에서는
  * 순차 포커스 대상(tabindex >= 0)만 tabindex·DOM 순서로 정렬한다.
+ * 라디오 그룹 전용 Tab 순서 처리는 현재 사용 사례가 없어 포함하지 않는다.
  */
 const getFocusableChildren = (panel: HTMLElement) => {
   const candidates = Array.from(
@@ -159,6 +137,9 @@ export interface DetailDrawerProps extends VariantProps<
 /**
  * 관리자 상세 정보를 화면 오른쪽에 표시하는 공통 Drawer다.
  * document.body Portal, Overlay 닫기, ESC/포커스 트랩, body 스크롤 잠금을 담당한다.
+ *
+ * 지원 범위: 한 번에 하나의 DetailDrawer만 연다. 중첩·다중 Drawer 스택은 지원하지 않는다.
+ * 단일 Drawer 기준으로 ESC 닫기, 포커스 트랩, 포커스 복원, body scroll lock만 보장한다.
  */
 export const DetailDrawer = ({
   open,
@@ -210,8 +191,9 @@ export const DetailDrawer = ({
     }
 
     // Drawer가 열린 동안 배경 페이지가 함께 스크롤되지 않도록 body 스크롤을 잠근다.
-    // 여러 Drawer가 동시에 열려도 ref-count로 관리해 마지막이 닫힐 때만 복원한다.
-    lockBodyScroll();
+    // cleanup에서는 Drawer가 열리기 전의 overflow 값을 복원한다. (단일 Drawer 기준)
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
 
     // 열릴 때 첫 포커스 가능 요소로 이동하고, 없으면 패널 자체에 포커스한다.
     const focusable = getFocusableChildren(panel);
@@ -265,7 +247,7 @@ export const DetailDrawer = ({
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      unlockBodyScroll();
+      document.body.style.overflow = previousOverflow;
       previouslyFocusedRef.current?.focus();
     };
   }, [open, mounted]);

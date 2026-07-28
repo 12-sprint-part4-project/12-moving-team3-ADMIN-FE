@@ -94,6 +94,19 @@ const meta: Meta<typeof DetailDrawer> = {
   parameters: {
     layout: 'fullscreen',
     docs: {
+      description: {
+        component: `
+관리자 상세 정보를 화면 오른쪽에 표시하는 공통 Drawer입니다.
+
+**지원 범위**
+- 한 번에 하나의 DetailDrawer만 연다.
+- ESC 닫기, Overlay 클릭 닫기, 포커스 트랩, 포커스 복원, body scroll lock을 보장한다.
+
+**제한 사항**
+- 중첩·다중 Drawer 스택은 지원하지 않는다.
+- 라디오 그룹 전용 Tab 순서 처리는 포함하지 않는다.
+        `.trim(),
+      },
       story: {
         inline: false,
         iframeHeight: 560,
