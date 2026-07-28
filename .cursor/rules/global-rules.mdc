@@ -17,3 +17,7 @@ alwaysApply: true
   - Components & Interfaces: `PascalCase`
   - Constants: `UPPER_SNAKE_CASE`
   - Folders & Image Files: `kebab-case` (Exceptions: Next.js App Router special routing folders such as `[slug]`, `(marketing)`, and `_components`).
+
+## CodeRabbit
+
+Always read `.coderabbit.yaml` before generating or modifying code, and follow the applicable `path_instructions` for the current file.
