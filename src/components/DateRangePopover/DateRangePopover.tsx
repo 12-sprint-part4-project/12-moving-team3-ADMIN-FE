@@ -1,7 +1,7 @@
 'use client';
 
 import { format, isSameDay } from 'date-fns';
-import { useId, useState } from 'react';
+import { useId, useState, useRef, useEffect } from 'react';
 
 import { Button } from '@/components/Button/Button';
 import { Calendar } from 'lucide-react';
@@ -42,7 +42,7 @@ const formatDateRange = (value?: DateRange) => {
 export const DateRangePopover = ({
   value,
   onConfirm,
-  placeholder = '날짜를 선택해주세요',
+  placeholder = '전체 기간',
   className,
 }: DateRangePopoverProps) => {
   // popover를 위한 고유 ID
@@ -51,6 +51,8 @@ export const DateRangePopover = ({
   const [isOpen, setIsOpen] = useState(false);
   // 임시 날짜 범위(팝오버 내에서 사용)
   const [draftRange, setDraftRange] = useState<DateRange | undefined>(value);
+  // wrapper ref (outside click 감지에 사용)
+  const wrapperRef = useRef<HTMLDivElement>(null);
   // 버튼에 표시될 날짜 문자열
   const dateRangeLabel = formatDateRange(value) ?? placeholder;
 
@@ -77,8 +79,28 @@ export const DateRangePopover = ({
     setIsOpen(false);
   };
 
+  // 바깥 영역 클릭 시 팝오버 닫기
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!wrapperRef.current) return;
+      // 클릭 대상이 wrapper 내부가 아니면 닫기
+      if (!wrapperRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    // cleanup에서 이벤트 리스너 제거
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
   return (
-    <div className={cn('relative inline-block', className)}>
+    <div ref={wrapperRef} className={cn('relative inline-block', className)}>
       {/* 날짜 범위 표시 및 팝오버 트리거 버튼 */}
       <Button
         variant="secondary"
@@ -107,6 +129,16 @@ export const DateRangePopover = ({
           />
           {/* 취소/확인 버튼 영역 */}
           <div className="flex justify-end gap-2 border-t border-line-200 p-4">
+            <Button
+              variant="outlined"
+              onClick={() => {
+                setDraftRange(undefined);
+                onConfirm(undefined);
+                setIsOpen(false);
+              }}
+            >
+              전체 기간
+            </Button>
             <Button variant="secondary" onClick={handleCancel}>
               취소
             </Button>

@@ -22,9 +22,11 @@ export const EmptyState = ({
     )}
   >
     <h2 className="text-center text-lg-semibold text-black-400">{title}</h2>
-    {description ? (
+    {description !== undefined && description !== null ? (
       <p className="text-center text-md-regular text-gray-500">{description}</p>
     ) : null}
-    {action ? <div className="mt-1">{action}</div> : null}
+    {action !== undefined && action !== null ? (
+      <div className="mt-1">{action}</div>
+    ) : null}
   </section>
 );

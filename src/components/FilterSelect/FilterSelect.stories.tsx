@@ -67,3 +67,18 @@ export const Period: Story = {
     ],
   },
 };
+
+export const Disabled: Story = {
+  args: {
+    'aria-label': '상태 (비활성화)',
+    defaultValue: 'all',
+    disabled: true,
+    options: [
+      { label: '상태 전체', value: 'all' },
+      { label: '대기', value: 'pending' },
+      { label: '진행 중', value: 'in-progress' },
+      { label: '완료', value: 'completed' },
+      { label: '취소', value: 'cancelled' },
+    ],
+  },
+};

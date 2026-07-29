@@ -13,7 +13,7 @@ export interface DateRange {
 
 export interface DateRangePickerProps {
   value?: DateRange;
-  onChange: (range: DateRange) => void;
+  onChange: (range: DateRange | undefined) => void;
   defaultMonth?: Date;
   className?: string;
 }
@@ -32,7 +32,10 @@ export const DateRangePicker = ({
       navLayout="after"
       locale={ko}
       onSelect={(range) => {
-        if (!range?.from) return;
+        if (!range?.from) {
+          onChange(undefined);
+          return;
+        }
 
         onChange({
           from: range.from,

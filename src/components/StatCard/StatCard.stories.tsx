@@ -53,6 +53,16 @@ export const AverageQuoteAmount: Story = {
   },
 };
 
+// 단위 없는 카드도 layout 검증을 위해 추가
+export const WithoutUnit: Story = {
+  args: {
+    title: '단위 없는 통계',
+    value: 42,
+    icon: <Star className="text-violet-300" />,
+    iconBackgroundClassName: 'bg-violet-100',
+  },
+};
+
 export const DashboardStats: Story = {
   render: () => (
     <div className="grid grid-cols-4 gap-4">
@@ -86,6 +96,13 @@ export const DashboardStats: Story = {
         unit="원"
         icon={<Banknote className="text-red-200" />}
         iconBackgroundClassName="bg-red-100"
+      />
+
+      <StatCard
+        title="단위 없는 통계"
+        value={42}
+        icon={<Star className="text-violet-300" />}
+        iconBackgroundClassName="bg-violet-100"
       />
     </div>
   ),

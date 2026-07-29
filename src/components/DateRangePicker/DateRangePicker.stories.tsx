@@ -12,7 +12,10 @@ const DateRangePickerStory = ({ initialValue }: DateRangePickerStoryProps) => {
 
   return (
     <div className="w-80">
-      <DateRangePicker value={value} onChange={setValue} />
+      <DateRangePicker
+        value={value}
+        onChange={setValue as (range: DateRange | undefined) => void}
+      />
     </div>
   );
 };

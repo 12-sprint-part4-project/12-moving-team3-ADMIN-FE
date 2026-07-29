@@ -31,6 +31,9 @@ export default meta;
 
 type Story = StoryObj<typeof DateRangePopover>;
 
+/**
+ * 완료된 날짜 범위가 주어진 상태(양쪽 날짜 모두 선택됨)
+ */
 export const WithAppliedRange: Story = {
   render: () => (
     <DateRangePopoverStory
@@ -42,6 +45,24 @@ export const WithAppliedRange: Story = {
   ),
 };
 
+/**
+ * value={undefined}: 전혀 값이 없는 빈 상태 (아예 날짜를 지정하지 않음)
+ */
 export const Empty: Story = {
   render: () => <DateRangePopoverStory />,
+};
+
+/**
+ * from만 존재하는 미완성 범위 (첫 번째 날짜만 고른 상태)
+ */
+export const IncompleteFromOnly: Story = {
+  name: 'Incomplete (from only)',
+  render: () => (
+    <DateRangePopoverStory
+      initialValue={{
+        from: new Date(2026, 6, 17),
+        to: undefined,
+      }}
+    />
+  ),
 };
