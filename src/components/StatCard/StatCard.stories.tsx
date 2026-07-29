@@ -97,13 +97,6 @@ export const DashboardStats: Story = {
         icon={<Banknote className="text-red-200" />}
         iconBackgroundClassName="bg-red-100"
       />
-
-      <StatCard
-        title="단위 없는 통계"
-        value={42}
-        icon={<Star className="text-violet-300" />}
-        iconBackgroundClassName="bg-violet-100"
-      />
     </div>
   ),
 };

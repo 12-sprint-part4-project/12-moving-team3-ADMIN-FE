@@ -8,14 +8,11 @@ interface DateRangePickerStoryProps {
 }
 
 const DateRangePickerStory = ({ initialValue }: DateRangePickerStoryProps) => {
-  const [value, setValue] = useState(initialValue);
+  const [value, setValue] = useState<DateRange | undefined>(initialValue);
 
   return (
     <div className="w-80">
-      <DateRangePicker
-        value={value}
-        onChange={setValue as (range: DateRange | undefined) => void}
-      />
+      <DateRangePicker value={value} onChange={setValue} />
     </div>
   );
 };
