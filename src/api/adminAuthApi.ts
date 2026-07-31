@@ -1,4 +1,8 @@
 import { axiosInstance } from '@/api/axiosInstance';
+import {
+  ADMIN_AUTH_LOGIN_PATH,
+  ADMIN_AUTH_REFRESH_PATH,
+} from '@/api/adminAuthPaths';
 import type {
   AdminLoginRequest,
   AdminLoginResponse,
@@ -10,7 +14,7 @@ export const loginAdmin = async (
   body: AdminLoginRequest
 ): Promise<AdminLoginResponse> => {
   const response = await axiosInstance.post<AdminLoginResponse>(
-    '/api/admin/auth/login',
+    ADMIN_AUTH_LOGIN_PATH,
     body
   );
 
@@ -22,10 +26,11 @@ export const loginAdmin = async (
  * Refresh Token은 httpOnly 쿠키로 전달되므로 Body에 넣지 않는다.
  * axiosInstance의 withCredentials: true가 쿠키 전송을 담당한다.
  */
-export const refreshAdminAccessToken = async (): Promise<AdminRefreshResponse> => {
-  const response = await axiosInstance.post<AdminRefreshResponse>(
-    '/api/admin/auth/refresh'
-  );
+export const refreshAdminAccessToken =
+  async (): Promise<AdminRefreshResponse> => {
+    const response = await axiosInstance.post<AdminRefreshResponse>(
+      ADMIN_AUTH_REFRESH_PATH
+    );
 
-  return response.data;
-};
+    return response.data;
+  };
