@@ -86,7 +86,7 @@ const refreshAccessToken = (): Promise<string> => {
   if (!refreshPromise) {
     refreshPromise = (async () => {
       // 순환 참조 방지를 위해 동적 import로 refreshAdminAccessToken을 호출한다.
-      const { refreshAdminAccessToken } = await import('@/api/adminAuthApi');
+      const { refreshAdminAccessToken } = await import('@/services/adminAuthApi');
       const refreshResponse = await refreshAdminAccessToken();
       // BE 응답: { data: { accessToken } }
       const newAccessToken = refreshResponse.data.accessToken;

@@ -1,14 +1,28 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { Eye, EyeOff, Lock, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState, type FormEvent } from 'react';
+import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { AdminHeader } from '@/components/AdminHeader/AdminHeader';
 import { Button } from '@/components/Button/Button';
 import { Input } from '@/components/Input/Input';
 import { useAdminLogin } from '@/hooks/useAdminLogin';
+
+const adminLoginFormSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .min(1, '이메일을 입력해 주세요.')
+    .email('올바른 이메일 형식을 입력해 주세요.'),
+  password: z.string().min(1, '비밀번호를 입력해 주세요.'),
+});
+
+type AdminLoginFormValues = z.infer<typeof adminLoginFormSchema>;
 
 const DEFAULT_LOGIN_ERROR_MESSAGE =
   '로그인에 실패했습니다. 이메일과 비밀번호를 확인해 주세요.';
@@ -38,61 +52,41 @@ const getLoginErrorMessage = (error: unknown): string => {
 const LoginPage = () => {
   const router = useRouter();
   const loginMutation = useAdminLogin();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [formError, setFormError] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  const isSubmitting = loginMutation.isPending;
+  const {
+    control,
+    handleSubmit,
+    setError,
+    clearErrors,
+    formState: { errors, isSubmitting },
+  } = useForm<AdminLoginFormValues>({
+    resolver: zodResolver(adminLoginFormSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  // mutateAsync 기준으로 isSubmitting과 mutation pending을 함께 본다.
+  const isPending = isSubmitting || loginMutation.isPending;
 
-    if (isSubmitting) {
-      return;
+  const onSubmit = handleSubmit(async (values) => {
+    clearErrors('root');
+
+    try {
+      await loginMutation.mutateAsync({
+        email: values.email,
+        password: values.password,
+      });
+      // Access Token 저장은 useAdminLogin onSuccess에서 처리한다.
+      router.push('/');
+    } catch (error) {
+      setError('root', {
+        message: getLoginErrorMessage(error),
+      });
     }
-
-    setEmailError('');
-    setPasswordError('');
-    setFormError('');
-
-    const trimmedEmail = email.trim();
-    let hasValidationError = false;
-
-    if (!trimmedEmail) {
-      setEmailError('이메일을 입력해 주세요.');
-      hasValidationError = true;
-    }
-
-    if (!password) {
-      setPasswordError('비밀번호를 입력해 주세요.');
-      hasValidationError = true;
-    }
-
-    // 빈 값이면 API를 호출하지 않는다.
-    if (hasValidationError) {
-      return;
-    }
-
-    loginMutation.mutate(
-      {
-        email: trimmedEmail,
-        password,
-      },
-      {
-        onSuccess: () => {
-          // Access Token 저장은 useAdminLogin onSuccess에서 처리한다.
-          // AdminSidebar 대시보드 경로(/)로 이동. 존재하지 않는 경로를 만들지 않는다.
-          router.push('/');
-        },
-        onError: (error) => {
-          setFormError(getLoginErrorMessage(error));
-        },
-      }
-    );
-  };
+  });
 
   return (
     <div className="flex min-h-full flex-col bg-white">
@@ -100,7 +94,7 @@ const LoginPage = () => {
 
       <main className="flex flex-1 flex-col items-center justify-center px-6 py-12">
         <form
-          onSubmit={handleSubmit}
+          onSubmit={onSubmit}
           noValidate
           className="flex w-full max-w-md flex-col gap-8"
         >
@@ -113,61 +107,69 @@ const LoginPage = () => {
           </div>
 
           <div className="flex flex-col gap-4">
-            <Input
-              label="이메일"
-              type="email"
+            <Controller
               name="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="이메일을 입력하세요"
-              autoComplete="email"
-              disabled={isSubmitting}
-              errorMessage={emailError || undefined}
-              leftIcon={<User className="size-5" aria-hidden />}
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  label="이메일"
+                  type="email"
+                  placeholder="이메일을 입력하세요"
+                  autoComplete="email"
+                  disabled={isPending}
+                  errorMessage={errors.email?.message}
+                  leftIcon={<User className="size-5" aria-hidden />}
+                />
+              )}
             />
-            <Input
-              label="비밀번호"
-              type={isPasswordVisible ? 'text' : 'password'}
+            <Controller
               name="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              placeholder="비밀번호를 입력하세요"
-              autoComplete="current-password"
-              disabled={isSubmitting}
-              errorMessage={passwordError || undefined}
-              leftIcon={<Lock className="size-5" aria-hidden />}
-              rightIcon={
-                <button
-                  type="button"
-                  onClick={() => setIsPasswordVisible((prev) => !prev)}
-                  disabled={isSubmitting}
-                  className="flex size-5 items-center justify-center text-gray-400 enabled:hover:text-gray-500 disabled:cursor-not-allowed disabled:text-gray-300"
-                  aria-label={
-                    isPasswordVisible
-                      ? '비밀번호 숨기기'
-                      : '비밀번호 표시하기'
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  label="비밀번호"
+                  type={isPasswordVisible ? 'text' : 'password'}
+                  placeholder="비밀번호를 입력하세요"
+                  autoComplete="current-password"
+                  disabled={isPending}
+                  errorMessage={errors.password?.message}
+                  leftIcon={<Lock className="size-5" aria-hidden />}
+                  rightIcon={
+                    <button
+                      type="button"
+                      onClick={() => setIsPasswordVisible((prev) => !prev)}
+                      disabled={isPending}
+                      className="flex size-5 items-center justify-center text-gray-400 enabled:hover:text-gray-500 disabled:cursor-not-allowed disabled:text-gray-300"
+                      aria-label={
+                        isPasswordVisible
+                          ? '비밀번호 숨기기'
+                          : '비밀번호 표시하기'
+                      }
+                    >
+                      {isPasswordVisible ? (
+                        <Eye className="size-5" aria-hidden />
+                      ) : (
+                        <EyeOff className="size-5" aria-hidden />
+                      )}
+                    </button>
                   }
-                >
-                  {isPasswordVisible ? (
-                    <Eye className="size-5" aria-hidden />
-                  ) : (
-                    <EyeOff className="size-5" aria-hidden />
-                  )}
-                </button>
-              }
+                />
+              )}
             />
           </div>
 
-          {formError ? (
+          {errors.root?.message ? (
             <p role="alert" className="text-md-medium text-red-200">
-              {formError}
+              {errors.root.message}
             </p>
           ) : null}
 
           <Button
             type="submit"
             variant="solid"
-            loading={isSubmitting}
+            loading={isPending}
             className="w-full"
           >
             로그인

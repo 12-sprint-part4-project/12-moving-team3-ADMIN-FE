@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { loginAdmin } from '@/api/adminAuthApi';
+import { loginAdmin } from '@/services/adminAuthApi';
 import { setAdminAccessToken } from '@/lib/adminAccessToken';
 import type { AdminLoginRequest } from '@/types/adminAuth';
 
