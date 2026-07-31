@@ -1,4 +1,7 @@
-import axios, { type InternalAxiosRequestConfig } from 'axios';
+import axios, {
+  AxiosHeaders,
+  type InternalAxiosRequestConfig,
+} from 'axios';
 
 import {
   ADMIN_AUTH_LOGIN_PATH,
@@ -34,21 +37,41 @@ export const axiosInstance = axios.create({
 /** 진행 중인 refresh Promise. 동시 401에서 동일 Promise를 재사용한다. */
 let refreshPromise: Promise<string> | null = null;
 
+/** 상대/절대 URL·query string이 있어도 pathname만 비교할 수 있게 정규화한다. */
+const getRequestPathname = (url: string): string => {
+  try {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return new URL(url).pathname;
+    }
+  } catch {
+    // URL 파싱 실패 시 아래 상대 경로 처리로 넘긴다.
+  }
+
+  return url.split('?')[0]?.split('#')[0] ?? '';
+};
+
 const isAdminAuthExemptPath = (url?: string): boolean => {
   if (!url) {
     return false;
   }
 
+  const pathname = getRequestPathname(url);
+
   // login/refresh 자체의 401에는 자동 재발급을 시도하지 않아 무한 루프를 막는다.
   return (
-    url.includes(ADMIN_AUTH_LOGIN_PATH) ||
-    url.includes(ADMIN_AUTH_REFRESH_PATH)
+    pathname === ADMIN_AUTH_LOGIN_PATH ||
+    pathname === ADMIN_AUTH_REFRESH_PATH
   );
 };
 
 const redirectToLogin = (): void => {
   // SSR에서는 window가 없으므로 브라우저에서만 이동한다.
   if (typeof window === 'undefined') {
+    return;
+  }
+
+  // 이미 로그인 페이지면 같은 경로로 다시 이동하지 않는다.
+  if (window.location.pathname === '/login') {
     return;
   }
 
@@ -130,15 +153,15 @@ axiosInstance.interceptors.response.use(
 
     try {
       const newAccessToken = await refreshAccessToken();
-      // 재시도 시에는 기존 Authorization이 있어도 새 토큰으로 교체한다.
-      originalRequest.headers.set(
-        'Authorization',
-        `Bearer ${newAccessToken}`
-      );
+      // headers가 없거나 일반 객체여도 AxiosHeaders로 정규화한 뒤 새 토큰으로 교체한다.
+      const headers = AxiosHeaders.from(originalRequest.headers ?? {});
+      headers.set('Authorization', `Bearer ${newAccessToken}`);
+      originalRequest.headers = headers;
 
       return axiosInstance(originalRequest);
     } catch (refreshError) {
       // clear/redirect는 공유 refreshPromise에서 이미 처리했다.
+      // 원래 401이 아니라 Refresh 실패 원인을 호출자에게 전달한다.
       return Promise.reject(refreshError);
     }
   }
