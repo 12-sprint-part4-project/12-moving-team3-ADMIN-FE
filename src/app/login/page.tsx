@@ -4,11 +4,10 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 
-import { loginAdmin } from '@/api/adminAuthApi';
 import { AdminHeader } from '@/components/AdminHeader/AdminHeader';
 import { Button } from '@/components/Button/Button';
 import { Input } from '@/components/Input/Input';
-import { setAdminAccessToken } from '@/lib/adminAccessToken';
+import { useAdminLogin } from '@/hooks/useAdminLogin';
 
 const DEFAULT_LOGIN_ERROR_MESSAGE =
   '로그인에 실패했습니다. 이메일과 비밀번호를 확인해 주세요.';
@@ -37,14 +36,16 @@ const getLoginErrorMessage = (error: unknown): string => {
 
 const LoginPage = () => {
   const router = useRouter();
+  const loginMutation = useAdminLogin();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [formError, setFormError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const isSubmitting = loginMutation.isPending;
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (isSubmitting) {
@@ -73,23 +74,22 @@ const LoginPage = () => {
       return;
     }
 
-    setIsSubmitting(true);
-
-    try {
-      const response = await loginAdmin({
+    loginMutation.mutate(
+      {
         email: trimmedEmail,
         password,
-      });
-
-      // BE 응답: { data: { accessToken, admin } }
-      setAdminAccessToken(response.data.accessToken);
-      // AdminSidebar 대시보드 경로(/)로 이동. 존재하지 않는 경로를 만들지 않는다.
-      router.push('/');
-    } catch (error) {
-      setFormError(getLoginErrorMessage(error));
-    } finally {
-      setIsSubmitting(false);
-    }
+      },
+      {
+        onSuccess: () => {
+          // Access Token 저장은 useAdminLogin onSuccess에서 처리한다.
+          // AdminSidebar 대시보드 경로(/)로 이동. 존재하지 않는 경로를 만들지 않는다.
+          router.push('/');
+        },
+        onError: (error) => {
+          setFormError(getLoginErrorMessage(error));
+        },
+      }
+    );
   };
 
   return (
