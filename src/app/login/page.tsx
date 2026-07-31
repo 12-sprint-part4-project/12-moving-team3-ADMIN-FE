@@ -1,6 +1,7 @@
 'use client';
 
 import axios from 'axios';
+import { Eye, EyeOff, Lock, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 
@@ -42,6 +43,7 @@ const LoginPage = () => {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [formError, setFormError] = useState('');
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const isSubmitting = loginMutation.isPending;
 
@@ -93,19 +95,20 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex min-h-full flex-col bg-background-200">
+    <div className="flex min-h-full flex-col bg-white">
       <AdminHeader showUserMenu={false} />
 
-      <main className="flex flex-1 items-center justify-center px-6 py-12">
+      <main className="flex flex-1 flex-col items-center justify-center px-6 py-12">
         <form
           onSubmit={handleSubmit}
           noValidate
-          className="flex w-full max-w-md flex-col gap-6 rounded-lg border border-line-200 bg-white p-8"
+          className="flex w-full max-w-md flex-col gap-8"
         >
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col items-center gap-2 text-center">
+            <p className="text-3xl-bold text-blue-300">무빙</p>
             <h1 className="text-2xl-bold text-black-400">관리자 로그인</h1>
             <p className="text-md-medium text-gray-500">
-              관리자 계정으로 로그인해 주세요.
+              관리자 계정으로 로그인하여 관리자 페이지를 이용하세요.
             </p>
           </div>
 
@@ -116,21 +119,42 @@ const LoginPage = () => {
               name="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              placeholder="admin@example.com"
+              placeholder="이메일을 입력하세요"
               autoComplete="email"
               disabled={isSubmitting}
               errorMessage={emailError || undefined}
+              leftIcon={<User className="size-5" aria-hidden />}
             />
             <Input
               label="비밀번호"
-              type="password"
+              type={isPasswordVisible ? 'text' : 'password'}
               name="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              placeholder="비밀번호를 입력해 주세요"
+              placeholder="비밀번호를 입력하세요"
               autoComplete="current-password"
               disabled={isSubmitting}
               errorMessage={passwordError || undefined}
+              leftIcon={<Lock className="size-5" aria-hidden />}
+              rightIcon={
+                <button
+                  type="button"
+                  onClick={() => setIsPasswordVisible((prev) => !prev)}
+                  disabled={isSubmitting}
+                  className="flex size-5 items-center justify-center text-gray-400 enabled:hover:text-gray-500 disabled:cursor-not-allowed disabled:text-gray-300"
+                  aria-label={
+                    isPasswordVisible
+                      ? '비밀번호 숨기기'
+                      : '비밀번호 표시하기'
+                  }
+                >
+                  {isPasswordVisible ? (
+                    <Eye className="size-5" aria-hidden />
+                  ) : (
+                    <EyeOff className="size-5" aria-hidden />
+                  )}
+                </button>
+              }
             />
           </div>
 
@@ -150,6 +174,10 @@ const LoginPage = () => {
           </Button>
         </form>
       </main>
+
+      <footer className="px-6 py-6 text-center text-xs-medium text-gray-400">
+        © 2024 Moving. All rights reserved.
+      </footer>
     </div>
   );
 };

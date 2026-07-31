@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { EyeOff, Lock, User } from 'lucide-react';
 
 import { Input } from './Input';
 
@@ -30,8 +31,9 @@ export const Email: Story = {
   args: {
     label: '이메일',
     type: 'email',
-    placeholder: 'admin@example.com',
+    placeholder: '이메일을 입력하세요',
     autoComplete: 'email',
+    leftIcon: <User className="size-5" aria-hidden />,
   },
 };
 
@@ -39,8 +41,10 @@ export const Password: Story = {
   args: {
     label: '비밀번호',
     type: 'password',
-    placeholder: '비밀번호를 입력해 주세요',
+    placeholder: '비밀번호를 입력하세요',
     autoComplete: 'current-password',
+    leftIcon: <Lock className="size-5" aria-hidden />,
+    rightIcon: <EyeOff className="size-5 text-gray-400" aria-hidden />,
   },
 };
 
