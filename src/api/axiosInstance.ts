@@ -24,11 +24,15 @@ if (!baseURL) {
  * - Refresh Token은 httpOnly 쿠키(adminRefreshToken)로 전달되므로 withCredentials가 필요하다.
  * - Access Token은 Request Interceptor가 Authorization 헤더에 자동 첨부한다.
  * - 401 시 Response Interceptor가 refresh 후 원래 요청을 한 번 재시도한다.
+ * - 동시 401이어도 refresh는 refreshPromise로 한 번만 호출한다.
  */
 export const axiosInstance = axios.create({
   baseURL,
   withCredentials: true,
 });
+
+/** 진행 중인 refresh Promise. 동시 401에서 동일 Promise를 재사용한다. */
+let refreshPromise: Promise<string> | null = null;
 
 const isAdminAuthExemptPath = (url?: string): boolean => {
   if (!url) {
@@ -49,6 +53,36 @@ const redirectToLogin = (): void => {
   }
 
   window.location.assign('/login');
+};
+
+/**
+ * Access Token 재발급.
+ * 이미 진행 중이면 기존 Promise를 재사용해 refresh API 중복 호출을 막는다.
+ */
+const refreshAccessToken = (): Promise<string> => {
+  if (!refreshPromise) {
+    refreshPromise = (async () => {
+      // 순환 참조 방지를 위해 동적 import로 refreshAdminAccessToken을 호출한다.
+      const { refreshAdminAccessToken } = await import('@/api/adminAuthApi');
+      const refreshResponse = await refreshAdminAccessToken();
+      // BE 응답: { data: { accessToken } }
+      const newAccessToken = refreshResponse.data.accessToken;
+
+      setAdminAccessToken(newAccessToken);
+      return newAccessToken;
+    })()
+      .catch((refreshError: unknown) => {
+        // 공유 Promise의 catch에서 한 번만 정리·이동해 중복 redirect를 막는다.
+        clearAdminAccessToken();
+        redirectToLogin();
+        throw refreshError;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+
+  return refreshPromise;
 };
 
 axiosInstance.interceptors.request.use(
@@ -95,13 +129,7 @@ axiosInstance.interceptors.response.use(
     originalRequest._retry = true;
 
     try {
-      // 순환 참조 방지를 위해 동적 import로 refreshAdminAccessToken을 호출한다.
-      const { refreshAdminAccessToken } = await import('@/api/adminAuthApi');
-      const refreshResponse = await refreshAdminAccessToken();
-      // BE 응답: { data: { accessToken } }
-      const newAccessToken = refreshResponse.data.accessToken;
-
-      setAdminAccessToken(newAccessToken);
+      const newAccessToken = await refreshAccessToken();
       // 재시도 시에는 기존 Authorization이 있어도 새 토큰으로 교체한다.
       originalRequest.headers.set(
         'Authorization',
@@ -110,8 +138,7 @@ axiosInstance.interceptors.response.use(
 
       return axiosInstance(originalRequest);
     } catch (refreshError) {
-      clearAdminAccessToken();
-      redirectToLogin();
+      // clear/redirect는 공유 refreshPromise에서 이미 처리했다.
       return Promise.reject(refreshError);
     }
   }
