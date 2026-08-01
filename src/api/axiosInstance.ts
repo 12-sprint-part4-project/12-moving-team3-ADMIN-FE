@@ -5,6 +5,7 @@ import axios, {
 
 import {
   ADMIN_AUTH_LOGIN_PATH,
+  ADMIN_AUTH_LOGOUT_PATH,
   ADMIN_AUTH_REFRESH_PATH,
 } from '@/api/adminAuthPaths';
 import {
@@ -26,7 +27,9 @@ if (!baseURL) {
  * 관리자 FE 전용 Axios 인스턴스.
  * - Refresh Token은 httpOnly 쿠키(adminRefreshToken)로 전달되므로 withCredentials가 필요하다.
  * - Access Token은 Request Interceptor가 Authorization 헤더에 자동 첨부한다.
+ *   (login/refresh/logout 경로도 헤더 첨부 대상이다. 토큰이 있을 때만 붙인다.)
  * - 401 시 Response Interceptor가 refresh 후 원래 요청을 한 번 재시도한다.
+ * - login/refresh/logout 경로의 401은 재발급 대상에서 제외한다.
  * - 동시 401이어도 refresh는 refreshPromise로 한 번만 호출한다.
  */
 export const axiosInstance = axios.create({
@@ -50,17 +53,23 @@ const getRequestPathname = (url: string): string => {
   return url.split('?')[0]?.split('#')[0] ?? '';
 };
 
-const isAdminAuthExemptPath = (url?: string): boolean => {
+/**
+ * 401 응답 시 Access Token 재발급·원요청 재시도를 하지 않는 인증 경로.
+ * - login/refresh: 재발급 루프 방지
+ * - logout: 로그아웃 중 refresh 재시도로 세션을 되살리지 않기 위함
+ * Authorization 헤더 첨부 여부와는 별개다(첨부는 Request Interceptor가 담당).
+ */
+const isAdminAuthRefreshRetryExemptPath = (url?: string): boolean => {
   if (!url) {
     return false;
   }
 
   const pathname = getRequestPathname(url);
 
-  // login/refresh 자체의 401에는 자동 재발급을 시도하지 않아 무한 루프를 막는다.
   return (
     pathname === ADMIN_AUTH_LOGIN_PATH ||
-    pathname === ADMIN_AUTH_REFRESH_PATH
+    pathname === ADMIN_AUTH_REFRESH_PATH ||
+    pathname === ADMIN_AUTH_LOGOUT_PATH
   );
 };
 
@@ -138,12 +147,12 @@ axiosInstance.interceptors.response.use(
 
     const originalRequest = error.config;
 
-    // 401만 대상. 이미 재시도했거나 login/refresh 경로는 재발급하지 않는다.
+    // 401만 대상. 이미 재시도했거나 login/refresh/logout 경로는 재발급하지 않는다.
     if (
       !originalRequest ||
       error.response?.status !== 401 ||
       originalRequest._retry ||
-      isAdminAuthExemptPath(originalRequest.url)
+      isAdminAuthRefreshRetryExemptPath(originalRequest.url)
     ) {
       return Promise.reject(error);
     }

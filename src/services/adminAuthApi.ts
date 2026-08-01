@@ -1,11 +1,15 @@
 import { axiosInstance } from '@/api/axiosInstance';
 import {
   ADMIN_AUTH_LOGIN_PATH,
+  ADMIN_AUTH_LOGOUT_PATH,
+  ADMIN_AUTH_ME_PATH,
   ADMIN_AUTH_REFRESH_PATH,
 } from '@/api/adminAuthPaths';
 import type {
   AdminLoginRequest,
   AdminLoginResponse,
+  AdminLogoutResponse,
+  AdminMeResponse,
   AdminRefreshResponse,
 } from '@/types/adminAuth';
 
@@ -34,3 +38,26 @@ export const refreshAdminAccessToken =
 
     return response.data;
   };
+
+/**
+ * 현재 로그인한 관리자 인증 정보 조회.
+ * Access Token은 axiosInstance Request Interceptor가 Authorization에 첨부한다.
+ */
+export const getAdminMe = async (): Promise<AdminMeResponse> => {
+  const response = await axiosInstance.get<AdminMeResponse>(ADMIN_AUTH_ME_PATH);
+
+  return response.data;
+};
+
+/**
+ * 관리자 로그아웃.
+ * Refresh Token은 httpOnly 쿠키로 전달되므로 Body에 넣지 않는다.
+ * Access Token 인증은 필요하지 않다(쿠키 기준으로 세션을 정리한다).
+ */
+export const logoutAdmin = async (): Promise<AdminLogoutResponse> => {
+  const response = await axiosInstance.post<AdminLogoutResponse>(
+    ADMIN_AUTH_LOGOUT_PATH
+  );
+
+  return response.data;
+};

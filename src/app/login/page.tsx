@@ -4,14 +4,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { Eye, EyeOff, Lock, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { AdminHeader } from '@/components/AdminHeader/AdminHeader';
 import { Button } from '@/components/Button/Button';
 import { Input } from '@/components/Input/Input';
+import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { useAdminLogin } from '@/hooks/useAdminLogin';
+import { useAdminMe } from '@/hooks/useAdminMe';
 
 const adminLoginFormSchema = z.object({
   email: z
@@ -51,6 +53,9 @@ const getLoginErrorMessage = (error: unknown): string => {
 
 const LoginPage = () => {
   const router = useRouter();
+  // 이미 로그인된 관리자의 /login 접근을 막기 위한 역방향 확인.
+  // 실패는 비로그인 정상 흐름이므로 폼 에러로 표시하지 않는다.
+  const { isPending: isAuthChecking, isSuccess: isAuthenticated } = useAdminMe();
   const loginMutation = useAdminLogin();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -68,8 +73,16 @@ const LoginPage = () => {
     },
   });
 
-  // mutateAsync 기준으로 isSubmitting과 mutation pending을 함께 본다.
-  const isPending = isSubmitting || loginMutation.isPending;
+  useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
+    router.replace('/');
+  }, [isAuthenticated, router]);
+
+  // 로그인 요청 상태는 인증 확인(isAuthChecking)과 분리한다.
+  const isLoginPending = isSubmitting || loginMutation.isPending;
 
   const onSubmit = handleSubmit(async (values) => {
     clearErrors('root');
@@ -87,6 +100,19 @@ const LoginPage = () => {
       });
     }
   });
+
+  // 확인 중이거나 이미 인증되어 이동하는 동안 로그인 폼을 노출하지 않는다.
+  if (isAuthChecking || isAuthenticated) {
+    return (
+      <div className="flex min-h-full flex-col bg-white">
+        <AdminHeader showUserMenu={false} />
+        <LoadingState
+          message="인증 확인 중..."
+          className="flex-1 py-0"
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-full flex-col bg-white">
@@ -117,7 +143,7 @@ const LoginPage = () => {
                   type="email"
                   placeholder="이메일을 입력하세요"
                   autoComplete="email"
-                  disabled={isPending}
+                  disabled={isLoginPending}
                   errorMessage={errors.email?.message}
                   leftIcon={<User className="size-5" aria-hidden />}
                 />
@@ -133,14 +159,14 @@ const LoginPage = () => {
                   type={isPasswordVisible ? 'text' : 'password'}
                   placeholder="비밀번호를 입력하세요"
                   autoComplete="current-password"
-                  disabled={isPending}
+                  disabled={isLoginPending}
                   errorMessage={errors.password?.message}
                   leftIcon={<Lock className="size-5" aria-hidden />}
                   rightIcon={
                     <button
                       type="button"
                       onClick={() => setIsPasswordVisible((prev) => !prev)}
-                      disabled={isPending}
+                      disabled={isLoginPending}
                       className="flex size-5 items-center justify-center text-gray-400 enabled:hover:text-gray-500 disabled:cursor-not-allowed disabled:text-gray-300"
                       aria-label={
                         isPasswordVisible
@@ -169,7 +195,7 @@ const LoginPage = () => {
           <Button
             type="submit"
             variant="solid"
-            loading={isPending}
+            loading={isLoginPending}
             className="w-full"
           >
             로그인

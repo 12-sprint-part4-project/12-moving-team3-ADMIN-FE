@@ -1,8 +1,19 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { fn } from 'storybook/test';
 
+import { AdminHeader } from '@/components/AdminHeader/AdminHeader';
 import { Button } from '@/components/Button/Button';
 
 import { AdminLayout } from './AdminLayout';
+
+/** Storybook/Chromatic용 목업 헤더. 실제 /me·logout API를 호출하지 않는다. */
+const mockHeader = (
+  <AdminHeader
+    userName="관리자(개발용)"
+    userEmail="admin@example.com"
+    onLogout={fn()}
+  />
+);
 
 const meta: Meta<typeof AdminLayout> = {
   title: 'Admin/AdminLayout',
@@ -16,6 +27,9 @@ const meta: Meta<typeof AdminLayout> = {
         pathname: '/members',
       },
     },
+  },
+  args: {
+    header: mockHeader,
   },
 };
 

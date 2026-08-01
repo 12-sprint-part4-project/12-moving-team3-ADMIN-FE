@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { AdminHeader } from './AdminHeader';
 
@@ -12,6 +13,12 @@ const meta: Meta<typeof AdminHeader> = {
   argTypes: {
     showUserMenu: { control: 'boolean' },
     onUserMenuClick: { action: 'user menu clicked' },
+    onLogout: { action: 'logout clicked' },
+  },
+  args: {
+    // 스토리에서는 실제 인증 훅/API 없이 목업 콜백만 연결한다.
+    onLogout: fn(),
+    onUserMenuClick: fn(),
   },
 };
 
@@ -32,7 +39,8 @@ export const Admin: Story = {
   args: {
     title: '관리자 페이지',
     showUserMenu: true,
-    userName: '관리자',
+    userName: '관리자(개발용)',
+    userEmail: 'admin@example.com',
   },
 };
 
@@ -41,5 +49,32 @@ export const CustomUserName: Story = {
     title: '관리자 페이지',
     showUserMenu: true,
     userName: '홍길동',
+    userEmail: 'hong@example.com',
+  },
+};
+
+/**
+ * 로그아웃 진행 중 UI.
+ * args로 isLoggingOut을 고정하고, play는 메뉴를 열어 로딩 문구만 확인한다.
+ */
+export const LoggingOut: Story = {
+  args: {
+    title: '관리자 페이지',
+    showUserMenu: true,
+    userName: '관리자(개발용)',
+    userEmail: 'admin@example.com',
+    isLoggingOut: true,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', {
+      name: '관리자(개발용) 메뉴',
+    });
+
+    await userEvent.click(trigger);
+
+    const logoutButton = canvas.getByRole('button', { name: '로그아웃 중...' });
+    await expect(logoutButton).toBeDisabled();
+    await expect(logoutButton).toBeVisible();
   },
 };
