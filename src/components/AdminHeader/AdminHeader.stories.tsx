@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { fn } from 'storybook/test';
+import { fn, userEvent, within } from 'storybook/test';
 
 import { AdminHeader } from './AdminHeader';
 
@@ -39,7 +39,7 @@ export const Admin: Story = {
   args: {
     title: '관리자 페이지',
     showUserMenu: true,
-    userName: '관리자',
+    userName: '관리자(개발용)',
     userEmail: 'admin@example.com',
   },
 };
@@ -50,5 +50,28 @@ export const CustomUserName: Story = {
     showUserMenu: true,
     userName: '홍길동',
     userEmail: 'hong@example.com',
+  },
+};
+
+/**
+ * 로그아웃 진행 중 UI.
+ * 메뉴를 연 뒤 isLoggingOut을 true로 바꿔 비활성·로딩 문구를 확인한다.
+ */
+export const LoggingOut: Story = {
+  args: {
+    title: '관리자 페이지',
+    showUserMenu: true,
+    userName: '관리자(개발용)',
+    userEmail: 'admin@example.com',
+    isLoggingOut: false,
+  },
+  play: async ({ canvasElement, updateArgs }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', {
+      name: '관리자(개발용) 메뉴',
+    });
+
+    await userEvent.click(trigger);
+    await updateArgs({ isLoggingOut: true });
   },
 };

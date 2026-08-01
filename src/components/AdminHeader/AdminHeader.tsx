@@ -51,6 +51,7 @@ export const AdminHeader = ({
 }: AdminHeaderProps) => {
   const menuId = useId();
   const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -64,10 +65,23 @@ export const AdminHeader = ({
       }
     };
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') {
+        return;
+      }
+
+      event.preventDefault();
+      setIsMenuOpen(false);
+      // Escape로 닫은 뒤 트리거로 포커스를 되돌린다.
+      triggerRef.current?.focus();
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isMenuOpen]);
 
@@ -85,7 +99,7 @@ export const AdminHeader = ({
       return;
     }
 
-    setIsMenuOpen(false);
+    // pending UI(로그아웃 중...)를 드롭다운에서 보여 주기 위해 닫지 않는다.
     await onLogout();
   };
 
@@ -105,12 +119,13 @@ export const AdminHeader = ({
       {showUserMenu ? (
         <div ref={menuRef} className="relative">
           <button
+            ref={triggerRef}
             type="button"
             onClick={handleMenuToggle}
             disabled={isLoggingOut}
             aria-expanded={isMenuOpen}
             aria-controls={isMenuOpen ? menuId : undefined}
-            aria-haspopup="menu"
+            aria-haspopup="true"
             aria-label={userName ? `${userName} 메뉴` : '관리자 메뉴'}
             className="flex items-center gap-2 text-md-medium text-black-300 disabled:cursor-not-allowed disabled:opacity-60"
           >
@@ -122,7 +137,6 @@ export const AdminHeader = ({
           {isMenuOpen ? (
             <div
               id={menuId}
-              role="menu"
               className="absolute top-full right-0 z-10 mt-2 min-w-52 overflow-hidden rounded-lg border border-line-200 bg-white py-1"
             >
               {userName || userEmail ? (
@@ -137,7 +151,6 @@ export const AdminHeader = ({
               ) : null}
               <button
                 type="button"
-                role="menuitem"
                 onClick={handleLogout}
                 disabled={isLoggingOut || !onLogout}
                 className="flex w-full px-4 py-2.5 text-left text-md-medium text-black-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"

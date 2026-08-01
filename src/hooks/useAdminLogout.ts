@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
-import { adminMeQueryKey } from '@/hooks/useAdminMe';
 import { clearAdminAccessToken } from '@/lib/adminAccessToken';
 import { logoutAdmin } from '@/services/adminAuthApi';
 
@@ -24,8 +23,7 @@ export const useAdminLogout = () => {
       // 로그아웃 API 실패 시에도 로컬 인증 상태는 반드시 정리한다.
     } finally {
       clearAdminAccessToken();
-      // /me 캐시를 먼저 제거하고, 나머지 관리자 관련 캐시도 초기화한다.
-      queryClient.removeQueries({ queryKey: adminMeQueryKey });
+      // /me 포함 관리자 관련 React Query 캐시를 모두 제거한다.
       queryClient.clear();
       router.replace('/login');
     }

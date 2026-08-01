@@ -9,7 +9,7 @@ import { AdminLayout } from './AdminLayout';
 /** Storybook/Chromatic용 목업 헤더. 실제 /me·logout API를 호출하지 않는다. */
 const mockHeader = (
   <AdminHeader
-    userName="관리자"
+    userName="관리자(개발용)"
     userEmail="admin@example.com"
     onLogout={fn()}
   />
