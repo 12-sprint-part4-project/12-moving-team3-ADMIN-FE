@@ -18,7 +18,7 @@ export interface AdminHeaderProps {
   userName?: string;
   /** 드롭다운에 표시할 관리자 이메일 */
   userEmail?: string;
-  /** 로그아웃 진행 중 여부. true면 메뉴·로그아웃 버튼을 비활성화한다. */
+  /** 로그아웃 진행 중 여부. true면 로그아웃 버튼만 비활성화하고 문구를 바꾼다. */
   isLoggingOut?: boolean;
   /** 로그아웃 버튼 클릭 핸들러. API 호출은 AdminHeaderContainer 등 상위에서 담당한다. */
   onLogout?: () => void | Promise<void>;
@@ -86,10 +86,6 @@ export const AdminHeader = ({
   }, [isMenuOpen]);
 
   const handleMenuToggle = () => {
-    if (isLoggingOut) {
-      return;
-    }
-
     setIsMenuOpen((prev) => !prev);
     onUserMenuClick?.();
   };
@@ -122,12 +118,11 @@ export const AdminHeader = ({
             ref={triggerRef}
             type="button"
             onClick={handleMenuToggle}
-            disabled={isLoggingOut}
             aria-expanded={isMenuOpen}
             aria-controls={isMenuOpen ? menuId : undefined}
             aria-haspopup="true"
             aria-label={userName ? `${userName} 메뉴` : '관리자 메뉴'}
-            className="flex items-center gap-2 text-md-medium text-black-300 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex items-center gap-2 text-md-medium text-black-300"
           >
             <UserIcon className="size-5" aria-hidden />
             {userName ? <span>{userName}</span> : null}
