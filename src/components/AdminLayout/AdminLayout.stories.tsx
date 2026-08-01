@@ -1,26 +1,19 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useState, type ReactNode } from 'react';
+import { fn } from 'storybook/test';
 
+import { AdminHeader } from '@/components/AdminHeader/AdminHeader';
 import { Button } from '@/components/Button/Button';
 
 import { AdminLayout } from './AdminLayout';
 
-const StoryQueryProvider = ({ children }: { children: ReactNode }) => {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: { retry: false },
-          mutations: { retry: false },
-        },
-      })
-  );
-
-  return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-};
+/** Storybook/Chromatic용 목업 헤더. 실제 /me·logout API를 호출하지 않는다. */
+const mockHeader = (
+  <AdminHeader
+    userName="관리자"
+    userEmail="admin@example.com"
+    onLogout={fn()}
+  />
+);
 
 const meta: Meta<typeof AdminLayout> = {
   title: 'Admin/AdminLayout',
@@ -35,13 +28,9 @@ const meta: Meta<typeof AdminLayout> = {
       },
     },
   },
-  decorators: [
-    (Story) => (
-      <StoryQueryProvider>
-        <Story />
-      </StoryQueryProvider>
-    ),
-  ],
+  args: {
+    header: mockHeader,
+  },
 };
 
 export default meta;

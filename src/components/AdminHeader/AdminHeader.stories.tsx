@@ -1,24 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useState, type ReactNode } from 'react';
+import { fn } from 'storybook/test';
 
 import { AdminHeader } from './AdminHeader';
-
-const StoryQueryProvider = ({ children }: { children: ReactNode }) => {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: { retry: false },
-          mutations: { retry: false },
-        },
-      })
-  );
-
-  return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-};
 
 const meta: Meta<typeof AdminHeader> = {
   title: 'Admin/AdminHeader',
@@ -27,16 +10,15 @@ const meta: Meta<typeof AdminHeader> = {
   parameters: {
     layout: 'fullscreen',
   },
-  decorators: [
-    (Story) => (
-      <StoryQueryProvider>
-        <Story />
-      </StoryQueryProvider>
-    ),
-  ],
   argTypes: {
     showUserMenu: { control: 'boolean' },
     onUserMenuClick: { action: 'user menu clicked' },
+    onLogout: { action: 'logout clicked' },
+  },
+  args: {
+    // 스토리에서는 실제 인증 훅/API 없이 목업 콜백만 연결한다.
+    onLogout: fn(),
+    onUserMenuClick: fn(),
   },
 };
 

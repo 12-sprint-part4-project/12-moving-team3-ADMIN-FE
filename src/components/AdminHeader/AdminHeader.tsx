@@ -5,8 +5,6 @@ import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 
 import ChevronDownIcon from '@/assets/icons/chevron-down.svg';
 import UserIcon from '@/assets/icons/user.svg';
-import { useAdminLogout } from '@/hooks/useAdminLogout';
-import { useAdminMe } from '@/hooks/useAdminMe';
 import { cn } from '@/lib/utils';
 
 export interface AdminHeaderProps {
@@ -16,16 +14,14 @@ export interface AdminHeaderProps {
   logo?: ReactNode;
   /** 우측 관리자 메뉴 표시 여부. 로그인 화면에서는 false */
   showUserMenu?: boolean;
-  /**
-   * 우측 표시 이름 오버라이드.
-   * Storybook 등에서만 쓰고, 실제 화면은 useAdminMe 결과를 사용한다.
-   */
+  /** 우측·드롭다운에 표시할 관리자 이름 */
   userName?: string;
-  /**
-   * 드롭다운 이메일 오버라이드.
-   * Storybook 등에서만 쓰고, 실제 화면은 useAdminMe 결과를 사용한다.
-   */
+  /** 드롭다운에 표시할 관리자 이메일 */
   userEmail?: string;
+  /** 로그아웃 진행 중 여부. true면 메뉴·로그아웃 버튼을 비활성화한다. */
+  isLoggingOut?: boolean;
+  /** 로그아웃 버튼 클릭 핸들러. API 호출은 AdminHeaderContainer 등 상위에서 담당한다. */
+  onLogout?: () => void | Promise<void>;
   /** 유저 메뉴 토글 시 추가 콜백 (Storybook action 등) */
   onUserMenuClick?: () => void;
   className?: string;
@@ -48,21 +44,14 @@ export const AdminHeader = ({
   showUserMenu = true,
   userName,
   userEmail,
+  isLoggingOut = false,
+  onLogout,
   onUserMenuClick,
   className,
 }: AdminHeaderProps) => {
   const menuId = useId();
   const menuRef = useRef<HTMLDivElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // 로그인 화면에서는 /me를 호출하지 않아 불필요한 401·redirect를 막는다.
-  const { data, isSuccess } = useAdminMe({ enabled: showUserMenu });
-  const { logout, isPending: isLoggingOut } = useAdminLogout();
-
-  const admin = isSuccess ? data.data : undefined;
-  // 로딩 중 임시 문자열을 넣지 않는다. props 오버라이드가 있을 때만 예외적으로 사용한다.
-  const displayName = userName ?? admin?.name;
-  const displayEmail = userEmail ?? admin?.email;
 
   useEffect(() => {
     if (!isMenuOpen) {
@@ -92,12 +81,12 @@ export const AdminHeader = ({
   };
 
   const handleLogout = async () => {
-    if (isLoggingOut) {
+    if (isLoggingOut || !onLogout) {
       return;
     }
 
     setIsMenuOpen(false);
-    await logout();
+    await onLogout();
   };
 
   return (
@@ -122,11 +111,11 @@ export const AdminHeader = ({
             aria-expanded={isMenuOpen}
             aria-controls={isMenuOpen ? menuId : undefined}
             aria-haspopup="menu"
-            aria-label={displayName ? `${displayName} 메뉴` : '관리자 메뉴'}
+            aria-label={userName ? `${userName} 메뉴` : '관리자 메뉴'}
             className="flex items-center gap-2 text-md-medium text-black-300 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <UserIcon className="size-5" aria-hidden />
-            {displayName ? <span>{displayName}</span> : null}
+            {userName ? <span>{userName}</span> : null}
             <ChevronDownIcon className="size-4" aria-hidden />
           </button>
 
@@ -136,13 +125,13 @@ export const AdminHeader = ({
               role="menu"
               className="absolute top-full right-0 z-10 mt-2 min-w-52 overflow-hidden rounded-lg border border-line-200 bg-white py-1"
             >
-              {displayName || displayEmail ? (
+              {userName || userEmail ? (
                 <div className="border-b border-line-200 px-4 py-3">
-                  {displayName ? (
-                    <p className="text-md-medium text-black-300">{displayName}</p>
+                  {userName ? (
+                    <p className="text-md-medium text-black-300">{userName}</p>
                   ) : null}
-                  {displayEmail ? (
-                    <p className="text-xs-medium text-gray-500">{displayEmail}</p>
+                  {userEmail ? (
+                    <p className="text-xs-medium text-gray-500">{userEmail}</p>
                   ) : null}
                 </div>
               ) : null}
@@ -150,7 +139,7 @@ export const AdminHeader = ({
                 type="button"
                 role="menuitem"
                 onClick={handleLogout}
-                disabled={isLoggingOut}
+                disabled={isLoggingOut || !onLogout}
                 className="flex w-full px-4 py-2.5 text-left text-md-medium text-black-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isLoggingOut ? '로그아웃 중...' : '로그아웃'}
