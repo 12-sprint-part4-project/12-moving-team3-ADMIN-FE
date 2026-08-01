@@ -1,6 +1,6 @@
 /**
  * 관리자 인증 관련 타입.
- * 백엔드 Swagger(AdminLoginRequest/AdminLoginResponse/AdminRefreshResponse)와
+ * 백엔드 Swagger(AdminLoginRequest/AdminLoginResponse/AdminRefreshResponse/AdminMeResponse)와
  * controller 응답(`{ data: ... }`) 구조에 맞춘다.
  */
 
@@ -10,7 +10,7 @@ export interface AdminLoginRequest {
   password: string;
 }
 
-/** 로그인 응답에 포함되는 관리자 정보 */
+/** 로그인·/me 응답에 공통으로 쓰이는 관리자 정보 */
 export interface AdminAuthAdmin {
   id: number;
   email: string;
@@ -36,4 +36,15 @@ export interface AdminRefreshData {
 /** POST /api/admin/auth/refresh 성공 응답 */
 export interface AdminRefreshResponse {
   data: AdminRefreshData;
+}
+
+/**
+ * GET /api/admin/auth/me 성공 시 data 필드.
+ * BE는 data에 관리자 정보를 바로 담아 반환한다(login의 admin과 동일 shape).
+ */
+export type AdminMeData = AdminAuthAdmin;
+
+/** GET /api/admin/auth/me 성공 응답 */
+export interface AdminMeResponse {
+  data: AdminMeData;
 }
