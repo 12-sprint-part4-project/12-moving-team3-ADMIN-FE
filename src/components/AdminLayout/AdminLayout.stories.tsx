@@ -1,8 +1,26 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useState, type ReactNode } from 'react';
 
 import { Button } from '@/components/Button/Button';
 
 import { AdminLayout } from './AdminLayout';
+
+const StoryQueryProvider = ({ children }: { children: ReactNode }) => {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: { retry: false },
+          mutations: { retry: false },
+        },
+      })
+  );
+
+  return (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+};
 
 const meta: Meta<typeof AdminLayout> = {
   title: 'Admin/AdminLayout',
@@ -17,6 +35,13 @@ const meta: Meta<typeof AdminLayout> = {
       },
     },
   },
+  decorators: [
+    (Story) => (
+      <StoryQueryProvider>
+        <Story />
+      </StoryQueryProvider>
+    ),
+  ],
 };
 
 export default meta;

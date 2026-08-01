@@ -48,3 +48,13 @@ export type AdminMeData = AdminAuthAdmin;
 export interface AdminMeResponse {
   data: AdminMeData;
 }
+
+/** 로그아웃 성공 시 data 필드 */
+export interface AdminLogoutData {
+  message: string;
+}
+
+/** POST /api/admin/auth/logout 성공 응답 */
+export interface AdminLogoutResponse {
+  data: AdminLogoutData;
+}

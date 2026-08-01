@@ -2,3 +2,4 @@
 export const ADMIN_AUTH_LOGIN_PATH = '/api/admin/auth/login';
 export const ADMIN_AUTH_REFRESH_PATH = '/api/admin/auth/refresh';
 export const ADMIN_AUTH_ME_PATH = '/api/admin/auth/me';
+export const ADMIN_AUTH_LOGOUT_PATH = '/api/admin/auth/logout';
