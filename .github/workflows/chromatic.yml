@@ -24,5 +24,7 @@ jobs:
 
       - name: Publish to Chromatic
         uses: chromaui/action@latest
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:8000
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
