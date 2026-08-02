@@ -246,10 +246,8 @@ export const Pagination = ({
                     ? resolvedSize === 'sm'
                       ? 'text-lg-semibold text-black-400'
                       : 'text-2lg-semibold text-black-400'
-                    : [
-                        paginationNumberVariants({ size: resolvedSize }),
-                        'text-gray-200',
-                      ]
+                    : paginationNumberVariants({ size: resolvedSize }),
+                  !isActive && 'text-gray-200'
                 )}
               >
                 {item}
