@@ -87,6 +87,24 @@ export const LastPage: Story = {
   },
 };
 
+/** lg 중간 페이지 — ellipsis 포함 */
+export const MiddlePageLg: Story = {
+  args: {
+    size: 'lg',
+    page: 5,
+    totalPages: 9,
+  },
+};
+
+/** lg 마지막 페이지 — 다음 버튼 비활성 */
+export const LastPageLg: Story = {
+  args: {
+    size: 'lg',
+    page: 9,
+    totalPages: 9,
+  },
+};
+
 /** 페이지 수가 적어 ellipsis 없이 전체 표시 */
 export const FewPages: Story = {
   args: {

@@ -1,50 +1,88 @@
 'use client';
 
 import type { ButtonHTMLAttributes, HTMLAttributes } from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 
 import ChevronLeftIcon from '@/assets/icons/chevron-left.svg';
 import ChevronRightIcon from '@/assets/icons/chevron-right.svg';
 import { cn } from '@/lib/utils';
 
-type PaginationSize = 'sm' | 'lg';
+export const paginationRootVariants = cva('inline-flex items-start', {
+  variants: {
+    size: {
+      sm: 'gap-2',
+      lg: 'gap-2.5',
+    },
+  },
+  defaultVariants: {
+    size: 'sm',
+  },
+});
 
-export interface PaginationProps extends Omit<
-  HTMLAttributes<HTMLElement>,
-  'onChange'
-> {
-  size?: PaginationSize;
+export const paginationGroupVariants = cva('flex items-start', {
+  variants: {
+    size: {
+      sm: 'gap-1',
+      lg: 'gap-1',
+    },
+  },
+  defaultVariants: {
+    size: 'sm',
+  },
+});
+
+export const paginationItemVariants = cva(
+  'inline-flex shrink-0 items-center justify-center bg-white p-2.5 disabled:cursor-not-allowed',
+  {
+    variants: {
+      size: {
+        sm: 'size-8 rounded-md',
+        lg: 'size-12 rounded-lg',
+      },
+    },
+    defaultVariants: {
+      size: 'sm',
+    },
+  }
+);
+
+export const paginationNumberVariants = cva('', {
+  variants: {
+    size: {
+      sm: 'text-lg-regular',
+      lg: 'text-2lg-regular',
+    },
+  },
+  defaultVariants: {
+    size: 'sm',
+  },
+});
+
+export const paginationIconVariants = cva('', {
+  variants: {
+    size: {
+      sm: 'size-6',
+      lg: 'size-6',
+    },
+  },
+  defaultVariants: {
+    size: 'sm',
+  },
+});
+
+export interface PaginationProps
+  extends
+    Omit<HTMLAttributes<HTMLElement>, 'onChange'>,
+    VariantProps<typeof paginationRootVariants> {
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
 }
 
 type PageItem = number | 'ellipsis';
-
-const sizeStyles: Record<
-  PaginationSize,
-  {
-    root: string;
-    group: string;
-    item: string;
-    number: string;
-    icon: string;
-  }
-> = {
-  sm: {
-    root: 'gap-2',
-    group: 'gap-1',
-    item: 'size-8 rounded-md',
-    number: 'text-lg-regular',
-    icon: 'size-6',
-  },
-  lg: {
-    root: 'gap-2.5',
-    group: 'gap-1',
-    item: 'size-12 rounded-lg',
-    number: 'text-2lg-regular',
-    icon: 'size-6',
-  },
-};
+type PaginationSize = NonNullable<
+  VariantProps<typeof paginationRootVariants>['size']
+>;
 
 /**
  * 표시할 페이지 번호 배열을 만든다.
@@ -92,9 +130,10 @@ const getPageItems = (
   return items;
 };
 
-interface PaginationItemProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  size: PaginationSize;
-}
+interface PaginationItemProps
+  extends
+    ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof paginationItemVariants> {}
 
 const PaginationItem = ({
   size,
@@ -107,11 +146,7 @@ const PaginationItem = ({
   <button
     type={type}
     disabled={disabled}
-    className={cn(
-      'inline-flex shrink-0 items-center justify-center bg-white p-2.5 disabled:cursor-not-allowed',
-      sizeStyles[size].item,
-      className
-    )}
+    className={cn(paginationItemVariants({ size }), className)}
     {...rest}
   >
     {children}
@@ -133,16 +168,18 @@ const Ellipsis = ({ isActive = false }: { isActive?: boolean }) => (
 );
 
 export const Pagination = ({
-  size = 'sm',
+  size,
   page,
   totalPages,
   onPageChange,
   className,
   ...rest
 }: PaginationProps) => {
+  // cva defaultVariants와 동일하게 해석해 페이지 윈도우 계산에도 같은 size를 쓴다.
+  const resolvedSize = size ?? 'sm';
   // 범위를 벗어나면 클램프해 잘못된 page prop에도 UI가 깨지지 않게 한다.
   const currentPage = Math.min(Math.max(page, 1), Math.max(totalPages, 1));
-  const pageItems = getPageItems(currentPage, totalPages, size);
+  const pageItems = getPageItems(currentPage, totalPages, resolvedSize);
   const canGoPrev = currentPage > 1;
   const canGoNext = currentPage < totalPages;
 
@@ -156,15 +193,11 @@ export const Pagination = ({
   return (
     <nav
       aria-label="페이지네이션"
-      className={cn(
-        'inline-flex items-start',
-        sizeStyles[size].root,
-        className
-      )}
+      className={cn(paginationRootVariants({ size: resolvedSize }), className)}
       {...rest}
     >
       <PaginationItem
-        size={size}
+        size={resolvedSize}
         disabled={!canGoPrev}
         aria-label="이전 페이지"
         onClick={() => handlePageChange(currentPage - 1)}
@@ -172,7 +205,7 @@ export const Pagination = ({
         <ChevronLeftIcon
           aria-hidden
           className={cn(
-            sizeStyles[size].icon,
+            paginationIconVariants({ size: resolvedSize }),
             canGoPrev
               ? '[&_path]:stroke-black-400'
               : '[&_path]:stroke-gray-200'
@@ -180,13 +213,13 @@ export const Pagination = ({
         />
       </PaginationItem>
 
-      <div className={cn('flex items-start', sizeStyles[size].group)}>
+      <div className={paginationGroupVariants({ size: resolvedSize })}>
         {pageItems.map((item, index) => {
           if (item === 'ellipsis') {
             return (
               <PaginationItem
                 key={`ellipsis-${index}`}
-                size={size}
+                size={resolvedSize}
                 disabled
                 tabIndex={-1}
                 aria-hidden
@@ -201,7 +234,7 @@ export const Pagination = ({
           return (
             <PaginationItem
               key={item}
-              size={size}
+              size={resolvedSize}
               aria-label={`${item}페이지`}
               aria-current={isActive ? 'page' : undefined}
               onClick={() => handlePageChange(item)}
@@ -210,10 +243,13 @@ export const Pagination = ({
                 className={cn(
                   'text-center whitespace-nowrap',
                   isActive
-                    ? size === 'sm'
+                    ? resolvedSize === 'sm'
                       ? 'text-lg-semibold text-black-400'
                       : 'text-2lg-semibold text-black-400'
-                    : [sizeStyles[size].number, 'text-gray-200']
+                    : [
+                        paginationNumberVariants({ size: resolvedSize }),
+                        'text-gray-200',
+                      ]
                 )}
               >
                 {item}
@@ -224,7 +260,7 @@ export const Pagination = ({
       </div>
 
       <PaginationItem
-        size={size}
+        size={resolvedSize}
         disabled={!canGoNext}
         aria-label="다음 페이지"
         onClick={() => handlePageChange(currentPage + 1)}
@@ -232,7 +268,7 @@ export const Pagination = ({
         <ChevronRightIcon
           aria-hidden
           className={cn(
-            sizeStyles[size].icon,
+            paginationIconVariants({ size: resolvedSize }),
             canGoNext
               ? '[&_path]:stroke-black-400'
               : '[&_path]:stroke-gray-200'
