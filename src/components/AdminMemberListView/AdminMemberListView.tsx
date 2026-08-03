@@ -1,6 +1,5 @@
 'use client';
 
-import { format } from 'date-fns';
 import { useMemo, useState, type ChangeEvent, type ReactNode } from 'react';
 
 import { Button } from '@/components/Button/Button';
@@ -22,6 +21,7 @@ import type {
   MemberStatus,
   MemberUserType,
 } from '@/types/adminMember';
+import { toAdminMemberApiDate } from '@/utils/adminMember';
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -31,8 +31,6 @@ const STATUS_FILTER_OPTIONS = [
   { label: '활성', value: 'ACTIVE' },
   { label: '정지', value: 'SUSPENDED' },
 ] as const;
-
-type StatusFilterValue = '' | MemberStatus;
 
 export interface AdminMemberListFilters {
   search?: string;
@@ -48,26 +46,14 @@ const INITIAL_FILTERS: AdminMemberListFilters = {
   pageSize: DEFAULT_PAGE_SIZE,
 };
 
-/** API 쿼리용 YYYY-MM-DD */
-export const toAdminMemberApiDate = (date: Date) => format(date, 'yyyy-MM-dd');
-
-/** 목록 가입일 표시 */
-export const formatAdminMemberJoinedAt = (iso: string) => {
-  const date = new Date(iso);
-
-  if (Number.isNaN(date.getTime())) {
-    return iso;
+/** select value → MemberStatus | undefined. 알 수 없는 값은 무시한다. */
+const parseMemberStatusFilter = (value: string): MemberStatus | undefined => {
+  if (value === 'ACTIVE' || value === 'SUSPENDED') {
+    return value;
   }
 
-  return format(date, 'yyyy-MM-dd HH:mm');
+  return undefined;
 };
-
-/** 페이지 기준 행 번호 (API에 없는 표시용 값) */
-export const getAdminMemberRowNumber = (
-  page: number,
-  pageSize: number,
-  index: number
-) => (page - 1) * pageSize + index + 1;
 
 const toListQuery = (
   userType: MemberUserType,
@@ -132,6 +118,18 @@ export const AdminMemberListView = ({
   const totalPages = pagination?.totalPages ?? 0;
   const currentPage = pagination?.page ?? filters.page;
 
+  // 응답 기준 page가 범위를 벗어나면 렌더 중 보정한다(effect setState 금지 규칙 회피).
+  // totalPages=0이면 1페이지로 맞춘다. prev 참조 유지로 불필요한 재렌더를 막는다.
+  if (!isPending && pagination) {
+    const safePage = pagination.totalPages > 0 ? pagination.totalPages : 1;
+
+    if (filters.page > safePage) {
+      setFilters((prev) =>
+        prev.page <= safePage ? prev : { ...prev, page: safePage }
+      );
+    }
+  }
+
   const dateRangeValue = useMemo<DateRangePopoverProps['value']>(() => {
     if (!filters.startDate) {
       return undefined;
@@ -183,9 +181,8 @@ export const AdminMemberListView = ({
   };
 
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value as StatusFilterValue;
     updateFilters(
-      { status: value === '' ? undefined : value },
+      { status: parseMemberStatusFilter(event.target.value) },
       { resetPage: true }
     );
   };

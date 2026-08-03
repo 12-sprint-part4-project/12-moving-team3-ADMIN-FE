@@ -47,7 +47,11 @@ const formatServiceRegions = (serviceRegions: MoverServiceRegion[]) => {
     .join(', ');
 };
 
-const MoverProfileSection = ({ profile }: { profile: MoverProfile }) => (
+interface MoverProfileSectionProps {
+  profile: MoverProfile;
+}
+
+const MoverProfileSection = ({ profile }: MoverProfileSectionProps) => (
   <DetailSection title="기사 프로필">
     <dl className="flex flex-col gap-2 text-md-medium">
       <DetailField
@@ -71,7 +75,11 @@ const MoverProfileSection = ({ profile }: { profile: MoverProfile }) => (
   </DetailSection>
 );
 
-const MoverStatsSection = ({ detail }: { detail: AdminMemberDetail }) => (
+interface MoverStatsSectionProps {
+  detail: AdminMemberDetail;
+}
+
+const MoverStatsSection = ({ detail }: MoverStatsSectionProps) => (
   <DetailSection title="기사 통계">
     <dl className="flex flex-col gap-2 text-md-medium">
       <DetailField
@@ -84,7 +92,11 @@ const MoverStatsSection = ({ detail }: { detail: AdminMemberDetail }) => (
   </DetailSection>
 );
 
-const MoverDetailContent = ({ detail }: { detail: AdminMemberDetail }) => {
+interface MoverDetailContentProps {
+  detail: AdminMemberDetail;
+}
+
+const MoverDetailContent = ({ detail }: MoverDetailContentProps) => {
   const moverProfile = detail.moverProfile;
 
   return (

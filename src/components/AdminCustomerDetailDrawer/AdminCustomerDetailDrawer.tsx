@@ -17,7 +17,11 @@ export interface AdminCustomerDetailDrawerProps {
   onClose: () => void;
 }
 
-const CustomerDetailContent = ({ detail }: { detail: AdminMemberDetail }) => {
+interface CustomerDetailContentProps {
+  detail: AdminMemberDetail;
+}
+
+const CustomerDetailContent = ({ detail }: CustomerDetailContentProps) => {
   const customerProfile = detail.customerProfile;
 
   return (

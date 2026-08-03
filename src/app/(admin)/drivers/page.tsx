@@ -4,8 +4,6 @@ import { useCallback, useState } from 'react';
 
 import {
   AdminMemberListView,
-  formatAdminMemberJoinedAt,
-  getAdminMemberRowNumber,
   type AdminMemberListColumnsContext,
 } from '@/components/AdminMemberListView/AdminMemberListView';
 import { AdminMoverDetailDrawer } from '@/components/AdminMoverDetailDrawer/AdminMoverDetailDrawer';
@@ -13,6 +11,10 @@ import { Button } from '@/components/Button/Button';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import type { Column } from '@/components/DataTable/DataTable';
 import type { AdminMemberListItem } from '@/types/adminMember';
+import {
+  formatAdminMemberJoinedAt,
+  getAdminMemberRowNumber,
+} from '@/utils/adminMember';
 
 /** 목록 API averageRating 표시. 리뷰가 없으면 '-' */
 const formatAverageRating = (averageRating: number | null) => {

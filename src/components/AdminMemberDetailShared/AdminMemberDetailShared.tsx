@@ -2,18 +2,19 @@
 
 import type { ReactNode } from 'react';
 
-import { formatAdminMemberJoinedAt } from '@/components/AdminMemberListView/AdminMemberListView';
 import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { useAdminMemberDetail } from '@/hooks/useAdminMemberDetail';
+import { cn } from '@/lib/utils';
 import type {
   AdminMemberDetail,
   MemberMoveType,
   MemberRegion,
 } from '@/types/adminMember';
+import { formatAdminMemberJoinedAt } from '@/utils/adminMember';
 
 export const REGION_LABEL: Record<MemberRegion, string> = {
   SEOUL: '서울',
@@ -66,27 +67,31 @@ export const formatServices = (services: MemberMoveType[]) => {
     .join(', ');
 };
 
-/** DetailSection 안 dl 행 */
-export const DetailField = ({
-  label,
-  value,
-}: {
+export interface DetailFieldProps {
   label: string;
   value: string | number;
-}) => (
-  <div className="flex justify-between gap-4">
+  className?: string;
+}
+
+/** DetailSection 안 dl 행 */
+export const DetailField = ({ label, value, className }: DetailFieldProps) => (
+  <div className={cn('flex justify-between gap-4', className)}>
     <dt className="shrink-0 text-gray-500">{label}</dt>
     <dd className="text-right break-words text-black-400">{value}</dd>
   </div>
 );
 
+export interface AdminMemberBasicInfoSectionProps {
+  detail: AdminMemberDetail;
+  className?: string;
+}
+
 /** 회원/기사 공통 기본 정보 */
 export const AdminMemberBasicInfoSection = ({
   detail,
-}: {
-  detail: AdminMemberDetail;
-}) => (
-  <DetailSection title="기본 정보">
+  className,
+}: AdminMemberBasicInfoSectionProps) => (
+  <DetailSection title="기본 정보" className={className}>
     <dl className="flex flex-col gap-2 text-md-medium">
       <DetailField label="이름" value={detail.name} />
       <DetailField label="닉네임" value={detail.nickname} />
@@ -100,19 +105,23 @@ export const AdminMemberBasicInfoSection = ({
   </DetailSection>
 );
 
+export interface AdminMemberAccountStatusSectionProps {
+  detail: AdminMemberDetail;
+  className?: string;
+}
+
 /** 회원/기사 공통 계정 상태 */
 export const AdminMemberAccountStatusSection = ({
   detail,
-}: {
-  detail: AdminMemberDetail;
-}) => {
+  className,
+}: AdminMemberAccountStatusSectionProps) => {
   // UserStatusInfo가 없으면 목록과 같이 ACTIVE로 표시한다.
   const status = detail.userStatus?.status ?? 'ACTIVE';
   const suspendedAt = detail.userStatus?.suspendedAt ?? null;
   const suspendedUntil = detail.userStatus?.suspendedUntil ?? null;
 
   return (
-    <DetailSection title="계정 상태">
+    <DetailSection title="계정 상태" className={className}>
       <dl className="flex flex-col gap-2 text-md-medium">
         <div className="flex items-center justify-between gap-4">
           <dt className="shrink-0 text-gray-500">계정 상태</dt>

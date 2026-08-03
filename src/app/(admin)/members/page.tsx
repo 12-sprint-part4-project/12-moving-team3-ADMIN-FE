@@ -5,14 +5,16 @@ import { useCallback, useState } from 'react';
 import { AdminCustomerDetailDrawer } from '@/components/AdminCustomerDetailDrawer/AdminCustomerDetailDrawer';
 import {
   AdminMemberListView,
-  formatAdminMemberJoinedAt,
-  getAdminMemberRowNumber,
   type AdminMemberListColumnsContext,
 } from '@/components/AdminMemberListView/AdminMemberListView';
 import { Button } from '@/components/Button/Button';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import type { Column } from '@/components/DataTable/DataTable';
 import type { AdminMemberListItem } from '@/types/adminMember';
+import {
+  formatAdminMemberJoinedAt,
+  getAdminMemberRowNumber,
+} from '@/utils/adminMember';
 
 const MembersPage = () => {
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
