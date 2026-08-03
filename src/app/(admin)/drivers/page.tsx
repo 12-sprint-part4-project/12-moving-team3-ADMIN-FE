@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import {
   AdminMemberListView,
@@ -8,6 +8,8 @@ import {
   getAdminMemberRowNumber,
   type AdminMemberListColumnsContext,
 } from '@/components/AdminMemberListView/AdminMemberListView';
+import { AdminMoverDetailDrawer } from '@/components/AdminMoverDetailDrawer/AdminMoverDetailDrawer';
+import { Button } from '@/components/Button/Button';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import type { Column } from '@/components/DataTable/DataTable';
 import type { AdminMemberListItem } from '@/types/adminMember';
@@ -22,6 +24,8 @@ const formatAverageRating = (averageRating: number | null) => {
 };
 
 const DriversPage = () => {
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
+
   const getColumns = useCallback(
     ({
       page,
@@ -63,21 +67,46 @@ const DriversPage = () => {
           />
         ),
       },
+      {
+        key: 'actions',
+        header: '관리',
+        align: 'center',
+        render: (row) => (
+          <Button
+            variant="secondary"
+            className="px-3 py-1.5 text-sm-medium"
+            onClick={() => setSelectedMemberId(row.id)}
+          >
+            상세 보기
+          </Button>
+        ),
+      },
     ],
     []
   );
 
+  const handleCloseDetail = () => {
+    setSelectedMemberId(null);
+  };
+
   return (
-    <AdminMemberListView
-      userType="MOVER"
-      title="기사 관리"
-      description="기사 목록을 조회하고 검색·필터할 수 있습니다."
-      caption="기사 목록"
-      searchAriaLabel="기사 검색"
-      emptyNoDataTitle="등록된 기사가 없습니다."
-      errorTitle="기사 목록을 불러오지 못했습니다."
-      getColumns={getColumns}
-    />
+    <>
+      <AdminMemberListView
+        userType="MOVER"
+        title="기사 관리"
+        description="기사 목록을 조회하고 검색·필터할 수 있습니다."
+        caption="기사 목록"
+        searchAriaLabel="기사 검색"
+        emptyNoDataTitle="등록된 기사가 없습니다."
+        errorTitle="기사 목록을 불러오지 못했습니다."
+        getColumns={getColumns}
+      />
+      <AdminMoverDetailDrawer
+        memberId={selectedMemberId}
+        open={Boolean(selectedMemberId)}
+        onClose={handleCloseDetail}
+      />
+    </>
   );
 };
 
