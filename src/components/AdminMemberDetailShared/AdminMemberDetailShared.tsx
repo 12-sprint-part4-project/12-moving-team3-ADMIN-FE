@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 
 import { Button } from '@/components/Button/Button';
 import { ConfirmModal } from '@/components/ConfirmModal/ConfirmModal';
@@ -26,10 +26,17 @@ import { formatAdminMemberJoinedAt } from '@/utils/adminMember';
 /** 상세 Drawer 상태 변경 액션. ConfirmModal·mutation 연결에 사용한다. */
 export type AdminMemberStatusChangeAction = 'suspend' | 'activate';
 
+/** ConfirmModal 액션별 문구. */
+interface StatusActionModalCopy {
+  title: string;
+  description: string;
+  confirmText: string;
+}
+
 /** ConfirmModal 문구. 액션별로 title/description/confirmText를 분리한다. */
 const STATUS_ACTION_MODAL_COPY: Record<
   AdminMemberStatusChangeAction,
-  { title: string; description: string; confirmText: string }
+  StatusActionModalCopy
 > = {
   suspend: {
     title: '회원을 7일 정지하시겠습니까?',
@@ -250,14 +257,6 @@ export const AdminMemberDetailDrawerShell = ({
   const suspendMutation = useSuspendAdminMember();
   const activateMutation = useActivateAdminMember();
 
-  // Drawer가 닫히면 ConfirmModal·에러 상태도 함께 초기화한다.
-  useEffect(() => {
-    if (!open) {
-      setPendingAction(null);
-      setStatusChangeError(null);
-    }
-  }, [open]);
-
   const detail = data?.data;
   // UserStatusInfo가 없으면 목록·계정 상태 섹션과 같이 ACTIVE로 간주한다.
   const status = detail?.userStatus?.status ?? 'ACTIVE';
@@ -266,6 +265,12 @@ export const AdminMemberDetailDrawerShell = ({
   const modalCopy = pendingAction
     ? STATUS_ACTION_MODAL_COPY[pendingAction]
     : null;
+
+  const handleCloseDrawer = () => {
+    setPendingAction(null);
+    setStatusChangeError(null);
+    onClose();
+  };
 
   const handleRequestStatusChange = (
     action: AdminMemberStatusChangeAction
@@ -344,7 +349,13 @@ export const AdminMemberDetailDrawerShell = ({
 
   return (
     <>
-      <DetailDrawer open={open} title={title} onClose={onClose} footer={footer}>
+      <DetailDrawer
+        open={open}
+        title={title}
+        onClose={handleCloseDrawer}
+        footer={footer}
+        disableKeyboardEvents={pendingAction !== null}
+      >
         {renderBody()}
       </DetailDrawer>
 
