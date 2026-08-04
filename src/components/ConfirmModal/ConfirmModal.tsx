@@ -37,6 +37,8 @@ export interface ConfirmModalProps {
   onConfirm: () => void;
   onCancel: () => void;
   className?: string;
+  /** true면 확인 버튼 loading + 취소 비활성화로 중복 요청을 막는다. */
+  confirmLoading?: boolean;
 }
 
 export const ConfirmModal = ({
@@ -48,6 +50,7 @@ export const ConfirmModal = ({
   onConfirm,
   onCancel,
   className,
+  confirmLoading = false,
 }: ConfirmModalProps) => {
   const titleId = useId();
   const descriptionId = useId();
@@ -78,7 +81,10 @@ export const ConfirmModal = ({
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
-        onCancel();
+        // 요청 중에는 ESC로 닫지 않아 중복 조작·요청 취소를 막는다.
+        if (!confirmLoading) {
+          onCancel();
+        }
         return;
       }
 
@@ -119,13 +125,18 @@ export const ConfirmModal = ({
       document.body.style.overflow = previousOverflow;
       previouslyFocusedRef.current?.focus();
     };
-  }, [open, onCancel]);
+  }, [open, onCancel, confirmLoading]);
 
   if (!mounted || !open) {
     return null;
   }
 
   const handleOverlayClick = () => {
+    // 요청 중에는 오버레이 클릭으로 닫지 않는다.
+    if (confirmLoading) {
+      return;
+    }
+
     onCancel();
   };
 
@@ -160,10 +171,18 @@ export const ConfirmModal = ({
         ) : null}
 
         <div className="flex justify-end gap-2">
-          <Button variant="secondary" onClick={onCancel}>
+          <Button
+            variant="secondary"
+            onClick={onCancel}
+            disabled={confirmLoading}
+          >
             {cancelText}
           </Button>
-          <Button variant="solid" onClick={onConfirm}>
+          <Button
+            variant="solid"
+            onClick={onConfirm}
+            loading={confirmLoading}
+          >
             {confirmText}
           </Button>
         </div>

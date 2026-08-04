@@ -1,14 +1,19 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 import { Button } from '@/components/Button/Button';
+import { ConfirmModal } from '@/components/ConfirmModal/ConfirmModal';
 import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { useAdminMemberDetail } from '@/hooks/useAdminMemberDetail';
+import {
+  useActivateAdminMember,
+  useSuspendAdminMember,
+} from '@/hooks/useAdminMemberStatusMutation';
 import { cn } from '@/lib/utils';
 import type {
   AdminMemberDetail,
@@ -18,8 +23,25 @@ import type {
 } from '@/types/adminMember';
 import { formatAdminMemberJoinedAt } from '@/utils/adminMember';
 
-/** 상세 Drawer 상태 변경 액션. ConfirmModal 연결 시 사용한다. */
+/** 상세 Drawer 상태 변경 액션. ConfirmModal·mutation 연결에 사용한다. */
 export type AdminMemberStatusChangeAction = 'suspend' | 'activate';
+
+/** ConfirmModal 문구. 액션별로 title/description/confirmText를 분리한다. */
+const STATUS_ACTION_MODAL_COPY: Record<
+  AdminMemberStatusChangeAction,
+  { title: string; description: string; confirmText: string }
+> = {
+  suspend: {
+    title: '회원을 7일 정지하시겠습니까?',
+    description: '정지 기간 동안 해당 회원은 서비스 이용이 제한됩니다.',
+    confirmText: '7일 정지',
+  },
+  activate: {
+    title: '회원 계정을 활성화하시겠습니까?',
+    description: '활성화 후 해당 회원은 다시 서비스를 이용할 수 있습니다.',
+    confirmText: '계정 활성화',
+  },
+};
 
 export const REGION_LABEL: Record<MemberRegion, string> = {
   SEOUL: '서울',
@@ -153,8 +175,8 @@ export const AdminMemberAccountStatusSection = ({
 
 export interface AdminMemberStatusActionFooterProps {
   status: MemberStatus;
-  /** 다음 작업에서 ConfirmModal·API 연결 시 사용. 미전달이면 no-op. */
-  onRequestStatusChange?: (action: AdminMemberStatusChangeAction) => void;
+  /** ConfirmModal을 열기 위한 액션 요청. */
+  onRequestStatusChange: (action: AdminMemberStatusChangeAction) => void;
 }
 
 /**
@@ -170,7 +192,7 @@ export const AdminMemberStatusActionFooter = ({
       <Button
         variant="danger"
         className="w-full"
-        onClick={() => onRequestStatusChange?.('suspend')}
+        onClick={() => onRequestStatusChange('suspend')}
       >
         7일 정지
       </Button>
@@ -181,7 +203,7 @@ export const AdminMemberStatusActionFooter = ({
     <Button
       variant="solid"
       className="w-full"
-      onClick={() => onRequestStatusChange?.('activate')}
+      onClick={() => onRequestStatusChange('activate')}
     >
       계정 활성화
     </Button>
@@ -196,14 +218,12 @@ export interface AdminMemberDetailDrawerShellProps {
   errorTitle: string;
   emptyTitle: string;
   renderContent: (detail: AdminMemberDetail) => ReactNode;
-  /** 상태 변경 요청 placeholder. ConfirmModal 연결 전에도 prop으로 받을 수 있다. */
-  onRequestStatusChange?: (action: AdminMemberStatusChangeAction) => void;
 }
 
 /**
  * 회원/기사 상세 Drawer 공통 셸.
  * 조회·로딩·에러·빈 상태를 담당하고, 본문만 renderContent로 주입한다.
- * 상세 로드 성공 시 footer에 상태별 액션 버튼을 표시한다.
+ * footer 액션 → ConfirmModal → 상태 변경 mutation까지 연결한다.
  */
 export const AdminMemberDetailDrawerShell = ({
   memberId,
@@ -213,16 +233,66 @@ export const AdminMemberDetailDrawerShell = ({
   errorTitle,
   emptyTitle,
   renderContent,
-  onRequestStatusChange,
 }: AdminMemberDetailDrawerShellProps) => {
+  const [pendingAction, setPendingAction] =
+    useState<AdminMemberStatusChangeAction | null>(null);
+
   const { data, isPending, isError, isSuccess } = useAdminMemberDetail(
     memberId,
     { enabled: open && Boolean(memberId) }
   );
+  const suspendMutation = useSuspendAdminMember();
+  const activateMutation = useActivateAdminMember();
+
+  // Drawer가 닫히면 ConfirmModal 상태도 함께 초기화한다.
+  useEffect(() => {
+    if (!open) {
+      setPendingAction(null);
+    }
+  }, [open]);
 
   const detail = data?.data;
   // UserStatusInfo가 없으면 목록·계정 상태 섹션과 같이 ACTIVE로 간주한다.
   const status = detail?.userStatus?.status ?? 'ACTIVE';
+  const isStatusChangePending =
+    suspendMutation.isPending || activateMutation.isPending;
+  const modalCopy = pendingAction
+    ? STATUS_ACTION_MODAL_COPY[pendingAction]
+    : null;
+
+  const handleRequestStatusChange = (
+    action: AdminMemberStatusChangeAction
+  ) => {
+    setPendingAction(action);
+  };
+
+  const handleCancelStatusChange = () => {
+    // 요청 중에는 취소·ESC·오버레이로 모달을 닫지 않아 중복 조작을 막는다.
+    if (isStatusChangePending) {
+      return;
+    }
+
+    setPendingAction(null);
+  };
+
+  const handleConfirmStatusChange = async () => {
+    if (!pendingAction || !memberId || isStatusChangePending) {
+      return;
+    }
+
+    try {
+      if (pendingAction === 'suspend') {
+        await suspendMutation.mutateAsync(memberId);
+      } else {
+        await activateMutation.mutateAsync(memberId);
+      }
+
+      // 성공 시에만 모달을 닫는다. 목록/상세 갱신은 이후 작업에서 처리한다.
+      setPendingAction(null);
+    } catch {
+      // 에러 UI는 이후 작업에서 연결한다. 모달은 열어 두어 재시도·취소를 가능하게 한다.
+    }
+  };
 
   const renderBody = () => {
     if (isPending) {
@@ -255,13 +325,29 @@ export const AdminMemberDetailDrawerShell = ({
     isSuccess && detail ? (
       <AdminMemberStatusActionFooter
         status={status}
-        onRequestStatusChange={onRequestStatusChange}
+        onRequestStatusChange={handleRequestStatusChange}
       />
     ) : undefined;
 
   return (
-    <DetailDrawer open={open} title={title} onClose={onClose} footer={footer}>
-      {renderBody()}
-    </DetailDrawer>
+    <>
+      <DetailDrawer open={open} title={title} onClose={onClose} footer={footer}>
+        {renderBody()}
+      </DetailDrawer>
+
+      {modalCopy ? (
+        <ConfirmModal
+          open={pendingAction != null}
+          title={modalCopy.title}
+          description={modalCopy.description}
+          confirmText={modalCopy.confirmText}
+          confirmLoading={isStatusChangePending}
+          onConfirm={() => {
+            void handleConfirmStatusChange();
+          }}
+          onCancel={handleCancelStatusChange}
+        />
+      ) : null}
+    </>
   );
 };
