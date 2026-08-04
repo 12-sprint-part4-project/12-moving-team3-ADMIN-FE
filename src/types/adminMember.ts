@@ -135,3 +135,19 @@ export interface AdminMemberDetail {
 export interface AdminMemberDetailResponse {
   data: AdminMemberDetail;
 }
+
+/**
+ * PATCH 정지/활성화 성공 시 data 필드.
+ * JSON 직렬화 후 Date는 ISO 문자열이므로 string | null로 둔다.
+ */
+export interface AdminMemberStatusChangeData {
+  memberId: string;
+  status: MemberStatus;
+  suspendedAt: string | null;
+  suspendedUntil: string | null;
+}
+
+/** PATCH /api/admin/members/:memberId/suspend|activate 성공 응답 */
+export interface AdminMemberStatusChangeResponse {
+  data: AdminMemberStatusChangeData;
+}
