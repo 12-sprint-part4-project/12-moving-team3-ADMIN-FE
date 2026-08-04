@@ -132,6 +132,11 @@ export interface DetailDrawerProps extends VariantProps<
   footer?: ReactNode;
   onClose: () => void;
   className?: string;
+  /**
+   * true면 ESC 닫기·Tab 포커스 트랩을 끈다.
+   * ConfirmModal 등 상위 모달이 열렸을 때 Drawer와 키보드 이벤트가 충돌하지 않게 한다.
+   */
+  disableKeyboardEvents?: boolean;
 }
 
 /**
@@ -149,6 +154,7 @@ export const DetailDrawer = ({
   onClose,
   size,
   className,
+  disableKeyboardEvents = false,
 }: DetailDrawerProps) => {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -156,6 +162,11 @@ export const DetailDrawer = ({
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
   /** ESC 핸들러가 항상 최신 onClose를 쓰도록 보관한다. */
   const onCloseRef = useRef(onClose);
+  /**
+   * 키보드 비활성 여부를 ref로 둔다.
+   * effect를 다시 돌리지 않아 스크롤 잠금·포커스 복원이 ConfirmModal과 충돌하지 않게 한다.
+   */
+  const disableKeyboardEventsRef = useRef(disableKeyboardEvents);
   // Portal은 클라이언트 마운트 이후에만 그린다. (hydration 불일치 방지)
   const mounted = useSyncExternalStore(
     subscribe,
@@ -167,6 +178,10 @@ export const DetailDrawer = ({
   useEffect(() => {
     onCloseRef.current = onClose;
   }, [onClose]);
+
+  useEffect(() => {
+    disableKeyboardEventsRef.current = disableKeyboardEvents;
+  }, [disableKeyboardEvents]);
 
   /**
    * open과 hydration(mounted)이 모두 true일 때 실행한다.
@@ -201,6 +216,11 @@ export const DetailDrawer = ({
     (firstFocusable ?? panel).focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      // ConfirmModal 등이 열린 동안은 ESC/Tab을 Drawer가 가로채지 않는다.
+      if (disableKeyboardEventsRef.current) {
+        return;
+      }
+
       // ESC로 Drawer를 닫는다. onCloseRef로 최신 콜백을 호출한다.
       if (event.key === 'Escape') {
         event.preventDefault();
