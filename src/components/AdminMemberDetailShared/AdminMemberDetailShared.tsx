@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 
+import { Button } from '@/components/Button/Button';
 import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
@@ -13,8 +14,12 @@ import type {
   AdminMemberDetail,
   MemberMoveType,
   MemberRegion,
+  MemberStatus,
 } from '@/types/adminMember';
 import { formatAdminMemberJoinedAt } from '@/utils/adminMember';
+
+/** 상세 Drawer 상태 변경 액션. ConfirmModal 연결 시 사용한다. */
+export type AdminMemberStatusChangeAction = 'suspend' | 'activate';
 
 export const REGION_LABEL: Record<MemberRegion, string> = {
   SEOUL: '서울',
@@ -146,6 +151,43 @@ export const AdminMemberAccountStatusSection = ({
   );
 };
 
+export interface AdminMemberStatusActionFooterProps {
+  status: MemberStatus;
+  /** 다음 작업에서 ConfirmModal·API 연결 시 사용. 미전달이면 no-op. */
+  onRequestStatusChange?: (action: AdminMemberStatusChangeAction) => void;
+}
+
+/**
+ * 계정 상태에 따라 정지 또는 활성화 버튼 하나만 표시한다.
+ * ACTIVE → 7일 정지(danger), SUSPENDED → 계정 활성화(solid)
+ */
+export const AdminMemberStatusActionFooter = ({
+  status,
+  onRequestStatusChange,
+}: AdminMemberStatusActionFooterProps) => {
+  if (status === 'ACTIVE') {
+    return (
+      <Button
+        variant="danger"
+        className="w-full"
+        onClick={() => onRequestStatusChange?.('suspend')}
+      >
+        7일 정지
+      </Button>
+    );
+  }
+
+  return (
+    <Button
+      variant="solid"
+      className="w-full"
+      onClick={() => onRequestStatusChange?.('activate')}
+    >
+      계정 활성화
+    </Button>
+  );
+};
+
 export interface AdminMemberDetailDrawerShellProps {
   memberId: string | null;
   open: boolean;
@@ -154,11 +196,14 @@ export interface AdminMemberDetailDrawerShellProps {
   errorTitle: string;
   emptyTitle: string;
   renderContent: (detail: AdminMemberDetail) => ReactNode;
+  /** 상태 변경 요청 placeholder. ConfirmModal 연결 전에도 prop으로 받을 수 있다. */
+  onRequestStatusChange?: (action: AdminMemberStatusChangeAction) => void;
 }
 
 /**
  * 회원/기사 상세 Drawer 공통 셸.
  * 조회·로딩·에러·빈 상태를 담당하고, 본문만 renderContent로 주입한다.
+ * 상세 로드 성공 시 footer에 상태별 액션 버튼을 표시한다.
  */
 export const AdminMemberDetailDrawerShell = ({
   memberId,
@@ -168,6 +213,7 @@ export const AdminMemberDetailDrawerShell = ({
   errorTitle,
   emptyTitle,
   renderContent,
+  onRequestStatusChange,
 }: AdminMemberDetailDrawerShellProps) => {
   const { data, isPending, isError, isSuccess } = useAdminMemberDetail(
     memberId,
@@ -175,6 +221,8 @@ export const AdminMemberDetailDrawerShell = ({
   );
 
   const detail = data?.data;
+  // UserStatusInfo가 없으면 목록·계정 상태 섹션과 같이 ACTIVE로 간주한다.
+  const status = detail?.userStatus?.status ?? 'ACTIVE';
 
   const renderBody = () => {
     if (isPending) {
@@ -202,8 +250,17 @@ export const AdminMemberDetailDrawerShell = ({
     return renderContent(detail);
   };
 
+  // 상세가 있을 때만 footer를 내려 로딩·에러·빈 상태에서는 액션을 숨긴다.
+  const footer =
+    isSuccess && detail ? (
+      <AdminMemberStatusActionFooter
+        status={status}
+        onRequestStatusChange={onRequestStatusChange}
+      />
+    ) : undefined;
+
   return (
-    <DetailDrawer open={open} title={title} onClose={onClose}>
+    <DetailDrawer open={open} title={title} onClose={onClose} footer={footer}>
       {renderBody()}
     </DetailDrawer>
   );
