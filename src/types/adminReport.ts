@@ -1,6 +1,6 @@
 /**
- * 관리자 신고 목록 UI용 타입.
- * 백엔드 AdminReportListItemDto와 맞춰 두어 이후 API 연동 시 변환을 최소화한다.
+ * 관리자 신고 목록 API 타입.
+ * 백엔드 Swagger(admin-report)와 controller 응답(`{ data: ... }`) 구조에 맞춘다.
  */
 
 export type AdminReportStatus = 'PENDING' | 'RESOLVED' | 'REJECTED';
@@ -18,6 +18,20 @@ export type AdminReportCategory =
   | 'ABUSIVE_LANGUAGE';
 
 export type AdminReportUserType = 'CUSTOMER' | 'MOVER';
+
+/** Prisma ChatRoomType */
+export type AdminReportChatRoomType = 'GENERAL' | 'DESIGNATED' | 'COMMUNITY';
+
+/** Prisma MessageType */
+export type AdminReportMessageType = 'TEXT' | 'IMAGE';
+
+/** Prisma PostsCategory */
+export type AdminReportPostsCategory =
+  | 'MOVING_TIP'
+  | 'QUESTION'
+  | 'REVIEW'
+  | 'ETC'
+  | 'FURNITURE_SHARE';
 
 export interface AdminReportReporter {
   id: string;
@@ -53,7 +67,7 @@ export interface AdminReportReviewTargetInfo {
 export interface AdminReportChatRoomTargetInfo {
   type: 'CHAT_ROOM';
   id: number;
-  roomType: string;
+  roomType: AdminReportChatRoomType;
   createdAt: string;
 }
 
@@ -61,7 +75,7 @@ export interface AdminReportMessageTargetInfo {
   type: 'MESSAGE';
   id: number;
   content: string;
-  messageType: string;
+  messageType: AdminReportMessageType;
   sender: AdminReportTargetAuthor | null;
 }
 
@@ -69,7 +83,7 @@ export interface AdminReportArticleTargetInfo {
   type: 'ARTICLE';
   id: number;
   title: string;
-  category: string;
+  category: AdminReportPostsCategory;
   author: AdminReportTargetAuthor | null;
 }
 
@@ -89,7 +103,7 @@ export type AdminReportTargetInfo =
   | AdminReportArticleTargetInfo
   | AdminReportCommentTargetInfo;
 
-/** 신고 목록 테이블 row */
+/** GET /api/admin/reports 목록 아이템 */
 export interface AdminReportListItem {
   id: number;
   reporterId: string;
@@ -99,5 +113,25 @@ export interface AdminReportListItem {
   targetInfo: AdminReportTargetInfo | null;
   category: AdminReportCategory;
   status: AdminReportStatus;
+  /** ISO date-time 문자열 */
   createdAt: string;
+}
+
+/** 목록 페이지네이션 — 회원 목록과 동일 필드 */
+export interface AdminReportPagination {
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
+
+/** 목록 조회 성공 시 data 필드 */
+export interface AdminReportListData {
+  items: AdminReportListItem[];
+  pagination: AdminReportPagination;
+}
+
+/** GET /api/admin/reports 성공 응답 */
+export interface AdminReportListResponse {
+  data: AdminReportListData;
 }

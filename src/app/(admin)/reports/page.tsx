@@ -1,10 +1,13 @@
 'use client';
 
+import type { ReactNode } from 'react';
+
 import { DataTable, type Column } from '@/components/DataTable/DataTable';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { PageHeader } from '@/components/PageHeader/PageHeader';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
+import { useAdminReportList } from '@/hooks/useAdminReportList';
 import type { AdminReportListItem } from '@/types/adminReport';
 import {
   ADMIN_REPORT_CATEGORY_LABEL,
@@ -15,89 +18,6 @@ import {
   formatAdminReportReporter,
   formatAdminReportTarget,
 } from '@/utils/adminReport';
-
-/**
- * API 연동 전 화면 형태 확인용 mock.
- * 이후 단계에서 실제 목록 조회로 교체한다.
- */
-const MOCK_REPORTS: AdminReportListItem[] = [
-  {
-    id: 101,
-    reporterId: 'reporter-1',
-    reporter: {
-      id: 'reporter-1',
-      name: '김고객',
-      nickname: '이사준비중',
-      email: 'customer@example.com',
-      userType: 'CUSTOMER',
-    },
-    target: 'USER',
-    targetId: 'mover-1',
-    targetInfo: {
-      type: 'USER',
-      id: 'mover-1',
-      name: '박기사',
-      nickname: '안전이사',
-      email: 'mover@example.com',
-      userType: 'MOVER',
-    },
-    category: 'INAPPROPRIATE_PROFILE',
-    status: 'PENDING',
-    createdAt: '2026-08-01T10:00:00.000Z',
-  },
-  {
-    id: 102,
-    reporterId: 'reporter-2',
-    reporter: {
-      id: 'reporter-2',
-      name: '이기사',
-      nickname: '이사프로',
-      email: 'mover2@example.com',
-      userType: 'MOVER',
-    },
-    target: 'REVIEW',
-    targetId: '12',
-    targetInfo: {
-      type: 'REVIEW',
-      id: 12,
-      rating: 1,
-      content: '약속한 시간에 오지 않았고 불친절했습니다.',
-      author: {
-        id: 'customer-2',
-        name: '최리뷰',
-        nickname: '리뷰왕',
-      },
-    },
-    category: 'ABUSIVE_LANGUAGE',
-    status: 'RESOLVED',
-    createdAt: '2026-07-28T14:30:00.000Z',
-  },
-  {
-    id: 103,
-    reporterId: 'reporter-3',
-    reporter: {
-      id: 'reporter-3',
-      name: '정회원',
-      nickname: '정회원',
-      email: 'member@example.com',
-      userType: 'CUSTOMER',
-    },
-    target: 'COMMENT',
-    targetId: '55',
-    targetInfo: null,
-    category: 'ABUSIVE_LANGUAGE',
-    status: 'REJECTED',
-    createdAt: '2026-07-20T09:15:00.000Z',
-  },
-];
-
-/**
- * 이번 단계는 정적 UI만 구성한다.
- * 'data'로 두고 mock row를 보여 주며, loading/empty/error 자리도 미리 잡아 둔다.
- * as 단언으로 리터럴 좁힘을 막아 다른 상태 분기 코드가 dead code로 잡히지 않게 한다.
- */
-type ListUiState = 'data' | 'loading' | 'empty' | 'error';
-const LIST_UI_STATE = 'data' as ListUiState;
 
 const REPORT_COLUMNS: Column<AdminReportListItem>[] = [
   {
@@ -135,6 +55,7 @@ const REPORT_COLUMNS: Column<AdminReportListItem>[] = [
     key: 'targetInfo',
     header: '신고 대상',
     className: 'max-w-72 truncate',
+    // targetInfo null은 formatAdminReportTarget에서 fallback 문구로 처리한다.
     render: (row) => formatAdminReportTarget(row.target, row.targetInfo),
   },
   {
@@ -145,12 +66,15 @@ const REPORT_COLUMNS: Column<AdminReportListItem>[] = [
 ];
 
 const ReportsPage = () => {
-  const renderListBody = () => {
-    if (LIST_UI_STATE === 'loading') {
+  const { data, isPending, isError } = useAdminReportList();
+  const items = data?.data.items ?? [];
+
+  const renderListBody = (): ReactNode => {
+    if (isPending) {
       return <LoadingState />;
     }
 
-    if (LIST_UI_STATE === 'error') {
+    if (isError) {
       return (
         <EmptyState
           title="신고 목록을 불러오지 못했습니다."
@@ -159,14 +83,14 @@ const ReportsPage = () => {
       );
     }
 
-    if (LIST_UI_STATE === 'empty' || MOCK_REPORTS.length === 0) {
+    if (items.length === 0) {
       return <EmptyState title="등록된 신고가 없습니다." />;
     }
 
     return (
       <DataTable
         columns={REPORT_COLUMNS}
-        data={MOCK_REPORTS}
+        data={items}
         rowKey="id"
         caption="신고 목록"
       />
