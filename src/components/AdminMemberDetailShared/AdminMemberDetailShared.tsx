@@ -43,6 +43,9 @@ const STATUS_ACTION_MODAL_COPY: Record<
   },
 };
 
+const STATUS_CHANGE_ERROR_MESSAGE =
+  '상태 변경에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+
 export const REGION_LABEL: Record<MemberRegion, string> = {
   SEOUL: '서울',
   GYEONGGI: '경기',
@@ -223,7 +226,7 @@ export interface AdminMemberDetailDrawerShellProps {
 /**
  * 회원/기사 상세 Drawer 공통 셸.
  * 조회·로딩·에러·빈 상태를 담당하고, 본문만 renderContent로 주입한다.
- * footer 액션 → ConfirmModal → 상태 변경 mutation까지 연결한다.
+ * footer 액션 → ConfirmModal → 상태 변경 mutation → 목록/상세 갱신까지 연결한다.
  */
 export const AdminMemberDetailDrawerShell = ({
   memberId,
@@ -236,6 +239,9 @@ export const AdminMemberDetailDrawerShell = ({
 }: AdminMemberDetailDrawerShellProps) => {
   const [pendingAction, setPendingAction] =
     useState<AdminMemberStatusChangeAction | null>(null);
+  const [statusChangeError, setStatusChangeError] = useState<string | null>(
+    null
+  );
 
   const { data, isPending, isError, isSuccess } = useAdminMemberDetail(
     memberId,
@@ -244,10 +250,11 @@ export const AdminMemberDetailDrawerShell = ({
   const suspendMutation = useSuspendAdminMember();
   const activateMutation = useActivateAdminMember();
 
-  // Drawer가 닫히면 ConfirmModal 상태도 함께 초기화한다.
+  // Drawer가 닫히면 ConfirmModal·에러 상태도 함께 초기화한다.
   useEffect(() => {
     if (!open) {
       setPendingAction(null);
+      setStatusChangeError(null);
     }
   }, [open]);
 
@@ -263,6 +270,7 @@ export const AdminMemberDetailDrawerShell = ({
   const handleRequestStatusChange = (
     action: AdminMemberStatusChangeAction
   ) => {
+    setStatusChangeError(null);
     setPendingAction(action);
   };
 
@@ -273,12 +281,16 @@ export const AdminMemberDetailDrawerShell = ({
     }
 
     setPendingAction(null);
+    setStatusChangeError(null);
   };
 
   const handleConfirmStatusChange = async () => {
     if (!pendingAction || !memberId || isStatusChangePending) {
       return;
     }
+
+    // 재시도 시 이전 실패 문구를 먼저 지운다.
+    setStatusChangeError(null);
 
     try {
       if (pendingAction === 'suspend') {
@@ -287,10 +299,11 @@ export const AdminMemberDetailDrawerShell = ({
         await activateMutation.mutateAsync(memberId);
       }
 
-      // 성공 시에만 모달을 닫는다. 목록/상세 갱신은 이후 작업에서 처리한다.
+      // 성공 시 모달만 닫고 Drawer는 유지한다. 목록·상세는 mutation onSuccess에서 invalidate한다.
       setPendingAction(null);
     } catch {
-      // 에러 UI는 이후 작업에서 연결한다. 모달은 열어 두어 재시도·취소를 가능하게 한다.
+      // 실패 시 모달을 유지해 재시도·취소를 가능하게 한다.
+      setStatusChangeError(STATUS_CHANGE_ERROR_MESSAGE);
     }
   };
 
@@ -342,6 +355,7 @@ export const AdminMemberDetailDrawerShell = ({
           description={modalCopy.description}
           confirmText={modalCopy.confirmText}
           confirmLoading={isStatusChangePending}
+          errorMessage={statusChangeError ?? undefined}
           onConfirm={() => {
             void handleConfirmStatusChange();
           }}

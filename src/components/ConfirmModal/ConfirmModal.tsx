@@ -39,6 +39,8 @@ export interface ConfirmModalProps {
   className?: string;
   /** true면 확인 버튼 loading + 취소 비활성화로 중복 요청을 막는다. */
   confirmLoading?: boolean;
+  /** description 아래에 표시하는 실패 안내. 없으면 숨긴다. */
+  errorMessage?: string;
 }
 
 export const ConfirmModal = ({
@@ -51,9 +53,11 @@ export const ConfirmModal = ({
   onCancel,
   className,
   confirmLoading = false,
+  errorMessage,
 }: ConfirmModalProps) => {
   const titleId = useId();
   const descriptionId = useId();
+  const errorId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
   const mounted = useSyncExternalStore(
@@ -131,6 +135,13 @@ export const ConfirmModal = ({
     return null;
   }
 
+  const describedBy = [
+    description ? descriptionId : null,
+    errorMessage ? errorId : null,
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   const handleOverlayClick = () => {
     // 요청 중에는 오버레이 클릭으로 닫지 않는다.
     if (confirmLoading) {
@@ -155,7 +166,7 @@ export const ConfirmModal = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        aria-describedby={description ? descriptionId : undefined}
+        aria-describedby={describedBy || undefined}
         tabIndex={-1}
         className={cn(confirmModalPanelVariants(), className)}
         onClick={handlePanelClick}
@@ -167,6 +178,12 @@ export const ConfirmModal = ({
         {description ? (
           <p id={descriptionId} className="text-md-medium text-gray-500">
             {description}
+          </p>
+        ) : null}
+
+        {errorMessage ? (
+          <p id={errorId} role="alert" className="text-md-medium text-red-200">
+            {errorMessage}
           </p>
         ) : null}
 
