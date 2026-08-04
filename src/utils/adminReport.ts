@@ -3,10 +3,10 @@ import { format } from 'date-fns';
 import type { StatusBadgeProps } from '@/components/StatusBadge/StatusBadge';
 import type {
   AdminReportCategory,
-  AdminReportListItem,
   AdminReportStatus,
   AdminReportTarget,
   AdminReportTargetInfo,
+  AdminReportUserType,
 } from '@/types/adminReport';
 
 /** 상태 → 한글 라벨. enum 원문을 그대로 노출하지 않기 위해 매핑한다. */
@@ -43,6 +43,13 @@ export const ADMIN_REPORT_CATEGORY_LABEL: Record<AdminReportCategory, string> =
     ABUSIVE_LANGUAGE: '욕설/비방',
   };
 
+/** 신고자/대상 userType → 한글 라벨 */
+export const ADMIN_REPORT_USER_TYPE_LABEL: Record<AdminReportUserType, string> =
+  {
+    CUSTOMER: '일반 회원',
+    MOVER: '기사',
+  };
+
 /** 목록·상세 신고일 표시 (회원 목록과 동일 포맷) */
 export const formatAdminReportCreatedAt = (iso: string) => {
   const date = new Date(iso);
@@ -55,9 +62,10 @@ export const formatAdminReportCreatedAt = (iso: string) => {
 };
 
 /** 신고자 셀 표시명. 닉네임이 있으면 이름 옆에 보조로 붙인다. */
-export const formatAdminReportReporter = (
-  reporter: AdminReportListItem['reporter']
-) => {
+export const formatAdminReportReporter = (reporter: {
+  name: string;
+  nickname: string;
+}) => {
   if (reporter.nickname && reporter.nickname !== reporter.name) {
     return `${reporter.name} (${reporter.nickname})`;
   }

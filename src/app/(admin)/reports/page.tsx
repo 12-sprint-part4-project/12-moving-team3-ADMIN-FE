@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type ChangeEvent, type ReactNode } from 'react';
 
+import { AdminReportDetailDrawer } from '@/components/AdminReportDetailDrawer/AdminReportDetailDrawer';
 import { Button } from '@/components/Button/Button';
 import { DataTable, type Column } from '@/components/DataTable/DataTable';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
@@ -147,6 +148,9 @@ const REPORT_COLUMNS: Column<AdminReportListItem>[] = [
 const ReportsPage = () => {
   const [filters, setFilters] =
     useState<AdminReportListFilters>(INITIAL_FILTERS);
+  // 목록 item을 그대로 보관해 상세 API 없이 Drawer에 표시한다.
+  const [selectedReport, setSelectedReport] =
+    useState<AdminReportListItem | null>(null);
 
   const listQuery = useMemo(() => toListQuery(filters), [filters]);
   const { data, isPending, isError } = useAdminReportList(listQuery);
@@ -203,6 +207,14 @@ const ReportsPage = () => {
     setFilters(INITIAL_FILTERS);
   };
 
+  const handleRowClick = (report: AdminReportListItem) => {
+    setSelectedReport(report);
+  };
+
+  const handleCloseDetail = () => {
+    setSelectedReport(null);
+  };
+
   const renderListBody = (): ReactNode => {
     if (isPending) {
       return <LoadingState />;
@@ -248,6 +260,7 @@ const ReportsPage = () => {
           data={items}
           rowKey="id"
           caption="신고 목록"
+          onRowClick={handleRowClick}
         />
         {totalPages > 0 ? (
           <div className="mt-6 flex justify-center">
@@ -289,6 +302,12 @@ const ReportsPage = () => {
           {renderListBody()}
         </section>
       </div>
+
+      <AdminReportDetailDrawer
+        report={selectedReport}
+        open={Boolean(selectedReport)}
+        onClose={handleCloseDetail}
+      />
     </>
   );
 };
