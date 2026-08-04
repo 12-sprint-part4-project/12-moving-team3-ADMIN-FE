@@ -1,14 +1,21 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useMemo, useState, type ChangeEvent, type ReactNode } from 'react';
 
+import { Button } from '@/components/Button/Button';
 import { DataTable, type Column } from '@/components/DataTable/DataTable';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
+import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { PageHeader } from '@/components/PageHeader/PageHeader';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { useAdminReportList } from '@/hooks/useAdminReportList';
-import type { AdminReportListItem } from '@/types/adminReport';
+import type {
+  AdminReportListItem,
+  AdminReportListQuery,
+  AdminReportStatus,
+  AdminReportTarget,
+} from '@/types/adminReport';
 import {
   ADMIN_REPORT_CATEGORY_LABEL,
   ADMIN_REPORT_STATUS_BADGE_VARIANT,
@@ -18,6 +25,67 @@ import {
   formatAdminReportReporter,
   formatAdminReportTarget,
 } from '@/utils/adminReport';
+
+/** 상태 필터: 빈 문자열은 status 미전달(전체) */
+const STATUS_FILTER_OPTIONS = [
+  { label: '전체', value: '' },
+  { label: '대기', value: 'PENDING' },
+  { label: '처리 완료', value: 'RESOLVED' },
+  { label: '반려', value: 'REJECTED' },
+] as const;
+
+/** 대상 유형 필터: 빈 문자열은 target 미전달(전체). value는 BE enum과 일치시킨다. */
+const TARGET_FILTER_OPTIONS = [
+  { label: '전체', value: '' },
+  { label: '사용자', value: 'USER' },
+  { label: '리뷰', value: 'REVIEW' },
+  { label: '채팅방', value: 'CHAT_ROOM' },
+  { label: '메시지', value: 'MESSAGE' },
+  { label: '게시글', value: 'ARTICLE' },
+  { label: '댓글', value: 'COMMENT' },
+] as const;
+
+interface AdminReportListFilters {
+  status?: AdminReportStatus;
+  target?: AdminReportTarget;
+}
+
+const INITIAL_FILTERS: AdminReportListFilters = {};
+
+/** select value → AdminReportStatus | undefined. 알 수 없는 값은 무시한다. */
+const parseReportStatusFilter = (
+  value: string
+): AdminReportStatus | undefined => {
+  if (value === 'PENDING' || value === 'RESOLVED' || value === 'REJECTED') {
+    return value;
+  }
+
+  return undefined;
+};
+
+/** select value → AdminReportTarget | undefined. 알 수 없는 값은 무시한다. */
+const parseReportTargetFilter = (
+  value: string
+): AdminReportTarget | undefined => {
+  if (
+    value === 'USER' ||
+    value === 'REVIEW' ||
+    value === 'CHAT_ROOM' ||
+    value === 'MESSAGE' ||
+    value === 'ARTICLE' ||
+    value === 'COMMENT'
+  ) {
+    return value;
+  }
+
+  return undefined;
+};
+
+/** UI 필터 → API query. 전체(undefined)인 필드는 객체에 넣지 않아 query string에서 빠진다. */
+const toListQuery = (filters: AdminReportListFilters): AdminReportListQuery => ({
+  ...(filters.status ? { status: filters.status } : {}),
+  ...(filters.target ? { target: filters.target } : {}),
+});
 
 const REPORT_COLUMNS: Column<AdminReportListItem>[] = [
   {
@@ -66,8 +134,32 @@ const REPORT_COLUMNS: Column<AdminReportListItem>[] = [
 ];
 
 const ReportsPage = () => {
-  const { data, isPending, isError } = useAdminReportList();
+  const [filters, setFilters] =
+    useState<AdminReportListFilters>(INITIAL_FILTERS);
+
+  const listQuery = useMemo(() => toListQuery(filters), [filters]);
+  const { data, isPending, isError } = useAdminReportList(listQuery);
   const items = data?.data.items ?? [];
+
+  const hasActiveFilters = Boolean(filters.status || filters.target);
+
+  const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setFilters((prev) => ({
+      ...prev,
+      status: parseReportStatusFilter(event.target.value),
+    }));
+  };
+
+  const handleTargetChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setFilters((prev) => ({
+      ...prev,
+      target: parseReportTargetFilter(event.target.value),
+    }));
+  };
+
+  const handleResetFilters = () => {
+    setFilters(INITIAL_FILTERS);
+  };
 
   const renderListBody = (): ReactNode => {
     if (isPending) {
@@ -84,7 +176,27 @@ const ReportsPage = () => {
     }
 
     if (items.length === 0) {
-      return <EmptyState title="등록된 신고가 없습니다." />;
+      return (
+        <EmptyState
+          title={
+            hasActiveFilters
+              ? '검색 결과가 없습니다.'
+              : '등록된 신고가 없습니다.'
+          }
+          description={
+            hasActiveFilters
+              ? '검색 조건을 변경한 후 다시 시도해 주세요.'
+              : undefined
+          }
+          action={
+            hasActiveFilters ? (
+              <Button variant="secondary" onClick={handleResetFilters}>
+                필터 초기화
+              </Button>
+            ) : undefined
+          }
+        />
+      );
     }
 
     return (
@@ -105,6 +217,21 @@ const ReportsPage = () => {
       />
 
       <div className="mt-6 flex flex-col gap-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <FilterSelect
+            aria-label="상태"
+            value={filters.status ?? ''}
+            onChange={handleStatusChange}
+            options={[...STATUS_FILTER_OPTIONS]}
+          />
+          <FilterSelect
+            aria-label="대상 유형"
+            value={filters.target ?? ''}
+            onChange={handleTargetChange}
+            options={[...TARGET_FILTER_OPTIONS]}
+          />
+        </div>
+
         <section className="rounded-lg border border-line-200 bg-white">
           {renderListBody()}
         </section>

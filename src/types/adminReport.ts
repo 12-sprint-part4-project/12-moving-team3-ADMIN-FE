@@ -103,6 +103,17 @@ export type AdminReportTargetInfo =
   | AdminReportArticleTargetInfo
   | AdminReportCommentTargetInfo;
 
+/**
+ * GET /api/admin/reports 쿼리 파라미터.
+ * status·target 미전달은 전체 조회. page·pageSize는 BE 기본값을 쓰며 이번 단계에서 UI는 건드리지 않는다.
+ */
+export interface AdminReportListQuery {
+  status?: AdminReportStatus;
+  target?: AdminReportTarget;
+  page?: number;
+  pageSize?: number;
+}
+
 /** GET /api/admin/reports 목록 아이템 */
 export interface AdminReportListItem {
   id: number;
