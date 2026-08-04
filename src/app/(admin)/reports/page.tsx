@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { PageHeader } from '@/components/PageHeader/PageHeader';
+import { Pagination } from '@/components/Pagination/Pagination';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { useAdminReportList } from '@/hooks/useAdminReportList';
 import type {
@@ -25,6 +26,9 @@ import {
   formatAdminReportReporter,
   formatAdminReportTarget,
 } from '@/utils/adminReport';
+
+/** BE listQuerySchema 기본값과 동일 */
+const DEFAULT_PAGE_SIZE = 10;
 
 /** 상태 필터: 빈 문자열은 status 미전달(전체) */
 const STATUS_FILTER_OPTIONS = [
@@ -48,9 +52,14 @@ const TARGET_FILTER_OPTIONS = [
 interface AdminReportListFilters {
   status?: AdminReportStatus;
   target?: AdminReportTarget;
+  page: number;
+  pageSize: number;
 }
 
-const INITIAL_FILTERS: AdminReportListFilters = {};
+const INITIAL_FILTERS: AdminReportListFilters = {
+  page: 1,
+  pageSize: DEFAULT_PAGE_SIZE,
+};
 
 /** select value → AdminReportStatus | undefined. 알 수 없는 값은 무시한다. */
 const parseReportStatusFilter = (
@@ -81,8 +90,10 @@ const parseReportTargetFilter = (
   return undefined;
 };
 
-/** UI 필터 → API query. 전체(undefined)인 필드는 객체에 넣지 않아 query string에서 빠진다. */
+/** UI 필터 → API query. 전체(undefined)인 status/target은 객체에 넣지 않아 query string에서 빠진다. */
 const toListQuery = (filters: AdminReportListFilters): AdminReportListQuery => ({
+  page: filters.page,
+  pageSize: filters.pageSize,
   ...(filters.status ? { status: filters.status } : {}),
   ...(filters.target ? { target: filters.target } : {}),
 });
@@ -139,22 +150,53 @@ const ReportsPage = () => {
 
   const listQuery = useMemo(() => toListQuery(filters), [filters]);
   const { data, isPending, isError } = useAdminReportList(listQuery);
+
   const items = data?.data.items ?? [];
+  const pagination = data?.data.pagination;
+  const totalPages = pagination?.totalPages ?? 0;
+  const currentPage = pagination?.page ?? filters.page;
+
+  // 응답 기준 page가 범위를 벗어나면 렌더 중 보정한다(effect setState 금지 규칙 회피).
+  // totalPages=0이면 1페이지로 맞춘다. prev 참조 유지로 불필요한 재렌더를 막는다.
+  if (!isPending && pagination) {
+    const safePage = pagination.totalPages > 0 ? pagination.totalPages : 1;
+
+    if (filters.page > safePage) {
+      setFilters((prev) =>
+        prev.page <= safePage ? prev : { ...prev, page: safePage }
+      );
+    }
+  }
 
   const hasActiveFilters = Boolean(filters.status || filters.target);
 
-  const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
+  const updateFilters = (
+    patch: Partial<AdminReportListFilters>,
+    options?: { resetPage?: boolean }
+  ) => {
     setFilters((prev) => ({
       ...prev,
-      status: parseReportStatusFilter(event.target.value),
+      ...patch,
+      ...(options?.resetPage ? { page: 1 } : {}),
     }));
   };
 
+  const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    updateFilters(
+      { status: parseReportStatusFilter(event.target.value) },
+      { resetPage: true }
+    );
+  };
+
   const handleTargetChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setFilters((prev) => ({
-      ...prev,
-      target: parseReportTargetFilter(event.target.value),
-    }));
+    updateFilters(
+      { target: parseReportTargetFilter(event.target.value) },
+      { resetPage: true }
+    );
+  };
+
+  const handlePageChange = (page: number) => {
+    updateFilters({ page });
   };
 
   const handleResetFilters = () => {
@@ -200,12 +242,23 @@ const ReportsPage = () => {
     }
 
     return (
-      <DataTable
-        columns={REPORT_COLUMNS}
-        data={items}
-        rowKey="id"
-        caption="신고 목록"
-      />
+      <>
+        <DataTable
+          columns={REPORT_COLUMNS}
+          data={items}
+          rowKey="id"
+          caption="신고 목록"
+        />
+        {totalPages > 0 ? (
+          <div className="mt-6 flex justify-center">
+            <Pagination
+              page={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        ) : null}
+      </>
     );
   };
 
