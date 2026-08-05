@@ -1,9 +1,11 @@
 import {
+  ADMIN_DASHBOARD_REQUEST_STATUS_PATH,
   ADMIN_DASHBOARD_REQUEST_TRENDS_PATH,
   ADMIN_DASHBOARD_STATISTICS_PATH,
 } from '@/api/adminDashboardPaths';
 import { axiosInstance } from '@/api/axiosInstance';
 import type {
+  AdminDashboardRequestStatusResponse,
   AdminDashboardRequestTrendQuery,
   AdminDashboardRequestTrendResponse,
   AdminDashboardStatisticsQuery,
@@ -41,3 +43,18 @@ export const getAdminDashboardRequestTrend = async (
 
   return response.data;
 };
+
+/**
+ * 관리자 대시보드 견적 요청 상태 현황 조회.
+ * Access Token은 axiosInstance Request Interceptor가 Authorization에 첨부한다.
+ * Query Parameter 없이 최근 30일 기준 상태별 건수를 반환한다.
+ */
+export const getAdminDashboardRequestStatus =
+  async (): Promise<AdminDashboardRequestStatusResponse> => {
+    const response =
+      await axiosInstance.get<AdminDashboardRequestStatusResponse>(
+        ADMIN_DASHBOARD_REQUEST_STATUS_PATH
+      );
+
+    return response.data;
+  };

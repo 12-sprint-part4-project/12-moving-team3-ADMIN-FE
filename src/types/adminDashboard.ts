@@ -45,3 +45,18 @@ export interface AdminDashboardRequestTrendItem {
 export interface AdminDashboardRequestTrendResponse {
   data: AdminDashboardRequestTrendItem[];
 }
+
+/** GET /api/admin/dashboard/charts/request-status 성공 시 data 필드 */
+export interface AdminDashboardRequestStatus {
+  total: number;
+  submitted: number;
+  confirmed: number;
+  completed: number;
+  expired: number;
+  canceled: number;
+}
+
+/** GET /api/admin/dashboard/charts/request-status 성공 응답 */
+export interface AdminDashboardRequestStatusResponse {
+  data: AdminDashboardRequestStatus;
+}
