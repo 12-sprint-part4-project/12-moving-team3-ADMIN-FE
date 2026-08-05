@@ -24,3 +24,24 @@ export interface AdminDashboardStatistics {
 export interface AdminDashboardStatisticsResponse {
   data: AdminDashboardStatistics;
 }
+
+/** GET /api/admin/dashboard/charts/request-trend period */
+export type AdminDashboardRequestTrendPeriod = 'DAY' | 'WEEK' | 'MONTH';
+
+/** GET /api/admin/dashboard/charts/request-trend 쿼리 파라미터 */
+export interface AdminDashboardRequestTrendQuery {
+  period: AdminDashboardRequestTrendPeriod;
+}
+
+/** 견적 요청 추이 데이터 포인트 */
+export interface AdminDashboardRequestTrendItem {
+  /** 기간에 따른 시간 또는 날짜 레이블 */
+  label: string;
+  /** 해당 구간에 제출된 견적 요청 수 */
+  count: number;
+}
+
+/** GET /api/admin/dashboard/charts/request-trend 성공 응답 */
+export interface AdminDashboardRequestTrendResponse {
+  data: AdminDashboardRequestTrendItem[];
+}

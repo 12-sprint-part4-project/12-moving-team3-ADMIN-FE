@@ -1,4 +1,7 @@
-import type { AdminDashboardStatisticsQuery } from '@/types/adminDashboard';
+import type {
+  AdminDashboardRequestTrendPeriod,
+  AdminDashboardStatisticsQuery,
+} from '@/types/adminDashboard';
 
 /**
  * 관리자 대시보드 조회용 queryKey.
@@ -8,4 +11,6 @@ export const ADMIN_DASHBOARD_QUERY_KEYS = {
   all: ['adminDashboard'] as const,
   statistics: (params?: AdminDashboardStatisticsQuery) =>
     [...ADMIN_DASHBOARD_QUERY_KEYS.all, 'statistics', params] as const,
+  requestTrend: (period: AdminDashboardRequestTrendPeriod) =>
+    [...ADMIN_DASHBOARD_QUERY_KEYS.all, 'requestTrend', period] as const,
 };

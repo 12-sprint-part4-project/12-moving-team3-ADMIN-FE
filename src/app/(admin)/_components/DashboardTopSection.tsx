@@ -32,7 +32,7 @@ interface KpiCardItem {
 const KPI_CARDS: KpiCardItem[] = [
   {
     key: 'userCount',
-    title: '전체 사용자 수',
+    title: '유저 수',
     unit: '명',
     icon: <Users className="size-6 text-blue-300" />,
     iconBackgroundClassName: 'bg-blue-100',
