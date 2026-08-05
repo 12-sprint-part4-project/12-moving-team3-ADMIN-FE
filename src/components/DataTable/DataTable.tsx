@@ -31,8 +31,6 @@ export interface DataTableProps<T> {
   emptyMessage?: string;
   caption?: string;
   className?: string;
-  /** 있으면 행 클릭·Enter/Space로 호출한다. hover/cursor도 함께 켠다. */
-  onRowClick?: (row: T, index: number) => void;
 }
 
 const CELL_ALIGN_CLASS: Record<CellAlign, string> = {
@@ -108,10 +106,8 @@ export const DataTable = <T,>({
   emptyMessage = DEFAULT_EMPTY_MESSAGE,
   caption,
   className,
-  onRowClick,
 }: DataTableProps<T>) => {
   const columnCount = columns.length;
-  const isRowInteractive = Boolean(onRowClick);
 
   return (
     <div className={cn('w-full overflow-x-auto', className)}>
@@ -157,30 +153,7 @@ export const DataTable = <T,>({
             data.map((row, index) => (
               <tr
                 key={resolveRowKey(row, rowKey)}
-                className={cn(
-                  'border-b border-line-200 bg-white',
-                  isRowInteractive &&
-                    'cursor-pointer transition-colors hover:bg-background-200'
-                )}
-                // 행 클릭으로 상세를 열 때만 키보드로도 같은 동작을 제공한다.
-                tabIndex={isRowInteractive ? 0 : undefined}
-                onClick={
-                  onRowClick
-                    ? () => {
-                        onRowClick(row, index);
-                      }
-                    : undefined
-                }
-                onKeyDown={
-                  onRowClick
-                    ? (event) => {
-                        if (event.key === 'Enter' || event.key === ' ') {
-                          event.preventDefault();
-                          onRowClick(row, index);
-                        }
-                      }
-                    : undefined
-                }
+                className="border-b border-line-200 bg-white"
               >
                 {columns.map((column) => (
                   <td

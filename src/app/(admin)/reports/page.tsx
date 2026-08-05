@@ -1,6 +1,13 @@
 'use client';
 
-import { useMemo, useState, type ChangeEvent, type ReactNode } from 'react';
+import {
+  useCallback,
+  useMemo,
+  useState,
+  type ChangeEvent,
+  type MouseEvent,
+  type ReactNode,
+} from 'react';
 
 import { AdminReportDetailDrawer } from '@/components/AdminReportDetailDrawer/AdminReportDetailDrawer';
 import { Button } from '@/components/Button/Button';
@@ -99,52 +106,6 @@ const toListQuery = (filters: AdminReportListFilters): AdminReportListQuery => (
   ...(filters.target ? { target: filters.target } : {}),
 });
 
-const REPORT_COLUMNS: Column<AdminReportListItem>[] = [
-  {
-    key: 'id',
-    header: '신고 ID',
-    accessor: 'id',
-  },
-  {
-    key: 'status',
-    header: '상태',
-    align: 'center',
-    render: (row) => (
-      <StatusBadge
-        variant={ADMIN_REPORT_STATUS_BADGE_VARIANT[row.status]}
-        label={ADMIN_REPORT_STATUS_LABEL[row.status]}
-      />
-    ),
-  },
-  {
-    key: 'target',
-    header: '대상 유형',
-    render: (row) => ADMIN_REPORT_TARGET_LABEL[row.target],
-  },
-  {
-    key: 'category',
-    header: '신고 유형',
-    render: (row) => ADMIN_REPORT_CATEGORY_LABEL[row.category],
-  },
-  {
-    key: 'reporter',
-    header: '신고자',
-    render: (row) => formatAdminReportReporter(row.reporter),
-  },
-  {
-    key: 'targetInfo',
-    header: '신고 대상',
-    className: 'max-w-72 truncate',
-    // targetInfo null은 formatAdminReportTarget에서 fallback 문구로 처리한다.
-    render: (row) => formatAdminReportTarget(row.target, row.targetInfo),
-  },
-  {
-    key: 'createdAt',
-    header: '신고일',
-    render: (row) => formatAdminReportCreatedAt(row.createdAt),
-  },
-];
-
 const ReportsPage = () => {
   const [filters, setFilters] =
     useState<AdminReportListFilters>(INITIAL_FILTERS);
@@ -173,6 +134,79 @@ const ReportsPage = () => {
   }
 
   const hasActiveFilters = Boolean(filters.status || filters.target);
+
+  const handleOpenDetail = useCallback(
+    (event: MouseEvent<HTMLButtonElement>, report: AdminReportListItem) => {
+      // 행/부모로 클릭이 전파되지 않도록 막아 의도치 않은 동작을 방지한다.
+      event.stopPropagation();
+      setSelectedReport(report);
+    },
+    []
+  );
+
+  const columns = useMemo(
+    (): Column<AdminReportListItem>[] => [
+      {
+        key: 'id',
+        header: '신고 ID',
+        accessor: 'id',
+      },
+      {
+        key: 'status',
+        header: '상태',
+        align: 'center',
+        render: (row) => (
+          <StatusBadge
+            variant={ADMIN_REPORT_STATUS_BADGE_VARIANT[row.status]}
+            label={ADMIN_REPORT_STATUS_LABEL[row.status]}
+          />
+        ),
+      },
+      {
+        key: 'target',
+        header: '대상 유형',
+        render: (row) => ADMIN_REPORT_TARGET_LABEL[row.target],
+      },
+      {
+        key: 'category',
+        header: '신고 유형',
+        render: (row) => ADMIN_REPORT_CATEGORY_LABEL[row.category],
+      },
+      {
+        key: 'reporter',
+        header: '신고자',
+        render: (row) => formatAdminReportReporter(row.reporter),
+      },
+      {
+        key: 'targetInfo',
+        header: '신고 대상',
+        className: 'max-w-72 truncate',
+        // targetInfo null은 formatAdminReportTarget에서 fallback 문구로 처리한다.
+        render: (row) => formatAdminReportTarget(row.target, row.targetInfo),
+      },
+      {
+        key: 'createdAt',
+        header: '신고일',
+        render: (row) => formatAdminReportCreatedAt(row.createdAt),
+      },
+      {
+        key: 'actions',
+        header: '관리',
+        align: 'center',
+        // 행 전체가 아닌 실제 button으로 Drawer를 열어 키보드·스크린리더 접근성을 맞춘다.
+        render: (row) => (
+          <Button
+            variant="secondary"
+            className="px-3 py-1.5 text-sm-medium"
+            onClick={(event) => handleOpenDetail(event, row)}
+          >
+            상세 보기
+          </Button>
+        ),
+      },
+    ],
+    [handleOpenDetail]
+  );
 
   const updateFilters = (
     patch: Partial<AdminReportListFilters>,
@@ -205,10 +239,6 @@ const ReportsPage = () => {
 
   const handleResetFilters = () => {
     setFilters(INITIAL_FILTERS);
-  };
-
-  const handleRowClick = (report: AdminReportListItem) => {
-    setSelectedReport(report);
   };
 
   const handleCloseDetail = () => {
@@ -256,11 +286,10 @@ const ReportsPage = () => {
     return (
       <>
         <DataTable
-          columns={REPORT_COLUMNS}
+          columns={columns}
           data={items}
           rowKey="id"
           caption="신고 목록"
-          onRowClick={handleRowClick}
         />
         {totalPages > 0 ? (
           <div className="mt-6 flex justify-center">
