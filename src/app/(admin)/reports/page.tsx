@@ -109,7 +109,7 @@ const toListQuery = (filters: AdminReportListFilters): AdminReportListQuery => (
 const ReportsPage = () => {
   const [filters, setFilters] =
     useState<AdminReportListFilters>(INITIAL_FILTERS);
-  // 상세 API 연동 전: 선택 ID만 보관해 Drawer 열림/닫힘을 연결한다.
+  // Drawer 열림·상세 조회 키. null이면 Drawer가 닫히고 상세 요청도 중단된다.
   const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
 
   const listQuery = useMemo(() => toListQuery(filters), [filters]);
@@ -334,7 +334,6 @@ const ReportsPage = () => {
       <AdminReportDetailDrawer
         open={Boolean(selectedReportId)}
         reportId={selectedReportId}
-        detail={null}
         onClose={handleCloseDetail}
       />
 
