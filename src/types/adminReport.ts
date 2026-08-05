@@ -146,3 +146,83 @@ export interface AdminReportListData {
 export interface AdminReportListResponse {
   data: AdminReportListData;
 }
+
+/** 신고를 처리한 관리자 요약. PENDING이면 null */
+export interface AdminReportAdmin {
+  id: number;
+  name: string;
+  email: string;
+}
+
+/**
+ * 신고자 상세.
+ * 목록 요약(AdminReportReporter)에 탈퇴 상태를 더한다.
+ */
+export interface AdminReportDetailReporter extends AdminReportReporter {
+  isDeleted: boolean;
+  /** ISO date-time. 미탈퇴면 null */
+  deletedAt: string | null;
+}
+
+/**
+ * 대상·콘텐츠에 연결된 사용자 요약.
+ * 작성자/발신자가 없으면 null로 둔다.
+ */
+export interface AdminReportDetailUserSummary {
+  id: string;
+  name: string;
+  nickname: string;
+  email: string;
+  userType: AdminReportUserType;
+  isDeleted: boolean;
+  deletedAt: string | null;
+}
+
+/**
+ * 신고 대상 상태.
+ * 목록은 미존재·삭제 시 targetInfo를 null로 두지만,
+ * 상세는 exists/isDeleted로 구분해 "없음"과 "삭제됨"을 다르게 표시한다.
+ */
+export interface AdminReportDetailTargetInfo {
+  type: AdminReportTarget;
+  id: string;
+  exists: boolean;
+  isDeleted: boolean;
+  user: AdminReportDetailUserSummary | null;
+}
+
+/**
+ * 신고된 콘텐츠 본문.
+ * USER 대상처럼 별도 콘텐츠가 없으면 상위 content가 null이다.
+ * metadata는 target별 전용 필드(rating, messageType 등)용 확장 슬롯이다.
+ */
+export interface AdminReportDetailContent {
+  type: AdminReportTarget;
+  id: string;
+  title: string | null;
+  body: string | null;
+  createdAt: string | null;
+  deletedAt: string | null;
+  metadata: Record<string, unknown> | null;
+}
+
+/** GET /api/admin/reports/:reportId 성공 시 data 필드 */
+export interface AdminReportDetail {
+  id: number;
+  target: AdminReportTarget;
+  targetId: string;
+  category: AdminReportCategory;
+  status: AdminReportStatus;
+  /** 미처리(PENDING)면 null */
+  adminId: number | null;
+  admin: AdminReportAdmin | null;
+  createdAt: string;
+  reporter: AdminReportDetailReporter;
+  targetInfo: AdminReportDetailTargetInfo;
+  content: AdminReportDetailContent | null;
+}
+
+/** GET /api/admin/reports/:reportId 성공 응답 */
+export interface AdminReportDetailResponse {
+  data: AdminReportDetail;
+}

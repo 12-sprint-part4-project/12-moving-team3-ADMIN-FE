@@ -1,6 +1,10 @@
-import { ADMIN_REPORT_LIST_PATH } from '@/api/adminReportPaths';
+import {
+  ADMIN_REPORT_LIST_PATH,
+  getAdminReportDetailPath,
+} from '@/api/adminReportPaths';
 import { axiosInstance } from '@/api/axiosInstance';
 import type {
+  AdminReportDetailResponse,
   AdminReportListQuery,
   AdminReportListResponse,
 } from '@/types/adminReport';
@@ -16,6 +20,20 @@ export const getAdminReportList = async (
   const response = await axiosInstance.get<AdminReportListResponse>(
     ADMIN_REPORT_LIST_PATH,
     { params }
+  );
+
+  return response.data;
+};
+
+/**
+ * 관리자 신고 상세 조회.
+ * Access Token은 axiosInstance Request Interceptor가 Authorization에 첨부한다.
+ */
+export const getAdminReportDetail = async (
+  reportId: number
+): Promise<AdminReportDetailResponse> => {
+  const response = await axiosInstance.get<AdminReportDetailResponse>(
+    getAdminReportDetailPath(reportId)
   );
 
   return response.data;
