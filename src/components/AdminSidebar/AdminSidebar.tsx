@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import {
   CircleAlert,
   CircleCheck,
-  FileText,
+  ClipboardList,
   LayoutDashboard,
   LogOut,
   MessageCircle,
@@ -32,7 +32,7 @@ const ADMIN_MENU_ITEMS: AdminMenuItem[] = [
   { label: '대시보드', href: '/', icon: LayoutDashboard },
   { label: '회원 관리', href: '/members', icon: Users },
   { label: '기사 관리', href: '/drivers', icon: Truck },
-  { label: '견적 관리', href: '/quotes', icon: FileText },
+  { label: '견적 요청 관리', href: '/requests', icon: ClipboardList },
   { label: '완료 건 관리', href: '/completed', icon: CircleCheck },
   { label: '채팅 관리', href: '/chats', icon: MessageCircle },
   { label: '신고 관리', href: '/reports', icon: CircleAlert },
