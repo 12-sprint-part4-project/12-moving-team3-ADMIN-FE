@@ -109,9 +109,8 @@ const toListQuery = (filters: AdminReportListFilters): AdminReportListQuery => (
 const ReportsPage = () => {
   const [filters, setFilters] =
     useState<AdminReportListFilters>(INITIAL_FILTERS);
-  // 목록 item을 그대로 보관해 상세 API 없이 Drawer에 표시한다.
-  const [selectedReport, setSelectedReport] =
-    useState<AdminReportListItem | null>(null);
+  // 상세 API 연동 전: 선택 ID만 보관해 Drawer 열림/닫힘을 연결한다.
+  const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
 
   const listQuery = useMemo(() => toListQuery(filters), [filters]);
   const { data, isPending, isError } = useAdminReportList(listQuery);
@@ -136,10 +135,10 @@ const ReportsPage = () => {
   const hasActiveFilters = Boolean(filters.status || filters.target);
 
   const handleOpenDetail = useCallback(
-    (event: MouseEvent<HTMLButtonElement>, report: AdminReportListItem) => {
+    (event: MouseEvent<HTMLButtonElement>, reportId: number) => {
       // 행/부모로 클릭이 전파되지 않도록 막아 의도치 않은 동작을 방지한다.
       event.stopPropagation();
-      setSelectedReport(report);
+      setSelectedReportId(reportId);
     },
     []
   );
@@ -198,7 +197,7 @@ const ReportsPage = () => {
           <Button
             variant="secondary"
             className="px-3 py-1.5 text-sm-medium"
-            onClick={(event) => handleOpenDetail(event, row)}
+            onClick={(event) => handleOpenDetail(event, row.id)}
           >
             상세 보기
           </Button>
@@ -242,7 +241,7 @@ const ReportsPage = () => {
   };
 
   const handleCloseDetail = () => {
-    setSelectedReport(null);
+    setSelectedReportId(null);
   };
 
   const renderListBody = (): ReactNode => {
@@ -333,10 +332,11 @@ const ReportsPage = () => {
       </div>
 
       <AdminReportDetailDrawer
-        report={selectedReport}
-        open={Boolean(selectedReport)}
+        reportId={selectedReportId}
+        open={Boolean(selectedReportId)}
         onClose={handleCloseDetail}
       />
+
     </>
   );
 };
