@@ -1,7 +1,26 @@
+'use client';
+
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { DataTable, type Column } from '@/components/DataTable/DataTable';
+import { EmptyState } from '@/components/EmptyState/EmptyState';
+import { LoadingState } from '@/components/LoadingState/LoadingState';
+import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
+import { useDashboardRecentActivities } from '@/hooks/useDashboardRecentActivities';
+import type {
+  AdminDashboardRecentCompletedRequest,
+  AdminDashboardRecentReport,
+  AdminDashboardRecentUser,
+} from '@/types/adminDashboard';
+import { formatAdminMemberJoinedAt } from '@/utils/adminMember';
+import {
+  ADMIN_REPORT_CATEGORY_LABEL,
+  ADMIN_REPORT_STATUS_BADGE_VARIANT,
+  ADMIN_REPORT_STATUS_LABEL,
+  ADMIN_REPORT_TARGET_LABEL,
+  formatAdminReportCreatedAt,
+} from '@/utils/adminReport';
 
 interface DashboardPanelProps {
   title: string;
@@ -9,6 +28,10 @@ interface DashboardPanelProps {
   viewAllHref: string;
   children: ReactNode;
 }
+
+/** 최근 활동 테이블 행 높이를 패널 간 동일하게 맞춘다. */
+const DASHBOARD_TABLE_CLASS_NAME =
+  '[&_tbody_td]:h-12 [&_tbody_td]:py-0 [&_tbody_td]:text-md-medium [&_tbody_td]:whitespace-nowrap [&_tbody_td]:align-middle';
 
 /** 하단 요약 패널 공통 레이아웃 */
 const DashboardPanel = ({
@@ -34,81 +57,134 @@ const DashboardPanel = ({
   </article>
 );
 
-/** 행 타입은 레이아웃용. 데이터는 연결하지 않는다. */
-interface RecentReportRow {
-  id: string;
-}
-
-interface RecentMemberRow {
-  id: string;
-}
-
-interface RecentCompletedRow {
-  id: string;
-}
-
-const RECENT_REPORT_COLUMNS: Column<RecentReportRow>[] = [
-  { key: 'createdAt', header: '신고일' },
-  { key: 'target', header: '신고 대상' },
-  { key: 'reason', header: '신고 사유' },
-  { key: 'status', header: '상태', align: 'center' },
+const RECENT_REPORT_COLUMNS: Column<AdminDashboardRecentReport>[] = [
+  {
+    key: 'createdAt',
+    header: '신고일',
+    render: (row) => formatAdminReportCreatedAt(row.createdAt),
+  },
+  {
+    key: 'target',
+    header: '신고 대상',
+    render: (row) => ADMIN_REPORT_TARGET_LABEL[row.target],
+  },
+  {
+    key: 'reason',
+    header: '신고 사유',
+    render: (row) => ADMIN_REPORT_CATEGORY_LABEL[row.category],
+  },
+  {
+    key: 'status',
+    header: '상태',
+    align: 'center',
+    render: (row) => (
+      <StatusBadge
+        variant={ADMIN_REPORT_STATUS_BADGE_VARIANT[row.status]}
+        label={ADMIN_REPORT_STATUS_LABEL[row.status]}
+      />
+    ),
+  },
 ];
 
-const RECENT_MEMBER_COLUMNS: Column<RecentMemberRow>[] = [
-  { key: 'nickname', header: '닉네임' },
-  { key: 'email', header: '이메일' },
-  { key: 'joinedAt', header: '가입일' },
+const RECENT_MEMBER_COLUMNS: Column<AdminDashboardRecentUser>[] = [
+  { key: 'nickname', header: '닉네임', accessor: 'nickname' },
+  { key: 'email', header: '이메일', accessor: 'email' },
+  {
+    key: 'joinedAt',
+    header: '가입일',
+    render: (row) => formatAdminMemberJoinedAt(row.createdAt),
+  },
 ];
 
-const RECENT_COMPLETED_COLUMNS: Column<RecentCompletedRow>[] = [
-  { key: 'requestId', header: '요청 번호' },
-  { key: 'customerName', header: '고객명' },
-  { key: 'moveDate', header: '이사일' },
-  { key: 'driverName', header: '기사명' },
-];
+const RECENT_COMPLETED_COLUMNS: Column<AdminDashboardRecentCompletedRequest>[] =
+  [
+    {
+      key: 'requestId',
+      header: '요청 번호',
+      render: (row) => row.id,
+    },
+    {
+      key: 'customerName',
+      header: '고객명',
+      render: (row) => row.user.name,
+    },
+    {
+      key: 'moveDate',
+      header: '이사일',
+      render: (row) => formatAdminMemberJoinedAt(row.moveDate),
+    },
+    {
+      key: 'driverName',
+      header: '기사명',
+      render: (row) => row.confirmedQuote?.mover.name ?? '-',
+    },
+  ];
 
-export const DashboardBottomSection = () => (
-  <section className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-    <DashboardPanel
-      title="최근 신고"
-      subtitle="(최근 7일)"
-      viewAllHref="/reports"
-    >
-      <DataTable
-        columns={RECENT_REPORT_COLUMNS}
-        data={[]}
-        rowKey="id"
-        caption="최근 신고"
-        emptyMessage="테이블 영역"
-      />
-    </DashboardPanel>
+export const DashboardBottomSection = () => {
+  const { data, isPending, isError } = useDashboardRecentActivities();
+  const activities = data?.data;
 
-    <DashboardPanel
-      title="최근 가입 회원"
-      subtitle="(최근 7일)"
-      viewAllHref="/members"
-    >
-      <DataTable
-        columns={RECENT_MEMBER_COLUMNS}
-        data={[]}
-        rowKey="id"
-        caption="최근 가입 회원"
-        emptyMessage="테이블 영역"
-      />
-    </DashboardPanel>
+  if (isPending) {
+    return <LoadingState />;
+  }
 
-    <DashboardPanel
-      title="최근 완료 건"
-      subtitle="(최근 7일)"
-      viewAllHref="/completed"
-    >
-      <DataTable
-        columns={RECENT_COMPLETED_COLUMNS}
-        data={[]}
-        rowKey="id"
-        caption="최근 완료 건"
-        emptyMessage="테이블 영역"
+  if (isError || !activities) {
+    return (
+      <EmptyState
+        title="최근 활동을 불러오지 못했습니다."
+        description="잠시 후 다시 시도해 주세요."
       />
-    </DashboardPanel>
-  </section>
-);
+    );
+  }
+
+  const { recentReports, recentUsers, recentCompletedRequests } = activities;
+
+  return (
+    <section className="grid grid-cols-1 gap-3 xl:grid-cols-3">
+      <DashboardPanel
+        title="최근 신고 건"
+        subtitle="(최근 7일)"
+        viewAllHref="/reports"
+      >
+        <DataTable
+          className={DASHBOARD_TABLE_CLASS_NAME}
+          columns={RECENT_REPORT_COLUMNS}
+          data={recentReports}
+          rowKey="id"
+          caption="최근 신고 건"
+          emptyMessage="최근 신고가 없습니다."
+        />
+      </DashboardPanel>
+
+      <DashboardPanel
+        title="최근 가입 회원"
+        subtitle="(최근 7일)"
+        viewAllHref="/members"
+      >
+        <DataTable
+          className={DASHBOARD_TABLE_CLASS_NAME}
+          columns={RECENT_MEMBER_COLUMNS}
+          data={recentUsers}
+          rowKey="id"
+          caption="최근 가입 회원"
+          emptyMessage="최근 가입 회원이 없습니다."
+        />
+      </DashboardPanel>
+
+      <DashboardPanel
+        title="최근 완료 건"
+        subtitle="(최근 7일)"
+        viewAllHref="/completed"
+      >
+        <DataTable
+          className={DASHBOARD_TABLE_CLASS_NAME}
+          columns={RECENT_COMPLETED_COLUMNS}
+          data={recentCompletedRequests}
+          rowKey="id"
+          caption="최근 완료 건"
+          emptyMessage="최근 완료 건이 없습니다."
+        />
+      </DashboardPanel>
+    </section>
+  );
+};

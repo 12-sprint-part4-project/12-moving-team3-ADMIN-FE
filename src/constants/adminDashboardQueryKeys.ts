@@ -15,4 +15,6 @@ export const ADMIN_DASHBOARD_QUERY_KEYS = {
     [...ADMIN_DASHBOARD_QUERY_KEYS.all, 'requestTrend', period] as const,
   requestStatus: () =>
     [...ADMIN_DASHBOARD_QUERY_KEYS.all, 'requestStatus'] as const,
+  recentActivities: () =>
+    [...ADMIN_DASHBOARD_QUERY_KEYS.all, 'recentActivities'] as const,
 };

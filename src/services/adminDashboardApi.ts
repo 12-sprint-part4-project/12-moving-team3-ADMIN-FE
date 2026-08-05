@@ -1,10 +1,12 @@
 import {
+  ADMIN_DASHBOARD_RECENT_ACTIVITY_PATH,
   ADMIN_DASHBOARD_REQUEST_STATUS_PATH,
   ADMIN_DASHBOARD_REQUEST_TRENDS_PATH,
   ADMIN_DASHBOARD_STATISTICS_PATH,
 } from '@/api/adminDashboardPaths';
 import { axiosInstance } from '@/api/axiosInstance';
 import type {
+  AdminDashboardRecentActivitiesResponse,
   AdminDashboardRequestStatusResponse,
   AdminDashboardRequestTrendQuery,
   AdminDashboardRequestTrendResponse,
@@ -54,6 +56,21 @@ export const getAdminDashboardRequestStatus =
     const response =
       await axiosInstance.get<AdminDashboardRequestStatusResponse>(
         ADMIN_DASHBOARD_REQUEST_STATUS_PATH
+      );
+
+    return response.data;
+  };
+
+/**
+ * 관리자 대시보드 최근 활동 조회.
+ * Access Token은 axiosInstance Request Interceptor가 Authorization에 첨부한다.
+ * Query Parameter 없이 최근 7일 활동 목록을 반환한다.
+ */
+export const getAdminDashboardRecentActivities =
+  async (): Promise<AdminDashboardRecentActivitiesResponse> => {
+    const response =
+      await axiosInstance.get<AdminDashboardRecentActivitiesResponse>(
+        ADMIN_DASHBOARD_RECENT_ACTIVITY_PATH
       );
 
     return response.data;
