@@ -28,6 +28,13 @@ const meta: Meta<typeof AdminLayout> = {
       },
     },
   },
+  decorators: [
+    (Story) => (
+      <div className="h-dvh">
+        <Story />
+      </div>
+    ),
+  ],
   args: {
     header: mockHeader,
   },
