@@ -3,7 +3,12 @@
 import axios from 'axios';
 import { useState, type ReactNode } from 'react';
 
-import { DetailField } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
+import {
+  DetailField,
+  formatRegion,
+  formatServices,
+  REGION_LABEL,
+} from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
 import { Button } from '@/components/Button/Button';
 import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
@@ -14,6 +19,9 @@ import { useAdminReportDetail } from '@/hooks/useAdminReportDetail';
 import type {
   AdminReportDetail,
   AdminReportDetailContent,
+  AdminReportDetailCustomerProfile,
+  AdminReportDetailMoverProfile,
+  AdminReportDetailMoverServiceRegion,
   AdminReportDetailTargetInfo,
   AdminReportDetailUserSummary,
 } from '@/types/adminReport';
@@ -290,6 +298,112 @@ const ReportContentMetadataFields = ({
   ));
 };
 
+/** 경력 null이면 '-', 있으면 n년 */
+const formatCareer = (career: number | null) => {
+  if (career == null) {
+    return '-';
+  }
+
+  return `${career}년`;
+};
+
+/** 서비스 지역 배열 → 한글 라벨 콤마 구분 */
+const formatServiceRegions = (
+  serviceRegions: AdminReportDetailMoverServiceRegion[]
+) => {
+  if (serviceRegions.length === 0) {
+    return '-';
+  }
+
+  return serviceRegions
+    .map(({ region }) => REGION_LABEL[region] ?? region)
+    .join(', ');
+};
+
+const CustomerProfileFields = ({
+  profile,
+}: {
+  profile: AdminReportDetailCustomerProfile;
+}) => (
+  <dl className="flex flex-col gap-2 text-md-medium">
+    <DetailField label="지역" value={formatRegion(profile.region)} />
+    <DetailField label="서비스" value={formatServices(profile.service)} />
+  </dl>
+);
+
+const MoverProfileFields = ({
+  profile,
+}: {
+  profile: AdminReportDetailMoverProfile;
+}) => (
+  <dl className="flex flex-col gap-2 text-md-medium">
+    <DetailField label="서비스" value={formatServices(profile.service)} />
+    <DetailField label="경력" value={formatCareer(profile.career)} />
+    <DetailMultilineField
+      label="한 줄 소개"
+      value={formatNullableText(profile.shortDescription)}
+    />
+    <DetailMultilineField
+      label="상세 소개"
+      value={formatNullableText(profile.description)}
+    />
+    <DetailField
+      label="서비스 지역"
+      value={formatServiceRegions(profile.serviceRegions)}
+    />
+  </dl>
+);
+
+/**
+ * 부적절한 프로필 신고 전용 프로필 상세.
+ * 다른 카테고리·대상 사용자 없음에서는 섹션 자체를 숨긴다.
+ */
+const ReportProfileSection = ({ detail }: { detail: AdminReportDetail }) => {
+  if (detail.category !== 'INAPPROPRIATE_PROFILE') {
+    return null;
+  }
+
+  const targetUser = detail.targetInfo.user;
+  if (!targetUser) {
+    return null;
+  }
+
+  const profile = targetUser.profile;
+  const emptyMessage = (
+    <p className="text-md-regular text-gray-500">프로필 정보가 없습니다.</p>
+  );
+
+  if (!profile) {
+    return <DetailSection title="프로필 정보">{emptyMessage}</DetailSection>;
+  }
+
+  if (targetUser.userType === 'CUSTOMER') {
+    return (
+      <DetailSection title="프로필 정보">
+        {profile.customer ? (
+          <CustomerProfileFields profile={profile.customer} />
+        ) : (
+          emptyMessage
+        )}
+      </DetailSection>
+    );
+  }
+
+  if (targetUser.userType === 'MOVER') {
+    return (
+      <DetailSection title="프로필 정보">
+        {profile.mover ? (
+          <MoverProfileFields profile={profile.mover} />
+        ) : (
+          emptyMessage
+        )}
+      </DetailSection>
+    );
+  }
+
+  return <DetailSection title="프로필 정보">{emptyMessage}</DetailSection>;
+};
+
 /** content null일 때 대상 상태에 맞는 안내 문구를 고른다. */
 const getEmptyContentMessage = (detail: AdminReportDetail) => {
   if (!detail.targetInfo.exists) {
@@ -349,6 +463,7 @@ const ReportDetailContent = ({ detail }: { detail: AdminReportDetail }) => (
     <ReportBasicInfoSection detail={detail} />
     <ReportReporterSection detail={detail} />
     <ReportTargetInfoSection detail={detail} />
+    <ReportProfileSection detail={detail} />
     <ReportContentSection detail={detail} />
   </div>
 );
