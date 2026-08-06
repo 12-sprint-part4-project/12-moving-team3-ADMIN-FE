@@ -1,7 +1,7 @@
 'use client';
 
 import axios from 'axios';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 
 import { DetailField } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
 import { Button } from '@/components/Button/Button';
@@ -15,6 +15,7 @@ import type {
   AdminReportDetail,
   AdminReportDetailContent,
   AdminReportDetailTargetInfo,
+  AdminReportDetailUserSummary,
 } from '@/types/adminReport';
 import {
   ADMIN_REPORT_CATEGORY_LABEL,
@@ -24,6 +25,7 @@ import {
   ADMIN_REPORT_USER_TYPE_LABEL,
   formatAdminReportCreatedAt,
 } from '@/utils/adminReport';
+import { getS3ImageUrl } from '@/utils/imageUrl';
 
 export interface AdminReportDetailDrawerProps {
   open: boolean;
@@ -190,6 +192,41 @@ const TargetStatusNotice = ({
   );
 };
 
+/**
+ * 신고 대상 사용자 프로필 이미지.
+ * key가 없거나 로드 실패 시 이름/닉네임 이니셜로 fallback한다.
+ */
+const TargetUserProfileImage = ({
+  user,
+}: {
+  user: AdminReportDetailUserSummary;
+}) => {
+  const imageUrl = getS3ImageUrl(user.profileImageKey);
+  const [hasError, setHasError] = useState(false);
+  const initial = (user.nickname || user.name || '?').trim().charAt(0);
+  // 부모에서 profileImageKey로 remount해 URL 변경 시 실패 상태를 초기화한다.
+  const showImage = Boolean(imageUrl) && !hasError;
+
+  return (
+    <div
+      className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-background-300 text-lg-semibold text-gray-500"
+      aria-label={`${user.name} 프로필 이미지`}
+    >
+      {showImage ? (
+        // eslint-disable-next-line @next/next/no-img-element -- S3 공개 URL + onError fallback이 필요해 img를 쓴다.
+        <img
+          src={imageUrl ?? undefined}
+          alt=""
+          className="size-full object-cover"
+          onError={() => setHasError(true)}
+        />
+      ) : (
+        <span aria-hidden>{initial}</span>
+      )}
+    </div>
+  );
+};
+
 const ReportTargetInfoSection = ({ detail }: { detail: AdminReportDetail }) => {
   const { targetInfo, content } = detail;
   const targetUser = targetInfo.user;
@@ -212,8 +249,14 @@ const ReportTargetInfoSection = ({ detail }: { detail: AdminReportDetail }) => {
             label="삭제 여부"
             value={formatBooleanLabel(targetInfo.isDeleted)}
           />
-          {targetUser ? (
-            <>
+        </dl>
+        {targetUser ? (
+          <div className="flex items-start gap-3">
+            <TargetUserProfileImage
+              key={targetUser.profileImageKey ?? targetUser.id}
+              user={targetUser}
+            />
+            <dl className="flex min-w-0 flex-1 flex-col gap-2 text-md-medium">
               <DetailField label="대상 사용자 이름" value={targetUser.name} />
               <DetailField
                 label="대상 사용자 닉네임"
@@ -223,9 +266,9 @@ const ReportTargetInfoSection = ({ detail }: { detail: AdminReportDetail }) => {
                 label="대상 사용자 이메일"
                 value={targetUser.email}
               />
-            </>
-          ) : null}
-        </dl>
+            </dl>
+          </div>
+        ) : null}
       </div>
     </DetailSection>
   );
