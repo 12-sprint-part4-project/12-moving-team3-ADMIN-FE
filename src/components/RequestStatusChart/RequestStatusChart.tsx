@@ -76,11 +76,7 @@ export const RequestStatusChart = ({
   }));
 
   return (
-    <div
-      className={cn('flex flex-col gap-4', className)}
-      role="img"
-      aria-label="견적 요청 상태 도넛 차트"
-    >
+    <div className={cn('flex flex-col gap-4', className)}>
       <div className="flex flex-col items-center gap-10 sm:flex-row sm:items-center">
         <div className="relative size-64 shrink-0">
           <ResponsiveContainer width="100%" height="100%">

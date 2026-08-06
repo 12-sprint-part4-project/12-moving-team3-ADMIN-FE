@@ -13,6 +13,7 @@ import type {
   AdminDashboardRecentReport,
   AdminDashboardRecentUser,
 } from '@/types/adminDashboard';
+import { formatAdminDashboardMoveDate } from '@/utils/adminDashboard';
 import { formatAdminMemberJoinedAt } from '@/utils/adminMember';
 import {
   ADMIN_REPORT_CATEGORY_LABEL,
@@ -111,7 +112,7 @@ const RECENT_COMPLETED_COLUMNS: Column<AdminDashboardRecentCompletedRequest>[] =
     {
       key: 'moveDate',
       header: '이사일',
-      render: (row) => formatAdminMemberJoinedAt(row.moveDate),
+      render: (row) => formatAdminDashboardMoveDate(row.moveDate),
     },
     {
       key: 'driverName',

@@ -7,6 +7,10 @@ import type { AdminDashboardStatisticsQuery } from '@/types/adminDashboard';
 export const toAdminDashboardApiDate = (date: Date) =>
   format(date, 'yyyy-MM-dd');
 
+/** 이사일 표시용 YYYY-MM-DD */
+export const formatAdminDashboardMoveDate = (moveDate: string) =>
+  moveDate.split('T')[0];
+
 /**
  * DateRange → statistics 쿼리 파라미터.
  * startDate·endDate가 모두 없으면 undefined를 반환해 params 전달을 생략한다.
