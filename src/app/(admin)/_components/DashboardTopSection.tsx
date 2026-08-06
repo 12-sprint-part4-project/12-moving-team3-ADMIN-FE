@@ -13,7 +13,7 @@ import type { DateRange } from '@/components/DateRangePicker/DateRangePicker';
 import { DateRangePopover } from '@/components/DateRangePopover/DateRangePopover';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
-import { StatCard } from '@/components/StatCard/StatCard';
+import { StatisticsCardList } from '@/components/StatCard/StatisticsCardList';
 import { useDashboardStatistics } from '@/hooks/useDashboardStatistics';
 import type { AdminDashboardStatistics } from '@/types/adminDashboard';
 import { toAdminDashboardStatisticsParams } from '@/utils/adminDashboard';
@@ -88,20 +88,17 @@ export const DashboardTopSection = () => {
     }
 
     return (
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        {KPI_CARDS.map(
-          ({ key, title, unit, icon, iconBackgroundClassName }) => (
-            <StatCard
-              key={key}
-              title={title}
-              value={statistics[key]}
-              unit={unit}
-              icon={icon}
-              iconBackgroundClassName={iconBackgroundClassName}
-            />
-          )
+      <StatisticsCardList
+        items={KPI_CARDS.map(
+          ({ key, title, unit, icon, iconBackgroundClassName }) => ({
+            title,
+            value: statistics[key],
+            unit,
+            icon,
+            iconBackgroundClassName,
+          })
         )}
-      </div>
+      />
     );
   };
 
