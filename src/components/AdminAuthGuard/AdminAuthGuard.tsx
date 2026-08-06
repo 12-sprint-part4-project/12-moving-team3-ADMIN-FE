@@ -32,7 +32,7 @@ export const AdminAuthGuard = ({ children }: AdminAuthGuardProps) => {
     return (
       <LoadingState
         message="인증 확인 중..."
-        className="min-h-screen py-0"
+        className="h-full py-0"
       />
     );
   }

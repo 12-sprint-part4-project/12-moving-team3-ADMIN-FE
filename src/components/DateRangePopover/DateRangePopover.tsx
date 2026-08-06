@@ -119,7 +119,7 @@ export const DateRangePopover = ({
           id={popoverId}
           role="dialog"
           aria-label="날짜 범위 선택"
-          className="absolute top-full mt-2 z-10 w-92 overflow-hidden rounded-lg border border-line-200 bg-white"
+          className="absolute top-full right-0 z-10 mt-2 w-92 overflow-hidden rounded-lg border border-line-200 bg-white"
         >
           {/* 날짜 범위 선택기 */}
           <DateRangePicker

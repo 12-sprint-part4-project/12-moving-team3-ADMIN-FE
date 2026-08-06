@@ -25,14 +25,14 @@ export const AdminLayout = ({
 }: AdminLayoutProps) => (
   <div
     className={cn(
-      'flex h-screen flex-col overflow-hidden bg-white',
+      'flex h-full flex-col overflow-hidden bg-white',
       className
     )}
   >
     {header}
     <div className="flex min-h-0 flex-1">
       <AdminSidebar className="overflow-y-auto" />
-      <main className="min-w-0 flex-1 overflow-y-auto">
+      <main className="min-h-0 min-w-0 flex-1 overflow-y-auto">
         <div className="p-6">
           {title ? (
             <>
