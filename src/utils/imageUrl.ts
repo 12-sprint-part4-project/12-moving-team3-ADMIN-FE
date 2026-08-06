@@ -22,6 +22,12 @@ export const getS3ImageUrl = (
     return null;
   }
 
-  const normalizedKey = key.replace(/^\//, '');
+  // `/`는 경로 구분자로 유지하고, segment만 인코딩해 특수문자 URL 깨짐을 막는다.
+  const normalizedKey = key
+    .replace(/^\/+/, '')
+    .split('/')
+    .map(encodeURIComponent)
+    .join('/');
+
   return `https://${bucket}.s3.${region}.amazonaws.com/${normalizedKey}`;
 };

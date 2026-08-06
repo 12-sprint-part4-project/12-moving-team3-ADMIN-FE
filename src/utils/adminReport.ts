@@ -97,6 +97,44 @@ const ADMIN_REPORT_POSTS_CATEGORY_LABEL: Record<
 };
 
 /**
+ * metadata enum 값 → 한글 라벨.
+ * `in` 검사·타입 단언을 한곳으로 모아 요약/포맷터에서 재사용한다.
+ */
+const getMetadataEnumLabel = <T extends string>(
+  labelMap: Record<T, string>,
+  value: unknown
+): string | null => {
+  if (typeof value !== 'string') {
+    return null;
+  }
+
+  if (!(value in labelMap)) {
+    return null;
+  }
+
+  return labelMap[value as T];
+};
+
+/** metadata key별 값 라벨. 매핑이 없으면 null */
+export const getMetadataLabel = (
+  key: string,
+  value: unknown
+): string | null => {
+  switch (key) {
+    case 'userType':
+      return getMetadataEnumLabel(ADMIN_REPORT_USER_TYPE_LABEL, value);
+    case 'roomType':
+      return getMetadataEnumLabel(ADMIN_REPORT_CHAT_ROOM_TYPE_LABEL, value);
+    case 'messageType':
+      return getMetadataEnumLabel(ADMIN_REPORT_MESSAGE_TYPE_LABEL, value);
+    case 'category':
+      return getMetadataEnumLabel(ADMIN_REPORT_POSTS_CATEGORY_LABEL, value);
+    default:
+      return null;
+  }
+};
+
+/**
  * BE가 type 라벨을 title에 넣는 경우(리뷰/댓글/메시지 등).
  * 실제 게시글 제목과 구분해 필드 노출 여부를 판단한다.
  */
@@ -157,48 +195,24 @@ export const getAdminReportContentSummary = (
       };
     }
     case 'MESSAGE': {
-      const messageType =
-        typeof meta.messageType === 'string' ? meta.messageType : null;
-      const typeLabel =
-        messageType && messageType in ADMIN_REPORT_MESSAGE_TYPE_LABEL
-          ? ADMIN_REPORT_MESSAGE_TYPE_LABEL[
-              messageType as AdminReportMessageType
-            ]
-          : null;
+      const typeLabel = getMetadataLabel('messageType', meta.messageType);
       return {
         text: typeLabel ? `메시지 · ${typeLabel}` : '메시지',
         usedMetadataKeys: typeLabel ? ['messageType'] : [],
       };
     }
     case 'CHAT_ROOM': {
-      const roomType =
-        typeof meta.roomType === 'string' ? meta.roomType : null;
-      const typeLabel =
-        roomType && roomType in ADMIN_REPORT_CHAT_ROOM_TYPE_LABEL
-          ? ADMIN_REPORT_CHAT_ROOM_TYPE_LABEL[
-              roomType as AdminReportChatRoomType
-            ]
-          : null;
+      const typeLabel = getMetadataLabel('roomType', meta.roomType);
       return {
         text: typeLabel ? `채팅방 · ${typeLabel}` : '채팅방',
         usedMetadataKeys: typeLabel ? ['roomType'] : [],
       };
     }
     case 'ARTICLE': {
-      const category =
-        typeof meta.category === 'string' ? meta.category : null;
-      const categoryLabel =
-        category && category in ADMIN_REPORT_POSTS_CATEGORY_LABEL
-          ? ADMIN_REPORT_POSTS_CATEGORY_LABEL[
-              category as AdminReportPostsCategory
-            ]
-          : null;
-      if (!categoryLabel) {
-        return null;
-      }
+      const categoryLabel = getMetadataLabel('category', meta.category);
       return {
-        text: `게시글 · ${categoryLabel}`,
-        usedMetadataKeys: ['category'],
+        text: categoryLabel ? `게시글 · ${categoryLabel}` : '게시글',
+        usedMetadataKeys: categoryLabel ? ['category'] : [],
       };
     }
     default:
@@ -219,31 +233,9 @@ export const formatAdminReportContentMetadataValue = (
     return `★${value}`;
   }
 
-  if (key === 'userType' && typeof value === 'string') {
-    return (
-      ADMIN_REPORT_USER_TYPE_LABEL[value as AdminReportUserType] ?? value
-    );
-  }
-
-  if (key === 'roomType' && typeof value === 'string') {
-    return (
-      ADMIN_REPORT_CHAT_ROOM_TYPE_LABEL[value as AdminReportChatRoomType] ??
-      value
-    );
-  }
-
-  if (key === 'messageType' && typeof value === 'string') {
-    return (
-      ADMIN_REPORT_MESSAGE_TYPE_LABEL[value as AdminReportMessageType] ??
-      value
-    );
-  }
-
-  if (key === 'category' && typeof value === 'string') {
-    return (
-      ADMIN_REPORT_POSTS_CATEGORY_LABEL[value as AdminReportPostsCategory] ??
-      value
-    );
+  const mappedLabel = getMetadataLabel(key, value);
+  if (mappedLabel != null) {
+    return mappedLabel;
   }
 
   if (

@@ -332,7 +332,7 @@ const ReportsPage = () => {
       </div>
 
       <AdminReportDetailDrawer
-        open={Boolean(selectedReportId)}
+        open={selectedReportId !== null}
         reportId={selectedReportId}
         onClose={handleCloseDetail}
       />
