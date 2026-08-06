@@ -104,7 +104,7 @@ const LoginPage = () => {
   // 확인 중이거나 이미 인증되어 이동하는 동안 로그인 폼을 노출하지 않는다.
   if (isAuthChecking || isAuthenticated) {
     return (
-      <div className="flex min-h-full flex-col bg-white">
+      <div className="flex h-full flex-col overflow-y-auto bg-white">
         <AdminHeader showUserMenu={false} />
         <LoadingState
           message="인증 확인 중..."
@@ -115,7 +115,7 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="flex min-h-full flex-col bg-white">
+    <div className="flex h-full flex-col overflow-y-auto bg-white">
       <AdminHeader showUserMenu={false} />
 
       <main className="flex flex-1 flex-col items-center justify-center px-6 py-12">
