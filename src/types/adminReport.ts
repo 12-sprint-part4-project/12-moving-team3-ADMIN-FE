@@ -3,7 +3,15 @@
  * 백엔드 Swagger(admin-report)와 controller 응답(`{ data: ... }`) 구조에 맞춘다.
  */
 
+import type { MemberMoveType, MemberRegion } from '@/types/adminMember';
+
 export type AdminReportStatus = 'PENDING' | 'RESOLVED' | 'REJECTED';
+
+/** Prisma Region — 회원 상세와 동일 enum을 재사용한다 */
+export type AdminReportRegion = MemberRegion;
+
+/** Prisma MoveType — 회원 상세와 동일 enum을 재사용한다 */
+export type AdminReportMoveType = MemberMoveType;
 
 export type AdminReportTarget =
   | 'USER'
@@ -164,9 +172,40 @@ export interface AdminReportDetailReporter extends AdminReportReporter {
   deletedAt: string | null;
 }
 
+/** 일반 회원(CUSTOMER) 프로필 요약. 전화번호는 포함하지 않는다. */
+export interface AdminReportDetailCustomerProfile {
+  region: AdminReportRegion | null;
+  service: AdminReportMoveType[];
+}
+
+/** 기사(MOVER) 서비스 가능 지역 */
+export interface AdminReportDetailMoverServiceRegion {
+  region: AdminReportRegion;
+}
+
+/** 기사(MOVER) 프로필 요약 */
+export interface AdminReportDetailMoverProfile {
+  service: AdminReportMoveType[];
+  career: number | null;
+  shortDescription: string | null;
+  description: string | null;
+  serviceRegions: AdminReportDetailMoverServiceRegion[];
+}
+
+/**
+ * 신고 대상 사용자의 역할별 프로필 묶음.
+ * CUSTOMER/MOVER 중 해당 타입만 채우고 나머지는 null이다.
+ */
+export interface AdminReportDetailUserProfile {
+  customer: AdminReportDetailCustomerProfile | null;
+  mover: AdminReportDetailMoverProfile | null;
+}
+
 /**
  * 대상·콘텐츠에 연결된 사용자 요약.
  * 작성자/발신자가 없으면 null로 둔다.
+ * USER 대상 상세에서는 profileImageKey·profile이 채워질 수 있다.
+ * 다른 target 작성자 요약에는 없을 수 있어 optional로 둔다.
  */
 export interface AdminReportDetailUserSummary {
   id: string;
@@ -176,6 +215,10 @@ export interface AdminReportDetailUserSummary {
   userType: AdminReportUserType;
   isDeleted: boolean;
   deletedAt: string | null;
+  /** User.profileImageKey. 없으면 null */
+  profileImageKey?: string | null;
+  /** 일반/기사 프로필. 프로필 row가 없으면 null */
+  profile?: AdminReportDetailUserProfile | null;
 }
 
 /**
