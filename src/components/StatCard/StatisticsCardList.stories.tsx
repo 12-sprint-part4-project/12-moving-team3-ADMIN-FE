@@ -15,6 +15,7 @@ type Story = StoryObj<typeof StatisticsCardList>;
 
 export const Default: Story = {
   args: {
+    description: '※ 제출일 기준으로 집계되며, 기간 필터만 적용됩니다.',
     items: [
       {
         title: '가입 회원 수',

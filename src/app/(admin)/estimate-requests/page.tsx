@@ -1,7 +1,5 @@
-import React from 'react';
+import { EstimateManagementContent } from './_components/EstimateManagementContent';
 
-const page = () => {
-  return <div>page</div>;
-};
+const EstimateRequestsPage = () => <EstimateManagementContent />;
 
-export default page;
+export default EstimateRequestsPage;

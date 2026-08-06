@@ -17,6 +17,7 @@ export interface DateRangePopoverProps {
   onConfirm: (range: DateRange | undefined) => void;
   placeholder?: string;
   className?: string;
+  triggerClassName?: string;
 }
 
 // 날짜 범위를 포맷팅하여 문자열로 반환하는 함수
@@ -44,6 +45,7 @@ export const DateRangePopover = ({
   onConfirm,
   placeholder = '전체 기간',
   className,
+  triggerClassName,
 }: DateRangePopoverProps) => {
   // popover를 위한 고유 ID
   const popoverId = useId();
@@ -107,7 +109,7 @@ export const DateRangePopover = ({
         aria-expanded={isOpen}
         aria-controls={isOpen ? popoverId : undefined}
         onClick={handleTriggerClick}
-        className="min-w-64 justify-start gap-2"
+        className={cn('min-w-64 justify-start gap-2', triggerClassName)}
       >
         <Calendar className="size-4 text-gray-400" aria-hidden />
         {dateRangeLabel}
