@@ -60,8 +60,12 @@ export const EstimateManagementContent = () => {
     () => toAdminEstimateRequestStatisticsQuery(dateRange),
     [dateRange]
   );
-  const { data: listData, isPending: isListPending } =
-    useAdminEstimateRequestList(listQuery);
+  const {
+    data: listData,
+    isPending: isListPending,
+    isError: isListError,
+    refetch: refetchList,
+  } = useAdminEstimateRequestList(listQuery);
   const { data: statisticsData } =
     useAdminEstimateRequestStatistics(statisticsQuery);
 
@@ -143,10 +147,12 @@ export const EstimateManagementContent = () => {
         page={listData?.meta?.page ?? filters.page}
         totalPages={listData?.meta?.totalPages ?? 0}
         isLoading={isListPending}
+        isError={isListError}
         hasActiveFilters={hasActiveFilters}
         onDetailClick={handleOpenDetail}
         onPageChange={handlePageChange}
         onResetFilters={handleResetFilters}
+        onRetry={() => void refetchList()}
       />
       <EstimateDetailDrawer
         open={selectedEstimateRequestId !== null}

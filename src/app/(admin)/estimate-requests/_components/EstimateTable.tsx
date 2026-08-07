@@ -20,10 +20,12 @@ export interface EstimateTableProps {
   page: number;
   totalPages: number;
   isLoading: boolean;
+  isError: boolean;
   hasActiveFilters: boolean;
   onDetailClick: (estimateRequestId: number) => void;
   onPageChange: (page: number) => void;
   onResetFilters: () => void;
+  onRetry: () => void;
 }
 
 const STATUS_BADGE_PROPS: Record<
@@ -112,14 +114,26 @@ export const EstimateTable = ({
   page,
   totalPages,
   isLoading,
+  isError,
   hasActiveFilters,
   onDetailClick,
   onPageChange,
   onResetFilters,
+  onRetry,
 }: EstimateTableProps) => (
   <section className="mt-4" aria-label="견적 요청 목록">
     <div className="overflow-hidden rounded-lg border border-line-200 bg-white">
-      {!isLoading && items.length === 0 ? (
+      {isError ? (
+        <EmptyState
+          title="견적 요청 목록을 불러오지 못했습니다."
+          description="잠시 후 다시 시도해 주세요."
+          action={
+            <Button variant="secondary" onClick={onRetry}>
+              다시 시도
+            </Button>
+          }
+        />
+      ) : !isLoading && items.length === 0 ? (
         <EmptyState
           title={
             hasActiveFilters
