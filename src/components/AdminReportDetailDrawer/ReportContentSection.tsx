@@ -12,6 +12,7 @@ import {
 
 import { DetailMultilineField } from './DetailMultilineField';
 import { formatNullableDateTime } from './helpers';
+import { ReportProcessActionToggle } from './ReportProcessActionToggle';
 
 const ReportContentMetadataFields = ({
   metadata,
@@ -55,12 +56,36 @@ const getEmptyContentMessage = (detail: AdminReportDetail) => {
 const isUserAbusiveLanguageReport = (detail: AdminReportDetail) =>
   detail.category === 'ABUSIVE_LANGUAGE' && detail.target === 'USER';
 
+export interface ReportContentSectionProps {
+  detail: AdminReportDetail;
+  /** DELETE_REPORTED_CONTENT 선택 여부. 상위(ReportDetailContent)에서 관리한다. */
+  isDeleteContentSelected: boolean;
+  onToggleDeleteContent: () => void;
+}
+
 export const ReportContentSection = ({
   detail,
-}: {
-  detail: AdminReportDetail;
-}) => {
-  const { content, category } = detail;
+  isDeleteContentSelected,
+  onToggleDeleteContent,
+}: ReportContentSectionProps) => {
+  const { content, category, availableActions, status } = detail;
+  // BE 허용 여부만 본다. USER/MESSAGE/CHAT_ROOM·이미 삭제는 canDeleteContent=false다.
+  const canDeleteContent = availableActions?.canDeleteContent === true;
+  const isDeleteDisabled = status !== 'PENDING';
+
+  const deleteActionToggle = canDeleteContent ? (
+    <ReportProcessActionToggle
+      label="콘텐츠 삭제"
+      selected={isDeleteContentSelected}
+      disabled={isDeleteDisabled}
+      disabledReason={
+        isDeleteDisabled
+          ? '처리 완료·반려된 신고는 콘텐츠 삭제 Action을 선택할 수 없습니다.'
+          : null
+      }
+      onToggle={onToggleDeleteContent}
+    />
+  ) : null;
 
   // 부적절한 프로필 신고는 프로필 검토가 핵심이므로 콘텐츠 섹션을 숨긴다.
   if (category === 'INAPPROPRIATE_PROFILE') {
@@ -70,10 +95,13 @@ export const ReportContentSection = ({
   if (isUserAbusiveLanguageReport(detail)) {
     return (
       <DetailSection title="신고된 콘텐츠 정보">
-        <p className="text-md-regular text-gray-500">
-          회원 대상 욕설/비방 신고입니다. 별도 본문 콘텐츠가 없습니다. 신고
-          대상 정보에서 회원을 확인해 주세요.
-        </p>
+        <div className="flex flex-col gap-3">
+          <p className="text-md-regular text-gray-500">
+            회원 대상 욕설/비방 신고입니다. 별도 본문 콘텐츠가 없습니다. 신고
+            대상 정보에서 회원을 확인해 주세요.
+          </p>
+          {deleteActionToggle}
+        </div>
       </DetailSection>
     );
   }
@@ -81,9 +109,12 @@ export const ReportContentSection = ({
   if (!content) {
     return (
       <DetailSection title="신고된 콘텐츠 정보">
-        <p className="text-md-regular text-gray-500">
-          {getEmptyContentMessage(detail)}
-        </p>
+        <div className="flex flex-col gap-3">
+          <p className="text-md-regular text-gray-500">
+            {getEmptyContentMessage(detail)}
+          </p>
+          {deleteActionToggle}
+        </div>
       </DetailSection>
     );
   }
@@ -137,6 +168,7 @@ export const ReportContentSection = ({
             이 콘텐츠는 삭제되어 현재 서비스에 노출되지 않습니다.
           </p>
         ) : null}
+        {deleteActionToggle}
       </div>
     </DetailSection>
   );

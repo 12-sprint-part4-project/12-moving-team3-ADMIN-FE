@@ -4,8 +4,21 @@ import type { StatusBadgeProps } from '@/components/StatusBadge/StatusBadge';
 import type {
   AdminReportDetail,
   AdminReportDetailTargetInfo,
+  AdminReportProcessAction,
 } from '@/types/adminReport';
 import { formatAdminReportCreatedAt } from '@/utils/adminReport';
+
+/** 선택 목록에 Action을 토글한다. 이후 처리 Modal이 같은 배열을 요청 body로 쓴다. */
+export const toggleReportProcessAction = (
+  selectedActions: AdminReportProcessAction[],
+  action: AdminReportProcessAction
+): AdminReportProcessAction[] => {
+  if (selectedActions.includes(action)) {
+    return selectedActions.filter((item) => item !== action);
+  }
+
+  return [...selectedActions, action];
+};
 
 /** null/빈 문자열은 '-'로 통일해 빈 칸이 어색하게 보이지 않게 한다. */
 export const formatNullableText = (value: string | null | undefined) => {

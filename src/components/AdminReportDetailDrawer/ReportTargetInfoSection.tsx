@@ -11,19 +11,28 @@ import {
   TARGET_PRESENCE_HINT,
   TARGET_PRESENCE_LABEL,
 } from './helpers';
+import { ReportProcessActionToggle } from './ReportProcessActionToggle';
 import { ReportProfileSection } from './ReportProfileSection';
 import { TargetUserProfileImage } from './TargetUserProfileImage';
+
+export interface ReportTargetInfoSectionProps {
+  detail: AdminReportDetail;
+  /** SUSPEND_TARGET_USER 선택 여부. 상위(ReportDetailContent)에서 관리한다. */
+  isSuspendSelected: boolean;
+  onToggleSuspend: () => void;
+}
 
 /**
  * 신고 대상 정보.
  * 대상 타입/ID는 기본 정보에 있으므로 여기서는 상태·작성자(·프로필)만 둔다.
+ * 정지 Action 노출은 availableActions.canSuspendUser만 본다(대상별 규칙 재계산 없음).
  */
 export const ReportTargetInfoSection = ({
   detail,
-}: {
-  detail: AdminReportDetail;
-}) => {
-  const { targetInfo, category } = detail;
+  isSuspendSelected,
+  onToggleSuspend,
+}: ReportTargetInfoSectionProps) => {
+  const { targetInfo, category, availableActions, status } = detail;
   const targetUser = targetInfo.user;
   const presenceStatus = getTargetPresenceStatus(targetInfo);
   const presenceHint = TARGET_PRESENCE_HINT[presenceStatus];
@@ -34,6 +43,10 @@ export const ReportTargetInfoSection = ({
 
   // 대상 섹션은 계정(작성자) 삭제일만 본다. 콘텐츠 삭제는 content 섹션에서 표시한다.
   const deletedAt = targetUser?.deletedAt ?? null;
+  // BE가 허용할 때만 버튼을 그린다. 삭제·미존재·비PENDING은 canSuspendUser=false다.
+  const canSuspendUser = availableActions?.canSuspendUser === true;
+  // 방어적 가드: availableActions와 어긋나도 PENDING이 아니면 선택하지 못하게 한다.
+  const isSuspendDisabled = status !== 'PENDING';
 
   const presenceStatusFields = (
     <>
@@ -102,6 +115,19 @@ export const ReportTargetInfoSection = ({
         )}
         {presenceHint ? (
           <p className="text-md-regular text-gray-500">{presenceHint}</p>
+        ) : null}
+        {canSuspendUser ? (
+          <ReportProcessActionToggle
+            label="7일 정지"
+            selected={isSuspendSelected}
+            disabled={isSuspendDisabled}
+            disabledReason={
+              isSuspendDisabled
+                ? '처리 완료·반려된 신고는 정지 Action을 선택할 수 없습니다.'
+                : null
+            }
+            onToggle={onToggleSuspend}
+          />
         ) : null}
       </div>
     </DetailSection>
