@@ -17,6 +17,7 @@ import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { PageHeader } from '@/components/PageHeader/PageHeader';
 import { Pagination } from '@/components/Pagination/Pagination';
+import { SearchInput } from '@/components/SearchInput/SearchInput';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { useAdminReportList } from '@/hooks/useAdminReportList';
 import type {
@@ -109,6 +110,8 @@ const toListQuery = (filters: AdminReportListFilters): AdminReportListQuery => (
 const ReportsPage = () => {
   const [filters, setFilters] =
     useState<AdminReportListFilters>(INITIAL_FILTERS);
+  // 검색 입력 초안. API query 연결은 이후 커밋에서 한다(지금은 UI·로컬 상태만).
+  const [targetUserSearch, setTargetUserSearch] = useState('');
   // Drawer 열림·상세 조회 키. null이면 Drawer가 닫히고 상세 요청도 중단된다.
   const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
 
@@ -218,6 +221,17 @@ const ReportsPage = () => {
     }));
   };
 
+  const handleTargetUserSearchChange = (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    setTargetUserSearch(event.target.value);
+  };
+
+  // 회원 목록과 같이 검색 버튼/Enter 시 trim만 반영한다. listQuery에는 아직 넣지 않는다.
+  const handleTargetUserSearch = (value: string) => {
+    setTargetUserSearch(value.trim());
+  };
+
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
     updateFilters(
       { status: parseReportStatusFilter(event.target.value) },
@@ -237,6 +251,7 @@ const ReportsPage = () => {
   };
 
   const handleResetFilters = () => {
+    setTargetUserSearch('');
     setFilters(INITIAL_FILTERS);
   };
 
@@ -312,6 +327,14 @@ const ReportsPage = () => {
 
       <div className="mt-6 flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-2">
+          <SearchInput
+            value={targetUserSearch}
+            onChange={handleTargetUserSearchChange}
+            onSearch={handleTargetUserSearch}
+            placeholder="신고 대상 이름, 닉네임, 이메일 검색"
+            className="min-w-64 flex-1"
+            aria-label="신고 대상 사용자 검색"
+          />
           <FilterSelect
             aria-label="상태"
             value={filters.status ?? ''}
