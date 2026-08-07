@@ -1,5 +1,6 @@
 'use client';
 
+import { format } from 'date-fns';
 import {
   useCallback,
   useMemo,
@@ -9,14 +10,18 @@ import {
   type ReactNode,
 } from 'react';
 
+import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
 import { AdminReportDetailDrawer } from '@/components/AdminReportDetailDrawer/AdminReportDetailDrawer';
 import { Button } from '@/components/Button/Button';
 import { DataTable, type Column } from '@/components/DataTable/DataTable';
+import {
+  DateRangePopover,
+  type DateRangePopoverProps,
+} from '@/components/DateRangePopover/DateRangePopover';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
-import { PageHeader } from '@/components/PageHeader/PageHeader';
-import { Pagination } from '@/components/Pagination/Pagination';
+import { SearchInput } from '@/components/SearchInput/SearchInput';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { useAdminReportList } from '@/hooks/useAdminReportList';
 import type {
@@ -34,6 +39,9 @@ import {
   formatAdminReportReporter,
   formatAdminReportTarget,
 } from '@/utils/adminReport';
+
+/** API 쿼리용 YYYY-MM-DD */
+const toReportApiDate = (date: Date) => format(date, 'yyyy-MM-dd');
 
 /** BE listQuerySchema 기본값과 동일 */
 const DEFAULT_PAGE_SIZE = 10;
@@ -60,6 +68,12 @@ const TARGET_FILTER_OPTIONS = [
 interface AdminReportListFilters {
   status?: AdminReportStatus;
   target?: AdminReportTarget;
+  /** 검색 버튼/Enter로 확정된 대상 사용자 검색어 */
+  targetUserKeyword?: string;
+  /** 신고일 시작 (YYYY-MM-DD) */
+  reportedFrom?: string;
+  /** 신고일 종료 (YYYY-MM-DD). reportedFrom 없이 단독 사용하지 않는다 */
+  reportedTo?: string;
   page: number;
   pageSize: number;
 }
@@ -98,17 +112,30 @@ const parseReportTargetFilter = (
   return undefined;
 };
 
-/** UI 필터 → API query. 전체(undefined)인 status/target은 객체에 넣지 않아 query string에서 빠진다. */
+/**
+ * UI 필터 → API query.
+ * undefined·빈 값은 객체에 넣지 않아 axios query string에서 빠진다.
+ * reportedTo는 reportedFrom이 있을 때만 전달해 BE 단독 사용 거부를 피한다.
+ */
 const toListQuery = (filters: AdminReportListFilters): AdminReportListQuery => ({
   page: filters.page,
   pageSize: filters.pageSize,
   ...(filters.status ? { status: filters.status } : {}),
   ...(filters.target ? { target: filters.target } : {}),
+  ...(filters.targetUserKeyword
+    ? { targetUserKeyword: filters.targetUserKeyword }
+    : {}),
+  ...(filters.reportedFrom ? { reportedFrom: filters.reportedFrom } : {}),
+  ...(filters.reportedFrom && filters.reportedTo
+    ? { reportedTo: filters.reportedTo }
+    : {}),
 });
 
 const ReportsPage = () => {
   const [filters, setFilters] =
     useState<AdminReportListFilters>(INITIAL_FILTERS);
+  // 입력창 초안. 검색 버튼/Enter 시에만 filters.targetUserKeyword로 반영한다.
+  const [targetUserSearch, setTargetUserSearch] = useState('');
   // Drawer 열림·상세 조회 키. null이면 Drawer가 닫히고 상세 요청도 중단된다.
   const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
 
@@ -132,7 +159,31 @@ const ReportsPage = () => {
     }
   }
 
-  const hasActiveFilters = Boolean(filters.status || filters.target);
+  // 회원 목록 DateRangePopover와 동일: from 없으면 전체 기간(undefined).
+  const dateRangeValue = useMemo<DateRangePopoverProps['value']>(() => {
+    if (!filters.reportedFrom) {
+      return undefined;
+    }
+
+    const from = new Date(`${filters.reportedFrom}T00:00:00`);
+    const to = filters.reportedTo
+      ? new Date(`${filters.reportedTo}T00:00:00`)
+      : from;
+
+    if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) {
+      return undefined;
+    }
+
+    return { from, to };
+  }, [filters.reportedFrom, filters.reportedTo]);
+
+  const hasActiveFilters = Boolean(
+    filters.status ||
+      filters.target ||
+      filters.targetUserKeyword ||
+      filters.reportedFrom ||
+      filters.reportedTo
+  );
 
   const handleOpenDetail = useCallback(
     (event: MouseEvent<HTMLButtonElement>, reportId: number) => {
@@ -218,6 +269,22 @@ const ReportsPage = () => {
     }));
   };
 
+  const handleTargetUserSearchChange = (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    setTargetUserSearch(event.target.value);
+  };
+
+  // 검색 버튼/Enter 시에만 query에 반영하고 page를 1로 돌린다.
+  const handleTargetUserSearch = (value: string) => {
+    const trimmed = value.trim();
+    setTargetUserSearch(trimmed);
+    updateFilters(
+      { targetUserKeyword: trimmed.length > 0 ? trimmed : undefined },
+      { resetPage: true }
+    );
+  };
+
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
     updateFilters(
       { status: parseReportStatusFilter(event.target.value) },
@@ -232,11 +299,35 @@ const ReportsPage = () => {
     );
   };
 
+  // DateRangePopover confirm 시 query에 바로 반영(회원 목록과 동일).
+  // DateRangePicker는 from 선택이 선행되므로 reportedTo 단독 상태를 만들지 않는다.
+  const handleDateRangeConfirm: DateRangePopoverProps['onConfirm'] = (
+    range
+  ) => {
+    if (!range?.from) {
+      updateFilters(
+        { reportedFrom: undefined, reportedTo: undefined },
+        { resetPage: true }
+      );
+      return;
+    }
+
+    updateFilters(
+      {
+        reportedFrom: toReportApiDate(range.from),
+        // 종료일이 없으면 시작일 당일만 조회되도록 reportedTo를 생략한다.
+        reportedTo: range.to ? toReportApiDate(range.to) : undefined,
+      },
+      { resetPage: true }
+    );
+  };
+
   const handlePageChange = (page: number) => {
     updateFilters({ page });
   };
 
   const handleResetFilters = () => {
+    setTargetUserSearch('');
     setFilters(INITIAL_FILTERS);
   };
 
@@ -283,60 +374,61 @@ const ReportsPage = () => {
     }
 
     return (
-      <>
-        <DataTable
-          columns={columns}
-          data={items}
-          rowKey="id"
-          caption="신고 목록"
-        />
-        {totalPages > 0 ? (
-          <div className="mt-6 flex justify-center">
-            <Pagination
-              page={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </div>
-        ) : null}
-      </>
+      <DataTable
+        columns={columns}
+        data={items}
+        rowKey="id"
+        caption="신고 목록"
+      />
     );
   };
 
   return (
     <>
-      <PageHeader
+      <AdminListLayout
         title="신고 관리"
         description="신고 목록을 조회하고 상태를 확인할 수 있습니다."
-      />
-
-      <div className="mt-6 flex flex-col gap-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <FilterSelect
-            aria-label="상태"
-            value={filters.status ?? ''}
-            onChange={handleStatusChange}
-            options={[...STATUS_FILTER_OPTIONS]}
-          />
-          <FilterSelect
-            aria-label="대상 유형"
-            value={filters.target ?? ''}
-            onChange={handleTargetChange}
-            options={[...TARGET_FILTER_OPTIONS]}
-          />
-        </div>
-
-        <section className="rounded-lg border border-line-200 bg-white">
-          {renderListBody()}
-        </section>
-      </div>
+        page={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+        filters={
+          <>
+            <SearchInput
+              value={targetUserSearch}
+              onChange={handleTargetUserSearchChange}
+              onSearch={handleTargetUserSearch}
+              placeholder="신고 대상 이름, 닉네임, 이메일 검색"
+              className="min-w-64 flex-1"
+              aria-label="신고 대상 사용자 검색"
+            />
+            <FilterSelect
+              aria-label="상태"
+              value={filters.status ?? ''}
+              onChange={handleStatusChange}
+              options={[...STATUS_FILTER_OPTIONS]}
+            />
+            <FilterSelect
+              aria-label="대상 유형"
+              value={filters.target ?? ''}
+              onChange={handleTargetChange}
+              options={[...TARGET_FILTER_OPTIONS]}
+            />
+            <DateRangePopover
+              value={dateRangeValue}
+              onConfirm={handleDateRangeConfirm}
+              placeholder="신고일 전체"
+            />
+          </>
+        }
+      >
+        {renderListBody()}
+      </AdminListLayout>
 
       <AdminReportDetailDrawer
         open={selectedReportId !== null}
         reportId={selectedReportId}
         onClose={handleCloseDetail}
       />
-
     </>
   );
 };
