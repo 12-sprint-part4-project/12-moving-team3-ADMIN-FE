@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type ChangeEvent, type ReactNode } from 'react';
 
+import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
 import { Button } from '@/components/Button/Button';
 import { DataTable, type Column } from '@/components/DataTable/DataTable';
 import {
@@ -11,8 +12,6 @@ import {
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
-import { PageHeader } from '@/components/PageHeader/PageHeader';
-import { Pagination } from '@/components/Pagination/Pagination';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
 import { useAdminMemberList } from '@/hooks/useAdminMemberList';
 import type {
@@ -255,32 +254,24 @@ export const AdminMemberListView = ({
     }
 
     return (
-      <>
-        <DataTable
-          columns={columns}
-          data={items}
-          rowKey="id"
-          caption={caption}
-        />
-        {totalPages > 0 ? (
-          <div className="mt-6 flex justify-center">
-            <Pagination
-              page={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </div>
-        ) : null}
-      </>
+      <DataTable
+        columns={columns}
+        data={items}
+        rowKey="id"
+        caption={caption}
+      />
     );
   };
 
   return (
-    <>
-      <PageHeader title={title} description={description} />
-
-      <div className="mt-6 flex flex-col gap-4">
-        <div className="flex flex-wrap items-center gap-2">
+    <AdminListLayout
+      title={title}
+      description={description}
+      page={currentPage}
+      totalPages={totalPages}
+      onPageChange={handlePageChange}
+      filters={
+        <>
           <SearchInput
             value={searchInput}
             onChange={handleSearchChange}
@@ -300,12 +291,10 @@ export const AdminMemberListView = ({
             onConfirm={handleDateRangeConfirm}
             placeholder="가입일 전체"
           />
-        </div>
-
-        <section className="rounded-lg border border-line-200 bg-white">
-          {renderListBody()}
-        </section>
-      </div>
-    </>
+        </>
+      }
+    >
+      {renderListBody()}
+    </AdminListLayout>
   );
 };
