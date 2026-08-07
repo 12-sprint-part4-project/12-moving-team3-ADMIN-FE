@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 
+import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
 import { AdminReportDetailDrawer } from '@/components/AdminReportDetailDrawer/AdminReportDetailDrawer';
 import { Button } from '@/components/Button/Button';
 import { DataTable, type Column } from '@/components/DataTable/DataTable';
@@ -20,8 +21,6 @@ import {
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
-import { PageHeader } from '@/components/PageHeader/PageHeader';
-import { Pagination } from '@/components/Pagination/Pagination';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { useAdminReportList } from '@/hooks/useAdminReportList';
@@ -375,73 +374,61 @@ const ReportsPage = () => {
     }
 
     return (
-      <>
-        <DataTable
-          columns={columns}
-          data={items}
-          rowKey="id"
-          caption="신고 목록"
-        />
-        {totalPages > 0 ? (
-          <div className="mt-6 flex justify-center">
-            <Pagination
-              page={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </div>
-        ) : null}
-      </>
+      <DataTable
+        columns={columns}
+        data={items}
+        rowKey="id"
+        caption="신고 목록"
+      />
     );
   };
 
   return (
     <>
-      <PageHeader
+      <AdminListLayout
         title="신고 관리"
         description="신고 목록을 조회하고 상태를 확인할 수 있습니다."
-      />
-
-      <div className="mt-6 flex flex-col gap-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <SearchInput
-            value={targetUserSearch}
-            onChange={handleTargetUserSearchChange}
-            onSearch={handleTargetUserSearch}
-            placeholder="신고 대상 이름, 닉네임, 이메일 검색"
-            className="min-w-64 flex-1"
-            aria-label="신고 대상 사용자 검색"
-          />
-          <FilterSelect
-            aria-label="상태"
-            value={filters.status ?? ''}
-            onChange={handleStatusChange}
-            options={[...STATUS_FILTER_OPTIONS]}
-          />
-          <FilterSelect
-            aria-label="대상 유형"
-            value={filters.target ?? ''}
-            onChange={handleTargetChange}
-            options={[...TARGET_FILTER_OPTIONS]}
-          />
-          <DateRangePopover
-            value={dateRangeValue}
-            onConfirm={handleDateRangeConfirm}
-            placeholder="신고일 전체"
-          />
-        </div>
-
-        <section className="rounded-lg border border-line-200 bg-white">
-          {renderListBody()}
-        </section>
-      </div>
+        page={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+        filters={
+          <>
+            <SearchInput
+              value={targetUserSearch}
+              onChange={handleTargetUserSearchChange}
+              onSearch={handleTargetUserSearch}
+              placeholder="신고 대상 이름, 닉네임, 이메일 검색"
+              className="min-w-64 flex-1"
+              aria-label="신고 대상 사용자 검색"
+            />
+            <FilterSelect
+              aria-label="상태"
+              value={filters.status ?? ''}
+              onChange={handleStatusChange}
+              options={[...STATUS_FILTER_OPTIONS]}
+            />
+            <FilterSelect
+              aria-label="대상 유형"
+              value={filters.target ?? ''}
+              onChange={handleTargetChange}
+              options={[...TARGET_FILTER_OPTIONS]}
+            />
+            <DateRangePopover
+              value={dateRangeValue}
+              onConfirm={handleDateRangeConfirm}
+              placeholder="신고일 전체"
+            />
+          </>
+        }
+      >
+        {renderListBody()}
+      </AdminListLayout>
 
       <AdminReportDetailDrawer
         open={selectedReportId !== null}
         reportId={selectedReportId}
         onClose={handleCloseDetail}
       />
-
     </>
   );
 };
