@@ -6,6 +6,7 @@ import {
   useRef,
   useSyncExternalStore,
   type MouseEvent,
+  type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
 import { cva } from 'class-variance-authority';
@@ -31,7 +32,8 @@ export const confirmModalPanelVariants = cva(
 export interface ConfirmModalProps {
   open: boolean;
   title: string;
-  description?: string;
+  /** 문자열 또는 조치 목록 등 블록 콘텐츠. */
+  description?: ReactNode;
   confirmText?: string;
   cancelText?: string;
   onConfirm: () => void;
@@ -39,6 +41,8 @@ export interface ConfirmModalProps {
   className?: string;
   /** true면 확인 버튼 loading + 취소 비활성화로 중복 요청을 막는다. */
   confirmLoading?: boolean;
+  /** Action 미선택 등 확인 불가 조건. loading과 별도로 확인 버튼만 비활성화한다. */
+  confirmDisabled?: boolean;
   /** description 아래에 표시하는 실패 안내. 없으면 숨긴다. */
   errorMessage?: string;
 }
@@ -53,6 +57,7 @@ export const ConfirmModal = ({
   onCancel,
   className,
   confirmLoading = false,
+  confirmDisabled = false,
   errorMessage,
 }: ConfirmModalProps) => {
   const titleId = useId();
@@ -176,9 +181,9 @@ export const ConfirmModal = ({
         </h2>
 
         {description ? (
-          <p id={descriptionId} className="text-md-medium text-gray-500">
+          <div id={descriptionId} className="text-md-medium text-gray-500">
             {description}
-          </p>
+          </div>
         ) : null}
 
         {errorMessage ? (
@@ -199,6 +204,7 @@ export const ConfirmModal = ({
             variant="solid"
             onClick={onConfirm}
             loading={confirmLoading}
+            disabled={confirmDisabled || confirmLoading}
           >
             {confirmText}
           </Button>
