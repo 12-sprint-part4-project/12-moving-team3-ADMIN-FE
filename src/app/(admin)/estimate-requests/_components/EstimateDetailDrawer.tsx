@@ -1,25 +1,29 @@
 'use client';
 
 import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
+import { DetailSection } from '@/components/DetailSection/DetailSection';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { cn } from '@/lib/utils';
 
 const BASIC_INFORMATION = [
   ['견적 번호', '12566'],
   ['요청자 이름', '이현수'],
-  ['전화번호', '010-2345-6789'],
   ['이사 유형', '원룸이사'],
-  ['이사 일자', '2024-07-15'],
+  ['출발지 우편번호', '08377'],
   ['출발지', '서울 마포구 월드컵로 235'],
+  ['출발지 상세', '서울 마포구 월드컵로 235'],
+  ['도착지 우편번호', '08377'],
   ['도착지', '서울 관악구 관악로 145'],
+  ['도착지 상세', '서울 관악구 관악로 145'],
+  ['제출일', '2024-07-15 12:34'],
 ];
 
 const QUOTE_HISTORY = [
   ['김기사', '520,000원', '확정', '2024-07-07 15:10'],
-  ['박기사', '500,000원', '완료', '2024-07-07 15:02'],
-  ['최기사', '480,000원', '완료', '2024-07-07 14:58'],
-  ['이기사', '510,000원', '완료', '2024-07-07 14:56'],
-  ['정기사', '470,000원', '완료', '2024-07-07 14:55'],
+  ['박기사', '500,000원', '반려', '2024-07-07 15:02'],
+  ['최기사', '480,000원', '반려', '2024-07-07 14:58'],
+  ['이기사', '510,000원', '반려', '2024-07-07 14:56'],
+  ['정기사', '470,000원', '반려', '2024-07-07 14:55'],
 ];
 
 export interface EstimateDetailDrawerProps {
@@ -37,10 +41,9 @@ export const EstimateDetailDrawer = ({
     onClose={onClose}
     size="md"
   >
-    <div className="flex flex-col gap-5">
-      <section className="border-b border-line-200 pb-5">
-        <h3 className="text-md-semibold text-black-400">기본 정보</h3>
-        <dl className="mt-4 flex flex-col gap-3 text-xs-medium">
+    <div className="flex flex-col gap-4">
+      <DetailSection title="기본 정보">
+        <dl className="flex flex-col gap-3 text-xs-medium">
           {BASIC_INFORMATION.map(([label, value]) => (
             <div key={label} className="flex items-start justify-between gap-4">
               <dt className="shrink-0 text-gray-500">{label}</dt>
@@ -54,16 +57,10 @@ export const EstimateDetailDrawer = ({
             </dd>
           </div>
         </dl>
-      </section>
+      </DetailSection>
 
-      <section className="pt-5" aria-labelledby="quote-history-title">
-        <h3
-          id="quote-history-title"
-          className="text-md-semibold text-black-400"
-        >
-          견적 리스트 (5건)
-        </h3>
-        <ul className="mt-4 flex flex-col gap-3">
+      <DetailSection title="견적 리스트 (5건)">
+        <ul className="flex flex-col gap-3">
           {QUOTE_HISTORY.map(([driverName, amount, status, submittedAt]) => (
             <li
               key={driverName}
@@ -82,7 +79,7 @@ export const EstimateDetailDrawer = ({
             </li>
           ))}
         </ul>
-      </section>
+      </DetailSection>
     </div>
   </DetailDrawer>
 );

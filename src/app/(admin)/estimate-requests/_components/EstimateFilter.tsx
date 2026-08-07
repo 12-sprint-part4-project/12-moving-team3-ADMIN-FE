@@ -1,8 +1,12 @@
 'use client';
 
+import { useState, type ChangeEvent } from 'react';
+
+import type { DateRange } from '@/components/DateRangePicker/DateRangePicker';
 import { DateRangePopover } from '@/components/DateRangePopover/DateRangePopover';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
+import type { AdminEstimateRequestStatus } from '@/types/adminEstimateRequest';
 
 const STATUS_OPTIONS = [
   { label: '상태 전체', value: '' },
@@ -12,25 +16,73 @@ const STATUS_OPTIONS = [
   { label: '취소 (CANCELED)', value: 'CANCELED' },
 ];
 
-export const EstimateFilter = () => (
-  <section
-    className="mt-4 flex flex-wrap items-center gap-2"
-    aria-label="견적 요청 필터"
-  >
-    <SearchInput
-      placeholder="견적 번호, 요청자 이름, 전화번호 검색"
-      aria-label="견적 요청 검색"
-      className="min-w-64 flex-1"
-    />
-    <FilterSelect
-      aria-label="견적 요청 상태"
-      defaultValue=""
-      options={STATUS_OPTIONS}
-    />
-    <DateRangePopover
-      placeholder="기간 전체"
-      onConfirm={() => undefined}
-      triggerClassName="min-w-40 px-3.5 py-1.5 text-md-medium"
-    />
-  </section>
-);
+interface EstimateFilterProps {
+  status?: AdminEstimateRequestStatus;
+  dateRange?: DateRange;
+  onSearch: (search: string) => void;
+  onStatusChange: (status?: AdminEstimateRequestStatus) => void;
+  onDateRangeConfirm: (range: DateRange | undefined) => void;
+}
+
+const parseStatus = (value: string): AdminEstimateRequestStatus | undefined => {
+  if (
+    value === 'SUBMITTED' ||
+    value === 'CONFIRMED' ||
+    value === 'EXPIRED' ||
+    value === 'CANCELED'
+  ) {
+    return value;
+  }
+
+  return undefined;
+};
+
+export const EstimateFilter = ({
+  status,
+  dateRange,
+  onSearch,
+  onStatusChange,
+  onDateRangeConfirm,
+}: EstimateFilterProps) => {
+  const [searchInput, setSearchInput] = useState('');
+
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(event.target.value);
+  };
+
+  const handleSearch = (value: string) => {
+    onSearch(value.trim());
+  };
+
+  const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    onStatusChange(parseStatus(event.target.value));
+  };
+
+  return (
+    <section
+      className="mt-4 flex flex-wrap items-center gap-2"
+      aria-label="견적 요청 필터"
+    >
+      <SearchInput
+        value={searchInput}
+        onChange={handleSearchChange}
+        onSearch={handleSearch}
+        placeholder="견적 번호, 요청자 이름, 전화번호 검색"
+        aria-label="견적 요청 검색"
+        className="min-w-64 flex-1"
+      />
+      <FilterSelect
+        aria-label="견적 요청 상태"
+        value={status ?? ''}
+        onChange={handleStatusChange}
+        options={STATUS_OPTIONS}
+      />
+      <DateRangePopover
+        value={dateRange}
+        placeholder="기간 전체"
+        onConfirm={onDateRangeConfirm}
+        triggerClassName="min-w-40 px-3.5 py-1.5 text-md-medium"
+      />
+    </section>
+  );
+};
