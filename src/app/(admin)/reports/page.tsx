@@ -1,5 +1,6 @@
 'use client';
 
+import { format } from 'date-fns';
 import {
   useCallback,
   useMemo,
@@ -12,6 +13,10 @@ import {
 import { AdminReportDetailDrawer } from '@/components/AdminReportDetailDrawer/AdminReportDetailDrawer';
 import { Button } from '@/components/Button/Button';
 import { DataTable, type Column } from '@/components/DataTable/DataTable';
+import {
+  DateRangePopover,
+  type DateRangePopoverProps,
+} from '@/components/DateRangePopover/DateRangePopover';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
@@ -35,6 +40,9 @@ import {
   formatAdminReportReporter,
   formatAdminReportTarget,
 } from '@/utils/adminReport';
+
+/** API 쿼리용 YYYY-MM-DD (다음 커밋 연동 전까지 로컬 상태 저장 형식) */
+const toReportApiDate = (date: Date) => format(date, 'yyyy-MM-dd');
 
 /** BE listQuerySchema 기본값과 동일 */
 const DEFAULT_PAGE_SIZE = 10;
@@ -112,6 +120,9 @@ const ReportsPage = () => {
     useState<AdminReportListFilters>(INITIAL_FILTERS);
   // 검색 입력 초안. API query 연결은 이후 커밋에서 한다(지금은 UI·로컬 상태만).
   const [targetUserSearch, setTargetUserSearch] = useState('');
+  // 신고일 필터 초안(YYYY-MM-DD). listQuery에는 아직 넣지 않는다.
+  const [reportedFrom, setReportedFrom] = useState<string | undefined>();
+  const [reportedTo, setReportedTo] = useState<string | undefined>();
   // Drawer 열림·상세 조회 키. null이면 Drawer가 닫히고 상세 요청도 중단된다.
   const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
 
@@ -134,6 +145,24 @@ const ReportsPage = () => {
       );
     }
   }
+
+  // 회원 목록 DateRangePopover와 동일: from 없으면 전체 기간(undefined).
+  const dateRangeValue = useMemo<DateRangePopoverProps['value']>(() => {
+    if (!reportedFrom) {
+      return undefined;
+    }
+
+    const from = new Date(`${reportedFrom}T00:00:00`);
+    const to = reportedTo
+      ? new Date(`${reportedTo}T00:00:00`)
+      : from;
+
+    if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) {
+      return undefined;
+    }
+
+    return { from, to };
+  }, [reportedFrom, reportedTo]);
 
   const hasActiveFilters = Boolean(filters.status || filters.target);
 
@@ -246,12 +275,30 @@ const ReportsPage = () => {
     );
   };
 
+  // 확인 시에만 로컬 날짜 상태를 갱신한다. API 연동은 다음 커밋.
+  // DateRangePicker는 from 선택이 선행되므로 종료일 단독 상태를 UI에서 만들지 않는다.
+  const handleDateRangeConfirm: DateRangePopoverProps['onConfirm'] = (
+    range
+  ) => {
+    if (!range?.from) {
+      setReportedFrom(undefined);
+      setReportedTo(undefined);
+      return;
+    }
+
+    setReportedFrom(toReportApiDate(range.from));
+    // 종료일이 없으면 시작일 당일만 의미하도록 reportedTo를 비운다(BE 정책과 동일).
+    setReportedTo(range.to ? toReportApiDate(range.to) : undefined);
+  };
+
   const handlePageChange = (page: number) => {
     updateFilters({ page });
   };
 
   const handleResetFilters = () => {
     setTargetUserSearch('');
+    setReportedFrom(undefined);
+    setReportedTo(undefined);
     setFilters(INITIAL_FILTERS);
   };
 
@@ -346,6 +393,11 @@ const ReportsPage = () => {
             value={filters.target ?? ''}
             onChange={handleTargetChange}
             options={[...TARGET_FILTER_OPTIONS]}
+          />
+          <DateRangePopover
+            value={dateRangeValue}
+            onConfirm={handleDateRangeConfirm}
+            placeholder="신고일 전체"
           />
         </div>
 
