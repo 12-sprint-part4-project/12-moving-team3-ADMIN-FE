@@ -5,11 +5,9 @@ import { DataTable, type Column } from '@/components/DataTable/DataTable';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { Pagination } from '@/components/Pagination/Pagination';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
-import type {
-  AdminEstimateRequestListItem,
-  AdminEstimateRequestStatus,
-} from '@/types/adminEstimateRequest';
+import type { AdminEstimateRequestListItem } from '@/types/adminEstimateRequest';
 import {
+  ADMIN_ESTIMATE_REQUEST_STATUS_BADGE,
   formatAdminEstimateRequestMoveType,
   formatAdminEstimateRequestPhoneNumber,
   formatAdminEstimateRequestSubmittedAt,
@@ -27,16 +25,6 @@ export interface EstimateTableProps {
   onResetFilters: () => void;
   onRetry: () => void;
 }
-
-const STATUS_BADGE_PROPS: Record<
-  AdminEstimateRequestStatus,
-  { label: string; variant: 'info' | 'success' | 'warning' | 'danger' }
-> = {
-  SUBMITTED: { label: '대기 중', variant: 'warning' },
-  CONFIRMED: { label: '매칭 완료', variant: 'success' },
-  EXPIRED: { label: '만료', variant: 'info' },
-  CANCELED: { label: '취소', variant: 'danger' },
-};
 
 const getEstimateRequestColumns = (
   onDetailClick: EstimateTableProps['onDetailClick']
@@ -80,7 +68,9 @@ const getEstimateRequestColumns = (
     key: 'status',
     header: '상태',
     align: 'center',
-    render: (row) => <StatusBadge {...STATUS_BADGE_PROPS[row.status]} />,
+    render: (row) => (
+      <StatusBadge {...ADMIN_ESTIMATE_REQUEST_STATUS_BADGE[row.status]} />
+    ),
   },
   {
     key: 'estimateCount',

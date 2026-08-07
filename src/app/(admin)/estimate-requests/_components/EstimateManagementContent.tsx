@@ -156,6 +156,7 @@ export const EstimateManagementContent = () => {
       />
       <EstimateDetailDrawer
         open={selectedEstimateRequestId !== null}
+        estimateRequestId={selectedEstimateRequestId}
         onClose={handleCloseDetail}
       />
     </>
