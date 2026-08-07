@@ -55,6 +55,36 @@ export const getDetailErrorTitle = (error: unknown) => {
   return '신고 상세를 불러오지 못했습니다.';
 };
 
+const DEFAULT_DECISION_ERROR_MESSAGE =
+  '요청에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+
+/**
+ * 처리·반려 API 오류 메시지.
+ * 서버가 내려준 message를 우선 쓰고(잘못된 Action·이미 처리·대상 없음·인증·서버 오류),
+ * 없으면 공통 fallback을 쓴다.
+ */
+export const getAdminReportDecisionErrorMessage = (error: unknown): string => {
+  if (!axios.isAxiosError(error)) {
+    return DEFAULT_DECISION_ERROR_MESSAGE;
+  }
+
+  const responseData = error.response?.data;
+  if (
+    responseData &&
+    typeof responseData === 'object' &&
+    'error' in responseData &&
+    responseData.error &&
+    typeof responseData.error === 'object' &&
+    'message' in responseData.error &&
+    typeof responseData.error.message === 'string' &&
+    responseData.error.message.trim()
+  ) {
+    return responseData.error.message;
+  }
+
+  return DEFAULT_DECISION_ERROR_MESSAGE;
+};
+
 /** exists/isDeleted를 관리자가 읽기 쉬운 단일 상태로 합친다. */
 export type TargetPresenceStatus = 'active' | 'deleted' | 'missing';
 

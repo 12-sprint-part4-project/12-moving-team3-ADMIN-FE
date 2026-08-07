@@ -8,18 +8,21 @@ export interface AdminReportResolveConfirmModalProps {
   open: boolean;
   selectedActions: AdminReportProcessAction[];
   isPending: boolean;
+  /** 처리 API 실패 시 ConfirmModal에 표시. 없으면 숨긴다. */
+  errorMessage?: string;
   onClose: () => void;
   onConfirm: () => void;
 }
 
 /**
  * 신고 처리 확인 Modal.
- * API·mutation은 호출하지 않고, 선택 Action 안내와 확인/취소만 담당한다.
+ * 선택 Action 안내·확인/취소를 담당하고, API 호출은 상위(Drawer)에서 한다.
  */
 export const AdminReportResolveConfirmModal = ({
   open,
   selectedActions,
   isPending,
+  errorMessage,
   onClose,
   onConfirm,
 }: AdminReportResolveConfirmModalProps) => {
@@ -52,6 +55,7 @@ export const AdminReportResolveConfirmModal = ({
       cancelText="취소"
       confirmLoading={isPending}
       confirmDisabled={!hasSelectedActions}
+      errorMessage={errorMessage}
       onConfirm={onConfirm}
       onCancel={onClose}
     />

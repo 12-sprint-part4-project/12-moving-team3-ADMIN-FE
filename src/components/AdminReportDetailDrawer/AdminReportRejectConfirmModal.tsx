@@ -5,17 +5,20 @@ import { ConfirmModal } from '@/components/ConfirmModal/ConfirmModal';
 export interface AdminReportRejectConfirmModalProps {
   open: boolean;
   isPending: boolean;
+  /** 반려 API 실패 시 ConfirmModal에 표시. 없으면 숨긴다. */
+  errorMessage?: string;
   onClose: () => void;
   onConfirm: () => void;
 }
 
 /**
  * 신고 반려 확인 Modal.
- * API·mutation은 호출하지 않고, 반려 안내와 확인/취소만 담당한다.
+ * 반려 안내·확인/취소를 담당하고, API 호출은 상위(Drawer)에서 한다.
  */
 export const AdminReportRejectConfirmModal = ({
   open,
   isPending,
+  errorMessage,
   onClose,
   onConfirm,
 }: AdminReportRejectConfirmModalProps) => (
@@ -26,6 +29,7 @@ export const AdminReportRejectConfirmModal = ({
     confirmText="신고 반려 확인"
     cancelText="취소"
     confirmLoading={isPending}
+    errorMessage={errorMessage}
     onConfirm={onConfirm}
     onCancel={onClose}
   />
