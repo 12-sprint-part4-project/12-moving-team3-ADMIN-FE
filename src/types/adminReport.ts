@@ -113,11 +113,18 @@ export type AdminReportTargetInfo =
 
 /**
  * GET /api/admin/reports 쿼리 파라미터.
- * status·target 미전달은 전체 조회. page·pageSize는 BE 기본값을 쓰며 이번 단계에서 UI는 건드리지 않는다.
+ * status·target·검색·신고일 미전달은 전체 조회.
+ * page·pageSize는 BE 기본값을 쓰며, 날짜는 YYYY-MM-DD 문자열로 유지한다.
  */
 export interface AdminReportListQuery {
   status?: AdminReportStatus;
   target?: AdminReportTarget;
+  /** 신고 대상 사용자 검색어 (이름·닉네임·이메일) */
+  targetUserKeyword?: string;
+  /** 신고일 시작일 (YYYY-MM-DD, UserReport.createdAt) */
+  reportedFrom?: string;
+  /** 신고일 종료일 (YYYY-MM-DD). reportedFrom 없이 단독 전달 불가 */
+  reportedTo?: string;
   page?: number;
   pageSize?: number;
 }
