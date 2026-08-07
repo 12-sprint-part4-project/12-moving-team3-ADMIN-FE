@@ -41,7 +41,7 @@ import {
   formatAdminReportTarget,
 } from '@/utils/adminReport';
 
-/** API 쿼리용 YYYY-MM-DD (다음 커밋 연동 전까지 로컬 상태 저장 형식) */
+/** API 쿼리용 YYYY-MM-DD */
 const toReportApiDate = (date: Date) => format(date, 'yyyy-MM-dd');
 
 /** BE listQuerySchema 기본값과 동일 */
@@ -69,6 +69,12 @@ const TARGET_FILTER_OPTIONS = [
 interface AdminReportListFilters {
   status?: AdminReportStatus;
   target?: AdminReportTarget;
+  /** 검색 버튼/Enter로 확정된 대상 사용자 검색어 */
+  targetUserKeyword?: string;
+  /** 신고일 시작 (YYYY-MM-DD) */
+  reportedFrom?: string;
+  /** 신고일 종료 (YYYY-MM-DD). reportedFrom 없이 단독 사용하지 않는다 */
+  reportedTo?: string;
   page: number;
   pageSize: number;
 }
@@ -107,22 +113,30 @@ const parseReportTargetFilter = (
   return undefined;
 };
 
-/** UI 필터 → API query. 전체(undefined)인 status/target은 객체에 넣지 않아 query string에서 빠진다. */
+/**
+ * UI 필터 → API query.
+ * undefined·빈 값은 객체에 넣지 않아 axios query string에서 빠진다.
+ * reportedTo는 reportedFrom이 있을 때만 전달해 BE 단독 사용 거부를 피한다.
+ */
 const toListQuery = (filters: AdminReportListFilters): AdminReportListQuery => ({
   page: filters.page,
   pageSize: filters.pageSize,
   ...(filters.status ? { status: filters.status } : {}),
   ...(filters.target ? { target: filters.target } : {}),
+  ...(filters.targetUserKeyword
+    ? { targetUserKeyword: filters.targetUserKeyword }
+    : {}),
+  ...(filters.reportedFrom ? { reportedFrom: filters.reportedFrom } : {}),
+  ...(filters.reportedFrom && filters.reportedTo
+    ? { reportedTo: filters.reportedTo }
+    : {}),
 });
 
 const ReportsPage = () => {
   const [filters, setFilters] =
     useState<AdminReportListFilters>(INITIAL_FILTERS);
-  // 검색 입력 초안. API query 연결은 이후 커밋에서 한다(지금은 UI·로컬 상태만).
+  // 입력창 초안. 검색 버튼/Enter 시에만 filters.targetUserKeyword로 반영한다.
   const [targetUserSearch, setTargetUserSearch] = useState('');
-  // 신고일 필터 초안(YYYY-MM-DD). listQuery에는 아직 넣지 않는다.
-  const [reportedFrom, setReportedFrom] = useState<string | undefined>();
-  const [reportedTo, setReportedTo] = useState<string | undefined>();
   // Drawer 열림·상세 조회 키. null이면 Drawer가 닫히고 상세 요청도 중단된다.
   const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
 
@@ -148,13 +162,13 @@ const ReportsPage = () => {
 
   // 회원 목록 DateRangePopover와 동일: from 없으면 전체 기간(undefined).
   const dateRangeValue = useMemo<DateRangePopoverProps['value']>(() => {
-    if (!reportedFrom) {
+    if (!filters.reportedFrom) {
       return undefined;
     }
 
-    const from = new Date(`${reportedFrom}T00:00:00`);
-    const to = reportedTo
-      ? new Date(`${reportedTo}T00:00:00`)
+    const from = new Date(`${filters.reportedFrom}T00:00:00`);
+    const to = filters.reportedTo
+      ? new Date(`${filters.reportedTo}T00:00:00`)
       : from;
 
     if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) {
@@ -162,9 +176,15 @@ const ReportsPage = () => {
     }
 
     return { from, to };
-  }, [reportedFrom, reportedTo]);
+  }, [filters.reportedFrom, filters.reportedTo]);
 
-  const hasActiveFilters = Boolean(filters.status || filters.target);
+  const hasActiveFilters = Boolean(
+    filters.status ||
+      filters.target ||
+      filters.targetUserKeyword ||
+      filters.reportedFrom ||
+      filters.reportedTo
+  );
 
   const handleOpenDetail = useCallback(
     (event: MouseEvent<HTMLButtonElement>, reportId: number) => {
@@ -256,9 +276,14 @@ const ReportsPage = () => {
     setTargetUserSearch(event.target.value);
   };
 
-  // 회원 목록과 같이 검색 버튼/Enter 시 trim만 반영한다. listQuery에는 아직 넣지 않는다.
+  // 검색 버튼/Enter 시에만 query에 반영하고 page를 1로 돌린다.
   const handleTargetUserSearch = (value: string) => {
-    setTargetUserSearch(value.trim());
+    const trimmed = value.trim();
+    setTargetUserSearch(trimmed);
+    updateFilters(
+      { targetUserKeyword: trimmed.length > 0 ? trimmed : undefined },
+      { resetPage: true }
+    );
   };
 
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -275,20 +300,27 @@ const ReportsPage = () => {
     );
   };
 
-  // 확인 시에만 로컬 날짜 상태를 갱신한다. API 연동은 다음 커밋.
-  // DateRangePicker는 from 선택이 선행되므로 종료일 단독 상태를 UI에서 만들지 않는다.
+  // DateRangePopover confirm 시 query에 바로 반영(회원 목록과 동일).
+  // DateRangePicker는 from 선택이 선행되므로 reportedTo 단독 상태를 만들지 않는다.
   const handleDateRangeConfirm: DateRangePopoverProps['onConfirm'] = (
     range
   ) => {
     if (!range?.from) {
-      setReportedFrom(undefined);
-      setReportedTo(undefined);
+      updateFilters(
+        { reportedFrom: undefined, reportedTo: undefined },
+        { resetPage: true }
+      );
       return;
     }
 
-    setReportedFrom(toReportApiDate(range.from));
-    // 종료일이 없으면 시작일 당일만 의미하도록 reportedTo를 비운다(BE 정책과 동일).
-    setReportedTo(range.to ? toReportApiDate(range.to) : undefined);
+    updateFilters(
+      {
+        reportedFrom: toReportApiDate(range.from),
+        // 종료일이 없으면 시작일 당일만 조회되도록 reportedTo를 생략한다.
+        reportedTo: range.to ? toReportApiDate(range.to) : undefined,
+      },
+      { resetPage: true }
+    );
   };
 
   const handlePageChange = (page: number) => {
@@ -297,8 +329,6 @@ const ReportsPage = () => {
 
   const handleResetFilters = () => {
     setTargetUserSearch('');
-    setReportedFrom(undefined);
-    setReportedTo(undefined);
     setFilters(INITIAL_FILTERS);
   };
 
