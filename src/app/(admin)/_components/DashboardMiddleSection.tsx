@@ -24,8 +24,7 @@ const isRequestTrendPeriod = (
 
 /** 견적 요청 추이 패널. period 변경 시 자동으로 다시 조회한다. */
 const RequestTrendPanel = () => {
-  const [period, setPeriod] =
-    useState<AdminDashboardRequestTrendPeriod>('DAY');
+  const [period, setPeriod] = useState<AdminDashboardRequestTrendPeriod>('DAY');
   const { data, isPending, isError } = useDashboardRequestTrend(period);
   const trendData = data?.data ?? [];
 
@@ -103,7 +102,7 @@ const RequestStatusPanel = () => {
       {renderStatusBody()}
       {!isPending && !isError && statusData ? (
         <p className="text-xs-medium text-gray-400">
-          ※ 최근 30일 동안 생성된 견적 요청을 기준으로 집계합니다.
+          ※ 최근 30일 동안 제출된 견적 요청을 기준으로 집계합니다.
         </p>
       ) : null}
     </article>
