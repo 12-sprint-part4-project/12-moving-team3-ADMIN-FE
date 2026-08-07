@@ -51,8 +51,24 @@ const getEstimateRequestColumns = (
     header: '이사 유형',
     render: (row) => formatAdminEstimateRequestMoveType(row.moveType),
   },
-  { key: 'departureAddress', header: '출발지', accessor: 'departureAddress' },
-  { key: 'arrivalAddress', header: '도착지', accessor: 'arrivalAddress' },
+  {
+    key: 'departureAddress',
+    header: '출발지',
+    render: (row) => (
+      <span className="block max-w-40 truncate" title={row.departureAddress}>
+        {row.departureAddress}
+      </span>
+    ),
+  },
+  {
+    key: 'arrivalAddress',
+    header: '도착지',
+    render: (row) => (
+      <span className="block max-w-40 truncate" title={row.arrivalAddress}>
+        {row.arrivalAddress}
+      </span>
+    ),
+  },
   {
     key: 'submittedAt',
     header: '제출일',
