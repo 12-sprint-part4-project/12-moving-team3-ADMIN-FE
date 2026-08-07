@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import { PageHeader } from '@/components/PageHeader/PageHeader';
 import { Pagination } from '@/components/Pagination/Pagination';
+import { cn } from '@/lib/utils';
 
 export interface AdminListLayoutProps {
   title: string;
@@ -13,6 +14,7 @@ export interface AdminListLayoutProps {
   page?: number;
   totalPages?: number;
   onPageChange?: (page: number) => void;
+  className?: string;
 }
 
 /**
@@ -27,6 +29,7 @@ export const AdminListLayout = ({
   page,
   totalPages = 0,
   onPageChange,
+  className,
 }: AdminListLayoutProps) => {
   const showPagination =
     totalPages > 0 && page !== undefined && onPageChange !== undefined;
@@ -35,7 +38,7 @@ export const AdminListLayout = ({
     <>
       <PageHeader title={title} description={description} />
 
-      <div className="mt-6 flex flex-col gap-4">
+      <div className={cn('mt-6 flex flex-col gap-4', className)}>
         {filters ? (
           <div className="flex flex-wrap items-center gap-2">{filters}</div>
         ) : null}
