@@ -1,5 +1,6 @@
 import {
   ADMIN_REPORT_LIST_PATH,
+  ADMIN_REPORT_STATISTICS_PATH,
   getAdminReportDetailPath,
   getAdminReportRejectPath,
   getAdminReportResolvePath,
@@ -12,6 +13,8 @@ import type {
   AdminReportRejectResponse,
   AdminReportResolveBody,
   AdminReportResolveResponse,
+  AdminReportStatisticsQuery,
+  AdminReportStatisticsResponse,
 } from '@/types/adminReport';
 
 /**
@@ -26,6 +29,22 @@ export const getAdminReportList = async (
   const response = await axiosInstance.get<AdminReportListResponse>(
     ADMIN_REPORT_LIST_PATH,
     { params }
+  );
+
+  return response.data;
+};
+
+/**
+ * 관리자 신고 통계 조회.
+ * params가 없으면 전체 기간을 집계한다.
+ * Access Token은 axiosInstance Request Interceptor가 Authorization에 첨부한다.
+ */
+export const getAdminReportStatistics = async (
+  params?: AdminReportStatisticsQuery
+): Promise<AdminReportStatisticsResponse> => {
+  const response = await axiosInstance.get<AdminReportStatisticsResponse>(
+    ADMIN_REPORT_STATISTICS_PATH,
+    params ? { params } : undefined
   );
 
   return response.data;

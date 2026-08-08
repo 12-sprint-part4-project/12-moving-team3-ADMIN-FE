@@ -1,19 +1,24 @@
 import type { ReactNode } from 'react';
-import { CircleAlert, CircleCheck, Clock3, TimerOff } from 'lucide-react';
+import {
+  CircleAlert,
+  CircleCheck,
+  CircleX,
+  ClipboardList,
+} from 'lucide-react';
 
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { StatisticsCardList } from '@/components/StatCard/StatisticsCardList';
-import type { AdminEstimateRequestStatistics } from '@/types/adminEstimateRequest';
+import type { AdminReportStatistics } from '@/types/adminReport';
 
-interface EstimateStatisticsProps {
-  statistics?: AdminEstimateRequestStatistics;
+interface ReportStatisticsProps {
+  statistics?: AdminReportStatistics;
   isPending: boolean;
   isError: boolean;
 }
 
 interface StatisticItem {
-  key: keyof AdminEstimateRequestStatistics;
+  key: keyof AdminReportStatistics;
   title: string;
   unit: string;
   icon: ReactNode;
@@ -22,40 +27,40 @@ interface StatisticItem {
 
 const STATISTICS_ITEMS: StatisticItem[] = [
   {
-    key: 'submitted',
-    title: '대기 중',
+    key: 'totalReportCount',
+    title: '전체 신고',
     unit: '건',
-    icon: <Clock3 className="size-6 text-yellow-100" />,
+    icon: <ClipboardList className="size-6 text-blue-300" />,
+    iconBackgroundClassName: 'bg-blue-100',
+  },
+  {
+    key: 'pendingReportCount',
+    title: '대기',
+    unit: '건',
+    icon: <CircleAlert className="size-6 text-yellow-100" />,
     iconBackgroundClassName: 'bg-yellow-50',
   },
   {
-    key: 'confirmed',
-    title: '매칭 완료',
+    key: 'resolvedReportCount',
+    title: '처리 완료',
     unit: '건',
     icon: <CircleCheck className="size-6 text-green-200" />,
     iconBackgroundClassName: 'bg-green-100',
   },
   {
-    key: 'expired',
-    title: '만료',
+    key: 'rejectedReportCount',
+    title: '반려',
     unit: '건',
-    icon: <TimerOff className="size-6 text-blue-300" />,
-    iconBackgroundClassName: 'bg-blue-100',
-  },
-  {
-    key: 'canceled',
-    title: '취소',
-    unit: '건',
-    icon: <CircleAlert className="size-6 text-red-200" />,
+    icon: <CircleX className="size-6 text-red-200" />,
     iconBackgroundClassName: 'bg-red-100',
   },
 ];
 
-export const EstimateStatistics = ({
+export const ReportStatistics = ({
   statistics,
   isPending,
   isError,
-}: EstimateStatisticsProps) => {
+}: ReportStatisticsProps) => {
   const renderBody = (): ReactNode => {
     if (isPending) {
       return <LoadingState />;
@@ -64,7 +69,7 @@ export const EstimateStatistics = ({
     if (isError && !statistics) {
       return (
         <EmptyState
-          title="견적 요청 통계를 불러오지 못했습니다."
+          title="신고 통계를 불러오지 못했습니다."
           description="잠시 후 다시 시도해 주세요."
         />
       );
@@ -85,7 +90,7 @@ export const EstimateStatistics = ({
             iconBackgroundClassName,
           })
         )}
-        description="※ 제출일 기준으로 집계되며, 기간 필터만 적용됩니다."
+        description="※ 신고일 기준으로 집계되며, 기간 필터만 적용됩니다."
         gridClassName="xl:grid-cols-4"
       />
     );
@@ -94,7 +99,7 @@ export const EstimateStatistics = ({
   return (
     <section
       className="mt-6 w-full rounded-lg border border-line-200 bg-white p-6"
-      aria-label="견적 요청 통계"
+      aria-label="신고 통계"
     >
       {renderBody()}
     </section>

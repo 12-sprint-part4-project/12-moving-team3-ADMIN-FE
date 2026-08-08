@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils';
 export interface AdminListLayoutProps {
   title: string;
   description?: string;
+  /** PageHeader 아래 KPI·통계 영역 */
+  statistics?: ReactNode;
   /** 검색·필터 컨트롤 영역 */
   filters?: ReactNode;
   /** 표/로딩/빈 상태 — 흰 카드 안에만 렌더한다 */
@@ -19,11 +21,12 @@ export interface AdminListLayoutProps {
 
 /**
  * 관리자 목록 공통 셸.
- * 필터 → 표 카드 → 카드 밖 페이지네이션 순으로 배치한다.
+ * 통계 → 필터 → 표 카드 → 카드 밖 페이지네이션 순으로 배치한다.
  */
 export const AdminListLayout = ({
   title,
   description,
+  statistics,
   filters,
   children,
   page,
@@ -37,6 +40,8 @@ export const AdminListLayout = ({
   return (
     <>
       <PageHeader title={title} description={description} />
+
+      {statistics}
 
       <div className={cn('mt-6 flex flex-col gap-4', className)}>
         {filters ? (

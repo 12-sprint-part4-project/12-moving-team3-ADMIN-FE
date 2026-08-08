@@ -1,4 +1,7 @@
-import type { AdminReportListQuery } from '@/types/adminReport';
+import type {
+  AdminReportListQuery,
+  AdminReportStatisticsQuery,
+} from '@/types/adminReport';
 
 /**
  * 관리자 신고 조회용 queryKey.
@@ -9,6 +12,8 @@ export const ADMIN_REPORT_QUERY_KEYS = {
   lists: () => [...ADMIN_REPORT_QUERY_KEYS.all, 'list'] as const,
   list: (params?: AdminReportListQuery) =>
     [...ADMIN_REPORT_QUERY_KEYS.lists(), params] as const,
+  statistics: (params?: AdminReportStatisticsQuery) =>
+    [...ADMIN_REPORT_QUERY_KEYS.all, 'statistics', params] as const,
   details: () => [...ADMIN_REPORT_QUERY_KEYS.all, 'detail'] as const,
   detail: (reportId: number) =>
     [...ADMIN_REPORT_QUERY_KEYS.details(), reportId] as const,

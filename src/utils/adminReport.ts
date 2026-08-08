@@ -8,6 +8,7 @@ import type {
   AdminReportMessageType,
   AdminReportPostsCategory,
   AdminReportProcessAction,
+  AdminReportStatisticsQuery,
   AdminReportStatus,
   AdminReportTarget,
   AdminReportTargetInfo,
@@ -339,4 +340,22 @@ export const formatAdminReportTarget = (
     default:
       return ADMIN_REPORT_TARGET_LABEL[target];
   }
+};
+
+/**
+ * 목록 신고일 필터 → statistics 쿼리.
+ * reportedFrom이 없으면 undefined를 반환해 params 전달을 생략한다.
+ */
+export const toAdminReportStatisticsQuery = (
+  reportedFrom?: string,
+  reportedTo?: string
+): AdminReportStatisticsQuery | undefined => {
+  if (!reportedFrom) {
+    return undefined;
+  }
+
+  return {
+    startDate: reportedFrom,
+    ...(reportedTo ? { endDate: reportedTo } : {}),
+  };
 };

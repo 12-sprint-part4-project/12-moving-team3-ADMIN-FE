@@ -24,6 +24,7 @@ import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { useAdminReportList } from '@/hooks/useAdminReportList';
+import { useAdminReportStatistics } from '@/hooks/useAdminReportStatistics';
 import type {
   AdminReportListItem,
   AdminReportListQuery,
@@ -38,7 +39,10 @@ import {
   formatAdminReportCreatedAt,
   formatAdminReportReporter,
   formatAdminReportTarget,
+  toAdminReportStatisticsQuery,
 } from '@/utils/adminReport';
+
+import { ReportStatistics } from './_components/ReportStatistics';
 
 /** API 쿼리용 YYYY-MM-DD */
 const toReportApiDate = (date: Date) => format(date, 'yyyy-MM-dd');
@@ -140,7 +144,17 @@ const ReportsPage = () => {
   const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
 
   const listQuery = useMemo(() => toListQuery(filters), [filters]);
+  const statisticsQuery = useMemo(
+    () =>
+      toAdminReportStatisticsQuery(filters.reportedFrom, filters.reportedTo),
+    [filters.reportedFrom, filters.reportedTo]
+  );
   const { data, isPending, isError } = useAdminReportList(listQuery);
+  const {
+    data: statisticsData,
+    isPending: isStatisticsPending,
+    isError: isStatisticsError,
+  } = useAdminReportStatistics(statisticsQuery);
 
   const items = data?.data.items ?? [];
   const pagination = data?.data.pagination;
@@ -391,6 +405,13 @@ const ReportsPage = () => {
         page={currentPage}
         totalPages={totalPages}
         onPageChange={handlePageChange}
+        statistics={
+          <ReportStatistics
+            statistics={statisticsData?.data}
+            isPending={isStatisticsPending}
+            isError={isStatisticsError}
+          />
+        }
         filters={
           <>
             <SearchInput
