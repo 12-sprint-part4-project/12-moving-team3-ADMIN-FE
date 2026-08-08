@@ -5,19 +5,21 @@ import { DataTable, type Column } from '@/components/DataTable/DataTable';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { Pagination } from '@/components/Pagination/Pagination';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
-import type { AdminEstimateRequestListItem } from '@/types/adminEstimateRequest';
+import type { AdminCompletedListItem } from '@/types/adminCompleted';
 import {
-  ADMIN_ESTIMATE_REQUEST_STATUS_BADGE,
-  formatAdminEstimateRequestMissingFields,
+  formatAdminCompletedMissingFields,
+  formatAdminCompletedMoveDate,
+  formatAdminCompletedPrice,
+  hasAdminCompletedMissingFields,
+} from '@/utils/adminCompleted';
+import {
   formatAdminEstimateRequestMoveType,
   formatAdminEstimateRequestNullableText,
   formatAdminEstimateRequestPhoneNumber,
-  formatAdminEstimateRequestSubmittedAt,
-  hasAdminEstimateRequestMissingFields,
 } from '@/utils/adminEstimateRequest';
 
-export interface EstimateTableProps {
-  items: AdminEstimateRequestListItem[];
+export interface CompletedTableProps {
+  items: AdminCompletedListItem[];
   page: number;
   totalPages: number;
   isLoading: boolean;
@@ -29,9 +31,9 @@ export interface EstimateTableProps {
   onRetry: () => void;
 }
 
-const getEstimateRequestColumns = (
-  onDetailClick: EstimateTableProps['onDetailClick']
-): Column<AdminEstimateRequestListItem>[] => [
+const getCompletedColumns = (
+  onDetailClick: CompletedTableProps['onDetailClick']
+): Column<AdminCompletedListItem>[] => [
   { key: 'id', header: '견적 번호', accessor: 'id' },
   { key: 'userName', header: '요청자 이름', accessor: 'userName' },
   {
@@ -75,47 +77,40 @@ const getEstimateRequestColumns = (
     },
   },
   {
-    key: 'submittedAt',
-    header: '제출일',
-    render: (row) => formatAdminEstimateRequestSubmittedAt(row.submittedAt),
-  },
-  {
-    key: 'status',
-    header: '상태',
-    align: 'center',
-    render: (row) => {
-      const missingLabels = formatAdminEstimateRequestMissingFields(
-        row.missingFields
-      );
-      const hasMissingFields = hasAdminEstimateRequestMissingFields(
-        row.missingFields
-      );
-
-      return (
-        <div className="flex flex-col items-center gap-1">
-          <StatusBadge {...ADMIN_ESTIMATE_REQUEST_STATUS_BADGE[row.status]} />
-          {hasMissingFields ? (
-            <span title={`누락: ${missingLabels.join(', ')}`}>
-              <StatusBadge variant="danger" label="정보 누락" />
-              <span className="sr-only">
-                누락 필드: {missingLabels.join(', ')}
-              </span>
-            </span>
-          ) : null}
-        </div>
-      );
-    },
-  },
-  {
-    key: 'estimateCount',
-    header: '견적 수',
-    accessor: 'estimateCount',
-    align: 'center',
+    key: 'moveDate',
+    header: '이사일',
+    render: (row) => formatAdminCompletedMoveDate(row.moveDate),
   },
   {
     key: 'mover',
     header: '매칭 기사',
-    render: (row) => row.mover ?? '-',
+    render: (row) => formatAdminEstimateRequestNullableText(row.mover),
+  },
+  {
+    key: 'price',
+    header: '견적 금액',
+    render: (row) => formatAdminCompletedPrice(row.price),
+  },
+  {
+    key: 'missingFields',
+    header: '데이터',
+    align: 'center',
+    render: (row) => {
+      if (!hasAdminCompletedMissingFields(row.missingFields)) {
+        return <span className="text-gray-500">-</span>;
+      }
+
+      const missingLabels = formatAdminCompletedMissingFields(
+        row.missingFields
+      );
+
+      return (
+        <span title={`누락: ${missingLabels.join(', ')}`}>
+          <StatusBadge variant="danger" label="정보 누락" />
+          <span className="sr-only">누락 필드: {missingLabels.join(', ')}</span>
+        </span>
+      );
+    },
   },
   {
     key: 'action',
@@ -133,7 +128,7 @@ const getEstimateRequestColumns = (
   },
 ];
 
-export const EstimateTable = ({
+export const CompletedTable = ({
   items,
   page,
   totalPages,
@@ -144,12 +139,12 @@ export const EstimateTable = ({
   onPageChange,
   onResetFilters,
   onRetry,
-}: EstimateTableProps) => (
-  <section className="mt-4" aria-label="견적 요청 목록">
+}: CompletedTableProps) => (
+  <section className="mt-4" aria-label="완료 건 목록">
     <div className="overflow-hidden rounded-lg border border-line-200 bg-white">
       {isError ? (
         <EmptyState
-          title="견적 요청 목록을 불러오지 못했습니다."
+          title="완료 건 목록을 불러오지 못했습니다."
           description="잠시 후 다시 시도해 주세요."
           action={
             <Button variant="secondary" onClick={onRetry}>
@@ -162,7 +157,7 @@ export const EstimateTable = ({
           title={
             hasActiveFilters
               ? '검색 결과가 없습니다.'
-              : '등록된 견적 요청이 없습니다.'
+              : '등록된 완료 건이 없습니다.'
           }
           description={
             hasActiveFilters
@@ -179,11 +174,11 @@ export const EstimateTable = ({
         />
       ) : (
         <DataTable
-          columns={getEstimateRequestColumns(onDetailClick)}
+          columns={getCompletedColumns(onDetailClick)}
           data={items}
           rowKey="id"
           loading={isLoading}
-          caption="견적 요청 목록"
+          caption="완료 건 목록"
         />
       )}
     </div>

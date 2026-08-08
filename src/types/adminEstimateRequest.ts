@@ -3,6 +3,18 @@ export type AdminEstimateRequestStatus =
 
 export type AdminEstimateRequestMoveType = 'SMALL' | 'HOME' | 'OFFICE';
 
+/** 목록 응답에서 누락될 수 있는 필수 필드명 */
+export type AdminEstimateRequestListMissingField =
+  'moveType' | 'departureAddress' | 'arrivalAddress' | 'submittedAt';
+
+/** 상세 응답에서 누락될 수 있는 필수 필드명 */
+export type AdminEstimateRequestDetailMissingField =
+  | AdminEstimateRequestListMissingField
+  | 'departureZipCode'
+  | 'departureDetailAddress'
+  | 'arrivalZipCode'
+  | 'arrivalDetailAddress';
+
 export interface AdminEstimateRequestListQuery {
   page: number;
   pageSize: number;
@@ -16,13 +28,16 @@ export interface AdminEstimateRequestListItem {
   id: number;
   userName: string;
   phoneNumber: string | null;
-  moveType: AdminEstimateRequestMoveType;
-  departureAddress: string;
-  arrivalAddress: string;
-  submittedAt: string;
+  moveType: AdminEstimateRequestMoveType | null;
+  departureAddress: string | null;
+  arrivalAddress: string | null;
+  /** ISO date-time. 누락 시 null */
+  submittedAt: string | null;
   estimateCount: number;
   status: AdminEstimateRequestStatus;
   mover: string | null;
+  /** 상태 불변식상 있어야 하지만 null인 필드명. 정상이면 빈 배열 */
+  missingFields: AdminEstimateRequestListMissingField[];
 }
 
 export interface AdminEstimateRequestMeta {
@@ -57,7 +72,7 @@ export type AdminEstimateQuoteStatus = 'PENDING' | 'CONFIRMED' | 'REJECTED';
 
 export interface AdminEstimateQuote {
   id: number;
-  moverName: string;
+  moverName: string | null;
   price: number | null;
   status: AdminEstimateQuoteStatus;
   /** ISO date-time */
@@ -67,18 +82,20 @@ export interface AdminEstimateQuote {
 export interface AdminEstimateRequestDetail {
   id: number;
   userName: string;
-  moveType: AdminEstimateRequestMoveType;
-  departureAddress: string;
-  arrivalAddress: string;
-  /** ISO date-time */
-  submittedAt: string;
+  moveType: AdminEstimateRequestMoveType | null;
+  departureAddress: string | null;
+  arrivalAddress: string | null;
+  /** ISO date-time. 누락 시 null */
+  submittedAt: string | null;
   status: AdminEstimateRequestStatus;
   estimateCount: number;
-  departureZipCode: string;
-  departureDetailAddress: string;
-  arrivalZipCode: string;
-  arrivalDetailAddress: string;
+  departureZipCode: string | null;
+  departureDetailAddress: string | null;
+  arrivalZipCode: string | null;
+  arrivalDetailAddress: string | null;
   quotes: AdminEstimateQuote[];
+  /** 상태 불변식상 있어야 하지만 null인 필드명. 정상이면 빈 배열 */
+  missingFields: AdminEstimateRequestDetailMissingField[];
 }
 
 export interface AdminEstimateRequestDetailResponse {

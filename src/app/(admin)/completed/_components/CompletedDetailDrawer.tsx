@@ -7,47 +7,43 @@ import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
-import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
-import { useAdminEstimateRequestDetail } from '@/hooks/useAdminEstimateRequestDetail';
-import { cn } from '@/lib/utils';
-import type { AdminEstimateRequestDetail } from '@/types/adminEstimateRequest';
+import { useAdminCompletedDetail } from '@/hooks/useAdminCompletedDetail';
+import type { AdminCompletedDetail } from '@/types/adminCompleted';
 import {
-  ADMIN_ESTIMATE_REQUEST_STATUS_BADGE,
-  formatAdminEstimateQuotePrice,
-  formatAdminEstimateQuoteStatus,
-  formatAdminEstimateRequestMissingFields,
+  formatAdminCompletedMissingFields,
+  formatAdminCompletedMoveDate,
+  formatAdminCompletedPrice,
+  hasAdminCompletedMissingFields,
+} from '@/utils/adminCompleted';
+import {
   formatAdminEstimateRequestMoveType,
   formatAdminEstimateRequestNullableText,
   formatAdminEstimateRequestSubmittedAt,
-  hasAdminEstimateRequestMissingFields,
 } from '@/utils/adminEstimateRequest';
 
-export interface EstimateDetailDrawerProps {
+export interface CompletedDetailDrawerProps {
   open: boolean;
-  /** 목록에서 선택한 견적 요청 ID. null이면 상세 요청을 하지 않는다. */
+  /** 목록에서 선택한 완료 건 ID. null이면 상세 요청을 하지 않는다. */
   estimateRequestId: number | null;
   onClose: () => void;
 }
 
 const getDetailErrorTitle = (error: unknown) => {
   if (axios.isAxiosError(error) && error.response?.status === 404) {
-    return '견적 요청 정보를 찾을 수 없습니다.';
+    return '완료 건 정보를 찾을 수 없습니다.';
   }
 
-  return '견적 요청 상세를 불러오지 못했습니다.';
+  return '완료 건 상세를 불러오지 못했습니다.';
 };
 
-interface EstimateDetailContentProps {
-  detail: AdminEstimateRequestDetail;
+interface CompletedDetailContentProps {
+  detail: AdminCompletedDetail;
 }
 
-const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
-  const missingLabels = formatAdminEstimateRequestMissingFields(
-    detail.missingFields
-  );
-  const hasMissingFields = hasAdminEstimateRequestMissingFields(
-    detail.missingFields
-  );
+const CompletedDetailContent = ({ detail }: CompletedDetailContentProps) => {
+  const missingLabels = formatAdminCompletedMissingFields(detail.missingFields);
+  const hasMissingFields = hasAdminCompletedMissingFields(detail.missingFields);
+  const confirmedQuote = detail.confirmedQuote;
 
   const basicInformation: [string, string][] = [
     ['견적 번호', String(detail.id)],
@@ -71,7 +67,20 @@ const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
       '도착지 상세',
       formatAdminEstimateRequestNullableText(detail.arrivalDetailAddress),
     ],
-    ['제출일', formatAdminEstimateRequestSubmittedAt(detail.submittedAt)],
+    ['이사일', formatAdminCompletedMoveDate(detail.moveDate)],
+  ];
+
+  const confirmedQuoteInformation: [string, string][] = [
+    [
+      '기사명',
+      formatAdminEstimateRequestNullableText(confirmedQuote?.moverName),
+    ],
+    ['견적 금액', formatAdminCompletedPrice(confirmedQuote?.price ?? null)],
+    ['코멘트', formatAdminEstimateRequestNullableText(confirmedQuote?.comment)],
+    [
+      '견적 생성일',
+      formatAdminEstimateRequestSubmittedAt(confirmedQuote?.createdAt ?? null),
+    ],
   ];
 
   return (
@@ -93,72 +102,47 @@ const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
               <dd className="text-right text-black-400">{value}</dd>
             </div>
           ))}
-          <div className="flex items-center justify-between gap-4">
-            <dt className="shrink-0 text-gray-500">상태</dt>
-            <dd>
-              <StatusBadge
-                {...ADMIN_ESTIMATE_REQUEST_STATUS_BADGE[detail.status]}
-              />
-            </dd>
-          </div>
         </dl>
       </DetailSection>
 
-      <DetailSection title={`견적 리스트 (${detail.estimateCount}건)`}>
-        <ul className="flex flex-col gap-3">
-          {detail.quotes.map((quote) => {
-            const statusLabel = formatAdminEstimateQuoteStatus(quote.status);
-
-            return (
-              <li
-                key={quote.id}
-                className="flex items-center justify-between gap-3 text-xs-medium"
+      <DetailSection title="확정 견적">
+        {confirmedQuote == null ? (
+          <p className="text-xs-medium text-gray-500">
+            확정 견적 정보가 없습니다.
+          </p>
+        ) : (
+          <dl className="flex flex-col gap-3 text-xs-medium">
+            {confirmedQuoteInformation.map(([label, value]) => (
+              <div
+                key={label}
+                className="flex items-start justify-between gap-4"
               >
-                <span className="text-black-400">
-                  {formatAdminEstimateRequestNullableText(quote.moverName)}
-                </span>
-                <span className="ml-auto text-black-400">
-                  {formatAdminEstimateQuotePrice(quote.price)}
-                </span>
-                <span
-                  className={cn(
-                    quote.status === 'CONFIRMED'
-                      ? 'text-green-200'
-                      : 'text-gray-500'
-                  )}
-                >
-                  {statusLabel}
-                </span>
-                <time className="text-gray-500">
-                  {formatAdminEstimateRequestSubmittedAt(quote.createdAt)}
-                </time>
-              </li>
-            );
-          })}
-        </ul>
+                <dt className="shrink-0 text-gray-500">{label}</dt>
+                <dd className="text-right text-black-400">{value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
       </DetailSection>
     </div>
   );
 };
 
 /**
- * 견적 요청 상세 Drawer.
+ * 완료 건 상세 Drawer.
  * open + estimateRequestId일 때 상세 API를 호출하고, 로딩·에러 상태를 Drawer 안에서 처리한다.
- * 필수값 누락 건은 500이 아니라 missingFields로 내려오므로 본문에서 원인을 표시한다.
  */
-export const EstimateDetailDrawer = ({
+export const CompletedDetailDrawer = ({
   open,
   estimateRequestId,
   onClose,
-}: EstimateDetailDrawerProps) => {
+}: CompletedDetailDrawerProps) => {
   const { data, error, isPending, isError, isSuccess, refetch } =
-    useAdminEstimateRequestDetail(estimateRequestId, {
+    useAdminCompletedDetail(estimateRequestId, {
       enabled: open && estimateRequestId != null,
     });
 
-  // queryKey가 estimateRequestId별이라 다른 요청을 열 때 이전 data가 섞이지 않는다.
   const detail = data?.data ?? null;
-  // 응답 id가 현재 선택과 다를 때만 막아, 캐시/전환 중 잘못된 상세가 잠깐 보이지 않게 한다.
   const isDetailForSelection =
     detail != null &&
     estimateRequestId != null &&
@@ -168,7 +152,7 @@ export const EstimateDetailDrawer = ({
     if (estimateRequestId == null) {
       return (
         <p className="text-md-regular text-gray-500">
-          선택한 견적 요청 정보가 없습니다.
+          선택한 완료 건 정보가 없습니다.
         </p>
       );
     }
@@ -194,19 +178,19 @@ export const EstimateDetailDrawer = ({
     if (!isSuccess || !isDetailForSelection) {
       return (
         <EmptyState
-          title="견적 요청 정보가 없습니다."
-          description="선택한 견적 요청을 찾을 수 없습니다."
+          title="완료 건 정보가 없습니다."
+          description="선택한 완료 건을 찾을 수 없습니다."
         />
       );
     }
 
-    return <EstimateDetailContent detail={detail} />;
+    return <CompletedDetailContent detail={detail} />;
   };
 
   return (
     <DetailDrawer
       open={open}
-      title="견적 요청 상세 정보"
+      title="완료 건 상세 정보"
       onClose={onClose}
       size="md"
     >
