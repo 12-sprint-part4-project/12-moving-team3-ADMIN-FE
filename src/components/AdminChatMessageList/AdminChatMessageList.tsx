@@ -10,6 +10,7 @@ import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { useAdminChatMessages } from '@/hooks/useAdminChatMessages';
 import type {
   AdminChatMessage,
+  AdminChatMessagesMeta,
   AdminChatMessagesQuery,
 } from '@/types/adminChat';
 import { formatAdminChatUserLabel } from '@/utils/adminChat';
@@ -116,10 +117,10 @@ export const AdminChatMessageList = ({
   const [frozenMessages, setFrozenMessages] = useState<AdminChatMessage[]>([]);
   const [before, setBefore] = useState<number | undefined>(undefined);
   /** 마지막 성공 응답의 meta. 다음 페이지 fetch 중에도 버튼을 유지하기 위해 보관한다. */
-  const [meta, setMeta] = useState<{
-    hasNext: boolean;
-    nextCursor: number | null;
-  }>({ hasNext: false, nextCursor: null });
+  const [meta, setMeta] = useState<AdminChatMessagesMeta>({
+    hasNext: false,
+    nextCursor: null,
+  });
   const [appliedDataUpdatedAt, setAppliedDataUpdatedAt] = useState(0);
 
   const params = useMemo((): AdminChatMessagesQuery => {

@@ -57,12 +57,18 @@ interface ChatLinkedInfoSectionProps {
   detail: AdminChatDetail;
 }
 
+/** 연결 정보 섹션에 표시할 ID 행 */
+interface ChatLinkedField {
+  label: string;
+  value: number;
+}
+
 /**
  * null이 아닌 연결 ID만 표시한다.
  * 전부 null이면 섹션 자체를 숨긴다.
  */
 const ChatLinkedInfoSection = ({ detail }: ChatLinkedInfoSectionProps) => {
-  const linkedFields: { label: string; value: number }[] = [];
+  const linkedFields: ChatLinkedField[] = [];
 
   if (detail.estimateRequestId != null) {
     linkedFields.push({

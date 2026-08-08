@@ -74,6 +74,11 @@ export interface AdminChatListViewProps {
   ) => Column<AdminChatListItem>[];
 }
 
+/** updateFilters 옵션. 검색·필터 변경 시 page 초기화에 사용한다. */
+interface UpdateFiltersOptions {
+  resetPage?: boolean;
+}
+
 /**
  * 관리자 채팅방 목록 화면.
  * 검색·유형 필터·페이지네이션과 Loading/Empty/Table 구조를 담당한다.
@@ -114,7 +119,7 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
 
   const updateFilters = (
     patch: Partial<AdminChatListFilters>,
-    options?: { resetPage?: boolean }
+    options?: UpdateFiltersOptions
   ) => {
     setFilters((prev) => ({
       ...prev,
