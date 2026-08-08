@@ -27,11 +27,26 @@ const formatServiceRegions = (
     .join(', ');
 };
 
+interface MoverReportedProfileFieldsProps {
+  content: AdminReportDetailReportedMoverProfileContent;
+}
+
+interface CustomerReportedProfileFieldsProps {
+  content: AdminReportDetailReportedCustomerProfileContent;
+}
+
+/** MOVER/CUSTOMER reportedContent 판별 유니온 — 유니온은 type으로 유지한다. */
+type ReportedUserProfileContent =
+  | AdminReportDetailReportedMoverProfileContent
+  | AdminReportDetailReportedCustomerProfileContent;
+
+interface ReportReportedUserProfileContentProps {
+  content: ReportedUserProfileContent;
+}
+
 const MoverReportedProfileFields = ({
   content,
-}: {
-  content: AdminReportDetailReportedMoverProfileContent;
-}) => (
+}: MoverReportedProfileFieldsProps) => (
   <>
     <DetailField label="이름" value={content.name} />
     <DetailField label="닉네임" value={content.nickname} />
@@ -54,9 +69,7 @@ const MoverReportedProfileFields = ({
 
 const CustomerReportedProfileFields = ({
   content,
-}: {
-  content: AdminReportDetailReportedCustomerProfileContent;
-}) => (
+}: CustomerReportedProfileFieldsProps) => (
   <>
     <DetailField label="이름" value={content.name} />
     <DetailField label="닉네임" value={content.nickname} />
@@ -71,11 +84,7 @@ const CustomerReportedProfileFields = ({
  */
 export const ReportReportedUserProfileContent = ({
   content,
-}: {
-  content:
-    | AdminReportDetailReportedMoverProfileContent
-    | AdminReportDetailReportedCustomerProfileContent;
-}) => (
+}: ReportReportedUserProfileContentProps) => (
   <div className="flex items-start gap-3">
     <TargetUserProfileImage
       key={content.profileImageKey ?? content.id}
