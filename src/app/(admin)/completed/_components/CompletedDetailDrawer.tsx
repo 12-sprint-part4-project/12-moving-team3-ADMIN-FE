@@ -1,7 +1,13 @@
 'use client';
 
+import axios from 'axios';
+
+import { Button } from '@/components/Button/Button';
 import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
+import { EmptyState } from '@/components/EmptyState/EmptyState';
+import { LoadingState } from '@/components/LoadingState/LoadingState';
+import { useAdminCompletedDetail } from '@/hooks/useAdminCompletedDetail';
 import type { AdminCompletedDetail } from '@/types/adminCompleted';
 import {
   formatAdminCompletedMissingFields,
@@ -17,9 +23,18 @@ import {
 
 export interface CompletedDetailDrawerProps {
   open: boolean;
-  detail: AdminCompletedDetail | null;
+  /** 목록에서 선택한 완료 건 ID. null이면 상세 요청을 하지 않는다. */
+  estimateRequestId: number | null;
   onClose: () => void;
 }
+
+const getDetailErrorTitle = (error: unknown) => {
+  if (axios.isAxiosError(error) && error.response?.status === 404) {
+    return '완료 건 정보를 찾을 수 없습니다.';
+  }
+
+  return '완료 건 상세를 불러오지 못했습니다.';
+};
 
 interface CompletedDetailContentProps {
   detail: AdminCompletedDetail;
@@ -115,25 +130,71 @@ const CompletedDetailContent = ({ detail }: CompletedDetailContentProps) => {
 
 /**
  * 완료 건 상세 Drawer.
- * 레이아웃 단계에서는 부모에서 전달한 detail을 표시한다.
+ * open + estimateRequestId일 때 상세 API를 호출하고, 로딩·에러 상태를 Drawer 안에서 처리한다.
  */
 export const CompletedDetailDrawer = ({
   open,
-  detail,
+  estimateRequestId,
   onClose,
-}: CompletedDetailDrawerProps) => (
-  <DetailDrawer
-    open={open}
-    title="완료 건 상세 정보"
-    onClose={onClose}
-    size="md"
-  >
-    {detail == null ? (
-      <p className="text-md-regular text-gray-500">
-        선택한 완료 건 정보가 없습니다.
-      </p>
-    ) : (
-      <CompletedDetailContent detail={detail} />
-    )}
-  </DetailDrawer>
-);
+}: CompletedDetailDrawerProps) => {
+  const { data, error, isPending, isError, isSuccess, refetch } =
+    useAdminCompletedDetail(estimateRequestId, {
+      enabled: open && estimateRequestId != null,
+    });
+
+  const detail = data?.data ?? null;
+  const isDetailForSelection =
+    detail != null &&
+    estimateRequestId != null &&
+    detail.id === estimateRequestId;
+
+  const renderBody = () => {
+    if (estimateRequestId == null) {
+      return (
+        <p className="text-md-regular text-gray-500">
+          선택한 완료 건 정보가 없습니다.
+        </p>
+      );
+    }
+
+    if (isPending) {
+      return <LoadingState />;
+    }
+
+    if (isError) {
+      return (
+        <EmptyState
+          title={getDetailErrorTitle(error)}
+          description="잠시 후 다시 시도해 주세요."
+          action={
+            <Button variant="secondary" onClick={() => void refetch()}>
+              다시 시도
+            </Button>
+          }
+        />
+      );
+    }
+
+    if (!isSuccess || !isDetailForSelection) {
+      return (
+        <EmptyState
+          title="완료 건 정보가 없습니다."
+          description="선택한 완료 건을 찾을 수 없습니다."
+        />
+      );
+    }
+
+    return <CompletedDetailContent detail={detail} />;
+  };
+
+  return (
+    <DetailDrawer
+      open={open}
+      title="완료 건 상세 정보"
+      onClose={onClose}
+      size="md"
+    >
+      {renderBody()}
+    </DetailDrawer>
+  );
+};

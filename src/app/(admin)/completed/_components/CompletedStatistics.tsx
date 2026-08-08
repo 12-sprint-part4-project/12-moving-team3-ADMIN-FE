@@ -29,23 +29,19 @@ const STATISTICS_ITEMS: StatisticItem[] = [
   },
   {
     key: 'averageCompletedPrice',
-    title: '평균 완료 금액',
+    title: '평균 완료 견적 금액',
     icon: <CircleDollarSign className="size-6 text-blue-300" />,
     iconBackgroundClassName: 'bg-blue-100',
     getValue: (statistics) =>
-      formatAdminCompletedPrice(
-        statistics?.averageCompletedPrice._avg.price ?? null
-      ),
+      formatAdminCompletedPrice(statistics?.averageCompletedPrice ?? null),
   },
   {
     key: 'totalCompletedPrice',
-    title: '총 완료 금액',
+    title: '총 완료 견적 금액',
     icon: <Wallet className="size-6 text-yellow-100" />,
     iconBackgroundClassName: 'bg-yellow-50',
     getValue: (statistics) =>
-      formatAdminCompletedPrice(
-        statistics?.totalCompletedPrice._sum.price ?? null
-      ),
+      formatAdminCompletedPrice(statistics?.totalCompletedPrice ?? null),
   },
 ];
 

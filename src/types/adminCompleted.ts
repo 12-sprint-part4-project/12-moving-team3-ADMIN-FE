@@ -63,16 +63,10 @@ export interface AdminCompletedStatisticsQuery {
 
 export interface AdminCompletedStatistics {
   totalCompletedCount: number;
-  averageCompletedPrice: {
-    _avg: {
-      price: number | null;
-    };
-  };
-  totalCompletedPrice: {
-    _sum: {
-      price: number | null;
-    };
-  };
+  /** 확정 견적 평균 금액. 없으면 0 */
+  averageCompletedPrice: number;
+  /** 확정 견적 총 금액. 없으면 0 */
+  totalCompletedPrice: number;
 }
 
 export interface AdminCompletedStatisticsResponse {
