@@ -1,7 +1,10 @@
 import { DetailField } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
-import type { AdminReportDetail } from '@/types/adminReport';
+import type {
+  AdminReportDetail,
+  AdminReportDetailTargetUser,
+} from '@/types/adminReport';
 import { ADMIN_REPORT_USER_TYPE_LABEL } from '@/utils/adminReport';
 
 import {
@@ -14,6 +17,23 @@ import {
 import { ReportProcessActionToggle } from './ReportProcessActionToggle';
 import { ReportProfileSection } from './ReportProfileSection';
 import { TargetUserProfileImage } from './TargetUserProfileImage';
+
+/** 처리용 targetUser 계정 상태 — ACTIVE=정상, SUSPENDED=정지됨 */
+const getAccountStatusBadge = (targetUser: AdminReportDetailTargetUser) => {
+  const isActive = targetUser.status === 'ACTIVE';
+
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <dt className="shrink-0 text-gray-500">계정 상태</dt>
+      <dd>
+        <StatusBadge
+          variant={isActive ? 'success' : 'danger'}
+          label={isActive ? '정상' : '정지됨'}
+        />
+      </dd>
+    </div>
+  );
+};
 
 export interface ReportTargetInfoSectionProps {
   detail: AdminReportDetail;
@@ -32,8 +52,8 @@ export const ReportTargetInfoSection = ({
   isSuspendSelected,
   onToggleSuspend,
 }: ReportTargetInfoSectionProps) => {
-  const { targetInfo, category, availableActions, status } = detail;
-  const targetUser = targetInfo.user;
+  const { targetInfo, category, availableActions, status, targetUser } = detail;
+  const summaryUser = targetInfo.user;
   const presenceStatus = getTargetPresenceStatus(targetInfo);
   const presenceHint = TARGET_PRESENCE_HINT[presenceStatus];
   const isInappropriateProfile = category === 'INAPPROPRIATE_PROFILE';
@@ -42,11 +62,22 @@ export const ReportTargetInfoSection = ({
     isInappropriateProfile && detail.target !== 'USER';
 
   // 대상 섹션은 계정(작성자) 삭제일만 본다. 콘텐츠 삭제는 content 섹션에서 표시한다.
-  const deletedAt = targetUser?.deletedAt ?? null;
+  const deletedAt = summaryUser?.deletedAt ?? null;
   // BE가 허용할 때만 버튼을 그린다. 삭제·미존재·비PENDING은 canSuspendUser=false다.
   const canSuspendUser = availableActions?.canSuspendUser === true;
   // 방어적 가드: availableActions와 어긋나도 PENDING이 아니면 선택하지 못하게 한다.
   const isSuspendDisabled = status !== 'PENDING';
+
+  // 이미지 key는 처리용 targetUser를 우선하고, 없으면 요약 user의 key를 쓴다.
+  const profileImageUser = summaryUser
+    ? {
+        id: summaryUser.id,
+        name: summaryUser.name,
+        nickname: summaryUser.nickname,
+        profileImageKey:
+          targetUser?.profileImageKey ?? summaryUser.profileImageKey,
+      }
+    : null;
 
   const presenceStatusFields = (
     <>
@@ -64,6 +95,13 @@ export const ReportTargetInfoSection = ({
     </>
   );
 
+  const sanctionUserFields = targetUser ? (
+    <>
+      {getAccountStatusBadge(targetUser)}
+      <DetailField label="신고 횟수" value={String(targetUser.reportCount)} />
+    </>
+  ) : null;
+
   return (
     <DetailSection
       title={isInappropriateProfile ? '신고 대상 프로필' : '신고 대상 정보'}
@@ -75,35 +113,41 @@ export const ReportTargetInfoSection = ({
             대상 타입·ID를 확인해 주세요.
           </p>
         ) : null}
-        {targetUser ? (
+        {summaryUser && profileImageUser ? (
           <>
             <div className="flex items-start gap-3">
               <TargetUserProfileImage
-                key={targetUser.profileImageKey ?? targetUser.id}
-                user={targetUser}
+                key={profileImageUser.profileImageKey ?? profileImageUser.id}
+                user={profileImageUser}
               />
               {/*
                 상태도 이 dl 안에 둬 아바타 옆 라벨 열과 정렬을 맞춘다.
                 전체 너비로 빼면 라벨이 아바타 아래로 밀려 깨져 보인다.
               */}
               <dl className="flex min-w-0 flex-1 flex-col gap-2 text-md-medium">
-                <DetailField label="이름" value={targetUser.name} />
-                <DetailField label="닉네임" value={targetUser.nickname} />
-                <DetailField label="이메일" value={targetUser.email} />
+                <DetailField label="이름" value={summaryUser.name} />
+                <DetailField label="닉네임" value={summaryUser.nickname} />
+                <DetailField label="이메일" value={summaryUser.email} />
                 {!isInappropriateProfile ? (
                   <DetailField
                     label="유저 타입"
-                    value={ADMIN_REPORT_USER_TYPE_LABEL[targetUser.userType]}
+                    value={ADMIN_REPORT_USER_TYPE_LABEL[summaryUser.userType]}
                   />
                 ) : null}
-                {!isInappropriateProfile ? presenceStatusFields : null}
+                {!isInappropriateProfile ? (
+                  <>
+                    {presenceStatusFields}
+                    {sanctionUserFields}
+                  </>
+                ) : null}
               </dl>
             </div>
             {isInappropriateProfile ? (
               <>
-                <ReportProfileSection targetUser={targetUser} />
+                <ReportProfileSection targetUser={summaryUser} />
                 <dl className="flex flex-col gap-2 text-md-medium">
                   {presenceStatusFields}
+                  {sanctionUserFields}
                 </dl>
               </>
             ) : null}
@@ -111,6 +155,7 @@ export const ReportTargetInfoSection = ({
         ) : (
           <dl className="flex flex-col gap-2 text-md-medium">
             {presenceStatusFields}
+            {sanctionUserFields}
           </dl>
         )}
         {presenceHint ? (
