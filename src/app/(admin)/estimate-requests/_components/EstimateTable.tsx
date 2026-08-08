@@ -97,6 +97,9 @@ const getEstimateRequestColumns = (
           {hasMissingFields ? (
             <span title={`누락: ${missingLabels.join(', ')}`}>
               <StatusBadge variant="danger" label="정보 누락" />
+              <span className="sr-only">
+                누락 필드: {missingLabels.join(', ')}
+              </span>
             </span>
           ) : null}
         </div>
@@ -181,7 +184,6 @@ export const EstimateTable = ({
           rowKey="id"
           loading={isLoading}
           caption="견적 요청 목록"
-          emptyMessage="견적 요청이 없습니다."
         />
       )}
     </div>

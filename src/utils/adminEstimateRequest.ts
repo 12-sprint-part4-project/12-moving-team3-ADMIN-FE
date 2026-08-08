@@ -131,7 +131,7 @@ export const formatAdminEstimateRequestMissingFields = (
   )[]
 ) =>
   missingFields.map((field) => {
-    if (field in MISSING_FIELD_LABEL) {
+    if (Object.hasOwn(MISSING_FIELD_LABEL, field)) {
       return MISSING_FIELD_LABEL[
         field as AdminEstimateRequestDetailMissingField
       ];

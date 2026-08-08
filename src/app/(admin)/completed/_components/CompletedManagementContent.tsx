@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ChangeEvent } from 'react';
 
 import type { DateRange } from '@/components/DateRangePicker/DateRangePicker';
 import { PageHeader } from '@/components/PageHeader/PageHeader';
@@ -8,10 +8,7 @@ import { useAdminCompletedList } from '@/hooks/useAdminCompletedList';
 import { useAdminCompletedStatistics } from '@/hooks/useAdminCompletedStatistics';
 import type { AdminCompletedListQuery } from '@/types/adminCompleted';
 import type { AdminEstimateRequestMoveType } from '@/types/adminEstimateRequest';
-import {
-  toAdminCompletedApiDate,
-  toAdminCompletedStatisticsQuery,
-} from '@/utils/adminCompleted';
+import { toAdminCompletedStatisticsQuery } from '@/utils/adminCompleted';
 
 import { CompletedDetailDrawer } from './CompletedDetailDrawer';
 import { CompletedFilter } from './CompletedFilter';
@@ -23,8 +20,6 @@ const DEFAULT_PAGE_SIZE = 10;
 interface CompletedFilters {
   search?: string;
   moveType?: AdminEstimateRequestMoveType;
-  startDate?: string;
-  endDate?: string;
   page: number;
   pageSize: number;
 }
@@ -38,24 +33,23 @@ export const CompletedManagementContent = () => {
   const [selectedEstimateRequestId, setSelectedEstimateRequestId] = useState<
     number | null
   >(null);
+  const [searchInput, setSearchInput] = useState('');
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [filterResetKey, setFilterResetKey] = useState(0);
   const [filters, setFilters] = useState<CompletedFilters>(INITIAL_FILTERS);
 
+  const dateQuery = useMemo(
+    () => toAdminCompletedStatisticsQuery(dateRange),
+    [dateRange]
+  );
   const listQuery = useMemo<AdminCompletedListQuery>(
     () => ({
       page: filters.page,
       pageSize: filters.pageSize,
       ...(filters.search ? { search: filters.search } : {}),
       ...(filters.moveType ? { moveType: filters.moveType } : {}),
-      ...(filters.startDate ? { startDate: filters.startDate } : {}),
-      ...(filters.endDate ? { endDate: filters.endDate } : {}),
+      ...dateQuery,
     }),
-    [filters]
-  );
-  const statisticsQuery = useMemo(
-    () => toAdminCompletedStatisticsQuery(dateRange),
-    [dateRange]
+    [filters, dateQuery]
   );
   const {
     data: listData,
@@ -63,7 +57,7 @@ export const CompletedManagementContent = () => {
     isError: isListError,
     refetch: refetchList,
   } = useAdminCompletedList(listQuery);
-  const { data: statisticsData } = useAdminCompletedStatistics(statisticsQuery);
+  const { data: statisticsData } = useAdminCompletedStatistics(dateQuery);
 
   const updateFilters = (
     patch: Partial<CompletedFilters>,
@@ -84,8 +78,14 @@ export const CompletedManagementContent = () => {
     setSelectedEstimateRequestId(null);
   };
 
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(event.target.value);
+  };
+
   const handleSearch = (search: string) => {
-    updateFilters({ search: search || undefined }, true);
+    const trimmed = search.trim();
+    setSearchInput(trimmed);
+    updateFilters({ search: trimmed || undefined }, true);
   };
 
   const handleMoveTypeChange = (moveType?: AdminEstimateRequestMoveType) => {
@@ -94,19 +94,7 @@ export const CompletedManagementContent = () => {
 
   const handleDateRangeConfirm = (range: DateRange | undefined) => {
     setDateRange(range);
-
-    if (!range?.from) {
-      updateFilters({ startDate: undefined, endDate: undefined }, true);
-      return;
-    }
-
-    updateFilters(
-      {
-        startDate: toAdminCompletedApiDate(range.from),
-        endDate: range.to ? toAdminCompletedApiDate(range.to) : undefined,
-      },
-      true
-    );
+    updateFilters({}, true);
   };
 
   const handlePageChange = (page: number) => {
@@ -114,13 +102,13 @@ export const CompletedManagementContent = () => {
   };
 
   const handleResetFilters = () => {
+    setSearchInput('');
     setDateRange(undefined);
     setFilters(INITIAL_FILTERS);
-    setFilterResetKey((previous) => previous + 1);
   };
 
   const hasActiveFilters = Boolean(
-    filters.search || filters.moveType || filters.startDate || filters.endDate
+    filters.search || filters.moveType || dateRange?.from
   );
 
   return (
@@ -131,9 +119,10 @@ export const CompletedManagementContent = () => {
       />
       <CompletedStatistics statistics={statisticsData?.data} />
       <CompletedFilter
-        key={filterResetKey}
+        search={searchInput}
         moveType={filters.moveType}
         dateRange={dateRange}
+        onSearchChange={handleSearchChange}
         onSearch={handleSearch}
         onMoveTypeChange={handleMoveTypeChange}
         onDateRangeConfirm={handleDateRangeConfirm}

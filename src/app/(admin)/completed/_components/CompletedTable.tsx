@@ -107,6 +107,7 @@ const getCompletedColumns = (
       return (
         <span title={`누락: ${missingLabels.join(', ')}`}>
           <StatusBadge variant="danger" label="정보 누락" />
+          <span className="sr-only">누락 필드: {missingLabels.join(', ')}</span>
         </span>
       );
     },
@@ -178,7 +179,6 @@ export const CompletedTable = ({
           rowKey="id"
           loading={isLoading}
           caption="완료 건 목록"
-          emptyMessage="완료 건이 없습니다."
         />
       )}
     </div>

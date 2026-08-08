@@ -17,14 +17,8 @@ export const useAdminCompletedDetail = (
   options?: UseAdminCompletedDetailOptions
 ) =>
   useQuery({
-    queryKey: ADMIN_COMPLETED_QUERY_KEYS.detail(estimateRequestId ?? 0),
-    queryFn: () => {
-      if (estimateRequestId == null) {
-        return Promise.reject(new Error('estimateRequestId is required'));
-      }
-
-      return getAdminCompletedDetail(estimateRequestId);
-    },
+    queryKey: ADMIN_COMPLETED_QUERY_KEYS.detail(estimateRequestId ?? null),
+    queryFn: () => getAdminCompletedDetail(estimateRequestId!),
     // Drawer가 열려 있고 완료 건이 선택된 경우에만 호출한다.
     enabled: (options?.enabled ?? true) && estimateRequestId != null,
     retry: false,

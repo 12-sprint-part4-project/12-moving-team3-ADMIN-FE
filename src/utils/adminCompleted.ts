@@ -34,13 +34,7 @@ export const formatAdminCompletedMoveDate = (moveDate: string | null) => {
     return '-';
   }
 
-  const date = new Date(moveDate);
-
-  if (Number.isNaN(date.getTime())) {
-    return moveDate.split('T')[0] ?? moveDate;
-  }
-
-  return format(date, 'yyyy-MM-dd');
+  return moveDate.split('T')[0] ?? moveDate;
 };
 
 export const formatAdminCompletedPrice = (price: number | null) =>
@@ -60,7 +54,7 @@ export const formatAdminCompletedMissingFields = (
   )[]
 ) =>
   missingFields.map((field) => {
-    if (field in MISSING_FIELD_LABEL) {
+    if (Object.hasOwn(MISSING_FIELD_LABEL, field)) {
       return MISSING_FIELD_LABEL[field as AdminCompletedDetailMissingField];
     }
 

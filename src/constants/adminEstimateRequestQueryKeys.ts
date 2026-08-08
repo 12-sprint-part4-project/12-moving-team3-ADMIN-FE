@@ -11,7 +11,7 @@ export const ADMIN_ESTIMATE_REQUEST_QUERY_KEYS = {
   statistics: (params?: AdminEstimateRequestStatisticsQuery) =>
     [...ADMIN_ESTIMATE_REQUEST_QUERY_KEYS.all, 'statistics', params] as const,
   details: () => [...ADMIN_ESTIMATE_REQUEST_QUERY_KEYS.all, 'detail'] as const,
-  detail: (estimateRequestId: number) =>
+  detail: (estimateRequestId: number | null) =>
     [
       ...ADMIN_ESTIMATE_REQUEST_QUERY_KEYS.details(),
       estimateRequestId,
