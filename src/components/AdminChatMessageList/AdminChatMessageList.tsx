@@ -52,6 +52,12 @@ interface AdminChatMessageItemProps {
 
 const AdminChatMessageItem = ({ message }: AdminChatMessageItemProps) => {
   const senderLabel = formatAdminChatUserLabel(message.sender);
+  // 필터링된 메시지는 관리자가 원문을 보도록 rawContent를 우선 표시한다.
+  // content/rawContent API 계약은 유지하고, 표시만 UI에서 선택한다.
+  const displayContent =
+    message.isFiltered && message.rawContent !== null
+      ? message.rawContent
+      : message.content;
 
   return (
     <li className="rounded-lg border border-line-100 bg-background-100 p-3">
@@ -96,7 +102,7 @@ const AdminChatMessageItem = ({ message }: AdminChatMessageItemProps) => {
           )
         ) : (
           <p className="text-md-regular break-words whitespace-pre-wrap text-black-400">
-            {message.content}
+            {displayContent}
           </p>
         )}
       </div>

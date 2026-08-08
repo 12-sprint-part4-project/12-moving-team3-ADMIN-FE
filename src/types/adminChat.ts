@@ -114,7 +114,13 @@ export interface AdminChatMessage {
   senderId: string;
   sender: AdminChatMessageSender;
   messageType: AdminChatMessageType;
+  /** ChatMessage.content — 필터링 시 마스킹된 값일 수 있다 */
   content: string;
+  /**
+   * 필터링 전 원문(ChatMessageRawLog.rawContent).
+   * RawLog가 없으면 null. 관리자 전용이며 content를 대체하지 않는다.
+   */
+  rawContent: string | null;
   isFiltered: boolean;
   /** S3 Presigned URL 배열. 첨부가 없으면 빈 배열 */
   attachments: string[];
