@@ -52,3 +52,35 @@ export interface AdminEstimateRequestStatistics {
 export interface AdminEstimateRequestStatisticsResponse {
   data: AdminEstimateRequestStatistics;
 }
+
+export type AdminEstimateQuoteStatus = 'PENDING' | 'CONFIRMED' | 'REJECTED';
+
+export interface AdminEstimateQuote {
+  id: number;
+  moverName: string;
+  price: number | null;
+  status: AdminEstimateQuoteStatus;
+  /** ISO date-time */
+  createdAt: string;
+}
+
+export interface AdminEstimateRequestDetail {
+  id: number;
+  userName: string;
+  moveType: AdminEstimateRequestMoveType;
+  departureAddress: string;
+  arrivalAddress: string;
+  /** ISO date-time */
+  submittedAt: string;
+  status: AdminEstimateRequestStatus;
+  estimateCount: number;
+  departureZipCode: string;
+  departureDetailAddress: string;
+  arrivalZipCode: string;
+  arrivalDetailAddress: string;
+  quotes: AdminEstimateQuote[];
+}
+
+export interface AdminEstimateRequestDetailResponse {
+  data: AdminEstimateRequestDetail;
+}
