@@ -4,6 +4,8 @@ import type { DateRange } from '@/components/DateRangePicker/DateRangePicker';
 import type { StatusBadgeProps } from '@/components/StatusBadge/StatusBadge';
 import type {
   AdminEstimateQuoteStatus,
+  AdminEstimateRequestDetailMissingField,
+  AdminEstimateRequestListMissingField,
   AdminEstimateRequestMoveType,
   AdminEstimateRequestStatisticsQuery,
   AdminEstimateRequestStatus,
@@ -21,6 +23,20 @@ const QUOTE_STATUS_LABEL: Record<AdminEstimateQuoteStatus, string> = {
   REJECTED: '반려',
 };
 
+const MISSING_FIELD_LABEL: Record<
+  AdminEstimateRequestDetailMissingField,
+  string
+> = {
+  moveType: '이사 유형',
+  departureAddress: '출발지',
+  departureDetailAddress: '출발지 상세',
+  departureZipCode: '출발지 우편번호',
+  arrivalAddress: '도착지',
+  arrivalZipCode: '도착지 우편번호',
+  arrivalDetailAddress: '도착지 상세',
+  submittedAt: '제출일',
+};
+
 export const ADMIN_ESTIMATE_REQUEST_STATUS_BADGE: Record<
   AdminEstimateRequestStatus,
   { label: string; variant: NonNullable<StatusBadgeProps['variant']> }
@@ -34,7 +50,24 @@ export const ADMIN_ESTIMATE_REQUEST_STATUS_BADGE: Record<
 export const toAdminEstimateRequestApiDate = (date: Date) =>
   format(date, 'yyyy-MM-dd');
 
-export const formatAdminEstimateRequestSubmittedAt = (submittedAt: string) => {
+/** null/빈 문자열은 '-'로 통일한다. */
+export const formatAdminEstimateRequestNullableText = (
+  value: string | null | undefined
+) => {
+  if (value == null || value.trim() === '') {
+    return '-';
+  }
+
+  return value;
+};
+
+export const formatAdminEstimateRequestSubmittedAt = (
+  submittedAt: string | null
+) => {
+  if (submittedAt == null) {
+    return '-';
+  }
+
   const date = new Date(submittedAt);
 
   if (Number.isNaN(date.getTime())) {
@@ -61,8 +94,14 @@ export const formatAdminEstimateRequestPhoneNumber = (
 };
 
 export const formatAdminEstimateRequestMoveType = (
-  moveType: AdminEstimateRequestMoveType
-) => MOVE_TYPE_LABEL[moveType];
+  moveType: AdminEstimateRequestMoveType | null
+) => {
+  if (moveType == null) {
+    return '-';
+  }
+
+  return MOVE_TYPE_LABEL[moveType];
+};
 
 export const formatAdminEstimateQuoteStatus = (
   status: AdminEstimateQuoteStatus
@@ -75,6 +114,31 @@ export const formatAdminEstimateQuotePrice = (price: number | null) => {
 
   return `${new Intl.NumberFormat('ko-KR').format(price)}원`;
 };
+
+export const hasAdminEstimateRequestMissingFields = (
+  missingFields: readonly string[]
+) => missingFields.length > 0;
+
+/**
+ * missingFields API 키를 관리자용 한글 라벨로 변환한다.
+ * 알 수 없는 키는 원본 필드명을 그대로 노출한다.
+ */
+export const formatAdminEstimateRequestMissingFields = (
+  missingFields: readonly (
+    | AdminEstimateRequestListMissingField
+    | AdminEstimateRequestDetailMissingField
+    | string
+  )[]
+) =>
+  missingFields.map((field) => {
+    if (field in MISSING_FIELD_LABEL) {
+      return MISSING_FIELD_LABEL[
+        field as AdminEstimateRequestDetailMissingField
+      ];
+    }
+
+    return field;
+  });
 
 export const toAdminEstimateRequestStatisticsQuery = (
   range?: DateRange

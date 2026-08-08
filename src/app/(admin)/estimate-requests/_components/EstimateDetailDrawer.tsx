@@ -15,8 +15,11 @@ import {
   ADMIN_ESTIMATE_REQUEST_STATUS_BADGE,
   formatAdminEstimateQuotePrice,
   formatAdminEstimateQuoteStatus,
+  formatAdminEstimateRequestMissingFields,
   formatAdminEstimateRequestMoveType,
+  formatAdminEstimateRequestNullableText,
   formatAdminEstimateRequestSubmittedAt,
+  hasAdminEstimateRequestMissingFields,
 } from '@/utils/adminEstimateRequest';
 
 export interface EstimateDetailDrawerProps {
@@ -39,21 +42,49 @@ interface EstimateDetailContentProps {
 }
 
 const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
+  const missingLabels = formatAdminEstimateRequestMissingFields(
+    detail.missingFields
+  );
+  const hasMissingFields = hasAdminEstimateRequestMissingFields(
+    detail.missingFields
+  );
+
   const basicInformation: [string, string][] = [
     ['견적 번호', String(detail.id)],
     ['요청자 이름', detail.userName],
     ['이사 유형', formatAdminEstimateRequestMoveType(detail.moveType)],
-    ['출발지 우편번호', detail.departureZipCode],
-    ['출발지', detail.departureAddress],
-    ['출발지 상세', detail.departureDetailAddress],
-    ['도착지 우편번호', detail.arrivalZipCode],
-    ['도착지', detail.arrivalAddress],
-    ['도착지 상세', detail.arrivalDetailAddress],
+    [
+      '출발지 우편번호',
+      formatAdminEstimateRequestNullableText(detail.departureZipCode),
+    ],
+    ['출발지', formatAdminEstimateRequestNullableText(detail.departureAddress)],
+    [
+      '출발지 상세',
+      formatAdminEstimateRequestNullableText(detail.departureDetailAddress),
+    ],
+    [
+      '도착지 우편번호',
+      formatAdminEstimateRequestNullableText(detail.arrivalZipCode),
+    ],
+    ['도착지', formatAdminEstimateRequestNullableText(detail.arrivalAddress)],
+    [
+      '도착지 상세',
+      formatAdminEstimateRequestNullableText(detail.arrivalDetailAddress),
+    ],
     ['제출일', formatAdminEstimateRequestSubmittedAt(detail.submittedAt)],
   ];
 
   return (
     <div className="flex flex-col gap-4">
+      {hasMissingFields ? (
+        <p
+          className="rounded-lg bg-red-100 px-3 py-2 text-xs-medium text-red-200"
+          role="status"
+        >
+          필수 정보가 누락된 데이터입니다. 누락 필드: {missingLabels.join(', ')}
+        </p>
+      ) : null}
+
       <DetailSection title="기본 정보">
         <dl className="flex flex-col gap-3 text-xs-medium">
           {basicInformation.map(([label, value]) => (
@@ -83,7 +114,9 @@ const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
                 key={quote.id}
                 className="flex items-center justify-between gap-3 text-xs-medium"
               >
-                <span className="text-black-400">{quote.moverName}</span>
+                <span className="text-black-400">
+                  {formatAdminEstimateRequestNullableText(quote.moverName)}
+                </span>
                 <span className="ml-auto text-black-400">
                   {formatAdminEstimateQuotePrice(quote.price)}
                 </span>
@@ -111,6 +144,7 @@ const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
 /**
  * 견적 요청 상세 Drawer.
  * open + estimateRequestId일 때 상세 API를 호출하고, 로딩·에러 상태를 Drawer 안에서 처리한다.
+ * 필수값 누락 건은 500이 아니라 missingFields로 내려오므로 본문에서 원인을 표시한다.
  */
 export const EstimateDetailDrawer = ({
   open,

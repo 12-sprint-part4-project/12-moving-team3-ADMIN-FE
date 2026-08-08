@@ -8,9 +8,12 @@ import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import type { AdminEstimateRequestListItem } from '@/types/adminEstimateRequest';
 import {
   ADMIN_ESTIMATE_REQUEST_STATUS_BADGE,
+  formatAdminEstimateRequestMissingFields,
   formatAdminEstimateRequestMoveType,
+  formatAdminEstimateRequestNullableText,
   formatAdminEstimateRequestPhoneNumber,
   formatAdminEstimateRequestSubmittedAt,
+  hasAdminEstimateRequestMissingFields,
 } from '@/utils/adminEstimateRequest';
 
 export interface EstimateTableProps {
@@ -44,20 +47,32 @@ const getEstimateRequestColumns = (
   {
     key: 'departureAddress',
     header: '출발지',
-    render: (row) => (
-      <span className="block max-w-40 truncate" title={row.departureAddress}>
-        {row.departureAddress}
-      </span>
-    ),
+    render: (row) => {
+      const address = formatAdminEstimateRequestNullableText(
+        row.departureAddress
+      );
+
+      return (
+        <span className="block max-w-40 truncate" title={address}>
+          {address}
+        </span>
+      );
+    },
   },
   {
     key: 'arrivalAddress',
     header: '도착지',
-    render: (row) => (
-      <span className="block max-w-40 truncate" title={row.arrivalAddress}>
-        {row.arrivalAddress}
-      </span>
-    ),
+    render: (row) => {
+      const address = formatAdminEstimateRequestNullableText(
+        row.arrivalAddress
+      );
+
+      return (
+        <span className="block max-w-40 truncate" title={address}>
+          {address}
+        </span>
+      );
+    },
   },
   {
     key: 'submittedAt',
@@ -68,9 +83,25 @@ const getEstimateRequestColumns = (
     key: 'status',
     header: '상태',
     align: 'center',
-    render: (row) => (
-      <StatusBadge {...ADMIN_ESTIMATE_REQUEST_STATUS_BADGE[row.status]} />
-    ),
+    render: (row) => {
+      const missingLabels = formatAdminEstimateRequestMissingFields(
+        row.missingFields
+      );
+      const hasMissingFields = hasAdminEstimateRequestMissingFields(
+        row.missingFields
+      );
+
+      return (
+        <div className="flex flex-col items-center gap-1">
+          <StatusBadge {...ADMIN_ESTIMATE_REQUEST_STATUS_BADGE[row.status]} />
+          {hasMissingFields ? (
+            <span title={`누락: ${missingLabels.join(', ')}`}>
+              <StatusBadge variant="danger" label="정보 누락" />
+            </span>
+          ) : null}
+        </div>
+      );
+    },
   },
   {
     key: 'estimateCount',
