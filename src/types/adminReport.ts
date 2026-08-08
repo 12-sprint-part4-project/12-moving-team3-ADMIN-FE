@@ -1,9 +1,13 @@
 /**
- * 관리자 신고 목록 API 타입.
+ * 관리자 신고 목록·상세·처리/반려 API 타입.
  * 백엔드 Swagger(admin-report)와 controller 응답(`{ data: ... }`) 구조에 맞춘다.
  */
 
-import type { MemberMoveType, MemberRegion } from '@/types/adminMember';
+import type {
+  MemberMoveType,
+  MemberRegion,
+  MemberStatus,
+} from '@/types/adminMember';
 
 export type AdminReportStatus = 'PENDING' | 'RESOLVED' | 'REJECTED';
 
@@ -12,6 +16,14 @@ export type AdminReportRegion = MemberRegion;
 
 /** Prisma MoveType — 회원 상세와 동일 enum을 재사용한다 */
 export type AdminReportMoveType = MemberMoveType;
+
+/**
+ * 신고 처리(resolve) 시 관리자가 선택하는 Action.
+ * Prisma enum이 아니라 요청 계약 전용 — 여러 파일에 문자열을 중복 선언하지 않는다.
+ */
+export type AdminReportProcessAction =
+  | 'SUSPEND_TARGET_USER'
+  | 'DELETE_REPORTED_CONTENT';
 
 export type AdminReportTarget =
   | 'USER'
@@ -256,6 +268,79 @@ export interface AdminReportDetailContent {
   metadata: Record<string, unknown> | null;
 }
 
+/**
+ * 신고 처리용 대상 사용자 요약.
+ * 없거나 CHAT_ROOM이면 null. status는 회원 상태(MemberStatus)와 동일하다.
+ */
+export interface AdminReportDetailTargetUser {
+  id: string;
+  name: string;
+  nickname: string;
+  status: MemberStatus;
+  /** ISO date-time. 미정지면 null */
+  suspendedAt: string | null;
+  /** ISO date-time. 미정지면 null */
+  suspendedUntil: string | null;
+}
+
+/** 신고 상세에서 선택 가능한 Action 플래그 */
+export interface AdminReportAvailableActions {
+  canSuspendUser: boolean;
+  canDeleteContent: boolean;
+}
+
+export interface AdminReportDetailReportedReviewContent {
+  type: 'REVIEW';
+  id: string;
+  rating: number;
+  content: string;
+  createdAt: string;
+  updatedAt: string | null;
+  deletedAt: string | null;
+}
+
+export interface AdminReportDetailReportedArticleContent {
+  type: 'ARTICLE';
+  id: string;
+  category: AdminReportPostsCategory;
+  title: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+export interface AdminReportDetailReportedCommentContent {
+  type: 'COMMENT';
+  id: string;
+  postId: number;
+  parentId: number | null;
+  content: string;
+  createdAt: string;
+  deletedAt: string | null;
+}
+
+/** 메시지는 soft-delete가 없어 deletedAt을 두지 않는다 */
+export interface AdminReportDetailReportedMessageContent {
+  type: 'MESSAGE';
+  id: string;
+  roomId: number;
+  messageType: AdminReportMessageType;
+  content: string;
+  isFiltered: boolean;
+  createdAt: string;
+}
+
+/**
+ * 신고된 콘텐츠 상세.
+ * USER/CHAT_ROOM·미존재면 null. type으로 구분한다.
+ */
+export type AdminReportDetailReportedContent =
+  | AdminReportDetailReportedReviewContent
+  | AdminReportDetailReportedArticleContent
+  | AdminReportDetailReportedCommentContent
+  | AdminReportDetailReportedMessageContent;
+
 /** GET /api/admin/reports/:reportId 성공 시 data 필드 */
 export interface AdminReportDetail {
   id: number;
@@ -270,9 +355,57 @@ export interface AdminReportDetail {
   reporter: AdminReportDetailReporter;
   targetInfo: AdminReportDetailTargetInfo;
   content: AdminReportDetailContent | null;
+  /** 정지 Action용 대상 사용자. 없거나 CHAT_ROOM이면 null */
+  targetUser: AdminReportDetailTargetUser | null;
+  /** 콘텐츠 삭제 Action·표시용. USER/CHAT_ROOM·미존재면 null */
+  reportedContent: AdminReportDetailReportedContent | null;
+  availableActions: AdminReportAvailableActions;
 }
 
 /** GET /api/admin/reports/:reportId 성공 응답 */
 export interface AdminReportDetailResponse {
   data: AdminReportDetail;
+}
+
+/** POST /api/admin/reports/:reportId/resolve 요청 Body */
+export interface AdminReportResolveBody {
+  actions: AdminReportProcessAction[];
+}
+
+/**
+ * POST resolve 성공 시 data 필드.
+ * JSON 직렬화 후 Date는 ISO 문자열이므로 processedAt은 string이다.
+ */
+export interface AdminReportResolveData {
+  reportId: number;
+  status: AdminReportStatus;
+  adminId: number;
+  actions: AdminReportProcessAction[];
+  processedAt: string;
+  /**
+   * DELETE_REPORTED_CONTENT가 포함된 경우에만 채운다.
+   * true면 이미 삭제된 콘텐츠를 성공으로 간주한 경우.
+   */
+  contentAlreadyDeleted: boolean | null;
+}
+
+/** POST /api/admin/reports/:reportId/resolve 성공 응답 */
+export interface AdminReportResolveResponse {
+  data: AdminReportResolveData;
+}
+
+/**
+ * POST reject 성공 시 data 필드.
+ * Action이 없으므로 resolve 결과와 분리한다.
+ */
+export interface AdminReportRejectData {
+  reportId: number;
+  status: AdminReportStatus;
+  adminId: number;
+  processedAt: string;
+}
+
+/** POST /api/admin/reports/:reportId/reject 성공 응답 */
+export interface AdminReportRejectResponse {
+  data: AdminReportRejectData;
 }

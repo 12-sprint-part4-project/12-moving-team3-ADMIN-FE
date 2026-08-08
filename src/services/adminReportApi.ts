@@ -1,12 +1,17 @@
 import {
   ADMIN_REPORT_LIST_PATH,
   getAdminReportDetailPath,
+  getAdminReportRejectPath,
+  getAdminReportResolvePath,
 } from '@/api/adminReportPaths';
 import { axiosInstance } from '@/api/axiosInstance';
 import type {
   AdminReportDetailResponse,
   AdminReportListQuery,
   AdminReportListResponse,
+  AdminReportRejectResponse,
+  AdminReportResolveBody,
+  AdminReportResolveResponse,
 } from '@/types/adminReport';
 
 /**
@@ -35,6 +40,38 @@ export const getAdminReportDetail = async (
 ): Promise<AdminReportDetailResponse> => {
   const response = await axiosInstance.get<AdminReportDetailResponse>(
     getAdminReportDetailPath(reportId)
+  );
+
+  return response.data;
+};
+
+/**
+ * 관리자 신고 처리(resolve).
+ * actions는 AdminReportProcessAction 타입으로 한곳에서만 정의한다.
+ * Access Token은 axiosInstance Request Interceptor가 Authorization에 첨부한다.
+ */
+export const resolveAdminReport = async (
+  reportId: number,
+  body: AdminReportResolveBody
+): Promise<AdminReportResolveResponse> => {
+  const response = await axiosInstance.post<AdminReportResolveResponse>(
+    getAdminReportResolvePath(reportId),
+    body
+  );
+
+  return response.data;
+};
+
+/**
+ * 관리자 신고 반려(reject).
+ * 요청 body는 없다 — 조치 없이 상태만 REJECTED로 바꾼다.
+ * Access Token은 axiosInstance Request Interceptor가 Authorization에 첨부한다.
+ */
+export const rejectAdminReport = async (
+  reportId: number
+): Promise<AdminReportRejectResponse> => {
+  const response = await axiosInstance.post<AdminReportRejectResponse>(
+    getAdminReportRejectPath(reportId)
   );
 
   return response.data;

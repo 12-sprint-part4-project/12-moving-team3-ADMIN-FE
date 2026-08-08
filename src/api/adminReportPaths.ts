@@ -4,3 +4,11 @@ export const ADMIN_REPORT_LIST_PATH = '/api/admin/reports';
 /** GET /api/admin/reports/:reportId */
 export const getAdminReportDetailPath = (reportId: number) =>
   `/api/admin/reports/${reportId}`;
+
+/** POST /api/admin/reports/:reportId/resolve */
+export const getAdminReportResolvePath = (reportId: number) =>
+  `/api/admin/reports/${reportId}/resolve`;
+
+/** POST /api/admin/reports/:reportId/reject */
+export const getAdminReportRejectPath = (reportId: number) =>
+  `/api/admin/reports/${reportId}/reject`;
