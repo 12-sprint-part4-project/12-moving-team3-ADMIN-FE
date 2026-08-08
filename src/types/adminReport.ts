@@ -456,3 +456,22 @@ export interface AdminReportRejectData {
 export interface AdminReportRejectResponse {
   data: AdminReportRejectData;
 }
+
+/** GET /api/admin/reports/statistics 쿼리 파라미터 */
+export interface AdminReportStatisticsQuery {
+  startDate?: string;
+  endDate?: string;
+}
+
+/** GET /api/admin/reports/statistics 성공 시 data 필드 */
+export interface AdminReportStatistics {
+  totalReportCount: number;
+  pendingReportCount: number;
+  resolvedReportCount: number;
+  rejectedReportCount: number;
+}
+
+/** GET /api/admin/reports/statistics 성공 응답 */
+export interface AdminReportStatisticsResponse {
+  data: AdminReportStatistics;
+}

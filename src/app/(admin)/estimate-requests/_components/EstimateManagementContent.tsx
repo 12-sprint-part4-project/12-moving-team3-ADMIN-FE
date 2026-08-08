@@ -66,8 +66,11 @@ export const EstimateManagementContent = () => {
     isError: isListError,
     refetch: refetchList,
   } = useAdminEstimateRequestList(listQuery);
-  const { data: statisticsData } =
-    useAdminEstimateRequestStatistics(statisticsQuery);
+  const {
+    data: statisticsData,
+    isPending: isStatisticsPending,
+    isError: isStatisticsError,
+  } = useAdminEstimateRequestStatistics(statisticsQuery);
 
   const updateFilters = (
     patch: Partial<EstimateRequestFilters>,
@@ -133,7 +136,11 @@ export const EstimateManagementContent = () => {
         title="견적 요청 관리"
         description="견적 요청 내역을 조회 할 수 있습니다."
       />
-      <EstimateStatistics statistics={statisticsData?.data} />
+      <EstimateStatistics
+        statistics={statisticsData?.data}
+        isPending={isStatisticsPending}
+        isError={isStatisticsError}
+      />
       <EstimateFilter
         key={filterResetKey}
         status={filters.status}

@@ -57,7 +57,11 @@ export const CompletedManagementContent = () => {
     isError: isListError,
     refetch: refetchList,
   } = useAdminCompletedList(listQuery);
-  const { data: statisticsData } = useAdminCompletedStatistics(dateQuery);
+  const {
+    data: statisticsData,
+    isPending: isStatisticsPending,
+    isError: isStatisticsError,
+  } = useAdminCompletedStatistics(dateQuery);
 
   const updateFilters = (
     patch: Partial<CompletedFilters>,
@@ -117,7 +121,11 @@ export const CompletedManagementContent = () => {
         title="완료 건 관리"
         description="완료된 견적 요청 내역을 조회 할 수 있습니다."
       />
-      <CompletedStatistics statistics={statisticsData?.data} />
+      <CompletedStatistics
+        statistics={statisticsData?.data}
+        isPending={isStatisticsPending}
+        isError={isStatisticsError}
+      />
       <CompletedFilter
         search={searchInput}
         moveType={filters.moveType}

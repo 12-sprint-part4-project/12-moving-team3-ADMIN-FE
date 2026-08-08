@@ -31,6 +31,9 @@ const invalidateAdminReportDecisionQueries = (
   void queryClient.invalidateQueries({
     queryKey: ADMIN_REPORT_QUERY_KEYS.lists(),
   });
+  void queryClient.invalidateQueries({
+    queryKey: [...ADMIN_REPORT_QUERY_KEYS.all, 'statistics'],
+  });
   // pendingReportCount·recentReports 반영용. params별 statistics도 all prefix로 묶는다.
   void queryClient.invalidateQueries({
     queryKey: ADMIN_DASHBOARD_QUERY_KEYS.all,

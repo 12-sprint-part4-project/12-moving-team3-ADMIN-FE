@@ -3,13 +3,15 @@ import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 /*
- * 제목, 값, 단위를 카드 형태로 표시하는 통계 컴포넌트
+ * 제목, 값, 단위, 설명을 카드 형태로 표시하는 통계 컴포넌트
  */
 
 export interface StatCardProps {
   title: string;
   value: string | number;
   unit?: string;
+  /** 값 아래에 표시하는 보조 설명 */
+  description?: string;
   icon: ReactNode;
   iconBackgroundClassName?: string;
   className?: string;
@@ -19,6 +21,7 @@ export const StatCard = ({
   title,
   value,
   unit,
+  description,
   icon,
   iconBackgroundClassName,
   className,
@@ -46,6 +49,9 @@ export const StatCard = ({
           <span className="text-lg-medium text-black-400">{unit}</span>
         ) : null}
       </div>
+      {description ? (
+        <p className="mt-1 text-sm-medium text-gray-500">{description}</p>
+      ) : null}
     </div>
   </div>
 );

@@ -38,6 +38,7 @@ export const AverageRating: Story = {
     title: '평균 평점',
     value: 4.8,
     unit: '점',
+    description: '삭제되지 않은 리뷰 기준',
     icon: <Star className="text-yellow-100" />,
     iconBackgroundClassName: 'bg-yellow-50',
   },
