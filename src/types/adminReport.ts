@@ -183,12 +183,14 @@ export interface AdminReportAdmin {
 
 /**
  * 신고자 상세.
- * 목록 요약(AdminReportReporter)에 탈퇴 상태를 더한다.
+ * 목록 요약(AdminReportReporter)에 탈퇴 상태·프로필 이미지를 더한다.
  */
 export interface AdminReportDetailReporter extends AdminReportReporter {
   isDeleted: boolean;
   /** ISO date-time. 미탈퇴면 null */
   deletedAt: string | null;
+  /** User.profileImageKey. 없으면 null */
+  profileImageKey: string | null;
 }
 
 /** 일반 회원(CUSTOMER) 프로필 요약. 전화번호는 포함하지 않는다. */
@@ -270,17 +272,22 @@ export interface AdminReportDetailContent {
 
 /**
  * 신고 처리용 대상 사용자 요약.
- * 없거나 CHAT_ROOM이면 null. status는 회원 상태(MemberStatus)와 동일하다.
+ * 없으면 null. status는 회원 상태(MemberStatus)와 동일하다.
+ * UserStatusInfo가 없으면 BE가 ACTIVE·null로 정규화한다.
  */
 export interface AdminReportDetailTargetUser {
   id: string;
   name: string;
   nickname: string;
+  /** User.profileImageKey. 없으면 null */
+  profileImageKey: string | null;
   status: MemberStatus;
   /** ISO date-time. 미정지면 null */
   suspendedAt: string | null;
   /** ISO date-time. 미정지면 null */
   suspendedUntil: string | null;
+  /** 해당 회원이 직접·작성 콘텐츠를 통해 받은 신고 누적 횟수 */
+  reportCount: number;
 }
 
 /** 신고 상세에서 선택 가능한 Action 플래그 */
@@ -332,14 +339,51 @@ export interface AdminReportDetailReportedMessageContent {
 }
 
 /**
+ * USER 신고 — 기사(MOVER) 프로필 콘텐츠.
+ * type + userType으로 판별한다. email·deletedAt은 포함하지 않는다.
+ * serviceRegions는 상세 프로필 타입을 재사용한다.
+ */
+export interface AdminReportDetailReportedMoverProfileContent {
+  type: 'USER';
+  userType: 'MOVER';
+  id: string;
+  name: string;
+  nickname: string;
+  profileImageKey: string | null;
+  shortDescription: string | null;
+  description: string | null;
+  career: number | null;
+  service: AdminReportMoveType[];
+  serviceRegions: AdminReportDetailMoverServiceRegion[];
+}
+
+/**
+ * USER 신고 — 고객(CUSTOMER) 프로필 콘텐츠.
+ * type + userType으로 판별한다. 전화번호·email은 포함하지 않는다.
+ */
+export interface AdminReportDetailReportedCustomerProfileContent {
+  type: 'USER';
+  userType: 'CUSTOMER';
+  id: string;
+  name: string;
+  nickname: string;
+  profileImageKey: string | null;
+  region: AdminReportRegion | null;
+  service: AdminReportMoveType[];
+}
+
+/**
  * 신고된 콘텐츠 상세.
- * USER/CHAT_ROOM·미존재면 null. type으로 구분한다.
+ * USER는 회원 프로필, 그 외는 콘텐츠 row.
+ * 프로필/콘텐츠 미존재·조회 실패면 null. type(+userType)으로 구분한다.
  */
 export type AdminReportDetailReportedContent =
   | AdminReportDetailReportedReviewContent
   | AdminReportDetailReportedArticleContent
   | AdminReportDetailReportedCommentContent
-  | AdminReportDetailReportedMessageContent;
+  | AdminReportDetailReportedMessageContent
+  | AdminReportDetailReportedMoverProfileContent
+  | AdminReportDetailReportedCustomerProfileContent;
 
 /** GET /api/admin/reports/:reportId 성공 시 data 필드 */
 export interface AdminReportDetail {
@@ -355,9 +399,12 @@ export interface AdminReportDetail {
   reporter: AdminReportDetailReporter;
   targetInfo: AdminReportDetailTargetInfo;
   content: AdminReportDetailContent | null;
-  /** 정지 Action용 대상 사용자. 없거나 CHAT_ROOM이면 null */
+  /** 정지 Action용 대상 사용자. 없으면 null */
   targetUser: AdminReportDetailTargetUser | null;
-  /** 콘텐츠 삭제 Action·표시용. USER/CHAT_ROOM·미존재면 null */
+  /**
+   * 콘텐츠 삭제 Action·표시용.
+   * USER는 회원 프로필, 그 외는 콘텐츠. 프로필/콘텐츠 없으면 null.
+   */
   reportedContent: AdminReportDetailReportedContent | null;
   availableActions: AdminReportAvailableActions;
 }

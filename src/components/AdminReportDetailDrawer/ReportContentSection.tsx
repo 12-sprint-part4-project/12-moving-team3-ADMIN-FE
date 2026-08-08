@@ -13,6 +13,7 @@ import {
 import { DetailMultilineField } from './DetailMultilineField';
 import { formatNullableDateTime } from './helpers';
 import { ReportProcessActionToggle } from './ReportProcessActionToggle';
+import { ReportReportedUserProfileContent } from './ReportReportedUserProfileContent';
 
 const ReportContentMetadataFields = ({
   metadata,
@@ -49,13 +50,6 @@ const getEmptyContentMessage = (detail: AdminReportDetail) => {
   return '신고된 콘텐츠가 없습니다.';
 };
 
-/**
- * 욕설/비방 + USER는 별도 본문이 없어 이름·이메일 요약 content가 어색하다.
- * 섹션은 유지하되 안내만 보여 준다.
- */
-const isUserAbusiveLanguageReport = (detail: AdminReportDetail) =>
-  detail.category === 'ABUSIVE_LANGUAGE' && detail.target === 'USER';
-
 export interface ReportContentSectionProps {
   detail: AdminReportDetail;
   /** DELETE_REPORTED_CONTENT 선택 여부. 상위(ReportDetailContent)에서 관리한다. */
@@ -68,8 +62,9 @@ export const ReportContentSection = ({
   isDeleteContentSelected,
   onToggleDeleteContent,
 }: ReportContentSectionProps) => {
-  const { content, category, availableActions, status } = detail;
-  // BE 허용 여부만 본다. USER/MESSAGE/CHAT_ROOM·이미 삭제는 canDeleteContent=false다.
+  const { content, category, availableActions, status, reportedContent, target } =
+    detail;
+  // BE 허용 여부만 본다. USER/MESSAGE·이미 삭제는 canDeleteContent=false다.
   const canDeleteContent = availableActions?.canDeleteContent === true;
   const isDeleteDisabled = status !== 'PENDING';
 
@@ -87,23 +82,28 @@ export const ReportContentSection = ({
     />
   ) : null;
 
-  // 부적절한 프로필 신고는 프로필 검토가 핵심이므로 콘텐츠 섹션을 숨긴다.
-  if (category === 'INAPPROPRIATE_PROFILE') {
-    return null;
-  }
+  // USER 신고: reportedContent 프로필을 콘텐츠 영역에 표시한다. 삭제 Action은 노출하지 않는다.
+  if (target === 'USER') {
+    if (reportedContent?.type === 'USER') {
+      return (
+        <DetailSection title="신고된 콘텐츠 정보">
+          <ReportReportedUserProfileContent content={reportedContent} />
+        </DetailSection>
+      );
+    }
 
-  if (isUserAbusiveLanguageReport(detail)) {
     return (
       <DetailSection title="신고된 콘텐츠 정보">
-        <div className="flex flex-col gap-3">
-          <p className="text-md-regular text-gray-500">
-            회원 대상 욕설/비방 신고입니다. 별도 본문 콘텐츠가 없습니다. 신고
-            대상 정보에서 회원을 확인해 주세요.
-          </p>
-          {deleteActionToggle}
-        </div>
+        <p className="text-md-regular text-gray-500">
+          프로필 정보가 없습니다.
+        </p>
       </DetailSection>
     );
+  }
+
+  // 부적절한 프로필인데 USER가 아니면 콘텐츠 섹션을 숨긴다 (기존 정책).
+  if (category === 'INAPPROPRIATE_PROFILE') {
+    return null;
   }
 
   if (!content) {
