@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from 'react';
 
+import { AdminChatDetailDrawer } from '@/components/AdminChatDetailDrawer/AdminChatDetailDrawer';
 import { AdminChatListView } from '@/components/AdminChatListView/AdminChatListView';
 import { Button } from '@/components/Button/Button';
 import type { Column } from '@/components/DataTable/DataTable';
@@ -14,8 +15,11 @@ import {
 import { formatAdminMemberJoinedAt } from '@/utils/adminMember';
 
 const ChatsPage = () => {
-  // DetailDrawer 연결 전 선택 상태만 준비한다. 읽기는 다음 단계에서 사용한다.
-  const [, setSelectedRoomId] = useState<number | null>(null);
+  const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
+
+  const handleCloseDetail = () => {
+    setSelectedRoomId(null);
+  };
 
   const getColumns = useCallback((): Column<AdminChatListItem>[] => [
     {
@@ -72,7 +76,16 @@ const ChatsPage = () => {
     },
   ], []);
 
-  return <AdminChatListView getColumns={getColumns} />;
+  return (
+    <>
+      <AdminChatListView getColumns={getColumns} />
+      <AdminChatDetailDrawer
+        roomId={selectedRoomId}
+        open={Boolean(selectedRoomId)}
+        onClose={handleCloseDetail}
+      />
+    </>
+  );
 };
 
 export default ChatsPage;
