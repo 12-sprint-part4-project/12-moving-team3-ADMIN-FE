@@ -42,8 +42,9 @@ const SUCCESS_TOAST_DURATION_MS = 3000;
 
 /**
  * 카테고리별 검토 우선순위에 맞춰 섹션 순서를 조정한다.
- * - 욕설/비방: 콘텐츠 → 대상 → 신고자
- * - 부적절한 프로필: 대상 프로필 → 신고자 (콘텐츠 없음)
+ * - 욕설/비방·일반: 콘텐츠 → 대상 → 신고자
+ * - 부적절한 프로필(USER): 콘텐츠(reportedContent 프로필) → 대상 → 신고자
+ * - 부적절한 프로필(비 USER): 대상 → 신고자 (콘텐츠 섹션 없음)
  */
 const ReportDetailSections = ({
   detail,
@@ -55,38 +56,29 @@ const ReportDetailSections = ({
   onToggleAction: (action: AdminReportProcessAction) => void;
 }) => {
   const isInappropriateProfile = detail.category === 'INAPPROPRIATE_PROFILE';
+  const showContentSection =
+    !isInappropriateProfile || detail.target === 'USER';
 
   return (
     <div className="flex flex-col gap-4">
       <ReportBasicInfoSection detail={detail} />
-      {isInappropriateProfile ? (
-        <>
-          <ReportTargetInfoSection
-            detail={detail}
-            isSuspendSelected={selectedActions.includes('SUSPEND_TARGET_USER')}
-            onToggleSuspend={() => onToggleAction('SUSPEND_TARGET_USER')}
-          />
-          <ReportReporterSection detail={detail} />
-        </>
-      ) : (
-        <>
-          <ReportContentSection
-            detail={detail}
-            isDeleteContentSelected={selectedActions.includes(
-              'DELETE_REPORTED_CONTENT'
-            )}
-            onToggleDeleteContent={() =>
-              onToggleAction('DELETE_REPORTED_CONTENT')
-            }
-          />
-          <ReportTargetInfoSection
-            detail={detail}
-            isSuspendSelected={selectedActions.includes('SUSPEND_TARGET_USER')}
-            onToggleSuspend={() => onToggleAction('SUSPEND_TARGET_USER')}
-          />
-          <ReportReporterSection detail={detail} />
-        </>
-      )}
+      {showContentSection ? (
+        <ReportContentSection
+          detail={detail}
+          isDeleteContentSelected={selectedActions.includes(
+            'DELETE_REPORTED_CONTENT'
+          )}
+          onToggleDeleteContent={() =>
+            onToggleAction('DELETE_REPORTED_CONTENT')
+          }
+        />
+      ) : null}
+      <ReportTargetInfoSection
+        detail={detail}
+        isSuspendSelected={selectedActions.includes('SUSPEND_TARGET_USER')}
+        onToggleSuspend={() => onToggleAction('SUSPEND_TARGET_USER')}
+      />
+      <ReportReporterSection detail={detail} />
     </div>
   );
 };
