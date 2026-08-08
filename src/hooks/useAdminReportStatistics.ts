@@ -1,4 +1,4 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { ADMIN_REPORT_QUERY_KEYS } from '@/constants/adminReportQueryKeys';
 import { getAdminReportStatistics } from '@/services/adminReportApi';
@@ -10,7 +10,6 @@ export const useAdminReportStatistics = (
   useQuery({
     queryKey: ADMIN_REPORT_QUERY_KEYS.statistics(params),
     queryFn: () => getAdminReportStatistics(params),
-    placeholderData: keepPreviousData,
     retry: false,
     staleTime: 1000 * 60 * 3,
   });
