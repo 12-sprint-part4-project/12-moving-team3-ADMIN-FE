@@ -34,11 +34,11 @@ const getDetailErrorTitle = (error: unknown) => {
   return '견적 요청 상세를 불러오지 못했습니다.';
 };
 
-const EstimateDetailContent = ({
-  detail,
-}: {
+interface EstimateDetailContentProps {
   detail: AdminEstimateRequestDetail;
-}) => {
+}
+
+const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
   const basicInformation: [string, string][] = [
     ['견적 번호', String(detail.id)],
     ['요청자 이름', detail.userName],
