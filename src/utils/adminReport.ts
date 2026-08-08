@@ -7,6 +7,7 @@ import type {
   AdminReportDetailContent,
   AdminReportMessageType,
   AdminReportPostsCategory,
+  AdminReportProcessAction,
   AdminReportStatus,
   AdminReportTarget,
   AdminReportTargetInfo,
@@ -53,6 +54,15 @@ export const ADMIN_REPORT_USER_TYPE_LABEL: Record<AdminReportUserType, string> =
     CUSTOMER: '일반 회원',
     MOVER: '기사',
   };
+
+/** 신고 처리 Action → 확인 Modal용 한글 문구 */
+export const ADMIN_REPORT_PROCESS_ACTION_LABEL: Record<
+  AdminReportProcessAction,
+  string
+> = {
+  SUSPEND_TARGET_USER: '신고 대상 사용자 7일 정지',
+  DELETE_REPORTED_CONTENT: '신고 콘텐츠 삭제',
+};
 
 /** content.metadata 키 → 관리자용 한글 라벨 */
 export const ADMIN_REPORT_CONTENT_METADATA_LABEL: Record<string, string> = {
