@@ -4,6 +4,7 @@ import {
   DetailField,
   formatNullableDateTime,
 } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
+import { AdminChatMessageList } from '@/components/AdminChatMessageList/AdminChatMessageList';
 import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
@@ -178,13 +179,21 @@ const ChatParticipantsSection = ({
 
 interface ChatDetailContentProps {
   detail: AdminChatDetail;
+  roomId: number;
+  open: boolean;
 }
 
-const ChatDetailContent = ({ detail }: ChatDetailContentProps) => (
+const ChatDetailContent = ({
+  detail,
+  roomId,
+  open,
+}: ChatDetailContentProps) => (
   <div className="flex flex-col gap-4">
     <ChatBasicInfoSection detail={detail} />
     <ChatLinkedInfoSection detail={detail} />
     <ChatParticipantsSection participants={detail.participants} />
+    {/* key로 room 전환 시 메시지 누적 상태를 완전히 초기화한다. */}
+    <AdminChatMessageList key={roomId} roomId={roomId} enabled={open} />
   </div>
 );
 
@@ -240,7 +249,9 @@ export const AdminChatDetailDrawer = ({
       );
     }
 
-    return <ChatDetailContent detail={detail} />;
+    return (
+      <ChatDetailContent detail={detail} roomId={roomId} open={open} />
+    );
   };
 
   return (

@@ -5,6 +5,13 @@ import type {
   AdminChatUserType,
 } from '@/types/adminChat';
 
+/** 발신자·참여자 공통 표시명에 필요한 최소 필드 */
+interface AdminChatNamedUser {
+  name: string;
+  nickname: string;
+  userType: AdminChatUserType;
+}
+
 /** 채팅방 유형 → 한글 라벨. enum 원문을 UI에 노출하지 않기 위해 매핑한다. */
 export const ADMIN_CHAT_ROOM_TYPE_LABEL: Record<AdminChatRoomType, string> = {
   GENERAL: '일반',
@@ -22,6 +29,17 @@ export const ADMIN_CHAT_USER_TYPE_LABEL: Record<AdminChatUserType, string> = {
 };
 
 /**
+ * `닉네임(회원 유형)` 표기.
+ * 닉네임이 비어 있으면 name으로 fallback한다.
+ */
+export const formatAdminChatUserLabel = (user: AdminChatNamedUser) => {
+  const displayName = user.nickname.trim() || user.name.trim() || '-';
+  const userTypeLabel = ADMIN_CHAT_USER_TYPE_LABEL[user.userType];
+
+  return `${displayName}(${userTypeLabel})`;
+};
+
+/**
  * 참여자 목록 셀 문구.
  * 예: `길동이(고객), 빠른이사맨(기사)`
  */
@@ -32,15 +50,7 @@ export const formatAdminChatParticipants = (
     return '-';
   }
 
-  return participants
-    .map((participant) => {
-      const displayName =
-        participant.nickname.trim() || participant.name.trim() || '-';
-      const userTypeLabel = ADMIN_CHAT_USER_TYPE_LABEL[participant.userType];
-
-      return `${displayName}(${userTypeLabel})`;
-    })
-    .join(', ');
+  return participants.map((participant) => formatAdminChatUserLabel(participant)).join(', ');
 };
 
 /**
