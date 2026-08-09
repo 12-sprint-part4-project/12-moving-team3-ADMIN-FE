@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { ADMIN_REVIEW_QUERY_KEYS } from '@/constants/adminReviewQueryKeys';
 import { getAdminReviewList } from '@/services/adminReviewApi';
@@ -12,6 +12,7 @@ interface UseAdminReviewListOptions {
 /**
  * 관리자 리뷰 목록 조회.
  * params가 바뀌면 queryKey가 달라져 필터·페이지별 캐시가 분리된다.
+ * keepPreviousData로 page/search/rating 변경 중에도 이전 목록을 유지한다.
  * (전역 QueryProvider도 retry: false이지만, useAdminMemberList와 동일하게 명시한다.)
  */
 export const useAdminReviewList = (
@@ -22,5 +23,6 @@ export const useAdminReviewList = (
     queryKey: ADMIN_REVIEW_QUERY_KEYS.list(params),
     queryFn: () => getAdminReviewList(params),
     enabled: options?.enabled ?? true,
+    placeholderData: keepPreviousData,
     retry: false,
   });
