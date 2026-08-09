@@ -9,15 +9,14 @@ import { deleteAdminReview } from '@/services/adminReviewApi';
 
 /**
  * 삭제 성공 후 목록·통계 캐시를 무효화한다.
- * lists() prefix로 현재 검색·별점·page 조건을 포함한 목록이 다시 조회된다.
+ * lists()/statisticses() prefix로 현재 조건의 목록·통계가 다시 조회된다.
  */
 const invalidateAdminReviewQueries = (queryClient: QueryClient) => {
   void queryClient.invalidateQueries({
     queryKey: ADMIN_REVIEW_QUERY_KEYS.lists(),
   });
-  // 삭제 건수·평균 평점 반영용. params별 statistics도 prefix로 묶는다.
   void queryClient.invalidateQueries({
-    queryKey: [...ADMIN_REVIEW_QUERY_KEYS.all, 'statistics'],
+    queryKey: ADMIN_REVIEW_QUERY_KEYS.statisticses(),
   });
 };
 

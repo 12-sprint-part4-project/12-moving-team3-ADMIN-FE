@@ -1,6 +1,9 @@
 import { format } from 'date-fns';
 
-import type { AdminReviewStatisticsQuery } from '@/types/adminReview';
+import type {
+  AdminReviewStatisticsQuery,
+  AdminReviewUserSummary,
+} from '@/types/adminReview';
 
 /** API 쿼리용 YYYY-MM-DD */
 export const toAdminReviewApiDate = (date: Date) => format(date, 'yyyy-MM-dd');
@@ -20,10 +23,9 @@ export const formatAdminReviewCreatedAt = (iso: string) => {
  * 작성자·기사 셀 메인 라벨.
  * 신고자 표시와 같이 이름을 우선하고, 닉네임이 다르면 괄호로 보조한다.
  */
-export const formatAdminReviewUserLabel = (user: {
-  name: string;
-  nickname: string;
-}) => {
+export const formatAdminReviewUserLabel = (
+  user: Pick<AdminReviewUserSummary, 'name' | 'nickname'>
+) => {
   if (user.nickname && user.nickname !== user.name) {
     return `${user.name} (${user.nickname})`;
   }
