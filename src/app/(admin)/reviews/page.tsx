@@ -1,11 +1,17 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, type ChangeEvent } from 'react';
 
 import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
 import { DataTable, type Column } from '@/components/DataTable/DataTable';
+import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
+import { SearchInput } from '@/components/SearchInput/SearchInput';
+import { useAdminReviewList } from '@/hooks/useAdminReviewList';
 import { useAdminReviewStatistics } from '@/hooks/useAdminReviewStatistics';
-import type { AdminReviewListItem } from '@/types/adminReview';
+import type {
+  AdminReviewListItem,
+  AdminReviewListQuery,
+} from '@/types/adminReview';
 import {
   formatAdminReviewCreatedAt,
   formatAdminReviewUserLabel,
@@ -13,57 +19,91 @@ import {
 
 import { ReviewStatistics } from './_components/ReviewStatistics';
 
+/** BE listQuerySchema 기본값과 동일 */
+const DEFAULT_PAGE_SIZE = 10;
+
+/** 별점 필터: 빈 문자열은 rating 미전달(전체) */
+const RATING_FILTER_OPTIONS = [
+  { label: '전체 별점', value: '' },
+  { label: '5점', value: '5' },
+  { label: '4점', value: '4' },
+  { label: '3점', value: '3' },
+  { label: '2점', value: '2' },
+  { label: '1점', value: '1' },
+] as const;
+
+interface AdminReviewListFilters {
+  /** 검색 버튼/Enter로 확정된 검색어 */
+  search?: string;
+  /** 1~5. 미선택 시 undefined */
+  rating?: number;
+  page: number;
+  pageSize: number;
+}
+
+const INITIAL_FILTERS: AdminReviewListFilters = {
+  page: 1,
+  pageSize: DEFAULT_PAGE_SIZE,
+};
+
+/** select value → 1~5 | undefined. 알 수 없는 값은 무시한다. */
+const parseRatingFilter = (value: string): number | undefined => {
+  if (
+    value === '1' ||
+    value === '2' ||
+    value === '3' ||
+    value === '4' ||
+    value === '5'
+  ) {
+    return Number(value);
+  }
+
+  return undefined;
+};
+
 /**
- * UI 확인용 임시 데이터.
- * 다음 TODO(API 연동)에서 제거하고 실제 목록 응답으로 교체한다.
+ * UI 필터 → API query.
+ * undefined·빈 값은 객체에 넣지 않아 axios query string에서 빠진다.
  */
-const PLACEHOLDER_REVIEWS: AdminReviewListItem[] = [
-  {
-    id: 1,
-    userId: '00000000-0000-4000-8000-000000000001',
-    quoteId: 10,
-    rating: 5,
-    content:
-      '기사님이 시간 약속을 잘 지켜 주셨고, 짐도 꼼꼼하게 포장해 주셔서 만족스러웠습니다.',
-    createdAt: '2026-08-01T09:30:00.000Z',
-    updatedAt: null,
-    author: {
-      id: '00000000-0000-4000-8000-000000000001',
-      name: '홍길동',
-      nickname: '길동이',
-      email: 'customer@example.com',
-      userType: 'CUSTOMER',
-    },
-    mover: {
-      id: '00000000-0000-4000-8000-000000000002',
-      name: '김기사',
-      nickname: '기사킴',
-      email: 'mover@example.com',
-      userType: 'MOVER',
-    },
-  },
-  {
-    id: 2,
-    userId: '00000000-0000-4000-8000-000000000003',
-    quoteId: 11,
-    rating: 4,
-    content: '전반적으로 좋았지만 도착이 조금 늦었습니다.',
-    createdAt: '2026-08-02T14:15:00.000Z',
-    updatedAt: null,
-    author: {
-      id: '00000000-0000-4000-8000-000000000003',
-      name: '이고객',
-      nickname: '이고객',
-      email: 'lee@example.com',
-      userType: 'CUSTOMER',
-    },
-    // mover nullable UI 확인용
-    mover: null,
-  },
-];
+const toListQuery = (
+  filters: AdminReviewListFilters
+): AdminReviewListQuery => ({
+  page: filters.page,
+  pageSize: filters.pageSize,
+  ...(filters.search ? { search: filters.search } : {}),
+  ...(filters.rating !== undefined ? { rating: filters.rating } : {}),
+});
 
 const ReviewsPage = () => {
-  const { data, isPending, isError } = useAdminReviewStatistics();
+  const [filters, setFilters] =
+    useState<AdminReviewListFilters>(INITIAL_FILTERS);
+  // 입력창 초안. 검색 버튼/Enter 시에만 filters.search로 반영한다.
+  const [searchInput, setSearchInput] = useState('');
+
+  const listQuery = useMemo(() => toListQuery(filters), [filters]);
+  const { data, isPending } = useAdminReviewList(listQuery);
+  const {
+    data: statisticsData,
+    isPending: isStatisticsPending,
+    isError: isStatisticsError,
+  } = useAdminReviewStatistics();
+
+  const items = data?.data.items ?? [];
+  const pagination = data?.data.pagination;
+  const totalPages = pagination?.totalPages ?? 0;
+  const currentPage = pagination?.page ?? filters.page;
+
+  // 응답 기준 page가 범위를 벗어나면 렌더 중 보정한다(effect setState 금지 규칙 회피).
+  // totalPages=0이면 1페이지로 맞춘다. prev 참조 유지로 불필요한 재렌더를 막는다.
+  if (!isPending && pagination) {
+    const safePage = pagination.totalPages > 0 ? pagination.totalPages : 1;
+
+    if (filters.page > safePage) {
+      setFilters((prev) =>
+        prev.page <= safePage ? prev : { ...prev, page: safePage }
+      );
+    }
+  }
 
   const columns = useMemo(
     (): Column<AdminReviewListItem>[] => [
@@ -147,21 +187,77 @@ const ReviewsPage = () => {
     []
   );
 
+  const updateFilters = (
+    patch: Partial<AdminReviewListFilters>,
+    options?: { resetPage?: boolean }
+  ) => {
+    setFilters((prev) => ({
+      ...prev,
+      ...patch,
+      ...(options?.resetPage ? { page: 1 } : {}),
+    }));
+  };
+
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(event.target.value);
+  };
+
+  const handleSearch = (value: string) => {
+    const trimmed = value.trim();
+    setSearchInput(trimmed);
+    updateFilters(
+      { search: trimmed.length > 0 ? trimmed : undefined },
+      { resetPage: true }
+    );
+  };
+
+  const handleRatingChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    updateFilters(
+      { rating: parseRatingFilter(event.target.value) },
+      { resetPage: true }
+    );
+  };
+
+  const handlePageChange = (page: number) => {
+    updateFilters({ page });
+  };
+
   return (
     <AdminListLayout
       title="리뷰 관리"
       description="리뷰 목록을 확인하고 작성자·기사 정보를 조회할 수 있습니다."
+      page={currentPage}
+      totalPages={totalPages}
+      onPageChange={handlePageChange}
       statistics={
         <ReviewStatistics
-          statistics={data?.data}
-          isPending={isPending}
-          isError={isError}
+          statistics={statisticsData?.data}
+          isPending={isStatisticsPending}
+          isError={isStatisticsError}
         />
+      }
+      filters={
+        <>
+          <SearchInput
+            value={searchInput}
+            onChange={handleSearchChange}
+            onSearch={handleSearch}
+            placeholder="내용, 작성자, 기사 검색"
+            className="min-w-64 flex-1"
+            aria-label="리뷰 검색"
+          />
+          <FilterSelect
+            aria-label="별점"
+            value={filters.rating !== undefined ? String(filters.rating) : ''}
+            onChange={handleRatingChange}
+            options={[...RATING_FILTER_OPTIONS]}
+          />
+        </>
       }
     >
       <DataTable
         columns={columns}
-        data={PLACEHOLDER_REVIEWS}
+        data={items}
         rowKey="id"
         caption="리뷰 목록"
       />
