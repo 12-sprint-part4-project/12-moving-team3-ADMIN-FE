@@ -40,6 +40,12 @@ type DecisionModal = 'resolve' | 'reject';
 
 const SUCCESS_TOAST_DURATION_MS = 3000;
 
+interface ReportDetailSectionsProps {
+  detail: AdminReportDetail;
+  selectedActions: AdminReportProcessAction[];
+  onToggleAction: (action: AdminReportProcessAction) => void;
+}
+
 /**
  * 카테고리별 검토 우선순위에 맞춰 섹션 순서를 조정한다.
  * - 욕설/비방·일반: 콘텐츠 → 대상 → 신고자
@@ -50,11 +56,7 @@ const ReportDetailSections = ({
   detail,
   selectedActions,
   onToggleAction,
-}: {
-  detail: AdminReportDetail;
-  selectedActions: AdminReportProcessAction[];
-  onToggleAction: (action: AdminReportProcessAction) => void;
-}) => {
+}: ReportDetailSectionsProps) => {
   const isInappropriateProfile = detail.category === 'INAPPROPRIATE_PROFILE';
   const showContentSection =
     !isInappropriateProfile || detail.target === 'USER';
@@ -83,36 +85,58 @@ const ReportDetailSections = ({
   );
 };
 
-/**
- * 단일 DetailDrawer 안에서 로딩·에러·상세·처리/반려를 모두 처리한다.
- * 신고 선택이 바뀌면 부모 key로 리마운트해 Action·Modal 상태를 초기화한다.
- * 상세 조회 완료나 캐시 갱신만으로는 key가 바뀌지 않아 Drawer가 다시 열리지 않는다.
- */
-const ReportDetailDrawerChrome = ({
-  open,
-  reportId,
-  detail,
-  isPending,
-  isError,
-  error,
-  onClose,
-  onRetry,
-}: {
+interface ReportDetailDrawerChromeProps {
   open: boolean;
-  reportId: number | null;
+  /**
+   * 화면에 유지할 신고 ID.
+   * 닫기 시 선택이 null이 되어도 직전 ID를 유지해 본문이 빈 화면으로 바뀌지 않게 한다.
+   */
+  displayReportId: number | null;
+  /** 목록의 현재 선택. 변경될 때만 Action·Modal 로컬 상태를 초기화한다. */
+  selectedReportId: number | null;
   detail: AdminReportDetail | null;
+  /** 최초 상세 조회(캐시 없음) 로딩 */
   isPending: boolean;
+  /** 재시도·백그라운드 refetch 포함 조회 중 여부 */
+  isFetching: boolean;
   isError: boolean;
   error: unknown;
   onClose: () => void;
   onRetry: () => void;
-}) => {
+}
+
+/**
+ * 단일 DetailDrawer 안에서 로딩·에러·상세·처리/반려를 모두 처리한다.
+ * 인스턴스는 유지하고, 선택 신고 ID가 바뀔 때만 로컬 Action·Modal 상태를 초기화한다.
+ */
+const ReportDetailDrawerChrome = ({
+  open,
+  displayReportId,
+  selectedReportId,
+  detail,
+  isPending,
+  isFetching,
+  isError,
+  error,
+  onClose,
+  onRetry,
+}: ReportDetailDrawerChromeProps) => {
   const [selectedActions, setSelectedActions] = useState<
     AdminReportProcessAction[]
   >([]);
   const [activeModal, setActiveModal] = useState<DecisionModal | null>(null);
   const [decisionError, setDecisionError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  // 선택 신고가 바뀔 때만 Action·Modal 상태를 초기화한다. Drawer 자체는 remount하지 않는다.
+  const [stateReportId, setStateReportId] = useState(selectedReportId);
+
+  if (selectedReportId !== stateReportId) {
+    setStateReportId(selectedReportId);
+    setSelectedActions([]);
+    setActiveModal(null);
+    setDecisionError(null);
+    setSuccessMessage(null);
+  }
 
   const resolveMutation = useResolveAdminReport();
   const rejectMutation = useRejectAdminReport();
@@ -225,6 +249,7 @@ const ReportDetailDrawerChrome = ({
   };
 
   const renderBody = () => {
+    // 닫기 전환 중에도 직전 detail을 유지해 본문이 로딩·빈 화면으로 바뀌지 않게 한다.
     if (detail) {
       return (
         <ReportDetailSections
@@ -235,7 +260,7 @@ const ReportDetailDrawerChrome = ({
       );
     }
 
-    if (reportId == null) {
+    if (displayReportId == null) {
       return (
         <p className="text-md-regular text-gray-500">
           선택한 신고 정보가 없습니다.
@@ -243,6 +268,7 @@ const ReportDetailDrawerChrome = ({
       );
     }
 
+    // 최초 조회만 전체 로딩으로 본다. 재시도는 버튼 loading(isFetching)으로 구분한다.
     if (isPending) {
       return <LoadingState />;
     }
@@ -253,7 +279,11 @@ const ReportDetailDrawerChrome = ({
           title={getDetailErrorTitle(error)}
           description="잠시 후 다시 시도해 주세요."
           action={
-            <Button variant="secondary" onClick={onRetry}>
+            <Button
+              variant="secondary"
+              loading={isFetching}
+              onClick={onRetry}
+            >
               다시 시도
             </Button>
           }
@@ -345,27 +375,38 @@ export const AdminReportDetailDrawer = ({
   reportId,
   onClose,
 }: AdminReportDetailDrawerProps) => {
-  const { data, error, isPending, isError, refetch } = useAdminReportDetail(
-    reportId,
-    {
-      enabled: open && reportId != null,
-    }
-  );
+  // 닫기 시 reportId=null이 되어도 직전 선택을 유지한다. 새 선택이 있을 때만 갱신한다.
+  const [displayReportId, setDisplayReportId] = useState<number | null>(null);
 
-  // queryKey가 reportId별이라 다른 신고를 열 때 이전 data가 섞이지 않는다.
+  if (reportId != null && reportId !== displayReportId) {
+    setDisplayReportId(reportId);
+  }
+
+  // 열린 동안은 최신 선택(reportId)을, 닫힌 동안은 직전 표시 ID를 쓴다.
+  const activeReportId = reportId ?? displayReportId;
+
+  const { data, error, isPending, isFetching, isError, refetch } =
+    useAdminReportDetail(activeReportId, {
+      // 실제로 열려 있고 목록 선택이 있을 때만 조회한다. 닫힌 동안은 refetch하지 않는다.
+      enabled: open && reportId != null,
+    });
+
+  // queryKey가 activeReportId별이라 다른 신고를 열 때 이전 data가 섞이지 않는다.
   const detail = data?.data ?? null;
-  // 응답 id가 현재 선택과 다를 때만 막아, 캐시/전환 중 잘못된 상세가 잠깐 보이지 않게 한다.
+  // 응답 id가 표시 대상과 다를 때만 막아, 캐시/전환 중 잘못된 상세가 잠깐 보이지 않게 한다.
   const isDetailForSelection =
-    detail != null && reportId != null && detail.id === reportId;
+    detail != null &&
+    activeReportId != null &&
+    detail.id === activeReportId;
 
   return (
     <ReportDetailDrawerChrome
-      // 선택 신고가 바뀔 때만 리마운트한다. 상세 조회 완료·invalidate로는 key가 유지된다.
-      key={reportId ?? 'closed'}
       open={open}
-      reportId={reportId}
+      displayReportId={activeReportId}
+      selectedReportId={reportId}
       detail={isDetailForSelection ? detail : null}
       isPending={isPending}
+      isFetching={isFetching}
       isError={isError}
       error={error}
       onClose={onClose}

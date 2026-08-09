@@ -36,13 +36,15 @@ const getAccountStatusBadge = (targetUser: AdminReportDetailTargetUser) => {
   );
 };
 
+interface PresenceStatusFieldsProps {
+  presenceStatus: TargetPresenceStatus;
+  deletedAt: string | null;
+}
+
 const PresenceStatusFields = ({
   presenceStatus,
   deletedAt,
-}: {
-  presenceStatus: TargetPresenceStatus;
-  deletedAt: string | null;
-}) => (
+}: PresenceStatusFieldsProps) => (
   <>
     <div className="flex items-center justify-between gap-4">
       <dt className="shrink-0 text-gray-500">대상 상태</dt>
@@ -58,16 +60,22 @@ const PresenceStatusFields = ({
   </>
 );
 
-const SanctionUserFields = ({
-  targetUser,
-}: {
+interface AccountInfoFieldsProps {
   targetUser: AdminReportDetailTargetUser;
-}) => (
+}
+
+const AccountInfoFields = ({ targetUser }: AccountInfoFieldsProps) => (
   <>
     {getAccountStatusBadge(targetUser)}
     <DetailField label="신고 횟수" value={String(targetUser.reportCount)} />
   </>
 );
+
+interface TargetMemberInfoFieldsProps {
+  summaryUser: AdminReportDetailUserSummary;
+  targetUser: AdminReportDetailTargetUser | null;
+  presenceStatus: TargetPresenceStatus;
+}
 
 /**
  * 신고 대상 회원 공통 필드.
@@ -78,11 +86,7 @@ const TargetMemberInfoFields = ({
   summaryUser,
   targetUser,
   presenceStatus,
-}: {
-  summaryUser: AdminReportDetailUserSummary;
-  targetUser: AdminReportDetailTargetUser | null;
-  presenceStatus: TargetPresenceStatus;
-}) => {
+}: TargetMemberInfoFieldsProps) => {
   const displayName = targetUser?.name ?? summaryUser.name;
   const displayNickname = targetUser?.nickname ?? summaryUser.nickname;
   const profileImageUser = {
@@ -115,7 +119,7 @@ const TargetMemberInfoFields = ({
           presenceStatus={presenceStatus}
           deletedAt={summaryUser.deletedAt}
         />
-        {targetUser ? <SanctionUserFields targetUser={targetUser} /> : null}
+        {targetUser ? <AccountInfoFields targetUser={targetUser} /> : null}
       </dl>
     </div>
   );
@@ -175,7 +179,7 @@ export const ReportTargetInfoSection = ({
               presenceStatus={presenceStatus}
               deletedAt={deletedAt}
             />
-            {targetUser ? <SanctionUserFields targetUser={targetUser} /> : null}
+            {targetUser ? <AccountInfoFields targetUser={targetUser} /> : null}
           </dl>
         )}
         {presenceHint ? (
