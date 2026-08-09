@@ -14,7 +14,7 @@ import { DetailMultilineField } from './DetailMultilineField';
 import { formatCareer, formatNullableText } from './helpers';
 import { TargetUserProfileImage } from './TargetUserProfileImage';
 
-/** 서비스 지역 배열 → 한글 라벨 콤마 구분 (ReportProfileSection과 동일) */
+/** 서비스 지역 배열 → 한글 라벨 콤마 구분 */
 const formatServiceRegions = (
   serviceRegions: AdminReportDetailMoverServiceRegion[]
 ) => {

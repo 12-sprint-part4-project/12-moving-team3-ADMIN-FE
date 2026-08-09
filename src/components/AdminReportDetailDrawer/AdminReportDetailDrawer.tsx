@@ -40,6 +40,12 @@ type DecisionModal = 'resolve' | 'reject';
 
 const SUCCESS_TOAST_DURATION_MS = 3000;
 
+interface ReportDetailSectionsProps {
+  detail: AdminReportDetail;
+  selectedActions: AdminReportProcessAction[];
+  onToggleAction: (action: AdminReportProcessAction) => void;
+}
+
 /**
  * 카테고리별 검토 우선순위에 맞춰 섹션 순서를 조정한다.
  * - 욕설/비방·일반: 콘텐츠 → 대상 → 신고자
@@ -50,11 +56,7 @@ const ReportDetailSections = ({
   detail,
   selectedActions,
   onToggleAction,
-}: {
-  detail: AdminReportDetail;
-  selectedActions: AdminReportProcessAction[];
-  onToggleAction: (action: AdminReportProcessAction) => void;
-}) => {
+}: ReportDetailSectionsProps) => {
   const isInappropriateProfile = detail.category === 'INAPPROPRIATE_PROFILE';
   const showContentSection =
     !isInappropriateProfile || detail.target === 'USER';
@@ -83,32 +85,65 @@ const ReportDetailSections = ({
   );
 };
 
-/**
- * 상세 데이터가 있을 때 Action 선택·처리/반려 Modal·mutation을 연결한다.
- * 신고가 바뀌면 부모에서 key={detail.id}로 리마운트해 선택을 초기화한다.
- */
-const ReportDetailPanel = ({
-  detail,
-  open,
-  onClose,
-}: {
-  detail: AdminReportDetail;
+interface ReportDetailDrawerChromeProps {
   open: boolean;
+  /**
+   * 화면에 유지할 신고 ID.
+   * 닫기 시 선택이 null이 되어도 직전 ID를 유지해 본문이 빈 화면으로 바뀌지 않게 한다.
+   */
+  displayReportId: number | null;
+  /** 목록의 현재 선택. 변경될 때만 Action·Modal 로컬 상태를 초기화한다. */
+  selectedReportId: number | null;
+  detail: AdminReportDetail | null;
+  /** 최초 상세 조회(캐시 없음) 로딩 */
+  isPending: boolean;
+  /** 재시도·백그라운드 refetch 포함 조회 중 여부 */
+  isFetching: boolean;
+  isError: boolean;
+  error: unknown;
   onClose: () => void;
-}) => {
+  onRetry: () => void;
+}
+
+/**
+ * 단일 DetailDrawer 안에서 로딩·에러·상세·처리/반려를 모두 처리한다.
+ * 인스턴스는 유지하고, 선택 신고 ID가 바뀔 때만 로컬 Action·Modal 상태를 초기화한다.
+ */
+const ReportDetailDrawerChrome = ({
+  open,
+  displayReportId,
+  selectedReportId,
+  detail,
+  isPending,
+  isFetching,
+  isError,
+  error,
+  onClose,
+  onRetry,
+}: ReportDetailDrawerChromeProps) => {
   const [selectedActions, setSelectedActions] = useState<
     AdminReportProcessAction[]
   >([]);
   const [activeModal, setActiveModal] = useState<DecisionModal | null>(null);
   const [decisionError, setDecisionError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  // 선택 신고가 바뀔 때만 Action·Modal 상태를 초기화한다. Drawer 자체는 remount하지 않는다.
+  const [stateReportId, setStateReportId] = useState(selectedReportId);
+
+  if (selectedReportId !== stateReportId) {
+    setStateReportId(selectedReportId);
+    setSelectedActions([]);
+    setActiveModal(null);
+    setDecisionError(null);
+    setSuccessMessage(null);
+  }
 
   const resolveMutation = useResolveAdminReport();
   const rejectMutation = useRejectAdminReport();
 
   const isDecisionPending =
     resolveMutation.isPending || rejectMutation.isPending;
-  const isReportPending = detail.status === 'PENDING';
+  const isReportPending = detail?.status === 'PENDING';
   const hasSelectedActions = selectedActions.length > 0;
 
   const showSuccessToast = (message: string) => {
@@ -128,6 +163,7 @@ const ReportDetailPanel = ({
   };
 
   const handleCloseDrawer = () => {
+    // Modal·에러 로컬 상태를 먼저 비우고, 부모 selectedReportId를 null로 초기화한다.
     setActiveModal(null);
     setDecisionError(null);
     onClose();
@@ -163,6 +199,7 @@ const ReportDetailPanel = ({
 
   const handleConfirmResolve = async () => {
     if (
+      !detail ||
       !isReportPending ||
       !hasSelectedActions ||
       isDecisionPending ||
@@ -189,7 +226,12 @@ const ReportDetailPanel = ({
   };
 
   const handleConfirmReject = async () => {
-    if (!isReportPending || isDecisionPending || activeModal !== 'reject') {
+    if (
+      !detail ||
+      !isReportPending ||
+      isDecisionPending ||
+      activeModal !== 'reject'
+    ) {
       return;
     }
 
@@ -206,27 +248,79 @@ const ReportDetailPanel = ({
     }
   };
 
-  // PENDING일 때만 footer를 둔다. 처리·반려 후에는 숨겨 Action 재실행을 막는다.
-  const footer = isReportPending ? (
-    <div className="flex gap-2">
-      <Button
-        variant="secondary"
-        className="flex-1"
-        disabled={isDecisionPending}
-        onClick={handleOpenRejectModal}
-      >
-        신고 반려
-      </Button>
-      <Button
-        variant="solid"
-        className="flex-1"
-        disabled={!hasSelectedActions || isDecisionPending}
-        onClick={handleOpenResolveModal}
-      >
-        신고 처리
-      </Button>
-    </div>
-  ) : undefined;
+  const renderBody = () => {
+    // 닫기 전환 중에도 직전 detail을 유지해 본문이 로딩·빈 화면으로 바뀌지 않게 한다.
+    if (detail) {
+      return (
+        <ReportDetailSections
+          detail={detail}
+          selectedActions={selectedActions}
+          onToggleAction={handleToggleAction}
+        />
+      );
+    }
+
+    if (displayReportId == null) {
+      return (
+        <p className="text-md-regular text-gray-500">
+          선택한 신고 정보가 없습니다.
+        </p>
+      );
+    }
+
+    // 최초 조회만 전체 로딩으로 본다. 재시도는 버튼 loading(isFetching)으로 구분한다.
+    if (isPending) {
+      return <LoadingState />;
+    }
+
+    if (isError) {
+      return (
+        <EmptyState
+          title={getDetailErrorTitle(error)}
+          description="잠시 후 다시 시도해 주세요."
+          action={
+            <Button
+              variant="secondary"
+              loading={isFetching}
+              onClick={onRetry}
+            >
+              다시 시도
+            </Button>
+          }
+        />
+      );
+    }
+
+    return (
+      <EmptyState
+        title="신고 정보가 없습니다."
+        description="선택한 신고를 찾을 수 없습니다."
+      />
+    );
+  };
+
+  // PENDING 상세가 있을 때만 footer를 둔다. 처리·반려 후에는 숨겨 Action 재실행을 막는다.
+  const footer =
+    detail && isReportPending ? (
+      <div className="flex gap-2">
+        <Button
+          variant="secondary"
+          className="flex-1"
+          disabled={isDecisionPending}
+          onClick={handleOpenRejectModal}
+        >
+          신고 반려
+        </Button>
+        <Button
+          variant="solid"
+          className="flex-1"
+          disabled={!hasSelectedActions || isDecisionPending}
+          onClick={handleOpenResolveModal}
+        >
+          신고 처리
+        </Button>
+      </div>
+    ) : undefined;
 
   return (
     <>
@@ -237,11 +331,7 @@ const ReportDetailPanel = ({
         footer={footer}
         disableKeyboardEvents={activeModal !== null}
       >
-        <ReportDetailSections
-          detail={detail}
-          selectedActions={selectedActions}
-          onToggleAction={handleToggleAction}
-        />
+        {renderBody()}
       </DetailDrawer>
 
       <AdminReportResolveConfirmModal
@@ -285,67 +375,44 @@ export const AdminReportDetailDrawer = ({
   reportId,
   onClose,
 }: AdminReportDetailDrawerProps) => {
-  const { data, error, isPending, isError, isSuccess, refetch } =
-    useAdminReportDetail(reportId, {
+  // 닫기 시 reportId=null이 되어도 직전 선택을 유지한다. 새 선택이 있을 때만 갱신한다.
+  const [displayReportId, setDisplayReportId] = useState<number | null>(null);
+
+  if (reportId != null && reportId !== displayReportId) {
+    setDisplayReportId(reportId);
+  }
+
+  // 열린 동안은 최신 선택(reportId)을, 닫힌 동안은 직전 표시 ID를 쓴다.
+  const activeReportId = reportId ?? displayReportId;
+
+  const { data, error, isPending, isFetching, isError, refetch } =
+    useAdminReportDetail(activeReportId, {
+      // 실제로 열려 있고 목록 선택이 있을 때만 조회한다. 닫힌 동안은 refetch하지 않는다.
       enabled: open && reportId != null,
     });
 
-  // queryKey가 reportId별이라 다른 신고를 열 때 이전 data가 섞이지 않는다.
+  // queryKey가 activeReportId별이라 다른 신고를 열 때 이전 data가 섞이지 않는다.
   const detail = data?.data ?? null;
-  // 응답 id가 현재 선택과 다를 때만 막아, 캐시/전환 중 잘못된 상세가 잠깐 보이지 않게 한다.
+  // 응답 id가 표시 대상과 다를 때만 막아, 캐시/전환 중 잘못된 상세가 잠깐 보이지 않게 한다.
   const isDetailForSelection =
-    detail != null && reportId != null && detail.id === reportId;
-
-  if (isSuccess && isDetailForSelection) {
-    // key로 신고별 선택·Modal 상태를 분리한다.
-    return (
-      <ReportDetailPanel
-        key={detail.id}
-        detail={detail}
-        open={open}
-        onClose={onClose}
-      />
-    );
-  }
-
-  const renderBody = () => {
-    if (reportId == null) {
-      return (
-        <p className="text-md-regular text-gray-500">
-          선택한 신고 정보가 없습니다.
-        </p>
-      );
-    }
-
-    if (isPending) {
-      return <LoadingState />;
-    }
-
-    if (isError) {
-      return (
-        <EmptyState
-          title={getDetailErrorTitle(error)}
-          description="잠시 후 다시 시도해 주세요."
-          action={
-            <Button variant="secondary" onClick={() => void refetch()}>
-              다시 시도
-            </Button>
-          }
-        />
-      );
-    }
-
-    return (
-      <EmptyState
-        title="신고 정보가 없습니다."
-        description="선택한 신고를 찾을 수 없습니다."
-      />
-    );
-  };
+    detail != null &&
+    activeReportId != null &&
+    detail.id === activeReportId;
 
   return (
-    <DetailDrawer open={open} title="신고 상세" onClose={onClose}>
-      {renderBody()}
-    </DetailDrawer>
+    <ReportDetailDrawerChrome
+      open={open}
+      displayReportId={activeReportId}
+      selectedReportId={reportId}
+      detail={isDetailForSelection ? detail : null}
+      isPending={isPending}
+      isFetching={isFetching}
+      isError={isError}
+      error={error}
+      onClose={onClose}
+      onRetry={() => {
+        void refetch();
+      }}
+    />
   );
 };

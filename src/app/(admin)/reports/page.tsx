@@ -345,6 +345,8 @@ const ReportsPage = () => {
     setFilters(INITIAL_FILTERS);
   };
 
+  // 닫기 시 선택 ID를 비워 open(selectedReportId !== null)도 함께 닫는다.
+  // 상세 조회 완료·목록 refetch는 이 상태를 다시 설정하지 않는다.
   const handleCloseDetail = () => {
     setSelectedReportId(null);
   };

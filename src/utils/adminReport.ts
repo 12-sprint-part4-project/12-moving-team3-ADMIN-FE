@@ -294,19 +294,10 @@ export const formatAdminReportReporter = (reporter: {
   return reporter.name;
 };
 
-const truncateText = (value: string, maxLength: number) => {
-  const trimmed = value.trim();
-
-  if (trimmed.length <= maxLength) {
-    return trimmed;
-  }
-
-  return `${trimmed.slice(0, maxLength)}…`;
-};
-
 /**
  * 신고 대상 셀 표시 문구.
- * targetInfo가 없으면 삭제·미존재이므로 유형만으로 대체한다.
+ * 목록에서는 본문·사유·미리보기 없이 대상만 짧게 보여 스캔 가능하게 한다.
+ * targetInfo가 없으면 삭제·미존재이므로 유형 + (삭제됨)으로 대체한다.
  */
 export const formatAdminReportTarget = (
   target: AdminReportTarget,
@@ -318,25 +309,20 @@ export const formatAdminReportTarget = (
 
   switch (targetInfo.type) {
     case 'USER':
+      // 회원 신고는 대상 식별이 핵심이므로 이름·닉네임을 재사용한다.
       return formatAdminReportReporter(targetInfo);
-    case 'REVIEW': {
-      const authorName = targetInfo.author?.name ?? '작성자 없음';
-      return `${authorName} · ★${targetInfo.rating} · ${truncateText(targetInfo.content, 24)}`;
-    }
+    case 'REVIEW':
+    case 'ARTICLE':
+    case 'COMMENT':
+      // 콘텐츠 유형은 목록에서 타입 라벨만으로 충분하다. 본문/제목은 상세에서 본다.
+      return ADMIN_REPORT_TARGET_LABEL[targetInfo.type];
     case 'CHAT_ROOM':
       return `채팅방 #${targetInfo.id}`;
-    case 'MESSAGE': {
-      const senderName = targetInfo.sender?.name ?? '발신자 없음';
-      return `${senderName} · ${truncateText(targetInfo.content, 24)}`;
-    }
-    case 'ARTICLE': {
-      const authorName = targetInfo.author?.name ?? '작성자 없음';
-      return `${authorName} · ${truncateText(targetInfo.title, 24)}`;
-    }
-    case 'COMMENT': {
-      const authorName = targetInfo.author?.name ?? '작성자 없음';
-      return `${authorName} · ${truncateText(targetInfo.content, 24)}`;
-    }
+    case 'MESSAGE':
+      // 메시지는 작성자만 표시해 대상 사용자를 바로 식별한다.
+      return targetInfo.sender
+        ? formatAdminReportReporter(targetInfo.sender)
+        : '발신자 없음';
     default:
       return ADMIN_REPORT_TARGET_LABEL[target];
   }
