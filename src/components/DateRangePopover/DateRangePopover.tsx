@@ -53,7 +53,7 @@ export const DateRangePopover = ({
   const [isOpen, setIsOpen] = useState(false);
   // 임시 날짜 범위(팝오버 내에서 사용)
   const [draftRange, setDraftRange] = useState<DateRange | undefined>(value);
-  // wrapper ref (outside click 감지에 사용)
+  // wrapper ref (outside click 감지·Escape 후 트리거 포커스 복귀에 사용)
   const wrapperRef = useRef<HTMLDivElement>(null);
   // 버튼에 표시될 날짜 문자열
   const dateRangeLabel = formatDateRange(value) ?? placeholder;
@@ -93,11 +93,27 @@ export const DateRangePopover = ({
       }
     };
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') {
+        return;
+      }
+
+      event.preventDefault();
+      setIsOpen(false);
+      // Escape로 닫은 뒤 트리거 버튼으로 포커스를 되돌린다.
+      // Button이 ref를 받지 않아 wrapper의 직계 트리거 button을 조회한다.
+      wrapperRef.current
+        ?.querySelector<HTMLButtonElement>(':scope > button')
+        ?.focus();
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('mousedown', handleClickOutside);
 
     // cleanup에서 이벤트 리스너 제거
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen]);
 
