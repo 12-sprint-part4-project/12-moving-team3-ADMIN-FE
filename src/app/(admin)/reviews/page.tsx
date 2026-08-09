@@ -12,20 +12,28 @@ import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
 import { Button } from '@/components/Button/Button';
 import { ConfirmModal } from '@/components/ConfirmModal/ConfirmModal';
 import { DataTable, type Column } from '@/components/DataTable/DataTable';
+import {
+  DateRangePopover,
+  type DateRangePopoverProps,
+} from '@/components/DateRangePopover/DateRangePopover';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
+import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { useAdminReviewList } from '@/hooks/useAdminReviewList';
 import { useAdminReviewStatistics } from '@/hooks/useAdminReviewStatistics';
 import { useDeleteAdminReview } from '@/hooks/useDeleteAdminReview';
 import type {
+  AdminReviewDeletionStatus,
   AdminReviewListItem,
   AdminReviewListQuery,
 } from '@/types/adminReview';
 import {
   formatAdminReviewCreatedAt,
   formatAdminReviewUserLabel,
+  toAdminReviewApiDate,
+  toAdminReviewStatisticsQuery,
 } from '@/utils/adminReview';
 
 import { ReviewStatistics } from './_components/ReviewStatistics';
@@ -43,6 +51,13 @@ const RATING_FILTER_OPTIONS = [
   { label: '1점', value: '1' },
 ] as const;
 
+/** 삭제 상태 필터: 빈 문자열은 deletionStatus 미전달(전체) */
+const DELETION_STATUS_FILTER_OPTIONS = [
+  { label: '전체', value: '' },
+  { label: '활성', value: 'ACTIVE' },
+  { label: '삭제됨', value: 'DELETED' },
+] as const;
+
 const DELETE_ERROR_MESSAGE =
   '리뷰 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.';
 
@@ -51,11 +66,18 @@ interface AdminReviewListFilters {
   search?: string;
   /** 1~5. 미선택 시 undefined */
   rating?: number;
+  /** 미선택(전체) 시 undefined. 기본값은 ACTIVE */
+  deletionStatus?: AdminReviewDeletionStatus;
+  /** 작성일 시작 (YYYY-MM-DD) */
+  startDate?: string;
+  /** 작성일 종료 (YYYY-MM-DD). startDate 없이 단독 사용하지 않는다 */
+  endDate?: string;
   page: number;
   pageSize: number;
 }
 
 const INITIAL_FILTERS: AdminReviewListFilters = {
+  deletionStatus: 'ACTIVE',
   page: 1,
   pageSize: DEFAULT_PAGE_SIZE,
 };
@@ -75,6 +97,17 @@ const parseRatingFilter = (value: string): number | undefined => {
   return undefined;
 };
 
+/** select value → ACTIVE | DELETED | undefined. 알 수 없는 값은 무시한다. */
+const parseDeletionStatusFilter = (
+  value: string
+): AdminReviewDeletionStatus | undefined => {
+  if (value === 'ACTIVE' || value === 'DELETED') {
+    return value;
+  }
+
+  return undefined;
+};
+
 /**
  * UI 필터 → API query.
  * undefined·빈 값은 객체에 넣지 않아 axios query string에서 빠진다.
@@ -86,6 +119,9 @@ const toListQuery = (
   pageSize: filters.pageSize,
   ...(filters.search ? { search: filters.search } : {}),
   ...(filters.rating !== undefined ? { rating: filters.rating } : {}),
+  ...(filters.deletionStatus ? { deletionStatus: filters.deletionStatus } : {}),
+  ...(filters.startDate ? { startDate: filters.startDate } : {}),
+  ...(filters.startDate && filters.endDate ? { endDate: filters.endDate } : {}),
 });
 
 const ReviewsPage = () => {
@@ -98,20 +134,29 @@ const ReviewsPage = () => {
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const listQuery = useMemo(() => toListQuery(filters), [filters]);
+  const statisticsQuery = useMemo(
+    () => toAdminReviewStatisticsQuery(filters.startDate, filters.endDate),
+    [filters.startDate, filters.endDate]
+  );
   const { data, isPending, isError } = useAdminReviewList(listQuery);
   const {
     data: statisticsData,
     isPending: isStatisticsPending,
     isError: isStatisticsError,
-  } = useAdminReviewStatistics();
+  } = useAdminReviewStatistics(statisticsQuery);
   const deleteMutation = useDeleteAdminReview();
 
   const items = data?.data.items ?? [];
   const pagination = data?.data.pagination;
   const totalPages = pagination?.totalPages ?? 0;
   const currentPage = pagination?.page ?? filters.page;
+  // 기본 삭제 상태(ACTIVE)는 활성 필터로 보지 않는다.
   const hasActiveFilters = Boolean(
-    filters.search || filters.rating !== undefined
+    filters.search ||
+    filters.rating !== undefined ||
+    filters.startDate ||
+    filters.endDate ||
+    filters.deletionStatus !== 'ACTIVE'
   );
   const isDeletePending = deleteMutation.isPending;
 
@@ -127,6 +172,21 @@ const ReviewsPage = () => {
       );
     }
   }
+
+  const dateRangeValue = useMemo<DateRangePopoverProps['value']>(() => {
+    if (!filters.startDate) {
+      return undefined;
+    }
+
+    const from = new Date(`${filters.startDate}T00:00:00`);
+    const to = filters.endDate ? new Date(`${filters.endDate}T00:00:00`) : from;
+
+    if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) {
+      return undefined;
+    }
+
+    return { from, to };
+  }, [filters.startDate, filters.endDate]);
 
   const handleRequestDelete = useCallback((reviewId: number) => {
     setDeleteError(null);
@@ -212,18 +272,37 @@ const ReviewsPage = () => {
         render: (row) => formatAdminReviewCreatedAt(row.createdAt),
       },
       {
+        key: 'status',
+        header: '상태',
+        align: 'center',
+        // deletedAt으로 활성/삭제됨을 한눈에 구분한다.
+        render: (row) =>
+          row.deletedAt == null ? (
+            <StatusBadge variant="success" label="활성" />
+          ) : (
+            <StatusBadge variant="danger" label="삭제됨" />
+          ),
+      },
+      {
         key: 'actions',
         header: '관리',
         align: 'center',
-        render: (row) => (
-          <Button
-            variant="danger"
-            className="px-3 py-1.5 text-sm-medium"
-            onClick={() => handleRequestDelete(row.id)}
-          >
-            삭제
-          </Button>
-        ),
+        // 이미 삭제된 리뷰는 삭제 버튼을 숨긴다.
+        render: (row) => {
+          if (row.deletedAt != null) {
+            return '-';
+          }
+
+          return (
+            <Button
+              variant="danger"
+              className="px-3 py-1.5 text-sm-medium"
+              onClick={() => handleRequestDelete(row.id)}
+            >
+              삭제
+            </Button>
+          );
+        },
       },
     ],
     [handleRequestDelete]
@@ -256,6 +335,36 @@ const ReviewsPage = () => {
   const handleRatingChange = (event: ChangeEvent<HTMLSelectElement>) => {
     updateFilters(
       { rating: parseRatingFilter(event.target.value) },
+      { resetPage: true }
+    );
+  };
+
+  const handleDeletionStatusChange = (
+    event: ChangeEvent<HTMLSelectElement>
+  ) => {
+    updateFilters(
+      { deletionStatus: parseDeletionStatusFilter(event.target.value) },
+      { resetPage: true }
+    );
+  };
+
+  const handleDateRangeConfirm: DateRangePopoverProps['onConfirm'] = (
+    range
+  ) => {
+    if (!range?.from) {
+      updateFilters(
+        { startDate: undefined, endDate: undefined },
+        { resetPage: true }
+      );
+      return;
+    }
+
+    updateFilters(
+      {
+        startDate: toAdminReviewApiDate(range.from),
+        // 종료일이 없으면 시작일 당일만 조회되도록 endDate를 생략한다.
+        endDate: range.to ? toAdminReviewApiDate(range.to) : undefined,
+      },
       { resetPage: true }
     );
   };
@@ -376,6 +485,17 @@ const ReviewsPage = () => {
               value={filters.rating !== undefined ? String(filters.rating) : ''}
               onChange={handleRatingChange}
               options={[...RATING_FILTER_OPTIONS]}
+            />
+            <FilterSelect
+              aria-label="삭제 상태"
+              value={filters.deletionStatus ?? ''}
+              onChange={handleDeletionStatusChange}
+              options={[...DELETION_STATUS_FILTER_OPTIONS]}
+            />
+            <DateRangePopover
+              value={dateRangeValue}
+              onConfirm={handleDateRangeConfirm}
+              placeholder="작성일 전체"
             />
           </>
         }

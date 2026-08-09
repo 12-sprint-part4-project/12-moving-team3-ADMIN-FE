@@ -38,11 +38,20 @@ export type AdminReviewAuthor = AdminReviewUserSummary;
 /** 기사 — 필드 구조는 AdminReviewUserSummary와 동일. 목록에서는 nullable */
 export type AdminReviewMover = AdminReviewUserSummary;
 
+/** 목록 삭제 상태 필터. 미전달 시 전체 */
+export type AdminReviewDeletionStatus = 'ACTIVE' | 'DELETED';
+
 /** GET /api/admin/reviews 쿼리 파라미터 */
 export interface AdminReviewListQuery {
   search?: string;
   /** 1~5. 미전달 시 전체 별점 */
   rating?: number;
+  /** 미전달 시 전체. ACTIVE=미삭제, DELETED=삭제됨 */
+  deletionStatus?: AdminReviewDeletionStatus;
+  /** 작성일 시작 (YYYY-MM-DD) */
+  startDate?: string;
+  /** 작성일 종료 (YYYY-MM-DD). startDate 없이 단독 전달 불가 */
+  endDate?: string;
   page?: number;
   pageSize?: number;
 }
@@ -64,6 +73,8 @@ export interface AdminReviewListItem {
   content: string;
   createdAt: string;
   updatedAt: string | null;
+  /** soft delete 시각. 미삭제이면 null */
+  deletedAt: string | null;
   author: AdminReviewAuthor;
   /** Quote.moverId가 없으면 null */
   mover: AdminReviewMover | null;
