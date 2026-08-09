@@ -1,10 +1,13 @@
 'use client';
 
-import { useMemo, useState, type ChangeEvent } from 'react';
+import { useMemo, useState, type ChangeEvent, type ReactNode } from 'react';
 
 import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
+import { Button } from '@/components/Button/Button';
 import { DataTable, type Column } from '@/components/DataTable/DataTable';
+import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
+import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
 import { useAdminReviewList } from '@/hooks/useAdminReviewList';
 import { useAdminReviewStatistics } from '@/hooks/useAdminReviewStatistics';
@@ -81,7 +84,7 @@ const ReviewsPage = () => {
   const [searchInput, setSearchInput] = useState('');
 
   const listQuery = useMemo(() => toListQuery(filters), [filters]);
-  const { data, isPending } = useAdminReviewList(listQuery);
+  const { data, isPending, isError } = useAdminReviewList(listQuery);
   const {
     data: statisticsData,
     isPending: isStatisticsPending,
@@ -92,6 +95,9 @@ const ReviewsPage = () => {
   const pagination = data?.data.pagination;
   const totalPages = pagination?.totalPages ?? 0;
   const currentPage = pagination?.page ?? filters.page;
+  const hasActiveFilters = Boolean(
+    filters.search || filters.rating !== undefined
+  );
 
   // 응답 기준 page가 범위를 벗어나면 렌더 중 보정한다(effect setState 금지 규칙 회피).
   // totalPages=0이면 1페이지로 맞춘다. prev 참조 유지로 불필요한 재렌더를 막는다.
@@ -222,6 +228,60 @@ const ReviewsPage = () => {
     updateFilters({ page });
   };
 
+  const handleResetFilters = () => {
+    setSearchInput('');
+    setFilters(INITIAL_FILTERS);
+  };
+
+  // 회원/신고 목록과 동일: loading → error → empty → table
+  const renderListBody = (): ReactNode => {
+    if (isPending) {
+      return <LoadingState />;
+    }
+
+    if (isError) {
+      return (
+        <EmptyState
+          title="리뷰 목록을 불러오지 못했습니다."
+          description="잠시 후 다시 시도해 주세요."
+        />
+      );
+    }
+
+    if (items.length === 0) {
+      return (
+        <EmptyState
+          title={
+            hasActiveFilters
+              ? '검색 결과가 없습니다.'
+              : '등록된 리뷰가 없습니다.'
+          }
+          description={
+            hasActiveFilters
+              ? '검색 조건을 변경한 후 다시 시도해 주세요.'
+              : undefined
+          }
+          action={
+            hasActiveFilters ? (
+              <Button variant="secondary" onClick={handleResetFilters}>
+                필터 초기화
+              </Button>
+            ) : undefined
+          }
+        />
+      );
+    }
+
+    return (
+      <DataTable
+        columns={columns}
+        data={items}
+        rowKey="id"
+        caption="리뷰 목록"
+      />
+    );
+  };
+
   return (
     <AdminListLayout
       title="리뷰 관리"
@@ -255,12 +315,7 @@ const ReviewsPage = () => {
         </>
       }
     >
-      <DataTable
-        columns={columns}
-        data={items}
-        rowKey="id"
-        caption="리뷰 목록"
-      />
+      {renderListBody()}
     </AdminListLayout>
   );
 };
