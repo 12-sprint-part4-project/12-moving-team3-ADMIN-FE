@@ -7,7 +7,6 @@ import {
   CircleCheck,
   ClipboardList,
   LayoutDashboard,
-  LogOut,
   MessageCircle,
   Star,
   Truck,
@@ -25,7 +24,6 @@ interface AdminMenuItem {
 
 export interface AdminSidebarProps {
   className?: string;
-  onLogout?: () => void;
 }
 
 const ADMIN_MENU_ITEMS: AdminMenuItem[] = [
@@ -44,13 +42,13 @@ const isActiveMenu = (pathname: string, href: string) =>
     ? pathname === href
     : pathname === href || pathname.startsWith(`${href}/`);
 
-export const AdminSidebar = ({ className, onLogout }: AdminSidebarProps) => {
+export const AdminSidebar = ({ className }: AdminSidebarProps) => {
   const pathname = usePathname();
 
   return (
     <aside
       className={cn(
-        'flex h-full w-44 shrink-0 flex-col border-r border-line-200 bg-white px-2 py-4',
+        'h-full w-44 shrink-0 border-r border-line-200 bg-white px-2 py-4',
         className
       )}
     >
@@ -77,15 +75,6 @@ export const AdminSidebar = ({ className, onLogout }: AdminSidebarProps) => {
           })}
         </ul>
       </nav>
-
-      <button
-        type="button"
-        onClick={onLogout}
-        className="mt-auto flex h-8 items-center gap-3 rounded px-3 text-sm-medium text-black-300"
-      >
-        <LogOut className="size-4 shrink-0" aria-hidden />
-        <span>로그아웃</span>
-      </button>
     </aside>
   );
 };
