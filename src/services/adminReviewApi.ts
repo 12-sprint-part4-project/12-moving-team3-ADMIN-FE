@@ -1,6 +1,7 @@
 import {
   ADMIN_REVIEW_LIST_PATH,
   ADMIN_REVIEW_STATISTICS_PATH,
+  getAdminReviewPath,
 } from '@/api/adminReviewPaths';
 import { axiosInstance } from '@/api/axiosInstance';
 import type {
@@ -24,6 +25,15 @@ export const getAdminReviewList = async (
   );
 
   return response.data;
+};
+
+/**
+ * 관리자 리뷰 soft delete.
+ * 성공 시 204 No Content라 본문이 없다.
+ * Access Token은 axiosInstance Request Interceptor가 Authorization에 첨부한다.
+ */
+export const deleteAdminReview = async (reviewId: number): Promise<void> => {
+  await axiosInstance.delete(getAdminReviewPath(reviewId));
 };
 
 /**
