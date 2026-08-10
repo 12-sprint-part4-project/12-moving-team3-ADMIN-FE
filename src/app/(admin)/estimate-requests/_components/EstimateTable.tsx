@@ -5,6 +5,7 @@ import { DataTable, type Column } from '@/components/DataTable/DataTable';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { Pagination } from '@/components/Pagination/Pagination';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
+import { TruncatedText } from '@/components/TruncatedText/TruncatedText';
 import type { AdminEstimateRequestListItem } from '@/types/adminEstimateRequest';
 import {
   ADMIN_ESTIMATE_REQUEST_STATUS_BADGE,
@@ -37,9 +38,7 @@ const getEstimateRequestColumns = (
     key: 'userName',
     header: '요청자 이름',
     render: (row) => (
-      <span className="block max-w-28 truncate" title={row.userName}>
-        {row.userName}
-      </span>
+      <TruncatedText value={row.userName} className="max-w-28" />
     ),
   },
   {
@@ -126,11 +125,7 @@ const getEstimateRequestColumns = (
     render: (row) => {
       const mover = row.mover ?? '-';
 
-      return (
-        <span className="block max-w-28 truncate" title={mover}>
-          {mover}
-        </span>
-      );
+      return <TruncatedText value={mover} className="max-w-28" />;
     },
   },
   {

@@ -5,6 +5,7 @@ import { DataTable, type Column } from '@/components/DataTable/DataTable';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { Pagination } from '@/components/Pagination/Pagination';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
+import { TruncatedText } from '@/components/TruncatedText/TruncatedText';
 import type { AdminCompletedListItem } from '@/types/adminCompleted';
 import {
   formatAdminCompletedMissingFields,
@@ -39,9 +40,7 @@ const getCompletedColumns = (
     key: 'userName',
     header: '요청자 이름',
     render: (row) => (
-      <span className="block max-w-28 truncate" title={row.userName}>
-        {row.userName}
-      </span>
+      <TruncatedText value={row.userName} className="max-w-28" />
     ),
   },
   {
@@ -95,11 +94,7 @@ const getCompletedColumns = (
     render: (row) => {
       const mover = formatAdminEstimateRequestNullableText(row.mover);
 
-      return (
-        <span className="block max-w-28 truncate" title={mover}>
-          {mover}
-        </span>
-      );
+      return <TruncatedText value={mover} className="max-w-28" />;
     },
   },
   {

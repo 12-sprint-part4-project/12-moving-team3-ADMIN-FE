@@ -23,6 +23,7 @@ import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
+import { TruncatedText } from '@/components/TruncatedText/TruncatedText';
 import { useAdminReportList } from '@/hooks/useAdminReportList';
 import { useAdminReportStatistics } from '@/hooks/useAdminReportStatistics';
 import type {
@@ -244,11 +245,7 @@ const ReportsPage = () => {
         render: (row) => {
           const reporter = formatAdminReportReporter(row.reporter);
 
-          return (
-            <span className="block max-w-40 truncate" title={reporter}>
-              {reporter}
-            </span>
-          );
+          return <TruncatedText value={reporter} className="max-w-40" />;
         },
       },
       {
@@ -261,11 +258,7 @@ const ReportsPage = () => {
             row.targetInfo
           );
 
-          return (
-            <span className="block max-w-72 truncate" title={targetInfo}>
-              {targetInfo}
-            </span>
-          );
+          return <TruncatedText value={targetInfo} className="max-w-72" />;
         },
       },
       {

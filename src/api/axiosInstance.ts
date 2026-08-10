@@ -1,7 +1,4 @@
-import axios, {
-  AxiosHeaders,
-  type InternalAxiosRequestConfig,
-} from 'axios';
+import axios, { AxiosHeaders, type InternalAxiosRequestConfig } from 'axios';
 
 import {
   ADMIN_AUTH_LOGIN_PATH,
@@ -95,7 +92,8 @@ const refreshAccessToken = (): Promise<string> => {
   if (!refreshPromise) {
     refreshPromise = (async () => {
       // 순환 참조 방지를 위해 동적 import로 refreshAdminAccessToken을 호출한다.
-      const { refreshAdminAccessToken } = await import('@/services/adminAuthApi');
+      const { refreshAdminAccessToken } =
+        await import('@/services/adminAuthApi');
       const refreshResponse = await refreshAdminAccessToken();
       // BE 응답: { data: { accessToken } }
       const newAccessToken = refreshResponse.data.accessToken;
@@ -166,11 +164,6 @@ axiosInstance.interceptors.response.use(
       const headers = AxiosHeaders.from(originalRequest.headers ?? {});
       headers.set('Authorization', `Bearer ${newAccessToken}`);
       originalRequest.headers = headers;
-
-      // React Query 등이 붙인 AbortSignal이 있으면, refresh 성공 후에도
-      // 재시도가 canceled로 끝나 인증 복구가 실패할 수 있다.
-      // 재시도는 새 요청으로 취급해 signal만 제거한다.
-      delete originalRequest.signal;
 
       return axiosInstance(originalRequest);
     } catch (refreshError) {
