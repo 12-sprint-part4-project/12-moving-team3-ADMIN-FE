@@ -29,12 +29,36 @@ const MembersPage = () => {
         header: '번호',
         render: (_row, index) => getAdminMemberRowNumber(page, pageSize, index),
       },
-      { key: 'name', header: '이름', accessor: 'name' },
-      { key: 'email', header: '이메일', accessor: 'email' },
+      {
+        key: 'name',
+        header: '이름',
+        render: (row) => (
+          <span className="block max-w-32 truncate" title={row.name}>
+            {row.name}
+          </span>
+        ),
+      },
+      {
+        key: 'email',
+        header: '이메일',
+        render: (row) => (
+          <span className="block max-w-56 truncate" title={row.email}>
+            {row.email}
+          </span>
+        ),
+      },
       {
         key: 'phoneNumber',
         header: '전화번호',
-        render: (row) => row.phoneNumber ?? '-',
+        render: (row) => {
+          const phoneNumber = row.phoneNumber ?? '-';
+
+          return (
+            <span className="block max-w-32 truncate" title={phoneNumber}>
+              {phoneNumber}
+            </span>
+          );
+        },
       },
       {
         key: 'createdAt',

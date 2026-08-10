@@ -33,7 +33,15 @@ const getEstimateRequestColumns = (
   onDetailClick: EstimateTableProps['onDetailClick']
 ): Column<AdminEstimateRequestListItem>[] => [
   { key: 'id', header: '견적 번호', accessor: 'id' },
-  { key: 'userName', header: '요청자 이름', accessor: 'userName' },
+  {
+    key: 'userName',
+    header: '요청자 이름',
+    render: (row) => (
+      <span className="block max-w-28 truncate" title={row.userName}>
+        {row.userName}
+      </span>
+    ),
+  },
   {
     key: 'phoneNumber',
     header: '전화번호',
@@ -115,7 +123,15 @@ const getEstimateRequestColumns = (
   {
     key: 'mover',
     header: '매칭 기사',
-    render: (row) => row.mover ?? '-',
+    render: (row) => {
+      const mover = row.mover ?? '-';
+
+      return (
+        <span className="block max-w-28 truncate" title={mover}>
+          {mover}
+        </span>
+      );
+    },
   },
   {
     key: 'action',

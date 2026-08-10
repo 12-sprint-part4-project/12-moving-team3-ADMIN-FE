@@ -38,13 +38,45 @@ const DriversPage = () => {
         header: '번호',
         render: (_row, index) => getAdminMemberRowNumber(page, pageSize, index),
       },
-      { key: 'name', header: '이름', accessor: 'name' },
-      { key: 'nickname', header: '닉네임', accessor: 'nickname' },
-      { key: 'email', header: '이메일', accessor: 'email' },
+      {
+        key: 'name',
+        header: '이름',
+        render: (row) => (
+          <span className="block max-w-28 truncate" title={row.name}>
+            {row.name}
+          </span>
+        ),
+      },
+      {
+        key: 'nickname',
+        header: '닉네임',
+        render: (row) => (
+          <span className="block max-w-28 truncate" title={row.nickname}>
+            {row.nickname}
+          </span>
+        ),
+      },
+      {
+        key: 'email',
+        header: '이메일',
+        render: (row) => (
+          <span className="block max-w-48 truncate" title={row.email}>
+            {row.email}
+          </span>
+        ),
+      },
       {
         key: 'phoneNumber',
         header: '전화번호',
-        render: (row) => row.phoneNumber ?? '-',
+        render: (row) => {
+          const phoneNumber = row.phoneNumber ?? '-';
+
+          return (
+            <span className="block max-w-32 truncate" title={phoneNumber}>
+              {phoneNumber}
+            </span>
+          );
+        },
       },
       // 목록 API의 MOVER 전용 필드. 서비스 지역은 상세에만 있어 목록에 표시하지 않는다.
       {

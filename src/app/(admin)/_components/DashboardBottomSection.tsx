@@ -88,8 +88,24 @@ const RECENT_REPORT_COLUMNS: Column<AdminDashboardRecentReport>[] = [
 ];
 
 const RECENT_MEMBER_COLUMNS: Column<AdminDashboardRecentUser>[] = [
-  { key: 'nickname', header: '닉네임', accessor: 'nickname' },
-  { key: 'email', header: '이메일', accessor: 'email' },
+  {
+    key: 'nickname',
+    header: '닉네임',
+    render: (row) => (
+      <span className="block max-w-28 truncate" title={row.nickname}>
+        {row.nickname}
+      </span>
+    ),
+  },
+  {
+    key: 'email',
+    header: '이메일',
+    render: (row) => (
+      <span className="block max-w-40 truncate" title={row.email}>
+        {row.email}
+      </span>
+    ),
+  },
   {
     key: 'joinedAt',
     header: '가입일',
@@ -107,7 +123,11 @@ const RECENT_COMPLETED_COLUMNS: Column<AdminDashboardRecentCompletedRequest>[] =
     {
       key: 'customerName',
       header: '고객명',
-      render: (row) => row.user.name,
+      render: (row) => (
+        <span className="block max-w-28 truncate" title={row.user.name}>
+          {row.user.name}
+        </span>
+      ),
     },
     {
       key: 'moveDate',
@@ -117,7 +137,15 @@ const RECENT_COMPLETED_COLUMNS: Column<AdminDashboardRecentCompletedRequest>[] =
     {
       key: 'driverName',
       header: '기사명',
-      render: (row) => row.confirmedQuote?.mover.name ?? '-',
+      render: (row) => {
+        const driverName = row.confirmedQuote?.mover.name ?? '-';
+
+        return (
+          <span className="block max-w-28 truncate" title={driverName}>
+            {driverName}
+          </span>
+        );
+      },
     },
   ];
 

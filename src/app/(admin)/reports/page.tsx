@@ -121,7 +121,9 @@ const parseReportTargetFilter = (
  * undefined·빈 값은 객체에 넣지 않아 axios query string에서 빠진다.
  * reportedTo는 reportedFrom이 있을 때만 전달해 BE 단독 사용 거부를 피한다.
  */
-const toListQuery = (filters: AdminReportListFilters): AdminReportListQuery => ({
+const toListQuery = (
+  filters: AdminReportListFilters
+): AdminReportListQuery => ({
   page: filters.page,
   pageSize: filters.pageSize,
   ...(filters.status ? { status: filters.status } : {}),
@@ -193,10 +195,10 @@ const ReportsPage = () => {
 
   const hasActiveFilters = Boolean(
     filters.status ||
-      filters.target ||
-      filters.targetUserKeyword ||
-      filters.reportedFrom ||
-      filters.reportedTo
+    filters.target ||
+    filters.targetUserKeyword ||
+    filters.reportedFrom ||
+    filters.reportedTo
   );
 
   const handleOpenDetail = useCallback(
@@ -239,14 +241,32 @@ const ReportsPage = () => {
       {
         key: 'reporter',
         header: '신고자',
-        render: (row) => formatAdminReportReporter(row.reporter),
+        render: (row) => {
+          const reporter = formatAdminReportReporter(row.reporter);
+
+          return (
+            <span className="block max-w-40 truncate" title={reporter}>
+              {reporter}
+            </span>
+          );
+        },
       },
       {
         key: 'targetInfo',
         header: '신고 대상',
-        className: 'max-w-72 truncate',
         // targetInfo null은 formatAdminReportTarget에서 fallback 문구로 처리한다.
-        render: (row) => formatAdminReportTarget(row.target, row.targetInfo),
+        render: (row) => {
+          const targetInfo = formatAdminReportTarget(
+            row.target,
+            row.targetInfo
+          );
+
+          return (
+            <span className="block max-w-72 truncate" title={targetInfo}>
+              {targetInfo}
+            </span>
+          );
+        },
       },
       {
         key: 'createdAt',
