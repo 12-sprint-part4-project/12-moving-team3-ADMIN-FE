@@ -10,7 +10,10 @@ import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { useAdminEstimateRequestDetail } from '@/hooks/useAdminEstimateRequestDetail';
 import { cn } from '@/lib/utils';
-import type { AdminEstimateRequestDetail } from '@/types/adminEstimateRequest';
+import type {
+  AdminEstimateQuote,
+  AdminEstimateRequestDetail,
+} from '@/types/adminEstimateRequest';
 import {
   ADMIN_ESTIMATE_REQUEST_STATUS_BADGE,
   formatAdminEstimateQuotePrice,
@@ -35,6 +38,59 @@ const getDetailErrorTitle = (error: unknown) => {
   }
 
   return '견적 요청 상세를 불러오지 못했습니다.';
+};
+
+interface EstimateQuoteListProps {
+  quotes: AdminEstimateQuote[];
+  emptyMessage: string;
+  /** true면 견적 status와 무관하게 상태를 '삭제'로 표시한다. */
+  forceDeletedStatus?: boolean;
+}
+
+const EstimateQuoteList = ({
+  quotes,
+  emptyMessage,
+  forceDeletedStatus = false,
+}: EstimateQuoteListProps) => {
+  if (quotes.length === 0) {
+    return <p className="text-xs-medium text-gray-500">{emptyMessage}</p>;
+  }
+
+  return (
+    <ul className="flex flex-col gap-3">
+      {quotes.map((quote) => {
+        const statusLabel = forceDeletedStatus
+          ? '삭제'
+          : formatAdminEstimateQuoteStatus(quote.status);
+
+        return (
+          <li
+            key={quote.id}
+            className="flex items-center justify-between gap-3 text-xs-medium"
+          >
+            <span className="text-black-400">
+              {formatAdminEstimateRequestNullableText(quote.moverName)}
+            </span>
+            <span className="ml-auto text-black-400">
+              {formatAdminEstimateQuotePrice(quote.price)}
+            </span>
+            <span
+              className={cn(
+                !forceDeletedStatus && quote.status === 'CONFIRMED'
+                  ? 'text-green-200'
+                  : 'text-gray-500'
+              )}
+            >
+              {statusLabel}
+            </span>
+            <time className="text-gray-500">
+              {formatAdminEstimateRequestSubmittedAt(quote.createdAt)}
+            </time>
+          </li>
+        );
+      })}
+    </ul>
+  );
 };
 
 interface EstimateDetailContentProps {
@@ -104,38 +160,19 @@ const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
         </dl>
       </DetailSection>
 
-      <DetailSection title={`견적 리스트 (${detail.estimateCount}건)`}>
-        <ul className="flex flex-col gap-3">
-          {detail.quotes.map((quote) => {
-            const statusLabel = formatAdminEstimateQuoteStatus(quote.status);
+      <DetailSection title={`활성 견적 (${detail.activeQuotesCount}건)`}>
+        <EstimateQuoteList
+          quotes={detail.activeQuotes}
+          emptyMessage="활성 견적이 없습니다."
+        />
+      </DetailSection>
 
-            return (
-              <li
-                key={quote.id}
-                className="flex items-center justify-between gap-3 text-xs-medium"
-              >
-                <span className="text-black-400">
-                  {formatAdminEstimateRequestNullableText(quote.moverName)}
-                </span>
-                <span className="ml-auto text-black-400">
-                  {formatAdminEstimateQuotePrice(quote.price)}
-                </span>
-                <span
-                  className={cn(
-                    quote.status === 'CONFIRMED'
-                      ? 'text-green-200'
-                      : 'text-gray-500'
-                  )}
-                >
-                  {statusLabel}
-                </span>
-                <time className="text-gray-500">
-                  {formatAdminEstimateRequestSubmittedAt(quote.createdAt)}
-                </time>
-              </li>
-            );
-          })}
-        </ul>
+      <DetailSection title={`삭제된 견적 (${detail.deletedQuotesCount}건)`}>
+        <EstimateQuoteList
+          quotes={detail.deletedQuotes}
+          emptyMessage="삭제된 견적이 없습니다."
+          forceDeletedStatus
+        />
       </DetailSection>
     </div>
   );

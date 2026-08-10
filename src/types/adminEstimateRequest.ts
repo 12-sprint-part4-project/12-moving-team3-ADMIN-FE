@@ -88,12 +88,14 @@ export interface AdminEstimateRequestDetail {
   /** ISO date-time. 누락 시 null */
   submittedAt: string | null;
   status: AdminEstimateRequestStatus;
-  estimateCount: number;
   departureZipCode: string | null;
   departureDetailAddress: string | null;
   arrivalZipCode: string | null;
   arrivalDetailAddress: string | null;
-  quotes: AdminEstimateQuote[];
+  activeQuotesCount: number;
+  deletedQuotesCount: number;
+  activeQuotes: AdminEstimateQuote[];
+  deletedQuotes: AdminEstimateQuote[];
   /** 상태 불변식상 있어야 하지만 null인 필드명. 정상이면 빈 배열 */
   missingFields: AdminEstimateRequestDetailMissingField[];
 }
