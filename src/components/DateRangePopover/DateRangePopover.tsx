@@ -125,8 +125,13 @@ export const DateRangePopover = ({
         aria-expanded={isOpen}
         aria-controls={isOpen ? popoverId : undefined}
         onClick={handleTriggerClick}
-        className={cn('min-w-64 justify-start gap-2', triggerClassName)}
+        className={cn(
+          // SearchInput·FilterSelect와 같은 필터 컨트롤 높이/너비/타이포를 맞춘다.
+          'h-9 min-w-40 justify-start gap-2 px-3.5 py-1.5 text-md-medium',
+          triggerClassName
+        )}
       >
+
         <Calendar className="size-4 text-gray-400" aria-hidden />
         {dateRangeLabel}
       </Button>

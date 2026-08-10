@@ -4,16 +4,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { Eye, EyeOff, Lock, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { AdminHeader } from '@/components/AdminHeader/AdminHeader';
 import { Button } from '@/components/Button/Button';
 import { Input } from '@/components/Input/Input';
-import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { useAdminLogin } from '@/hooks/useAdminLogin';
-import { useAdminMe } from '@/hooks/useAdminMe';
 
 const adminLoginFormSchema = z.object({
   email: z
@@ -53,9 +51,8 @@ const getLoginErrorMessage = (error: unknown): string => {
 
 const LoginPage = () => {
   const router = useRouter();
-  // 이미 로그인된 관리자의 /login 접근을 막기 위한 역방향 확인.
-  // 실패는 비로그인 정상 흐름이므로 폼 에러로 표시하지 않는다.
-  const { isPending: isAuthChecking, isSuccess: isAuthenticated } = useAdminMe();
+  // 비로그인 /login 진입 시 /me·/refresh를 호출하지 않는다.
+  // 관리자 영역 새로고침 복구는 AdminAuthGuard + axios interceptor가 담당한다.
   const loginMutation = useAdminLogin();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -73,15 +70,6 @@ const LoginPage = () => {
     },
   });
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      return;
-    }
-
-    router.replace('/');
-  }, [isAuthenticated, router]);
-
-  // 로그인 요청 상태는 인증 확인(isAuthChecking)과 분리한다.
   const isLoginPending = isSubmitting || loginMutation.isPending;
 
   const onSubmit = handleSubmit(async (values) => {
@@ -101,22 +89,9 @@ const LoginPage = () => {
     }
   });
 
-  // 확인 중이거나 이미 인증되어 이동하는 동안 로그인 폼을 노출하지 않는다.
-  if (isAuthChecking || isAuthenticated) {
-    return (
-      <div className="flex h-full flex-col overflow-y-auto bg-white">
-        <AdminHeader showUserMenu={false} />
-        <LoadingState
-          message="인증 확인 중..."
-          className="flex-1 py-0"
-        />
-      </div>
-    );
-  }
-
   return (
     <div className="flex h-full flex-col overflow-y-auto bg-white">
-      <AdminHeader showUserMenu={false} />
+      <AdminHeader showUserMenu={false} logoLinkEnabled={false} />
 
       <main className="flex flex-1 flex-col items-center justify-center px-6 py-12">
         <form
