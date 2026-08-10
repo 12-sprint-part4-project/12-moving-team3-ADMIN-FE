@@ -206,9 +206,7 @@ export const Pagination = ({
           aria-hidden
           className={cn(
             paginationIconVariants({ size: resolvedSize }),
-            canGoPrev
-              ? '[&_path]:stroke-black-400'
-              : '[&_path]:stroke-gray-200'
+            canGoPrev ? '[&_path]:stroke-black-400' : '[&_path]:stroke-gray-200'
           )}
         />
       </PaginationItem>
@@ -267,9 +265,7 @@ export const Pagination = ({
           aria-hidden
           className={cn(
             paginationIconVariants({ size: resolvedSize }),
-            canGoNext
-              ? '[&_path]:stroke-black-400'
-              : '[&_path]:stroke-gray-200'
+            canGoNext ? '[&_path]:stroke-black-400' : '[&_path]:stroke-gray-200'
           )}
         />
       </PaginationItem>
