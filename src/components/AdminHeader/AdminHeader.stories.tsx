@@ -12,6 +12,7 @@ const meta: Meta<typeof AdminHeader> = {
   },
   argTypes: {
     showUserMenu: { control: 'boolean' },
+    logoLinkEnabled: { control: 'boolean' },
     onUserMenuClick: { action: 'user menu clicked' },
     onLogout: { action: 'logout clicked' },
   },
@@ -26,11 +27,12 @@ export default meta;
 
 type Story = StoryObj<typeof AdminHeader>;
 
-/** 로그인 화면: 로고 + 타이틀만, 우측 메뉴 숨김 */
+/** 로그인 화면: 로고 + 타이틀만, 우측 메뉴 숨김, 로고 링크 없음 */
 export const Login: Story = {
   args: {
     title: '관리자 페이지',
     showUserMenu: false,
+    logoLinkEnabled: false,
   },
 };
 

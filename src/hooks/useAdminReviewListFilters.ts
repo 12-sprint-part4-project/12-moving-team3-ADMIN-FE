@@ -10,7 +10,7 @@ import {
   toAdminReviewStatisticsQuery,
 } from '@/utils/adminReview';
 
-/** BE listQuerySchema 기본값과 동일 */
+/** BE listQuerySchema 기본 페이지 크기와 동일 */
 const DEFAULT_PAGE_SIZE = 10;
 
 export interface AdminReviewListFilters {
@@ -18,7 +18,7 @@ export interface AdminReviewListFilters {
   search?: string;
   /** 1~5. 미선택 시 undefined */
   rating?: number;
-  /** 미선택(전체) 시 undefined. 기본값은 ACTIVE */
+  /** 미선택(전체) 시 undefined */
   deletionStatus?: AdminReviewDeletionStatus;
   /** 작성일 시작 (YYYY-MM-DD) */
   startDate?: string;
@@ -29,7 +29,6 @@ export interface AdminReviewListFilters {
 }
 
 const INITIAL_FILTERS: AdminReviewListFilters = {
-  deletionStatus: 'ACTIVE',
   page: 1,
   pageSize: DEFAULT_PAGE_SIZE,
 };
@@ -93,13 +92,13 @@ export const useAdminReviewListFilters = () => {
     [filters.startDate, filters.endDate]
   );
 
-  // 기본 삭제 상태(ACTIVE)는 활성 필터로 보지 않는다.
+  // 삭제 상태가 선택된 경우에만 활성 필터로 본다.
   const hasActiveFilters = Boolean(
     filters.search ||
     filters.rating !== undefined ||
     filters.startDate ||
     filters.endDate ||
-    filters.deletionStatus !== 'ACTIVE'
+    filters.deletionStatus !== undefined
   );
 
   const dateRangeValue = useMemo<DateRangePopoverProps['value']>(() => {

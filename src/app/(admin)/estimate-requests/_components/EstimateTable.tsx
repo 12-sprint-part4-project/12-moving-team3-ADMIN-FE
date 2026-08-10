@@ -5,6 +5,7 @@ import { DataTable, type Column } from '@/components/DataTable/DataTable';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { Pagination } from '@/components/Pagination/Pagination';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
+import { TruncatedText } from '@/components/TruncatedText/TruncatedText';
 import type { AdminEstimateRequestListItem } from '@/types/adminEstimateRequest';
 import {
   ADMIN_ESTIMATE_REQUEST_STATUS_BADGE,
@@ -33,7 +34,13 @@ const getEstimateRequestColumns = (
   onDetailClick: EstimateTableProps['onDetailClick']
 ): Column<AdminEstimateRequestListItem>[] => [
   { key: 'id', header: '견적 번호', accessor: 'id' },
-  { key: 'userName', header: '요청자 이름', accessor: 'userName' },
+  {
+    key: 'userName',
+    header: '요청자 이름',
+    render: (row) => (
+      <TruncatedText value={row.userName} className="max-w-28" />
+    ),
+  },
   {
     key: 'phoneNumber',
     header: '전화번호',
@@ -115,7 +122,11 @@ const getEstimateRequestColumns = (
   {
     key: 'mover',
     header: '매칭 기사',
-    render: (row) => row.mover ?? '-',
+    render: (row) => {
+      const mover = row.mover ?? '-';
+
+      return <TruncatedText value={mover} className="max-w-28" />;
+    },
   },
   {
     key: 'action',

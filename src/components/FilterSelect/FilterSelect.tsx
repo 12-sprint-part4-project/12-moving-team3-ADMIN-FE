@@ -18,11 +18,11 @@ export const FilterSelect = ({
   className,
   ...props
 }: FilterSelectProps) => (
-  <div className="relative inline-flex">
+  <div className="relative inline-flex shrink-0">
     <select
       {...props}
       className={cn(
-        'cursor-pointer appearance-none rounded-lg border border-line-200 bg-white py-1.5 pr-10 pl-3.5 text-md-medium text-black-400 outline-none transition-colors focus:border-blue-300 disabled:cursor-not-allowed disabled:border-line-100 disabled:bg-background-200 disabled:text-gray-300',
+        'h-9 min-w-40 cursor-pointer appearance-none rounded-lg border border-line-200 bg-white py-1.5 pr-10 pl-3.5 text-md-medium text-black-400 outline-none transition-colors focus:border-blue-300 disabled:cursor-not-allowed disabled:border-line-100 disabled:bg-background-200 disabled:text-gray-300',
         className
       )}
     >

@@ -9,6 +9,7 @@ import {
 import { AdminMoverDetailDrawer } from '@/components/AdminMoverDetailDrawer/AdminMoverDetailDrawer';
 import { Button } from '@/components/Button/Button';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
+import { TruncatedText } from '@/components/TruncatedText/TruncatedText';
 import type { Column } from '@/components/DataTable/DataTable';
 import type { AdminMemberListItem } from '@/types/adminMember';
 import {
@@ -38,13 +39,35 @@ const DriversPage = () => {
         header: '번호',
         render: (_row, index) => getAdminMemberRowNumber(page, pageSize, index),
       },
-      { key: 'name', header: '이름', accessor: 'name' },
-      { key: 'nickname', header: '닉네임', accessor: 'nickname' },
-      { key: 'email', header: '이메일', accessor: 'email' },
+      {
+        key: 'name',
+        header: '이름',
+        render: (row) => (
+          <TruncatedText value={row.name} className="max-w-28" />
+        ),
+      },
+      {
+        key: 'nickname',
+        header: '닉네임',
+        render: (row) => (
+          <TruncatedText value={row.nickname} className="max-w-28" />
+        ),
+      },
+      {
+        key: 'email',
+        header: '이메일',
+        render: (row) => (
+          <TruncatedText value={row.email} className="max-w-48" />
+        ),
+      },
       {
         key: 'phoneNumber',
         header: '전화번호',
-        render: (row) => row.phoneNumber ?? '-',
+        render: (row) => {
+          const phoneNumber = row.phoneNumber ?? '-';
+
+          return <TruncatedText value={phoneNumber} className="max-w-32" />;
+        },
       },
       // 목록 API의 MOVER 전용 필드. 서비스 지역은 상세에만 있어 목록에 표시하지 않는다.
       {

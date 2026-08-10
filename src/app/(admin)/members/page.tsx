@@ -9,6 +9,7 @@ import {
 } from '@/components/AdminMemberListView/AdminMemberListView';
 import { Button } from '@/components/Button/Button';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
+import { TruncatedText } from '@/components/TruncatedText/TruncatedText';
 import type { Column } from '@/components/DataTable/DataTable';
 import type { AdminMemberListItem } from '@/types/adminMember';
 import {
@@ -29,12 +30,28 @@ const MembersPage = () => {
         header: '번호',
         render: (_row, index) => getAdminMemberRowNumber(page, pageSize, index),
       },
-      { key: 'name', header: '이름', accessor: 'name' },
-      { key: 'email', header: '이메일', accessor: 'email' },
+      {
+        key: 'name',
+        header: '이름',
+        render: (row) => (
+          <TruncatedText value={row.name} className="max-w-32" />
+        ),
+      },
+      {
+        key: 'email',
+        header: '이메일',
+        render: (row) => (
+          <TruncatedText value={row.email} className="max-w-56" />
+        ),
+      },
       {
         key: 'phoneNumber',
         header: '전화번호',
-        render: (row) => row.phoneNumber ?? '-',
+        render: (row) => {
+          const phoneNumber = row.phoneNumber ?? '-';
+
+          return <TruncatedText value={phoneNumber} className="max-w-32" />;
+        },
       },
       {
         key: 'createdAt',

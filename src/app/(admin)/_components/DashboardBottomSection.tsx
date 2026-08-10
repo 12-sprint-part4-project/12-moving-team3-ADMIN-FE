@@ -7,6 +7,7 @@ import { DataTable, type Column } from '@/components/DataTable/DataTable';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
+import { TruncatedText } from '@/components/TruncatedText/TruncatedText';
 import { useDashboardRecentActivities } from '@/hooks/useDashboardRecentActivities';
 import type {
   AdminDashboardRecentCompletedRequest,
@@ -88,8 +89,18 @@ const RECENT_REPORT_COLUMNS: Column<AdminDashboardRecentReport>[] = [
 ];
 
 const RECENT_MEMBER_COLUMNS: Column<AdminDashboardRecentUser>[] = [
-  { key: 'nickname', header: '닉네임', accessor: 'nickname' },
-  { key: 'email', header: '이메일', accessor: 'email' },
+  {
+    key: 'nickname',
+    header: '닉네임',
+    render: (row) => (
+      <TruncatedText value={row.nickname} className="max-w-28" />
+    ),
+  },
+  {
+    key: 'email',
+    header: '이메일',
+    render: (row) => <TruncatedText value={row.email} className="max-w-40" />,
+  },
   {
     key: 'joinedAt',
     header: '가입일',
@@ -107,7 +118,9 @@ const RECENT_COMPLETED_COLUMNS: Column<AdminDashboardRecentCompletedRequest>[] =
     {
       key: 'customerName',
       header: '고객명',
-      render: (row) => row.user.name,
+      render: (row) => (
+        <TruncatedText value={row.user.name} className="max-w-28" />
+      ),
     },
     {
       key: 'moveDate',
@@ -117,7 +130,11 @@ const RECENT_COMPLETED_COLUMNS: Column<AdminDashboardRecentCompletedRequest>[] =
     {
       key: 'driverName',
       header: '기사명',
-      render: (row) => row.confirmedQuote?.mover.name ?? '-',
+      render: (row) => {
+        const driverName = row.confirmedQuote?.mover.name ?? '-';
+
+        return <TruncatedText value={driverName} className="max-w-28" />;
+      },
     },
   ];
 
