@@ -12,9 +12,9 @@ import { useDashboardRequestTrend } from '@/hooks/useDashboardRequestTrend';
 import type { AdminDashboardRequestTrendPeriod } from '@/types/adminDashboard';
 
 const TREND_FILTER_OPTIONS = [
-  { label: '일별', value: 'DAY' },
-  { label: '주별', value: 'WEEK' },
-  { label: '월별', value: 'MONTH' },
+  { label: '오늘', value: 'DAY' },
+  { label: '최근 7일', value: 'WEEK' },
+  { label: '최근 30일', value: 'MONTH' },
 ] as const;
 
 const isRequestTrendPeriod = (
