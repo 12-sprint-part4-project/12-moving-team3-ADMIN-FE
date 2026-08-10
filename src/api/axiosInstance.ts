@@ -167,6 +167,11 @@ axiosInstance.interceptors.response.use(
       headers.set('Authorization', `Bearer ${newAccessToken}`);
       originalRequest.headers = headers;
 
+      // React Query 등이 붙인 AbortSignal이 있으면, refresh 성공 후에도
+      // 재시도가 canceled로 끝나 인증 복구가 실패할 수 있다.
+      // 재시도는 새 요청으로 취급해 signal만 제거한다.
+      delete originalRequest.signal;
+
       return axiosInstance(originalRequest);
     } catch (refreshError) {
       // clear/redirect는 공유 refreshPromise에서 이미 처리했다.

@@ -32,8 +32,12 @@ export const loginAdmin = async (
  */
 export const refreshAdminAccessToken =
   async (): Promise<AdminRefreshResponse> => {
+    // Refresh Token은 httpOnly 쿠키이므로 credentials 포함이 필수다.
+    // 인스턴스 기본값과 동일하지만, 인증 복구 경로임을 명시한다.
     const response = await axiosInstance.post<AdminRefreshResponse>(
-      ADMIN_AUTH_REFRESH_PATH
+      ADMIN_AUTH_REFRESH_PATH,
+      undefined,
+      { withCredentials: true }
     );
 
     return response.data;

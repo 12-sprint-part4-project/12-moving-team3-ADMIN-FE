@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 
 import ChevronDownIcon from '@/assets/icons/chevron-down.svg';
@@ -12,6 +13,11 @@ export interface AdminHeaderProps {
   title?: string;
   /** 좌측 로고. 미지정 시 기본 무빙 로고 */
   logo?: ReactNode;
+  /**
+   * 로고 클릭 시 대시보드(`/`)로 이동할지 여부.
+   * 관리자 화면에서는 true, 로그인 화면에서는 false.
+   */
+  logoLinkEnabled?: boolean;
   /** 우측 관리자 메뉴 표시 여부. 로그인 화면에서는 false */
   showUserMenu?: boolean;
   /** 우측·드롭다운에 표시할 관리자 이름 */
@@ -41,6 +47,7 @@ const DefaultLogo = () => (
 export const AdminHeader = ({
   title = '관리자 페이지',
   logo,
+  logoLinkEnabled = true,
   showUserMenu = true,
   userName,
   userEmail,
@@ -107,7 +114,17 @@ export const AdminHeader = ({
       )}
     >
       <div className="flex items-center gap-3">
-        {logo ?? <DefaultLogo />}
+        {logoLinkEnabled ? (
+          <Link
+            href="/"
+            aria-label="대시보드로 이동"
+            className="inline-flex shrink-0 items-center"
+          >
+            {logo ?? <DefaultLogo />}
+          </Link>
+        ) : (
+          (logo ?? <DefaultLogo />)
+        )}
         <span className="h-4 w-px bg-line-200" aria-hidden />
         <h1 className="text-lg-medium text-black-400">{title}</h1>
       </div>

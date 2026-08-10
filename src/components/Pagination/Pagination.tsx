@@ -32,7 +32,7 @@ export const paginationGroupVariants = cva('flex items-start', {
 });
 
 export const paginationItemVariants = cva(
-  'inline-flex shrink-0 items-center justify-center bg-white p-2.5 disabled:cursor-not-allowed',
+  'inline-flex shrink-0 cursor-pointer items-center justify-center bg-white p-2.5 disabled:cursor-not-allowed',
   {
     variants: {
       size: {

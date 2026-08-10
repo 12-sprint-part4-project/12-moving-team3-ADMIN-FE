@@ -77,7 +77,6 @@ export const CompletedFilter = ({
         value={dateRange}
         placeholder="이사일 기간 전체"
         onConfirm={onDateRangeConfirm}
-        triggerClassName="min-w-40 px-3.5 py-1.5 text-md-medium"
       />
     </section>
   );
