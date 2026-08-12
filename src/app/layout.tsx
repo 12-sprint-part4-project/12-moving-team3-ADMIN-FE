@@ -23,7 +23,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${pretendard.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${pretendard.variable} h-full overflow-hidden antialiased`}
+    >
       <body className="flex h-full flex-col overflow-hidden">
         <QueryProvider>{children}</QueryProvider>
       </body>
