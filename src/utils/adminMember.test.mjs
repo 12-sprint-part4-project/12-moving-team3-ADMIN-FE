@@ -18,6 +18,12 @@ test('전화번호가 없으면 대시를 반환한다', () => {
   assert.equal(formatAdminMemberPhoneNumber(''), '-');
 });
 
+test('공백이나 하이픈만 있는 전화번호는 대시를 반환한다', () => {
+  assert.equal(formatAdminMemberPhoneNumber('   '), '-');
+  assert.equal(formatAdminMemberPhoneNumber('---'), '-');
+  assert.equal(formatAdminMemberPhoneNumber(' - '), '-');
+});
+
 test('예상하지 못한 길이나 형식의 값은 원본을 유지한다', () => {
   assert.equal(formatAdminMemberPhoneNumber('0101234567'), '0101234567');
   assert.equal(formatAdminMemberPhoneNumber('02-1234-5678'), '02-1234-5678');

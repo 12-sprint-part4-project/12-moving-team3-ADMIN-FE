@@ -2,12 +2,15 @@
   "name": "fs12-part4-team3-admin-fe",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22.6.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test --experimental-strip-types src/**/*.test.mjs",
+    "test": "node --test --experimental-strip-types \"src/**/*.test.mjs\"",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "storybook": "storybook dev -p 6006",

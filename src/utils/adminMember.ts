@@ -24,6 +24,10 @@ export const formatAdminMemberPhoneNumber = (
 
   const normalizedPhoneNumber = phoneNumber.replace(/[\s-]/g, '');
 
+  if (normalizedPhoneNumber.length === 0) {
+    return '-';
+  }
+
   if (!/^010\d{8}$/.test(normalizedPhoneNumber)) {
     return phoneNumber;
   }
