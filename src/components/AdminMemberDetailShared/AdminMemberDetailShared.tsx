@@ -21,7 +21,10 @@ import type {
   MemberRegion,
   MemberStatus,
 } from '@/types/adminMember';
-import { formatAdminMemberJoinedAt } from '@/utils/adminMember';
+import {
+  formatAdminMemberJoinedAt,
+  formatAdminMemberPhoneNumber,
+} from '@/utils/adminMember';
 
 /** 상세 Drawer 상태 변경 액션. ConfirmModal·mutation 연결에 사용한다. */
 export type AdminMemberStatusChangeAction = 'suspend' | 'activate';
@@ -112,9 +115,11 @@ export interface DetailFieldProps {
 
 /** DetailSection 안 dl 행 */
 export const DetailField = ({ label, value, className }: DetailFieldProps) => (
-  <div className={cn('flex justify-between gap-4', className)}>
+  <div className={cn('flex min-w-0 justify-between gap-4', className)}>
     <dt className="shrink-0 text-gray-500">{label}</dt>
-    <dd className="text-right break-words text-black-400">{value}</dd>
+    <dd className="min-w-0 flex-1 break-all text-right text-black-400">
+      {value}
+    </dd>
   </div>
 );
 
@@ -133,7 +138,10 @@ export const AdminMemberBasicInfoSection = ({
       <DetailField label="이름" value={detail.name} />
       <DetailField label="닉네임" value={detail.nickname} />
       <DetailField label="이메일" value={detail.email} />
-      <DetailField label="전화번호" value={detail.phoneNumber ?? '-'} />
+      <DetailField
+        label="전화번호"
+        value={formatAdminMemberPhoneNumber(detail.phoneNumber)}
+      />
       <DetailField
         label="가입일"
         value={formatAdminMemberJoinedAt(detail.createdAt)}

@@ -9,8 +9,8 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { X } from 'lucide-react';
 
-import CloseIcon from '@/assets/icons/close.svg';
 import { cn } from '@/lib/utils';
 
 /**
@@ -114,7 +114,7 @@ export const detailDrawerHeaderVariants = cva(
 );
 
 export const detailDrawerBodyVariants = cva(
-  'flex-1 overflow-y-auto bg-background-200 px-6 py-4'
+  'flex-1 overflow-x-hidden overflow-y-auto bg-background-200 px-6 py-4'
 );
 
 export const detailDrawerFooterVariants = cva(
@@ -320,7 +320,7 @@ export const DetailDrawer = ({
             className="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-black-100 hover:bg-background-200"
             aria-label="닫기"
           >
-            <CloseIcon className="size-5" aria-hidden />
+            <X className="size-5" aria-hidden />
           </button>
         </header>
 

@@ -7,8 +7,8 @@ import {
   type KeyboardEvent,
 } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { Search } from 'lucide-react';
 
-import SearchIcon from '@/assets/icons/search.svg';
 import { cn } from '@/lib/utils';
 
 export const SEARCH_INPUT_VARIANTS = cva(
@@ -99,7 +99,7 @@ export const SearchInput = ({
         )}
         aria-label="검색"
       >
-        <SearchIcon className="size-5" aria-hidden />
+        <Search className="size-5" aria-hidden />
       </button>
 
       <input

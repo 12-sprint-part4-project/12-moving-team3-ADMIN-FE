@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 
+import { DetailField } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 
 import { DetailDrawer } from './DetailDrawer';
@@ -171,6 +172,26 @@ export const WithFooter: Story = {
           회원 정지
         </button>
       </div>
+    ),
+  },
+};
+
+export const LongEmail: Story = {
+  args: {
+    title: '기사 상세',
+    children: (
+      <DetailSection title="기본 정보">
+        <dl className="flex flex-col gap-2 text-md-medium">
+          <DetailField label="이름" value="김무빙" />
+          <DetailField label="닉네임" value="안전한이사" />
+          <DetailField
+            label="이메일"
+            value="very-long-email-address-without-spaces-for-drawer-layout-verification@example-domain.com"
+          />
+          <DetailField label="가입일" value="2026. 08. 13." />
+          <DetailField label="신고 횟수" value={12} />
+        </dl>
+      </DetailSection>
     ),
   },
 };

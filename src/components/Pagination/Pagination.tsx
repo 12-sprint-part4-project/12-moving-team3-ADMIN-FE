@@ -2,9 +2,8 @@
 
 import type { ButtonHTMLAttributes, HTMLAttributes } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-import ChevronLeftIcon from '@/assets/icons/chevron-left.svg';
-import ChevronRightIcon from '@/assets/icons/chevron-right.svg';
 import { cn } from '@/lib/utils';
 
 export const paginationRootVariants = cva('inline-flex items-start', {
@@ -202,7 +201,7 @@ export const Pagination = ({
         aria-label="이전 페이지"
         onClick={() => handlePageChange(currentPage - 1)}
       >
-        <ChevronLeftIcon
+        <ChevronLeft
           aria-hidden
           className={cn(
             paginationIconVariants({ size: resolvedSize }),
@@ -261,7 +260,7 @@ export const Pagination = ({
         aria-label="다음 페이지"
         onClick={() => handlePageChange(currentPage + 1)}
       >
-        <ChevronRightIcon
+        <ChevronRight
           aria-hidden
           className={cn(
             paginationIconVariants({ size: resolvedSize }),

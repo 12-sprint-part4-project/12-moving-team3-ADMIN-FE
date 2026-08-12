@@ -3,9 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { ChevronDown, User } from 'lucide-react';
 
-import ChevronDownIcon from '@/assets/icons/chevron-down.svg';
-import UserIcon from '@/assets/icons/user.svg';
 import { cn } from '@/lib/utils';
 
 export interface AdminHeaderProps {
@@ -141,9 +140,9 @@ export const AdminHeader = ({
             aria-label={userName ? `${userName} 메뉴` : '관리자 메뉴'}
             className="flex items-center gap-2 text-md-medium text-black-300"
           >
-            <UserIcon className="size-5" aria-hidden />
+            <User className="size-5" aria-hidden />
             {userName ? <span>{userName}</span> : null}
-            <ChevronDownIcon className="size-4" aria-hidden />
+            <ChevronDown className="size-4" aria-hidden />
           </button>
 
           {isMenuOpen ? (
