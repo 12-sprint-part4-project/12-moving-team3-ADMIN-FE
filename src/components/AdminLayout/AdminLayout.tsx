@@ -4,6 +4,8 @@ import { AdminSidebar } from '@/components/AdminSidebar/AdminSidebar';
 import { PageHeader } from '@/components/PageHeader/PageHeader';
 import { cn } from '@/lib/utils';
 
+import { AdminMainScrollArea } from './AdminMainScrollArea';
+
 export interface AdminLayoutProps {
   /** 상단 헤더 슬롯. 앱에서는 AdminHeaderContainer, Storybook에서는 목업 Header를 전달한다. */
   header: ReactNode;
@@ -25,14 +27,16 @@ export const AdminLayout = ({
 }: AdminLayoutProps) => (
   <div
     className={cn(
-      'flex h-full flex-col overflow-hidden bg-white',
+      // h-dvh로 뷰포트 높이를 고정한다. h-full만 쓰면 콘텐츠가 길 때
+      // 셸이 늘어나 document 스크롤이 생기고 AdminHeader가 화면 밖으로 밀릴 수 있다.
+      'flex h-dvh min-h-0 flex-col overflow-hidden bg-white',
       className
     )}
   >
     {header}
     <div className="flex min-h-0 flex-1">
       <AdminSidebar className="overflow-y-auto" />
-      <main className="min-h-0 min-w-0 flex-1 overflow-y-auto">
+      <AdminMainScrollArea>
         <div className="p-6">
           {title ? (
             <>
@@ -47,7 +51,7 @@ export const AdminLayout = ({
             children
           )}
         </div>
-      </main>
+      </AdminMainScrollArea>
     </div>
   </div>
 );
