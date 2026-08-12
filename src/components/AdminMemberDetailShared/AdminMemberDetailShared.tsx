@@ -21,7 +21,10 @@ import type {
   MemberRegion,
   MemberStatus,
 } from '@/types/adminMember';
-import { formatAdminMemberJoinedAt } from '@/utils/adminMember';
+import {
+  formatAdminMemberJoinedAt,
+  formatAdminMemberPhoneNumber,
+} from '@/utils/adminMember';
 
 /** 상세 Drawer 상태 변경 액션. ConfirmModal·mutation 연결에 사용한다. */
 export type AdminMemberStatusChangeAction = 'suspend' | 'activate';
@@ -135,7 +138,10 @@ export const AdminMemberBasicInfoSection = ({
       <DetailField label="이름" value={detail.name} />
       <DetailField label="닉네임" value={detail.nickname} />
       <DetailField label="이메일" value={detail.email} />
-      <DetailField label="전화번호" value={detail.phoneNumber ?? '-'} />
+      <DetailField
+        label="전화번호"
+        value={formatAdminMemberPhoneNumber(detail.phoneNumber)}
+      />
       <DetailField
         label="가입일"
         value={formatAdminMemberJoinedAt(detail.createdAt)}

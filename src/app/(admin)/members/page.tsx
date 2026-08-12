@@ -14,6 +14,7 @@ import type { Column } from '@/components/DataTable/DataTable';
 import type { AdminMemberListItem } from '@/types/adminMember';
 import {
   formatAdminMemberJoinedAt,
+  formatAdminMemberPhoneNumber,
   getAdminMemberRowNumber,
 } from '@/utils/adminMember';
 
@@ -47,11 +48,12 @@ const MembersPage = () => {
       {
         key: 'phoneNumber',
         header: '전화번호',
-        render: (row) => {
-          const phoneNumber = row.phoneNumber ?? '-';
-
-          return <TruncatedText value={phoneNumber} className="max-w-32" />;
-        },
+        render: (row) => (
+          <TruncatedText
+            value={formatAdminMemberPhoneNumber(row.phoneNumber)}
+            className="max-w-32"
+          />
+        ),
       },
       {
         key: 'createdAt',

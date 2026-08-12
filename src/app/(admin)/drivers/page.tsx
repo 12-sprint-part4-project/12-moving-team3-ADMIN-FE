@@ -14,6 +14,7 @@ import type { Column } from '@/components/DataTable/DataTable';
 import type { AdminMemberListItem } from '@/types/adminMember';
 import {
   formatAdminMemberJoinedAt,
+  formatAdminMemberPhoneNumber,
   getAdminMemberRowNumber,
 } from '@/utils/adminMember';
 
@@ -63,11 +64,12 @@ const DriversPage = () => {
       {
         key: 'phoneNumber',
         header: '전화번호',
-        render: (row) => {
-          const phoneNumber = row.phoneNumber ?? '-';
-
-          return <TruncatedText value={phoneNumber} className="max-w-32" />;
-        },
+        render: (row) => (
+          <TruncatedText
+            value={formatAdminMemberPhoneNumber(row.phoneNumber)}
+            className="max-w-32"
+          />
+        ),
       },
       // 목록 API의 MOVER 전용 필드. 서비스 지역은 상세에만 있어 목록에 표시하지 않는다.
       {
