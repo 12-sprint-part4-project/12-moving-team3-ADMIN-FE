@@ -114,7 +114,7 @@ export const detailDrawerHeaderVariants = cva(
 );
 
 export const detailDrawerBodyVariants = cva(
-  'flex-1 overflow-y-auto bg-background-200 px-6 py-4'
+  'flex-1 overflow-x-hidden overflow-y-auto bg-background-200 px-6 py-4'
 );
 
 export const detailDrawerFooterVariants = cva(
