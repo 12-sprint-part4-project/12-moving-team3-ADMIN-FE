@@ -4,6 +4,7 @@ import localFont from 'next/font/local';
 import { QueryProvider } from '@/providers/QueryProvider';
 
 import './globals.css';
+import { cn } from '@/lib/utils';
 
 const pretendard = localFont({
   src: './fonts/PretendardVariable.woff2',
@@ -25,7 +26,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${pretendard.variable} h-full overflow-hidden antialiased`}
+      className={cn(pretendard.variable, 'h-full overflow-hidden antialiased')}
     >
       <body className="flex h-full flex-col overflow-hidden">
         <QueryProvider>{children}</QueryProvider>
