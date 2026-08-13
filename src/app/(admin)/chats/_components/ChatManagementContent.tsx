@@ -2,9 +2,8 @@
 
 import { useCallback, useState } from 'react';
 
-import { AdminChatDetailDrawer } from '@/components/AdminChatDetailDrawer/AdminChatDetailDrawer';
-import { AdminChatListView } from '@/components/AdminChatListView/AdminChatListView';
-
+import { AdminChatDetailDrawer } from './AdminChatDetailDrawer';
+import { AdminChatListView } from './AdminChatListView';
 import { getChatListColumns } from './getChatListColumns';
 
 /**

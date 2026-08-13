@@ -1,13 +1,14 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
-import { AdminReportDetailDrawer } from '@/components/AdminReportDetailDrawer/AdminReportDetailDrawer';
 import { useAdminReportList } from '@/hooks/useAdminReportList';
 import { useAdminReportStatistics } from '@/hooks/useAdminReportStatistics';
+import { useClampListPage } from '@/hooks/useClampListPage';
 
 import { useAdminReportListFilters } from '../_hooks/useAdminReportListFilters';
+import { AdminReportDetailDrawer } from './AdminReportDetailDrawer/AdminReportDetailDrawer';
 import { getReportListColumns } from './getReportListColumns';
 import { ReportFilter } from './ReportFilter';
 import { ReportStatistics } from './ReportStatistics';
@@ -21,7 +22,6 @@ export const ReportManagementContent = () => {
   const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
   const {
     filters,
-    setFilters,
     targetUserSearch,
     listQuery,
     statisticsQuery,
@@ -33,6 +33,7 @@ export const ReportManagementContent = () => {
     handleTargetChange,
     handleDateRangeConfirm,
     handlePageChange,
+    clampPage,
     handleResetFilters,
   } = useAdminReportListFilters();
   const { data, isPending, isError } = useAdminReportList(listQuery);
@@ -47,19 +48,12 @@ export const ReportManagementContent = () => {
   const totalPages = pagination?.totalPages ?? 0;
   const currentPage = pagination?.page ?? filters.page;
 
-  useEffect(() => {
-    if (isPending || !pagination) return;
-
-    const safePage = Math.max(pagination.totalPages, 1);
-    // 처리 후 마지막 페이지가 사라지면 존재하는 마지막 페이지로 다시 조회한다.
-    const timeoutId = window.setTimeout(() => {
-      setFilters((previous) =>
-        previous.page > safePage ? { ...previous, page: safePage } : previous
-      );
-    }, 0);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [isPending, pagination, setFilters]);
+  useClampListPage({
+    page: filters.page,
+    totalPages: pagination?.totalPages,
+    isPending,
+    clampPage,
+  });
 
   const columns = useMemo(() => getReportListColumns(setSelectedReportId), []);
 

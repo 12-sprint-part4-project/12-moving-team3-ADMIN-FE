@@ -1,7 +1,7 @@
 'use client';
 
 import {
-  useEffect,
+  useCallback,
   useMemo,
   useState,
   type ChangeEvent,
@@ -16,6 +16,7 @@ import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
 import { useAdminChatList } from '@/hooks/useAdminChatList';
+import { useClampListPage } from '@/hooks/useClampListPage';
 import type {
   AdminChatListItem,
   AdminChatListQuery,
@@ -47,11 +48,7 @@ const INITIAL_FILTERS: AdminChatListFilters = {
 
 /** select value → AdminChatRoomType | undefined. 알 수 없는 값은 무시한다. */
 const parseRoomTypeFilter = (value: string): AdminChatRoomType | undefined => {
-  if (
-    value === 'GENERAL' ||
-    value === 'DESIGNATED' ||
-    value === 'COMMUNITY'
-  ) {
+  if (value === 'GENERAL' || value === 'DESIGNATED' || value === 'COMMUNITY') {
     return value;
   }
 
@@ -102,18 +99,17 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
   const totalPages = pagination?.totalPages ?? 0;
   const currentPage = pagination?.page ?? filters.page;
 
-  useEffect(() => {
-    if (isPending || !pagination) return;
-
-    const safePage = Math.max(pagination.totalPages, 1);
-    const timeoutId = window.setTimeout(() => {
-      setFilters((previous) =>
-        previous.page > safePage ? { ...previous, page: safePage } : previous
-      );
-    }, 0);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [isPending, pagination]);
+  const clampPage = useCallback((page: number) => {
+    setFilters((previous) =>
+      previous.page === page ? previous : { ...previous, page }
+    );
+  }, []);
+  useClampListPage({
+    page: filters.page,
+    totalPages: pagination?.totalPages,
+    isPending,
+    clampPage,
+  });
 
   const columns = useMemo(
     () =>

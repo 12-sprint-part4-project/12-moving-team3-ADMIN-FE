@@ -1,7 +1,7 @@
 'use client';
 
 import {
-  useEffect,
+  useCallback,
   useMemo,
   useState,
   type ChangeEvent,
@@ -20,6 +20,7 @@ import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
 import { useAdminMemberList } from '@/hooks/useAdminMemberList';
+import { useClampListPage } from '@/hooks/useClampListPage';
 import type {
   AdminMemberListItem,
   AdminMemberListQuery,
@@ -123,18 +124,17 @@ export const AdminMemberListView = ({
   const totalPages = pagination?.totalPages ?? 0;
   const currentPage = pagination?.page ?? filters.page;
 
-  useEffect(() => {
-    if (isPending || !pagination) return;
-
-    const safePage = Math.max(pagination.totalPages, 1);
-    const timeoutId = window.setTimeout(() => {
-      setFilters((previous) =>
-        previous.page > safePage ? { ...previous, page: safePage } : previous
-      );
-    }, 0);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [isPending, pagination]);
+  const clampPage = useCallback((page: number) => {
+    setFilters((previous) =>
+      previous.page === page ? previous : { ...previous, page }
+    );
+  }, []);
+  useClampListPage({
+    page: filters.page,
+    totalPages: pagination?.totalPages,
+    isPending,
+    clampPage,
+  });
 
   const dateRangeValue = useMemo<DateRangePopoverProps['value']>(() => {
     if (!filters.startDate) {
@@ -142,9 +142,7 @@ export const AdminMemberListView = ({
     }
 
     const from = new Date(`${filters.startDate}T00:00:00`);
-    const to = filters.endDate
-      ? new Date(`${filters.endDate}T00:00:00`)
-      : from;
+    const to = filters.endDate ? new Date(`${filters.endDate}T00:00:00`) : from;
 
     if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) {
       return undefined;
@@ -241,9 +239,7 @@ export const AdminMemberListView = ({
     if (items.length === 0) {
       return (
         <EmptyState
-          title={
-            hasActiveFilters ? '검색 결과가 없습니다.' : emptyNoDataTitle
-          }
+          title={hasActiveFilters ? '검색 결과가 없습니다.' : emptyNoDataTitle}
           description={
             hasActiveFilters
               ? '검색 조건을 변경한 후 다시 시도해 주세요.'
@@ -261,12 +257,7 @@ export const AdminMemberListView = ({
     }
 
     return (
-      <DataTable
-        columns={columns}
-        data={items}
-        rowKey="id"
-        caption={caption}
-      />
+      <DataTable columns={columns} data={items} rowKey="id" caption={caption} />
     );
   };
 

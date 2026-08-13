@@ -4,7 +4,6 @@ import {
   DetailField,
   formatNullableDateTime,
 } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
-import { AdminChatMessageList } from '@/components/AdminChatMessageList/AdminChatMessageList';
 import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
@@ -20,6 +19,8 @@ import {
   ADMIN_CHAT_USER_TYPE_LABEL,
 } from '@/utils/adminChat';
 import { formatAdminMemberJoinedAt } from '@/utils/adminMember';
+
+import { AdminChatMessageList } from './AdminChatMessageList';
 
 export interface AdminChatDetailDrawerProps {
   open: boolean;

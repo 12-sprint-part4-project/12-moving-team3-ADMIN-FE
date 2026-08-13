@@ -4,22 +4,10 @@ import { DateRangePopover } from '@/components/DateRangePopover/DateRangePopover
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
 
-const STATUS_FILTER_OPTIONS = [
-  { label: '전체', value: '' },
-  { label: '대기', value: 'PENDING' },
-  { label: '처리 완료', value: 'RESOLVED' },
-  { label: '반려', value: 'REJECTED' },
-];
-
-const TARGET_FILTER_OPTIONS = [
-  { label: '전체', value: '' },
-  { label: '사용자', value: 'USER' },
-  { label: '리뷰', value: 'REVIEW' },
-  { label: '채팅방', value: 'CHAT_ROOM' },
-  { label: '메시지', value: 'MESSAGE' },
-  { label: '게시글', value: 'ARTICLE' },
-  { label: '댓글', value: 'COMMENT' },
-];
+import {
+  REPORT_STATUS_FILTER_OPTIONS,
+  REPORT_TARGET_FILTER_OPTIONS,
+} from '../_constants/reportFilters';
 
 interface ReportFilterProps {
   searchValue: string;
@@ -58,13 +46,13 @@ export const ReportFilter = ({
       aria-label="상태"
       value={statusValue}
       onChange={onStatusChange}
-      options={STATUS_FILTER_OPTIONS}
+      options={REPORT_STATUS_FILTER_OPTIONS}
     />
     <FilterSelect
       aria-label="대상 유형"
       value={targetValue}
       onChange={onTargetChange}
-      options={TARGET_FILTER_OPTIONS}
+      options={REPORT_TARGET_FILTER_OPTIONS}
     />
     <DateRangePopover
       value={dateRangeValue}

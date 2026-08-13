@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { useMemo, useState, type ChangeEvent } from 'react';
+import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
 
 import type { DateRangePopoverProps } from '@/components/DateRangePopover/DateRangePopover';
 import type {
@@ -8,6 +8,11 @@ import type {
   AdminReportTarget,
 } from '@/types/adminReport';
 import { toAdminReportStatisticsQuery } from '@/utils/adminReport';
+
+import {
+  parseReportStatusFilter,
+  parseReportTargetFilter,
+} from '../_constants/reportFilters';
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -25,33 +30,6 @@ interface AdminReportListFilters {
 const INITIAL_FILTERS: AdminReportListFilters = {
   page: 1,
   pageSize: DEFAULT_PAGE_SIZE,
-};
-
-const parseReportStatusFilter = (
-  value: string
-): AdminReportStatus | undefined => {
-  if (value === 'PENDING' || value === 'RESOLVED' || value === 'REJECTED') {
-    return value;
-  }
-
-  return undefined;
-};
-
-const parseReportTargetFilter = (
-  value: string
-): AdminReportTarget | undefined => {
-  if (
-    value === 'USER' ||
-    value === 'REVIEW' ||
-    value === 'CHAT_ROOM' ||
-    value === 'MESSAGE' ||
-    value === 'ARTICLE' ||
-    value === 'COMMENT'
-  ) {
-    return value;
-  }
-
-  return undefined;
 };
 
 const toListQuery = (
@@ -159,6 +137,12 @@ export const useAdminReportListFilters = () => {
     setFilters(INITIAL_FILTERS);
   };
 
+  const clampPage = useCallback((page: number) => {
+    setFilters((previous) =>
+      previous.page === page ? previous : { ...previous, page }
+    );
+  }, []);
+
   return {
     filters,
     setFilters,
@@ -179,6 +163,7 @@ export const useAdminReportListFilters = () => {
     handleTargetChange,
     handleDateRangeConfirm,
     handlePageChange: (page: number) => updateFilters({ page }),
+    clampPage,
     handleResetFilters,
   };
 };

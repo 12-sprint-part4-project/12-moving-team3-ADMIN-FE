@@ -3,8 +3,8 @@
 import { useCallback, useState } from 'react';
 
 import { AdminMemberListView } from '@/components/AdminMemberListView/AdminMemberListView';
-import { AdminMoverDetailDrawer } from '@/components/AdminMoverDetailDrawer/AdminMoverDetailDrawer';
 
+import { AdminMoverDetailDrawer } from './AdminMoverDetailDrawer';
 import { getDriverListColumns } from './getDriverListColumns';
 
 /**

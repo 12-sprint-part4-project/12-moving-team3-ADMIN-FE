@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, type ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 
 import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
 import { Button } from '@/components/Button/Button';
@@ -14,6 +14,7 @@ import { useAdminReviewDeleteConfirm } from '@/hooks/useAdminReviewDeleteConfirm
 import { useAdminReviewList } from '@/hooks/useAdminReviewList';
 import { useAdminReviewListFilters } from '@/hooks/useAdminReviewListFilters';
 import { useAdminReviewStatistics } from '@/hooks/useAdminReviewStatistics';
+import { useClampListPage } from '@/hooks/useClampListPage';
 
 import { getReviewListColumns } from './getReviewListColumns';
 import { ReviewDeleteConfirmModal } from './ReviewDeleteConfirmModal';
@@ -43,7 +44,6 @@ const DELETION_STATUS_FILTER_OPTIONS = [
 export const ReviewManagementContent = () => {
   const {
     filters,
-    setFilters,
     searchInput,
     listQuery,
     statisticsQuery,
@@ -55,6 +55,7 @@ export const ReviewManagementContent = () => {
     handleDeletionStatusChange,
     handleDateRangeConfirm,
     handlePageChange,
+    clampPage,
     handleResetFilters,
   } = useAdminReviewListFilters();
 
@@ -78,18 +79,12 @@ export const ReviewManagementContent = () => {
   const totalPages = pagination?.totalPages ?? 0;
   const currentPage = pagination?.page ?? filters.page;
 
-  useEffect(() => {
-    if (isPending || !pagination) return;
-
-    const safePage = Math.max(pagination.totalPages, 1);
-    const timeoutId = window.setTimeout(() => {
-      setFilters((previous) =>
-        previous.page > safePage ? { ...previous, page: safePage } : previous
-      );
-    }, 0);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [isPending, pagination, setFilters]);
+  useClampListPage({
+    page: filters.page,
+    totalPages: pagination?.totalPages,
+    isPending,
+    clampPage,
+  });
 
   const columns = useMemo(
     () => getReviewListColumns(handleRequestDelete),

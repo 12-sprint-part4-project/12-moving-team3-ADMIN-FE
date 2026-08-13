@@ -2,9 +2,9 @@
 
 import { useCallback, useState } from 'react';
 
-import { AdminCustomerDetailDrawer } from '@/components/AdminCustomerDetailDrawer/AdminCustomerDetailDrawer';
 import { AdminMemberListView } from '@/components/AdminMemberListView/AdminMemberListView';
 
+import { AdminCustomerDetailDrawer } from './AdminCustomerDetailDrawer';
 import { getMemberListColumns } from './getMemberListColumns';
 
 /**
