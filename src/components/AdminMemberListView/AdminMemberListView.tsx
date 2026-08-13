@@ -1,6 +1,12 @@
 'use client';
 
-import { useMemo, useState, type ChangeEvent, type ReactNode } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type ChangeEvent,
+  type ReactNode,
+} from 'react';
 
 import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
 import { Button } from '@/components/Button/Button';
@@ -117,17 +123,18 @@ export const AdminMemberListView = ({
   const totalPages = pagination?.totalPages ?? 0;
   const currentPage = pagination?.page ?? filters.page;
 
-  // 응답 기준 page가 범위를 벗어나면 렌더 중 보정한다(effect setState 금지 규칙 회피).
-  // totalPages=0이면 1페이지로 맞춘다. prev 참조 유지로 불필요한 재렌더를 막는다.
-  if (!isPending && pagination) {
-    const safePage = pagination.totalPages > 0 ? pagination.totalPages : 1;
+  useEffect(() => {
+    if (isPending || !pagination) return;
 
-    if (filters.page > safePage) {
-      setFilters((prev) =>
-        prev.page <= safePage ? prev : { ...prev, page: safePage }
+    const safePage = Math.max(pagination.totalPages, 1);
+    const timeoutId = window.setTimeout(() => {
+      setFilters((previous) =>
+        previous.page > safePage ? { ...previous, page: safePage } : previous
       );
-    }
-  }
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [isPending, pagination]);
 
   const dateRangeValue = useMemo<DateRangePopoverProps['value']>(() => {
     if (!filters.startDate) {
