@@ -1,6 +1,12 @@
 'use client';
 
-import { useMemo, useState, type ChangeEvent, type ReactNode } from 'react';
+import {
+  useCallback,
+  useMemo,
+  useState,
+  type ChangeEvent,
+  type ReactNode,
+} from 'react';
 
 import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
 import { Button } from '@/components/Button/Button';
@@ -10,6 +16,7 @@ import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
 import { useAdminChatList } from '@/hooks/useAdminChatList';
+import { useClampListPage } from '@/hooks/useClampListPage';
 import type {
   AdminChatListItem,
   AdminChatListQuery,
@@ -41,11 +48,7 @@ const INITIAL_FILTERS: AdminChatListFilters = {
 
 /** select value → AdminChatRoomType | undefined. 알 수 없는 값은 무시한다. */
 const parseRoomTypeFilter = (value: string): AdminChatRoomType | undefined => {
-  if (
-    value === 'GENERAL' ||
-    value === 'DESIGNATED' ||
-    value === 'COMMUNITY'
-  ) {
+  if (value === 'GENERAL' || value === 'DESIGNATED' || value === 'COMMUNITY') {
     return value;
   }
 
@@ -96,17 +99,17 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
   const totalPages = pagination?.totalPages ?? 0;
   const currentPage = pagination?.page ?? filters.page;
 
-  // 응답 기준 page가 범위를 벗어나면 렌더 중 보정한다(effect setState 금지 규칙 회피).
-  // totalPages=0이면 1페이지로 맞춘다. prev 참조 유지로 불필요한 재렌더를 막는다.
-  if (!isPending && pagination) {
-    const safePage = pagination.totalPages > 0 ? pagination.totalPages : 1;
-
-    if (filters.page > safePage) {
-      setFilters((prev) =>
-        prev.page <= safePage ? prev : { ...prev, page: safePage }
-      );
-    }
-  }
+  const clampPage = useCallback((page: number) => {
+    setFilters((previous) =>
+      previous.page === page ? previous : { ...previous, page }
+    );
+  }, []);
+  useClampListPage({
+    page: filters.page,
+    totalPages: pagination?.totalPages,
+    isPending,
+    clampPage,
+  });
 
   const columns = useMemo(
     () =>

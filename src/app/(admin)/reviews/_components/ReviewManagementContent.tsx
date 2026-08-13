@@ -14,6 +14,7 @@ import { useAdminReviewDeleteConfirm } from '@/hooks/useAdminReviewDeleteConfirm
 import { useAdminReviewList } from '@/hooks/useAdminReviewList';
 import { useAdminReviewListFilters } from '@/hooks/useAdminReviewListFilters';
 import { useAdminReviewStatistics } from '@/hooks/useAdminReviewStatistics';
+import { useClampListPage } from '@/hooks/useClampListPage';
 
 import { getReviewListColumns } from './getReviewListColumns';
 import { ReviewDeleteConfirmModal } from './ReviewDeleteConfirmModal';
@@ -43,7 +44,6 @@ const DELETION_STATUS_FILTER_OPTIONS = [
 export const ReviewManagementContent = () => {
   const {
     filters,
-    setFilters,
     searchInput,
     listQuery,
     statisticsQuery,
@@ -55,6 +55,7 @@ export const ReviewManagementContent = () => {
     handleDeletionStatusChange,
     handleDateRangeConfirm,
     handlePageChange,
+    clampPage,
     handleResetFilters,
   } = useAdminReviewListFilters();
 
@@ -78,18 +79,12 @@ export const ReviewManagementContent = () => {
   const totalPages = pagination?.totalPages ?? 0;
   const currentPage = pagination?.page ?? filters.page;
 
-  // 응답 기준 page가 범위를 벗어나면 렌더 중 보정한다(effect setState 금지 규칙 회피).
-  // totalPages=0이면 1페이지로 맞춘다. prev 참조 유지로 불필요한 재렌더를 막는다.
-  // 마지막 행 삭제 후 totalPages가 줄어든 경우에도 동일 패턴으로 보정된다.
-  if (!isPending && pagination) {
-    const safePage = pagination.totalPages > 0 ? pagination.totalPages : 1;
-
-    if (filters.page > safePage) {
-      setFilters((prev) =>
-        prev.page <= safePage ? prev : { ...prev, page: safePage }
-      );
-    }
-  }
+  useClampListPage({
+    page: filters.page,
+    totalPages: pagination?.totalPages,
+    isPending,
+    clampPage,
+  });
 
   const columns = useMemo(
     () => getReviewListColumns(handleRequestDelete),
