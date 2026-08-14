@@ -35,7 +35,7 @@ export const AdminLayout = ({
   >
     {header}
     <div className="flex min-h-0 flex-1">
-      <AdminSidebar />
+      <AdminSidebar className="overflow-y-auto" />
       <AdminMainScrollArea>
         <div className="p-6">
           {title ? (

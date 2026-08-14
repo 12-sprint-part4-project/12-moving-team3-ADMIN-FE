@@ -60,6 +60,8 @@ export const DateRangePopover = ({
   const [draftRange, setDraftRange] = useState<DateRange | undefined>(value);
   // wrapper ref (outside click 감지·Escape 후 트리거 포커스 복귀에 사용)
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const isOpenRef = useRef(isOpen);
+  isOpenRef.current = isOpen;
   // 버튼에 표시될 날짜 문자열
   const dateRangeLabel = formatDateRange(value) ?? placeholder;
   const popoverTransition = {
@@ -84,9 +86,23 @@ export const DateRangePopover = ({
     setIsOpen(false);
   };
 
-  // 확인 버튼 클릭시 외부에 선택한 범위를 전달한 후 팝오버 닫기
+  // 종료 애니메이션 중에는 onConfirm이 다시 실행되지 않게 막는다.
   const handleConfirm = () => {
+    if (!isOpenRef.current) {
+      return;
+    }
+
     onConfirm(draftRange);
+    setIsOpen(false);
+  };
+
+  const handleSelectAllPeriod = () => {
+    if (!isOpenRef.current) {
+      return;
+    }
+
+    setDraftRange(undefined);
+    onConfirm(undefined);
     setIsOpen(false);
   };
 
@@ -154,7 +170,11 @@ export const DateRangePopover = ({
             aria-label="날짜 범위 선택"
             initial={{ opacity: 0, y: -POPOVER_MOTION_OFFSET_PX }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -POPOVER_MOTION_OFFSET_PX }}
+            exit={{
+              opacity: 0,
+              y: -POPOVER_MOTION_OFFSET_PX,
+              pointerEvents: 'none',
+            }}
             transition={popoverTransition}
             className="absolute top-full right-0 z-10 mt-2 w-92 overflow-hidden rounded-lg border border-line-200 bg-white"
           >
@@ -166,14 +186,7 @@ export const DateRangePopover = ({
             />
             {/* 취소/확인 버튼 영역 */}
             <div className="flex justify-end gap-2 border-t border-line-200 p-4">
-              <Button
-                variant="outlined"
-                onClick={() => {
-                  setDraftRange(undefined);
-                  onConfirm(undefined);
-                  setIsOpen(false);
-                }}
-              >
+              <Button variant="outlined" onClick={handleSelectAllPeriod}>
                 전체 기간
               </Button>
               <Button variant="secondary" onClick={handleCancel}>

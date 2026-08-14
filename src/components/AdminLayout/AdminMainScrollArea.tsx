@@ -102,14 +102,24 @@ export const AdminMainScrollArea = ({
 
     apply();
 
+    if (!shouldRestore) {
+      scrollTopByPathname.set(pathname, 0);
+    }
+
     if (!shouldRestore || nextTop <= 0) {
       return;
     }
 
-    // 목록 데이터가 늦게 붙으면 높이가 부족해 복원이 클램프되므로, 잠시 높이를 지켜 재적용한다.
+    // 목록 데이터가 늦게 붙으면 높이가 부족해 복원이 클램프되므로, 잠시 콘텐츠 높이를 지켜 재적용한다.
+    // main은 overflow 컨테이너라 겉크기가 고정되고, 늘어나는 것은 안쪽 콘텐츠다.
+    const content = main.firstElementChild;
+    if (!content) {
+      return;
+    }
+
     const observer = new ResizeObserver(apply);
     restoreObserverRef.current = observer;
-    observer.observe(main);
+    observer.observe(content);
     restoreTimeoutRef.current = window.setTimeout(() => {
       stopRestoreWatch();
     }, SCROLL_RESTORE_WATCH_MS);

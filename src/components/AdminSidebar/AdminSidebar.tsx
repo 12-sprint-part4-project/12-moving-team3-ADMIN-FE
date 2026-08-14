@@ -107,14 +107,14 @@ export const AdminSidebar = ({
         className
       )}
     >
-      <div className="flex flex-col gap-1">
+      <div className="flex min-w-0 flex-col gap-1">
         <button
           type="button"
           onClick={handleToggleCollapse}
           aria-expanded={!isCollapsed}
           aria-controls={navId}
           aria-label={toggleLabel}
-          className="group relative flex h-8 w-full cursor-pointer items-center rounded text-black-300"
+          className="group relative flex h-8 w-full min-w-0 cursor-pointer items-center rounded text-black-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300"
         >
           <span className={ICON_COLUMN_CLASS_NAME}>
             <PanelLeft className="size-5 shrink-0" aria-hidden />
@@ -128,12 +128,12 @@ export const AdminSidebar = ({
               const isActive = isActiveMenu(pathname, href);
 
               return (
-                <li key={href}>
+                <li key={href} className="min-w-0">
                   <Link
                     href={href}
                     aria-current={isActive ? 'page' : undefined}
                     className={cn(
-                      'group relative flex h-8 items-center rounded text-md-medium text-black-300',
+                      'group relative flex h-8 min-w-0 items-center rounded text-md-medium text-black-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300',
                       isActive && 'bg-blue-100 text-blue-300'
                     )}
                   >
@@ -144,7 +144,12 @@ export const AdminSidebar = ({
                       initial={false}
                       animate={{ opacity: isCollapsed ? 0 : 1 }}
                       transition={sidebarTransition}
-                      className="min-w-0 flex-1 overflow-hidden whitespace-nowrap"
+                      className={cn(
+                        'whitespace-nowrap',
+                        isCollapsed
+                          ? 'sr-only'
+                          : 'min-w-0 flex-1 overflow-hidden'
+                      )}
                     >
                       {label}
                     </motion.span>
