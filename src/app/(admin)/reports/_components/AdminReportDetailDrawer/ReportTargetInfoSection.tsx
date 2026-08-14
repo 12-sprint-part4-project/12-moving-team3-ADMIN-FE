@@ -1,11 +1,6 @@
 import { DetailField } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
-import type {
-  AdminReportDetail,
-  AdminReportDetailTargetUser,
-  AdminReportDetailUserSummary,
-} from '@/types/adminReport';
 import { ADMIN_REPORT_USER_TYPE_LABEL } from '@/utils/adminReport';
 
 import {
@@ -18,6 +13,12 @@ import {
 } from './helpers';
 import { ReportProcessActionToggle } from './ReportProcessActionToggle';
 import { TargetUserProfileImage } from './TargetUserProfileImage';
+
+import type {
+  AdminReportDetail,
+  AdminReportDetailTargetUser,
+  AdminReportDetailUserSummary,
+} from '@/types/adminReport';
 
 /** 처리용 targetUser 계정 상태 — ACTIVE=정상, SUSPENDED=정지됨 */
 const getAccountStatusBadge = (targetUser: AdminReportDetailTargetUser) => {

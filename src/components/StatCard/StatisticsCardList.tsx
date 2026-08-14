@@ -1,5 +1,6 @@
-import { StatCard, type StatCardProps } from './StatCard';
 import { cn } from '@/lib/utils';
+
+import { StatCard, type StatCardProps } from './StatCard';
 
 interface StatisticsCardListProps {
   items: StatCardProps[];

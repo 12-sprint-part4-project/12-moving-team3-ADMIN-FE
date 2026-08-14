@@ -4,6 +4,7 @@ import {
   getAdminCompletedDetailPath,
 } from '@/api/adminCompletedPaths';
 import { axiosInstance } from '@/api/axiosInstance';
+
 import type {
   AdminCompletedDetailResponse,
   AdminCompletedListQuery,

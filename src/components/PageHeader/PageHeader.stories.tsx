@@ -1,8 +1,9 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { Button } from '@/components/Button/Button';
 
 import { PageHeader } from './PageHeader';
+
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const meta: Meta<typeof PageHeader> = {
   title: 'Admin/PageHeader',

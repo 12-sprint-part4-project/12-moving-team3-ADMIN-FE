@@ -1,6 +1,7 @@
+import { LoadingState } from './LoadingState';
+
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { LoadingState } from './LoadingState';
 
 const meta: Meta<typeof LoadingState> = {
   title: 'Admin/LoadingState',

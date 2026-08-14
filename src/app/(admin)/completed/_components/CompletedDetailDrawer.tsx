@@ -8,7 +8,6 @@ import { DetailSection } from '@/components/DetailSection/DetailSection';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { useAdminCompletedDetail } from '@/hooks/useAdminCompletedDetail';
-import type { AdminCompletedDetail } from '@/types/adminCompleted';
 import {
   formatAdminCompletedMissingFields,
   formatAdminCompletedMoveDate,
@@ -20,6 +19,8 @@ import {
   formatAdminEstimateRequestNullableText,
   formatAdminEstimateRequestSubmittedAt,
 } from '@/utils/adminEstimateRequest';
+
+import type { AdminCompletedDetail } from '@/types/adminCompleted';
 
 export interface CompletedDetailDrawerProps {
   open: boolean;

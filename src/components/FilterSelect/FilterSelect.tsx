@@ -1,7 +1,8 @@
-import type { SelectHTMLAttributes } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+
+import type { SelectHTMLAttributes } from 'react';
 
 interface FilterOption {
   label: string;

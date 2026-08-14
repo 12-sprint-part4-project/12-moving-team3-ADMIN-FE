@@ -17,12 +17,13 @@ import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
 import { useAdminChatList } from '@/hooks/useAdminChatList';
 import { useClampListPage } from '@/hooks/useClampListPage';
+import { ADMIN_CHAT_ROOM_TYPE_LABEL } from '@/utils/adminChat';
+
 import type {
   AdminChatListItem,
   AdminChatListQuery,
   AdminChatRoomType,
 } from '@/types/adminChat';
-import { ADMIN_CHAT_ROOM_TYPE_LABEL } from '@/utils/adminChat';
 
 const DEFAULT_PAGE_SIZE = 10;
 

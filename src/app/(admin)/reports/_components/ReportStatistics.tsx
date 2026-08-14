@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import {
   CircleAlert,
   CircleCheck,
@@ -9,7 +8,9 @@ import {
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { StatisticsCardList } from '@/components/StatCard/StatisticsCardList';
+
 import type { AdminReportStatistics } from '@/types/adminReport';
+import type { ReactNode } from 'react';
 
 interface ReportStatisticsProps {
   statistics?: AdminReportStatistics;

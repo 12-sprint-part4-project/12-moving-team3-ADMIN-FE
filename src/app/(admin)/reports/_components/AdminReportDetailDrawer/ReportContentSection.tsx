@@ -1,8 +1,6 @@
-import type { ReactNode } from 'react';
 
 import { DetailField } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
-import type { AdminReportDetail } from '@/types/adminReport';
 import {
   ADMIN_REPORT_CONTENT_METADATA_LABEL,
   formatAdminReportContentMetadataValue,
@@ -14,6 +12,9 @@ import { DetailMultilineField } from './DetailMultilineField';
 import { formatNullableDateTime } from './helpers';
 import { ReportProcessActionToggle } from './ReportProcessActionToggle';
 import { ReportReportedUserProfileContent } from './ReportReportedUserProfileContent';
+
+import type { AdminReportDetail } from '@/types/adminReport';
+import type { ReactNode } from 'react';
 
 const ReportContentMetadataFields = ({
   metadata,

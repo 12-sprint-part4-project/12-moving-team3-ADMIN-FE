@@ -1,8 +1,9 @@
-import type { ReactNode } from 'react';
 
 import { AdminAuthGuard } from '@/components/AdminAuthGuard/AdminAuthGuard';
 import { AdminHeaderContainer } from '@/components/AdminHeader/AdminHeaderContainer';
 import { AdminLayout } from '@/components/AdminLayout/AdminLayout';
+
+import type { ReactNode } from 'react';
 
 interface AdminRouteLayoutProps {
   children: ReactNode;

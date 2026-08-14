@@ -15,16 +15,17 @@ import {
   useSuspendAdminMember,
 } from '@/hooks/useAdminMemberStatusMutation';
 import { cn } from '@/lib/utils';
+import {
+  formatAdminMemberJoinedAt,
+  formatAdminMemberPhoneNumber,
+} from '@/utils/adminMember';
+
 import type {
   AdminMemberDetail,
   MemberMoveType,
   MemberRegion,
   MemberStatus,
 } from '@/types/adminMember';
-import {
-  formatAdminMemberJoinedAt,
-  formatAdminMemberPhoneNumber,
-} from '@/utils/adminMember';
 
 /** 상세 Drawer 상태 변경 액션. ConfirmModal·mutation 연결에 사용한다. */
 export type AdminMemberStatusChangeAction = 'suspend' | 'activate';

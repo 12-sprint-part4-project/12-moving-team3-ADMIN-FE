@@ -11,10 +11,7 @@ import {
   useResolveAdminReport,
 } from '@/hooks/useAdminReportDecisionMutation';
 import { useAdminReportDetail } from '@/hooks/useAdminReportDetail';
-import type {
-  AdminReportDetail,
-  AdminReportProcessAction,
-} from '@/types/adminReport';
+
 
 import { AdminReportDecisionSuccessToast } from './AdminReportDecisionSuccessToast';
 import { AdminReportRejectConfirmModal } from './AdminReportRejectConfirmModal';
@@ -28,6 +25,11 @@ import { ReportBasicInfoSection } from './ReportBasicInfoSection';
 import { ReportContentSection } from './ReportContentSection';
 import { ReportReporterSection } from './ReportReporterSection';
 import { ReportTargetInfoSection } from './ReportTargetInfoSection';
+
+import type {
+  AdminReportDetail,
+  AdminReportProcessAction,
+} from '@/types/adminReport';
 
 export interface AdminReportDetailDrawerProps {
   open: boolean;

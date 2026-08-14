@@ -6,7 +6,6 @@ import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { Pagination } from '@/components/Pagination/Pagination';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { TruncatedText } from '@/components/TruncatedText/TruncatedText';
-import type { AdminEstimateRequestListItem } from '@/types/adminEstimateRequest';
 import {
   ADMIN_ESTIMATE_REQUEST_STATUS_BADGE,
   formatAdminEstimateRequestMissingFields,
@@ -16,6 +15,8 @@ import {
   formatAdminEstimateRequestSubmittedAt,
   hasAdminEstimateRequestMissingFields,
 } from '@/utils/adminEstimateRequest';
+
+import type { AdminEstimateRequestListItem } from '@/types/adminEstimateRequest';
 
 export interface EstimateTableProps {
   items: AdminEstimateRequestListItem[];

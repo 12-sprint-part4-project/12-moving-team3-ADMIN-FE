@@ -1,4 +1,3 @@
-import type { ComponentProps } from 'react';
 
 import { DateRangePopover } from '@/components/DateRangePopover/DateRangePopover';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
@@ -8,6 +7,8 @@ import {
   REPORT_STATUS_FILTER_OPTIONS,
   REPORT_TARGET_FILTER_OPTIONS,
 } from '../_constants/reportFilters';
+
+import type { ComponentProps } from 'react';
 
 interface ReportFilterProps {
   searchValue: string;

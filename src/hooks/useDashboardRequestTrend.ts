@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { ADMIN_DASHBOARD_QUERY_KEYS } from '@/constants/adminDashboardQueryKeys';
 import { getAdminDashboardRequestTrend } from '@/services/adminDashboardApi';
+
 import type { AdminDashboardRequestTrendPeriod } from '@/types/adminDashboard';
 
 interface UseDashboardRequestTrendOptions {

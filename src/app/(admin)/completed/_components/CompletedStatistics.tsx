@@ -1,10 +1,11 @@
-import type { ReactNode } from 'react';
 import { CircleCheck, CircleDollarSign, Wallet } from 'lucide-react';
 
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { StatisticsCardList } from '@/components/StatCard/StatisticsCardList';
+
 import type { AdminCompletedStatistics } from '@/types/adminCompleted';
+import type { ReactNode } from 'react';
 
 interface CompletedStatisticsProps {
   statistics?: AdminCompletedStatistics;

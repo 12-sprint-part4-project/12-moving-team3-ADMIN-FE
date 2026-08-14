@@ -1,5 +1,6 @@
 'use client';
 
+import { cva } from 'class-variance-authority';
 import {
   useEffect,
   useId,
@@ -9,7 +10,6 @@ import {
   type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { cva } from 'class-variance-authority';
 
 import { Button } from '@/components/Button/Button';
 import { cn } from '@/lib/utils';

@@ -1,8 +1,9 @@
 'use client';
 
 import { ConfirmModal } from '@/components/ConfirmModal/ConfirmModal';
-import type { AdminReportProcessAction } from '@/types/adminReport';
 import { ADMIN_REPORT_PROCESS_ACTION_LABEL } from '@/utils/adminReport';
+
+import type { AdminReportProcessAction } from '@/types/adminReport';
 
 export interface AdminReportResolveConfirmModalProps {
   open: boolean;

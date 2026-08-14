@@ -1,7 +1,8 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { useState, type ComponentProps } from 'react';
 
 import { ConfirmModal } from './ConfirmModal';
+
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 type ConfirmModalProps = ComponentProps<typeof ConfirmModal>;
 

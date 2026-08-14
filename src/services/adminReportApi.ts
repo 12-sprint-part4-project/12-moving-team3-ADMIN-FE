@@ -6,6 +6,7 @@ import {
   getAdminReportResolvePath,
 } from '@/api/adminReportPaths';
 import { axiosInstance } from '@/api/axiosInstance';
+
 import type {
   AdminReportDetailResponse,
   AdminReportListQuery,

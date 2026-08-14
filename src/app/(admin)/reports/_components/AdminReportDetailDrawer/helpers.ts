@@ -1,12 +1,13 @@
 import axios from 'axios';
 
+import { formatAdminReportCreatedAt } from '@/utils/adminReport';
+
 import type { StatusBadgeProps } from '@/components/StatusBadge/StatusBadge';
 import type {
   AdminReportDetail,
   AdminReportDetailTargetInfo,
   AdminReportProcessAction,
 } from '@/types/adminReport';
-import { formatAdminReportCreatedAt } from '@/utils/adminReport';
 
 /** 선택 목록에 Action을 토글한다. 이후 처리 Modal이 같은 배열을 요청 body로 쓴다. */
 export const toggleReportProcessAction = (

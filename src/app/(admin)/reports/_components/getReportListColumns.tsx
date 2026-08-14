@@ -1,8 +1,6 @@
 import { Button } from '@/components/Button/Button';
-import type { Column } from '@/components/DataTable/DataTable';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { TruncatedText } from '@/components/TruncatedText/TruncatedText';
-import type { AdminReportListItem } from '@/types/adminReport';
 import {
   ADMIN_REPORT_CATEGORY_LABEL,
   ADMIN_REPORT_STATUS_BADGE_VARIANT,
@@ -12,6 +10,9 @@ import {
   formatAdminReportReporter,
   formatAdminReportTarget,
 } from '@/utils/adminReport';
+
+import type { Column } from '@/components/DataTable/DataTable';
+import type { AdminReportListItem } from '@/types/adminReport';
 
 /** 신고 목록 표시 규칙과 상세 열기 액션을 컬럼 정의로 묶는다. */
 export const getReportListColumns = (

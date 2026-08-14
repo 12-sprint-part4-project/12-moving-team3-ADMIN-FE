@@ -1,10 +1,11 @@
-import type { ReactNode } from 'react';
 
 import { AdminSidebar } from '@/components/AdminSidebar/AdminSidebar';
 import { PageHeader } from '@/components/PageHeader/PageHeader';
 import { cn } from '@/lib/utils';
 
 import { AdminMainScrollArea } from './AdminMainScrollArea';
+
+import type { ReactNode } from 'react';
 
 export interface AdminLayoutProps {
   /** 상단 헤더 슬롯. 앱에서는 AdminHeaderContainer, Storybook에서는 목업 Header를 전달한다. */

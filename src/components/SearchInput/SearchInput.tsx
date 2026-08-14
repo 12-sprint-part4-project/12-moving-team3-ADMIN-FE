@@ -1,13 +1,13 @@
 'use client';
 
+import { cva, type VariantProps } from 'class-variance-authority';
+import { Search } from 'lucide-react';
 import {
   useRef,
   type ChangeEvent,
   type InputHTMLAttributes,
   type KeyboardEvent,
 } from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { Search } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 

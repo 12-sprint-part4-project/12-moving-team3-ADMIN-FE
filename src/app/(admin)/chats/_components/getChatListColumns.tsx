@@ -1,12 +1,13 @@
 import { Button } from '@/components/Button/Button';
-import type { Column } from '@/components/DataTable/DataTable';
-import type { AdminChatListItem } from '@/types/adminChat';
 import {
   ADMIN_CHAT_ROOM_TYPE_LABEL,
   formatAdminChatLastMessagePreview,
   formatAdminChatParticipants,
 } from '@/utils/adminChat';
 import { formatAdminMemberJoinedAt } from '@/utils/adminMember';
+
+import type { Column } from '@/components/DataTable/DataTable';
+import type { AdminChatListItem } from '@/types/adminChat';
 
 /**
  * 채팅방 목록 전용 컬럼을 생성한다.

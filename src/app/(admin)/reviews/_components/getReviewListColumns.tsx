@@ -1,11 +1,13 @@
 import { Button } from '@/components/Button/Button';
-import type { Column } from '@/components/DataTable/DataTable';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
-import type { AdminReviewListItem } from '@/types/adminReview';
 import {
   formatAdminReviewCreatedAt,
   formatAdminReviewUserLabel,
 } from '@/utils/adminReview';
+
+import type { Column } from '@/components/DataTable/DataTable';
+import type { AdminReviewListItem } from '@/types/adminReview';
+
 
 /**
  * 관리자 리뷰 목록 DataTable 컬럼.

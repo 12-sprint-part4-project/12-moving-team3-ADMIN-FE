@@ -1,6 +1,7 @@
+import { FilterSelect } from './FilterSelect';
+
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { FilterSelect } from './FilterSelect';
 
 const meta: Meta<typeof FilterSelect> = {
   title: 'Admin/FilterSelect',

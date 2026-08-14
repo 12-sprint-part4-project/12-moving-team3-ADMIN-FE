@@ -9,6 +9,7 @@ import {
   formatServices,
 } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
+
 import type { AdminMemberDetail } from '@/types/adminMember';
 
 export interface AdminCustomerDetailDrawerProps {

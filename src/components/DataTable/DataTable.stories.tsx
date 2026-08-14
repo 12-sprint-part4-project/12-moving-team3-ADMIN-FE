@@ -1,9 +1,10 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { Button } from '@/components/Button/Button';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 
 import { DataTable, type Column, type DataTableProps } from './DataTable';
+
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 /** 회원 관리 목록을 대표하는 스토리용 행 타입 */
 interface MemberRow {
