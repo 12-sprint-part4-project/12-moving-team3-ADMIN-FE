@@ -16,6 +16,7 @@ interface StatisticItem {
   key: keyof AdminCompletedStatistics;
   title: string;
   unit?: string;
+  description?: string;
   icon: ReactNode;
   iconBackgroundClassName: string;
 }
@@ -32,6 +33,7 @@ const STATISTICS_ITEMS: StatisticItem[] = [
     key: 'averageCompletedPrice',
     title: '평균 완료 견적 금액',
     unit: '원',
+    description: '※ 평균 금액은 소수점 이하를 반올림하여 표시합니다.',
     icon: <CircleDollarSign className="size-6 text-blue-300" />,
     iconBackgroundClassName: 'bg-blue-100',
   },
@@ -83,10 +85,18 @@ export const CompletedStatistics = ({
     return (
       <StatisticsCardList
         items={STATISTICS_ITEMS.map(
-          ({ key, title, unit, icon, iconBackgroundClassName }) => ({
+          ({
+            key,
+            title,
+            unit,
+            description,
+            icon,
+            iconBackgroundClassName,
+          }) => ({
             title,
             value: formatStatisticValue(key, statistics),
             unit,
+            description,
             icon,
             iconBackgroundClassName,
           })

@@ -2,12 +2,15 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useId, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   CircleAlert,
   CircleCheck,
   ClipboardList,
   LayoutDashboard,
   MessageCircle,
+  PanelLeft,
   Star,
   Truck,
   Users,
@@ -22,8 +25,24 @@ interface AdminMenuItem {
   icon: LucideIcon;
 }
 
+interface SidebarHoverLabelProps {
+  children: string;
+}
+
+/** 네이티브 title은 브라우저 지연이 커서, 호버 즉시 보이는 라벨을 쓴다. */
+const SidebarHoverLabel = ({ children }: SidebarHoverLabelProps) => (
+  <span
+    aria-hidden
+    className="pointer-events-none absolute top-1/2 left-full z-20 ml-2 -translate-y-1/2 whitespace-nowrap rounded bg-black-400 px-2 py-1 text-xs-medium text-background-100 opacity-0 group-hover:opacity-100"
+  >
+    {children}
+  </span>
+);
+
 export interface AdminSidebarProps {
   className?: string;
+  /** 초기 접힘 여부. 기본값은 아이콘만 보이는 접힌 상태 */
+  defaultCollapsed?: boolean;
 }
 
 const ADMIN_MENU_ITEMS: AdminMenuItem[] = [
@@ -42,39 +61,103 @@ const isActiveMenu = (pathname: string, href: string) =>
     ? pathname === href
     : pathname === href || pathname.startsWith(`${href}/`);
 
-export const AdminSidebar = ({ className }: AdminSidebarProps) => {
+/** 접힌 너비(w-14)에서 px-2를 뺀 아이콘 열. 펼쳐도 아이콘이 가운데 자리에 남는다. */
+const ICON_COLUMN_CLASS_NAME = 'flex w-10 shrink-0 justify-center';
+
+const EXPAND_SIDEBAR_LABEL = '사이드바 펼치기';
+const COLLAPSE_SIDEBAR_LABEL = '사이드바 접기';
+
+/** Tailwind w-14 / w-45와 동일한 rem 값 */
+const SIDEBAR_COLLAPSED_WIDTH = '3.5rem';
+const SIDEBAR_EXPANDED_WIDTH = '11.25rem';
+/** DetailDrawer와 동일한 0.2s ease-out */
+const SIDEBAR_MOTION_DURATION_SEC = 0.2;
+
+export const AdminSidebar = ({
+  className,
+  defaultCollapsed = true,
+}: AdminSidebarProps) => {
   const pathname = usePathname();
+  const navId = useId();
+  const shouldReduceMotion = useReducedMotion();
+  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
+
+  const handleToggleCollapse = () => {
+    setIsCollapsed((prev) => !prev);
+  };
+
+  const toggleLabel = isCollapsed
+    ? EXPAND_SIDEBAR_LABEL
+    : COLLAPSE_SIDEBAR_LABEL;
+
+  const sidebarTransition = {
+    duration: shouldReduceMotion ? 0 : SIDEBAR_MOTION_DURATION_SEC,
+    ease: 'easeOut',
+  } as const;
 
   return (
-    <aside
+    <motion.aside
+      initial={false}
+      animate={{
+        width: isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_EXPANDED_WIDTH,
+      }}
+      transition={sidebarTransition}
       className={cn(
-        'h-full w-44 shrink-0 border-r border-line-200 bg-white px-2 py-4',
+        'relative z-10 h-full shrink-0 border-r border-line-200 bg-white px-2 py-4',
         className
       )}
     >
-      <nav aria-label="관리자 메뉴">
-        <ul className="flex flex-col gap-1">
-          {ADMIN_MENU_ITEMS.map(({ label, href, icon: Icon }) => {
-            const isActive = isActiveMenu(pathname, href);
+      <div className="flex flex-col gap-1">
+        <button
+          type="button"
+          onClick={handleToggleCollapse}
+          aria-expanded={!isCollapsed}
+          aria-controls={navId}
+          aria-label={toggleLabel}
+          className="group relative flex h-8 w-full cursor-pointer items-center rounded text-black-300"
+        >
+          <span className={ICON_COLUMN_CLASS_NAME}>
+            <PanelLeft className="size-5 shrink-0" aria-hidden />
+          </span>
+          <SidebarHoverLabel>{toggleLabel}</SidebarHoverLabel>
+        </button>
 
-            return (
-              <li key={href}>
-                <Link
-                  href={href}
-                  aria-current={isActive ? 'page' : undefined}
-                  className={cn(
-                    'flex h-8 items-center gap-3 rounded px-3 text-sm-medium text-black-300',
-                    isActive && 'bg-blue-100 text-blue-300'
-                  )}
-                >
-                  <Icon className="size-4 shrink-0" aria-hidden />
-                  <span>{label}</span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-    </aside>
+        <nav id={navId} aria-label="관리자 메뉴">
+          <ul className="flex flex-col gap-1">
+            {ADMIN_MENU_ITEMS.map(({ label, href, icon: Icon }) => {
+              const isActive = isActiveMenu(pathname, href);
+
+              return (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    aria-current={isActive ? 'page' : undefined}
+                    className={cn(
+                      'group relative flex h-8 items-center rounded text-md-medium text-black-300',
+                      isActive && 'bg-blue-100 text-blue-300'
+                    )}
+                  >
+                    <span className={ICON_COLUMN_CLASS_NAME}>
+                      <Icon className="size-5 shrink-0" aria-hidden />
+                    </span>
+                    <motion.span
+                      initial={false}
+                      animate={{ opacity: isCollapsed ? 0 : 1 }}
+                      transition={sidebarTransition}
+                      className="min-w-0 flex-1 overflow-hidden whitespace-nowrap"
+                    >
+                      {label}
+                    </motion.span>
+                    {isCollapsed ? (
+                      <SidebarHoverLabel>{label}</SidebarHoverLabel>
+                    ) : null}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      </div>
+    </motion.aside>
   );
 };
