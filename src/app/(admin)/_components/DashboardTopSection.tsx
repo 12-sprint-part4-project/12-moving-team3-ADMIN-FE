@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
 import {
   CircleAlert,
   CircleCheck,
@@ -8,15 +7,17 @@ import {
   FileText,
   Users,
 } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
 
-import type { DateRange } from '@/components/DateRangePicker/DateRangePicker';
 import { DateRangePopover } from '@/components/DateRangePopover/DateRangePopover';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { StatisticsCardList } from '@/components/StatCard/StatisticsCardList';
 import { useDashboardStatistics } from '@/hooks/useDashboardStatistics';
-import type { AdminDashboardStatistics } from '@/types/adminDashboard';
 import { toAdminDashboardStatisticsParams } from '@/utils/adminDashboard';
+
+import type { DateRange } from '@/components/DateRangePicker/DateRangePicker';
+import type { AdminDashboardStatistics } from '@/types/adminDashboard';
 
 type KpiField = keyof AdminDashboardStatistics;
 

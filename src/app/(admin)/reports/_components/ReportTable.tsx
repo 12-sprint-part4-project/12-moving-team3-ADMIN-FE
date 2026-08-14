@@ -2,6 +2,7 @@ import { Button } from '@/components/Button/Button';
 import { DataTable, type Column } from '@/components/DataTable/DataTable';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
+
 import type { AdminReportListItem } from '@/types/adminReport';
 
 interface ReportTableProps {

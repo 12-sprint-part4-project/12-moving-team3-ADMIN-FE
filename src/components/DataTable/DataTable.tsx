@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react';
 
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { cn } from '@/lib/utils';
+
+import type { ReactNode } from 'react';
 
 type CellAlign = 'left' | 'center' | 'right';
 

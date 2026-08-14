@@ -1,6 +1,7 @@
+import { cn } from '@/lib/utils';
+
 import type { ReactNode } from 'react';
 
-import { cn } from '@/lib/utils';
 
 /*
  * 제목, 값, 단위, 설명을 카드 형태로 표시하는 통계 컴포넌트

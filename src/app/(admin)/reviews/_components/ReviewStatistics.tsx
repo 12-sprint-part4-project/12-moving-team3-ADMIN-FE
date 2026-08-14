@@ -1,10 +1,11 @@
-import type { ReactNode } from 'react';
 import { Star, Trash2 } from 'lucide-react';
 
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { StatisticsCardList } from '@/components/StatCard/StatisticsCardList';
+
 import type { AdminReviewStatistics } from '@/types/adminReview';
+import type { ReactNode } from 'react';
 
 interface ReviewStatisticsProps {
   statistics?: AdminReviewStatistics;

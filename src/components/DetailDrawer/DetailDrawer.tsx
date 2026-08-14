@@ -1,5 +1,7 @@
 'use client';
 
+import { cva, type VariantProps } from 'class-variance-authority';
+import { X } from 'lucide-react';
 import {
   useEffect,
   useId,
@@ -8,8 +10,6 @@ import {
   type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { X } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 

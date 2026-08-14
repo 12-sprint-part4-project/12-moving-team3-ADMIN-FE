@@ -1,10 +1,11 @@
-import { axiosInstance } from '@/api/axiosInstance';
 import {
   ADMIN_MEMBER_LIST_PATH,
   getAdminMemberActivatePath,
   getAdminMemberDetailPath,
   getAdminMemberSuspendPath,
 } from '@/api/adminMemberPaths';
+import { axiosInstance } from '@/api/axiosInstance';
+
 import type {
   AdminMemberDetailResponse,
   AdminMemberListQuery,

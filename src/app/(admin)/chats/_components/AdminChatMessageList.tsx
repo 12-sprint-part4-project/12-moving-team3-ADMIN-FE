@@ -8,13 +8,14 @@ import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { useAdminChatMessages } from '@/hooks/useAdminChatMessages';
+import { formatAdminChatUserLabel } from '@/utils/adminChat';
+import { formatAdminMemberJoinedAt } from '@/utils/adminMember';
+
 import type {
   AdminChatMessage,
   AdminChatMessagesMeta,
   AdminChatMessagesQuery,
 } from '@/types/adminChat';
-import { formatAdminChatUserLabel } from '@/utils/adminChat';
-import { formatAdminMemberJoinedAt } from '@/utils/adminMember';
 
 const MESSAGE_PAGE_LIMIT = 30;
 

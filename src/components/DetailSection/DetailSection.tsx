@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
+
+import type { ReactNode } from 'react';
 
 export const detailSectionVariants = cva(
   'flex flex-col rounded-lg border border-line-200 bg-white',

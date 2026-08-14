@@ -1,12 +1,13 @@
 import { format } from 'date-fns';
 
+import { formatAdminEstimateQuotePrice } from '@/utils/adminEstimateRequest';
+
 import type { DateRange } from '@/components/DateRangePicker/DateRangePicker';
 import type {
   AdminCompletedDetailMissingField,
   AdminCompletedListMissingField,
   AdminCompletedStatisticsQuery,
 } from '@/types/adminCompleted';
-import { formatAdminEstimateQuotePrice } from '@/utils/adminEstimateRequest';
 
 const MISSING_FIELD_LABEL: Record<AdminCompletedDetailMissingField, string> = {
   moveType: '이사 유형',

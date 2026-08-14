@@ -9,6 +9,7 @@ import {
   REGION_LABEL,
 } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
+
 import type {
   AdminMemberDetail,
   MoverProfile,

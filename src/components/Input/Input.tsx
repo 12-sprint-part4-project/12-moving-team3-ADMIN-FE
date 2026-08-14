@@ -1,7 +1,7 @@
 'use client';
 
-import { useId, type InputHTMLAttributes, type ReactNode } from 'react';
 import { cva } from 'class-variance-authority';
+import { useId, type InputHTMLAttributes, type ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
 

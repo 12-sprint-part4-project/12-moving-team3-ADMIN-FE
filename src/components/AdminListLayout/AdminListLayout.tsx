@@ -1,8 +1,9 @@
-import type { ReactNode } from 'react';
 
 import { PageHeader } from '@/components/PageHeader/PageHeader';
 import { Pagination } from '@/components/Pagination/Pagination';
 import { cn } from '@/lib/utils';
+
+import type { ReactNode } from 'react';
 
 export interface AdminListLayoutProps {
   title: string;

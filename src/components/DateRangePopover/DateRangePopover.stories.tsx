@@ -1,9 +1,9 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { useState } from 'react';
 
-import type { DateRange } from '@/components/DateRangePicker/DateRangePicker';
-
 import { DateRangePopover } from './DateRangePopover';
+
+import type { DateRange } from '@/components/DateRangePicker/DateRangePicker';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 interface DateRangePopoverStoryProps {
   initialValue?: DateRange;

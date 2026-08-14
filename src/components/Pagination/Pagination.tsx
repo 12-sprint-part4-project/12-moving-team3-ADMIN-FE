@@ -1,10 +1,11 @@
 'use client';
 
-import type { ButtonHTMLAttributes, HTMLAttributes } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+
+import type { ButtonHTMLAttributes, HTMLAttributes } from 'react';
 
 export const paginationRootVariants = cva('inline-flex items-start', {
   variants: {

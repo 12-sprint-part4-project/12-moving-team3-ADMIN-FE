@@ -1,7 +1,8 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { Banknote, ClipboardList, Star, Users } from 'lucide-react';
 
 import { StatCard } from './StatCard';
+
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const meta: Meta<typeof StatCard> = {
   title: 'Admin/StatCard',

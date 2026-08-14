@@ -10,6 +10,7 @@ import {
   rejectAdminReport,
   resolveAdminReport,
 } from '@/services/adminReportApi';
+
 import type { AdminReportResolveBody } from '@/types/adminReport';
 
 export type ResolveAdminReportVariables = {

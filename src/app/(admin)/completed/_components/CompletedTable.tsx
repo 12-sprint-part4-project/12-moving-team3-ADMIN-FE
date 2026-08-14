@@ -6,7 +6,6 @@ import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { Pagination } from '@/components/Pagination/Pagination';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { TruncatedText } from '@/components/TruncatedText/TruncatedText';
-import type { AdminCompletedListItem } from '@/types/adminCompleted';
 import {
   formatAdminCompletedMissingFields,
   formatAdminCompletedMoveDate,
@@ -18,6 +17,8 @@ import {
   formatAdminEstimateRequestNullableText,
   formatAdminEstimateRequestPhoneNumber,
 } from '@/utils/adminEstimateRequest';
+
+import type { AdminCompletedListItem } from '@/types/adminCompleted';
 
 export interface CompletedTableProps {
   items: AdminCompletedListItem[];

@@ -1,14 +1,15 @@
 import { Button } from '@/components/Button/Button';
-import type { Column } from '@/components/DataTable/DataTable';
-import type { AdminMemberListColumnsContext } from '@/components/AdminMemberListView/AdminMemberListView';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { TruncatedText } from '@/components/TruncatedText/TruncatedText';
-import type { AdminMemberListItem } from '@/types/adminMember';
 import {
   formatAdminMemberJoinedAt,
   formatAdminMemberPhoneNumber,
   getAdminMemberRowNumber,
 } from '@/utils/adminMember';
+
+import type { AdminMemberListColumnsContext } from '@/components/AdminMemberListView/AdminMemberListView';
+import type { Column } from '@/components/DataTable/DataTable';
+import type { AdminMemberListItem } from '@/types/adminMember';
 
 /** 목록 API의 평균 평점이 없으면 빈 값 대신 대시를 표시한다. */
 const formatAverageRating = (averageRating: number | null) => {

@@ -1,7 +1,6 @@
 import { DetailField } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
-import type { AdminReportDetail } from '@/types/adminReport';
 import {
   ADMIN_REPORT_CATEGORY_LABEL,
   ADMIN_REPORT_STATUS_BADGE_VARIANT,
@@ -11,6 +10,8 @@ import {
 } from '@/utils/adminReport';
 
 import { formatAdminLabel } from './helpers';
+
+import type { AdminReportDetail } from '@/types/adminReport';
 
 export const ReportBasicInfoSection = ({
   detail,

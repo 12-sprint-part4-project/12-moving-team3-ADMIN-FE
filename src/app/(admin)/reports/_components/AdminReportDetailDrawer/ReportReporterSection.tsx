@@ -1,11 +1,12 @@
 import { DetailField } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
-import type { AdminReportDetail } from '@/types/adminReport';
 import { ADMIN_REPORT_USER_TYPE_LABEL } from '@/utils/adminReport';
 
 import { formatNullableDateTime } from './helpers';
 import { TargetUserProfileImage } from './TargetUserProfileImage';
+
+import type { AdminReportDetail } from '@/types/adminReport';
 
 export const ReportReporterSection = ({
   detail,

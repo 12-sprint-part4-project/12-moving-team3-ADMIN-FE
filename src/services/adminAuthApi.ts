@@ -1,10 +1,11 @@
-import { axiosInstance } from '@/api/axiosInstance';
 import {
   ADMIN_AUTH_LOGIN_PATH,
   ADMIN_AUTH_LOGOUT_PATH,
   ADMIN_AUTH_ME_PATH,
   ADMIN_AUTH_REFRESH_PATH,
 } from '@/api/adminAuthPaths';
+import { axiosInstance } from '@/api/axiosInstance';
+
 import type {
   AdminLoginRequest,
   AdminLoginResponse,

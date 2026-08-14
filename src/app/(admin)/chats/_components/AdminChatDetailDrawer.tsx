@@ -10,10 +10,6 @@ import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { useAdminChatDetail } from '@/hooks/useAdminChatDetail';
-import type {
-  AdminChatDetail,
-  AdminChatParticipant,
-} from '@/types/adminChat';
 import {
   ADMIN_CHAT_ROOM_TYPE_LABEL,
   ADMIN_CHAT_USER_TYPE_LABEL,
@@ -21,6 +17,11 @@ import {
 import { formatAdminMemberJoinedAt } from '@/utils/adminMember';
 
 import { AdminChatMessageList } from './AdminChatMessageList';
+
+import type {
+  AdminChatDetail,
+  AdminChatParticipant,
+} from '@/types/adminChat';
 
 export interface AdminChatDetailDrawerProps {
   open: boolean;

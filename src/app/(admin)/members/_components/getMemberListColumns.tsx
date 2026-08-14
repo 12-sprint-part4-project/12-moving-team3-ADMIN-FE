@@ -1,14 +1,15 @@
 import { Button } from '@/components/Button/Button';
-import type { Column } from '@/components/DataTable/DataTable';
-import type { AdminMemberListColumnsContext } from '@/components/AdminMemberListView/AdminMemberListView';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { TruncatedText } from '@/components/TruncatedText/TruncatedText';
-import type { AdminMemberListItem } from '@/types/adminMember';
 import {
   formatAdminMemberJoinedAt,
   formatAdminMemberPhoneNumber,
   getAdminMemberRowNumber,
 } from '@/utils/adminMember';
+
+import type { AdminMemberListColumnsContext } from '@/components/AdminMemberListView/AdminMemberListView';
+import type { Column } from '@/components/DataTable/DataTable';
+import type { AdminMemberListItem } from '@/types/adminMember';
 
 /** 일반 회원 목록에만 필요한 컬럼을 생성한다. */
 export const getMemberListColumns = (

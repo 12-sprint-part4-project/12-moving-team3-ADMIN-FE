@@ -1,10 +1,11 @@
-import type { ReactNode } from 'react';
 import { CircleAlert, CircleCheck, Clock3, TimerOff } from 'lucide-react';
 
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { StatisticsCardList } from '@/components/StatCard/StatisticsCardList';
+
 import type { AdminEstimateRequestStatistics } from '@/types/adminEstimateRequest';
+import type { ReactNode } from 'react';
 
 interface EstimateStatisticsProps {
   statistics?: AdminEstimateRequestStatistics;

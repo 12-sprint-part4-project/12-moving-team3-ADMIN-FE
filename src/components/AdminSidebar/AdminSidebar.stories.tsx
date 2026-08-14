@@ -1,6 +1,7 @@
+import { AdminSidebar } from './AdminSidebar';
+
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { AdminSidebar } from './AdminSidebar';
 
 const meta: Meta<typeof AdminSidebar> = {
   title: 'Admin/AdminSidebar',

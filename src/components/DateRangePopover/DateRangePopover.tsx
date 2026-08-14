@@ -1,10 +1,10 @@
 'use client';
 
 import { format, isSameDay } from 'date-fns';
+import { Calendar } from 'lucide-react';
 import { useId, useState, useRef, useEffect } from 'react';
 
 import { Button } from '@/components/Button/Button';
-import { Calendar } from 'lucide-react';
 import {
   DateRangePicker,
   type DateRange,

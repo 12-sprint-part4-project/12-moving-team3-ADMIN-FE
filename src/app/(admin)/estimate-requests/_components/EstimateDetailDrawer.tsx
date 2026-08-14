@@ -10,10 +10,6 @@ import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { useAdminEstimateRequestDetail } from '@/hooks/useAdminEstimateRequestDetail';
 import { cn } from '@/lib/utils';
-import type {
-  AdminEstimateQuote,
-  AdminEstimateRequestDetail,
-} from '@/types/adminEstimateRequest';
 import {
   ADMIN_ESTIMATE_REQUEST_STATUS_BADGE,
   formatAdminEstimateQuotePrice,
@@ -24,6 +20,11 @@ import {
   formatAdminEstimateRequestSubmittedAt,
   hasAdminEstimateRequestMissingFields,
 } from '@/utils/adminEstimateRequest';
+
+import type {
+  AdminEstimateQuote,
+  AdminEstimateRequestDetail,
+} from '@/types/adminEstimateRequest';
 
 export interface EstimateDetailDrawerProps {
   open: boolean;
