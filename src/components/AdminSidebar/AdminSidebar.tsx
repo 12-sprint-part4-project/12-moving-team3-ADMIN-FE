@@ -1,5 +1,9 @@
 'use client';
 
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useId, useRef, useState, type MouseEvent } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   CircleAlert,
@@ -13,9 +17,6 @@ import {
   Users,
   type LucideIcon,
 } from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useId, useState } from 'react';
 
 import { cn } from '@/lib/utils';
 
@@ -25,19 +26,11 @@ interface AdminMenuItem {
   icon: LucideIcon;
 }
 
-interface SidebarHoverLabelProps {
-  children: string;
+interface SidebarTooltipState {
+  label: string;
+  top: number;
+  left: number;
 }
-
-/** 네이티브 title은 브라우저 지연이 커서, 호버 즉시 보이는 라벨을 쓴다. */
-const SidebarHoverLabel = ({ children }: SidebarHoverLabelProps) => (
-  <span
-    aria-hidden
-    className="pointer-events-none absolute top-1/2 left-full z-20 ml-2 -translate-y-1/2 whitespace-nowrap rounded bg-black-400 px-2 py-1 text-xs-medium text-background-100 opacity-0 group-hover:opacity-100"
-  >
-    {children}
-  </span>
-);
 
 export interface AdminSidebarProps {
   className?: string;
@@ -61,6 +54,29 @@ const isActiveMenu = (pathname: string, href: string) =>
     ? pathname === href
     : pathname === href || pathname.startsWith(`${href}/`);
 
+const getSidebarTooltipPosition = (element: HTMLElement) => {
+  const iconColumn = element.querySelector<HTMLElement>('[data-sidebar-icon]');
+  const rect = (iconColumn ?? element).getBoundingClientRect();
+
+  return {
+    top: rect.top + rect.height / 2,
+    left: rect.right,
+  };
+};
+
+/** overflow에 잘리지 않도록 body에 고정 위치로 그린다. */
+const SidebarPortalTooltip = ({ label, top, left }: SidebarTooltipState) =>
+  createPortal(
+    <span
+      aria-hidden
+      className="pointer-events-none fixed z-50 ml-2 -translate-y-1/2 whitespace-nowrap rounded bg-black-400 px-2 py-1 text-xs-medium text-background-100"
+      style={{ top, left }}
+    >
+      {label}
+    </span>,
+    document.body
+  );
+
 /** 접힌 너비(w-14)에서 px-2를 뺀 아이콘 열. 펼쳐도 아이콘이 가운데 자리에 남는다. */
 const ICON_COLUMN_CLASS_NAME = 'flex w-10 shrink-0 justify-center';
 
@@ -79,11 +95,25 @@ export const AdminSidebar = ({
 }: AdminSidebarProps) => {
   const pathname = usePathname();
   const navId = useId();
+  const asideRef = useRef<HTMLElement>(null);
   const shouldReduceMotion = useReducedMotion();
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
+  const [tooltip, setTooltip] = useState<SidebarTooltipState | null>(null);
 
   const handleToggleCollapse = () => {
+    setTooltip(null);
     setIsCollapsed((prev) => !prev);
+  };
+
+  const handleShowTooltip = (event: MouseEvent<HTMLElement>, label: string) => {
+    setTooltip({
+      label,
+      ...getSidebarTooltipPosition(event.currentTarget),
+    });
+  };
+
+  const handleHideTooltip = () => {
+    setTooltip(null);
   };
 
   const toggleLabel = isCollapsed
@@ -95,8 +125,24 @@ export const AdminSidebar = ({
     ease: 'easeOut',
   } as const;
 
+  useEffect(() => {
+    if (!tooltip) {
+      return;
+    }
+
+    const sidebar = asideRef.current;
+    sidebar?.addEventListener('scroll', handleHideTooltip);
+    window.addEventListener('resize', handleHideTooltip);
+
+    return () => {
+      sidebar?.removeEventListener('scroll', handleHideTooltip);
+      window.removeEventListener('resize', handleHideTooltip);
+    };
+  }, [tooltip]);
+
   return (
     <motion.aside
+      ref={asideRef}
       initial={false}
       animate={{
         width: isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_EXPANDED_WIDTH,
@@ -111,15 +157,16 @@ export const AdminSidebar = ({
         <button
           type="button"
           onClick={handleToggleCollapse}
+          onMouseEnter={(event) => handleShowTooltip(event, toggleLabel)}
+          onMouseLeave={handleHideTooltip}
           aria-expanded={!isCollapsed}
           aria-controls={navId}
           aria-label={toggleLabel}
-          className="group relative flex h-8 w-full min-w-0 cursor-pointer items-center rounded text-black-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300"
+          className="flex h-8 w-full min-w-0 cursor-pointer items-center rounded text-black-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300"
         >
-          <span className={ICON_COLUMN_CLASS_NAME}>
+          <span data-sidebar-icon className={ICON_COLUMN_CLASS_NAME}>
             <PanelLeft className="size-5 shrink-0" aria-hidden />
           </span>
-          <SidebarHoverLabel>{toggleLabel}</SidebarHoverLabel>
         </button>
 
         <nav id={navId} aria-label="관리자 메뉴">
@@ -132,12 +179,18 @@ export const AdminSidebar = ({
                   <Link
                     href={href}
                     aria-current={isActive ? 'page' : undefined}
+                    onMouseEnter={
+                      isCollapsed
+                        ? (event) => handleShowTooltip(event, label)
+                        : undefined
+                    }
+                    onMouseLeave={isCollapsed ? handleHideTooltip : undefined}
                     className={cn(
-                      'group relative flex h-8 min-w-0 items-center rounded text-md-medium text-black-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300',
+                      'flex h-8 min-w-0 items-center rounded text-md-medium text-black-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300',
                       isActive && 'bg-blue-100 text-blue-300'
                     )}
                   >
-                    <span className={ICON_COLUMN_CLASS_NAME}>
+                    <span data-sidebar-icon className={ICON_COLUMN_CLASS_NAME}>
                       <Icon className="size-5 shrink-0" aria-hidden />
                     </span>
                     <motion.span
@@ -153,9 +206,6 @@ export const AdminSidebar = ({
                     >
                       {label}
                     </motion.span>
-                    {isCollapsed ? (
-                      <SidebarHoverLabel>{label}</SidebarHoverLabel>
-                    ) : null}
                   </Link>
                 </li>
               );
@@ -163,6 +213,7 @@ export const AdminSidebar = ({
           </ul>
         </nav>
       </div>
+      {tooltip ? <SidebarPortalTooltip {...tooltip} /> : null}
     </motion.aside>
   );
 };
