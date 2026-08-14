@@ -1,15 +1,19 @@
 'use client';
 
+import { useEffect, useId, useRef, useState } from 'react';
 import { format, isSameDay } from 'date-fns';
-import { useId, useState, useRef, useEffect } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { Calendar } from 'lucide-react';
 
 import { Button } from '@/components/Button/Button';
-import { Calendar } from 'lucide-react';
 import {
   DateRangePicker,
   type DateRange,
 } from '@/components/DateRangePicker/DateRangePicker';
 import { cn } from '@/lib/utils';
+
+const POPOVER_MOTION_OFFSET_PX = 4;
+const POPOVER_MOTION_DURATION_SEC = 0.2;
 
 // DateRangePopover 컴포넌트의 props 타입 정의
 export interface DateRangePopoverProps {
@@ -49,14 +53,21 @@ export const DateRangePopover = ({
 }: DateRangePopoverProps) => {
   // popover를 위한 고유 ID
   const popoverId = useId();
+  const shouldReduceMotion = useReducedMotion();
   // 팝오버 열림 상태
   const [isOpen, setIsOpen] = useState(false);
   // 임시 날짜 범위(팝오버 내에서 사용)
   const [draftRange, setDraftRange] = useState<DateRange | undefined>(value);
   // wrapper ref (outside click 감지·Escape 후 트리거 포커스 복귀에 사용)
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const isOpenRef = useRef(isOpen);
+  isOpenRef.current = isOpen;
   // 버튼에 표시될 날짜 문자열
   const dateRangeLabel = formatDateRange(value) ?? placeholder;
+  const popoverTransition = {
+    duration: shouldReduceMotion ? 0 : POPOVER_MOTION_DURATION_SEC,
+    ease: 'easeOut',
+  } as const;
 
   // 버튼 클릭시 팝오버 열고 닫기
   const handleTriggerClick = () => {
@@ -75,9 +86,23 @@ export const DateRangePopover = ({
     setIsOpen(false);
   };
 
-  // 확인 버튼 클릭시 외부에 선택한 범위를 전달한 후 팝오버 닫기
+  // 종료 애니메이션 중에는 onConfirm이 다시 실행되지 않게 막는다.
   const handleConfirm = () => {
+    if (!isOpenRef.current) {
+      return;
+    }
+
     onConfirm(draftRange);
+    setIsOpen(false);
+  };
+
+  const handleSelectAllPeriod = () => {
+    if (!isOpenRef.current) {
+      return;
+    }
+
+    setDraftRange(undefined);
+    onConfirm(undefined);
     setIsOpen(false);
   };
 
@@ -131,46 +156,49 @@ export const DateRangePopover = ({
           triggerClassName
         )}
       >
-
         <Calendar className="size-4 text-gray-400" aria-hidden />
         {dateRangeLabel}
       </Button>
 
       {/* 팝오버 영역 (isOpen이 true일 때만 표시) */}
-      {isOpen ? (
-        <div
-          id={popoverId}
-          role="dialog"
-          aria-label="날짜 범위 선택"
-          className="absolute top-full right-0 z-10 mt-2 w-92 overflow-hidden rounded-lg border border-line-200 bg-white"
-        >
-          {/* 날짜 범위 선택기 */}
-          <DateRangePicker
-            value={draftRange}
-            onChange={setDraftRange}
-            className="rounded-none border-0"
-          />
-          {/* 취소/확인 버튼 영역 */}
-          <div className="flex justify-end gap-2 border-t border-line-200 p-4">
-            <Button
-              variant="outlined"
-              onClick={() => {
-                setDraftRange(undefined);
-                onConfirm(undefined);
-                setIsOpen(false);
-              }}
-            >
-              전체 기간
-            </Button>
-            <Button variant="secondary" onClick={handleCancel}>
-              취소
-            </Button>
-            <Button variant="solid" onClick={handleConfirm}>
-              확인
-            </Button>
-          </div>
-        </div>
-      ) : null}
+      <AnimatePresence>
+        {isOpen ? (
+          <motion.div
+            key="date-range-popover"
+            id={popoverId}
+            role="dialog"
+            aria-label="날짜 범위 선택"
+            initial={{ opacity: 0, y: -POPOVER_MOTION_OFFSET_PX }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{
+              opacity: 0,
+              y: -POPOVER_MOTION_OFFSET_PX,
+              pointerEvents: 'none',
+            }}
+            transition={popoverTransition}
+            className="absolute top-full right-0 z-10 mt-2 w-92 overflow-hidden rounded-lg border border-line-200 bg-white"
+          >
+            {/* 날짜 범위 선택기 */}
+            <DateRangePicker
+              value={draftRange}
+              onChange={setDraftRange}
+              className="rounded-none border-0"
+            />
+            {/* 취소/확인 버튼 영역 */}
+            <div className="flex justify-end gap-2 border-t border-line-200 p-4">
+              <Button variant="outlined" onClick={handleSelectAllPeriod}>
+                전체 기간
+              </Button>
+              <Button variant="secondary" onClick={handleCancel}>
+                취소
+              </Button>
+              <Button variant="solid" onClick={handleConfirm}>
+                확인
+              </Button>
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 };
