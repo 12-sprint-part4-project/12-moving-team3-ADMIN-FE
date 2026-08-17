@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 import { PageHeader } from '@/components/PageHeader/PageHeader';
 import { useAdminEstimateRequestList } from '@/hooks/useAdminEstimateRequestList';
 import { useAdminEstimateRequestStatistics } from '@/hooks/useAdminEstimateRequestStatistics';
+import { useClampListPage } from '@/hooks/useClampListPage';
 import {
   toAdminEstimateRequestApiDate,
   toAdminEstimateRequestStatisticsQuery,
@@ -72,6 +73,13 @@ export const EstimateManagementContent = () => {
     isPending: isStatisticsPending,
     isError: isStatisticsError,
   } = useAdminEstimateRequestStatistics(statisticsQuery);
+
+  useClampListPage({
+    page: filters.page,
+    totalPages: listData?.meta?.totalPages,
+    isPending: isListPending,
+    setFilters,
+  });
 
   const updateFilters = (
     patch: Partial<EstimateRequestFilters>,

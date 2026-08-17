@@ -5,6 +5,7 @@ import { useMemo, useState, type ChangeEvent } from 'react';
 import { PageHeader } from '@/components/PageHeader/PageHeader';
 import { useAdminCompletedList } from '@/hooks/useAdminCompletedList';
 import { useAdminCompletedStatistics } from '@/hooks/useAdminCompletedStatistics';
+import { useClampListPage } from '@/hooks/useClampListPage';
 import { toAdminCompletedStatisticsQuery } from '@/utils/adminCompleted';
 
 import { CompletedDetailDrawer } from './CompletedDetailDrawer';
@@ -63,6 +64,13 @@ export const CompletedManagementContent = () => {
     isPending: isStatisticsPending,
     isError: isStatisticsError,
   } = useAdminCompletedStatistics(dateQuery);
+
+  useClampListPage({
+    page: filters.page,
+    totalPages: listData?.meta?.totalPages,
+    isPending: isListPending,
+    setFilters,
+  });
 
   const updateFilters = (
     patch: Partial<CompletedFilters>,
