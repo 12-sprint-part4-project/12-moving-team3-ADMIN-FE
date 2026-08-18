@@ -55,7 +55,7 @@ export const ReviewManagementContent = () => {
     handleDeletionStatusChange,
     handleDateRangeConfirm,
     handlePageChange,
-    clampPage,
+    setFilters,
     handleResetFilters,
   } = useAdminReviewListFilters();
 
@@ -83,7 +83,7 @@ export const ReviewManagementContent = () => {
     page: filters.page,
     totalPages: pagination?.totalPages,
     isPending,
-    clampPage,
+    setFilters,
   });
 
   const columns = useMemo(

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
+import { useMemo, useState, type ChangeEvent } from 'react';
 
 import {
   toAdminReviewApiDate,
@@ -187,12 +187,6 @@ export const useAdminReviewListFilters = () => {
     setFilters(INITIAL_FILTERS);
   };
 
-  const clampPage = useCallback((page: number) => {
-    setFilters((previous) =>
-      previous.page === page ? previous : { ...previous, page }
-    );
-  }, []);
-
   return {
     filters,
     setFilters,
@@ -207,7 +201,6 @@ export const useAdminReviewListFilters = () => {
     handleDeletionStatusChange,
     handleDateRangeConfirm,
     handlePageChange,
-    clampPage,
     handleResetFilters,
   };
 };

@@ -33,7 +33,7 @@ export const ReportManagementContent = () => {
     handleTargetChange,
     handleDateRangeConfirm,
     handlePageChange,
-    clampPage,
+    setFilters,
     handleResetFilters,
   } = useAdminReportListFilters();
   const { data, isPending, isError } = useAdminReportList(listQuery);
@@ -52,7 +52,7 @@ export const ReportManagementContent = () => {
     page: filters.page,
     totalPages: pagination?.totalPages,
     isPending,
-    clampPage,
+    setFilters,
   });
 
   const columns = useMemo(() => getReportListColumns(setSelectedReportId), []);

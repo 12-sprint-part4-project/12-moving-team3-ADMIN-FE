@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
+import { useMemo, useState, type ChangeEvent } from 'react';
 
 import { toAdminReportStatisticsQuery } from '@/utils/adminReport';
 
@@ -139,12 +139,6 @@ export const useAdminReportListFilters = () => {
     setFilters(INITIAL_FILTERS);
   };
 
-  const clampPage = useCallback((page: number) => {
-    setFilters((previous) =>
-      previous.page === page ? previous : { ...previous, page }
-    );
-  }, []);
-
   return {
     filters,
     setFilters,
@@ -165,7 +159,6 @@ export const useAdminReportListFilters = () => {
     handleTargetChange,
     handleDateRangeConfirm,
     handlePageChange: (page: number) => updateFilters({ page }),
-    clampPage,
     handleResetFilters,
   };
 };

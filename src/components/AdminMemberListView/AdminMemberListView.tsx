@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  useCallback,
-  useMemo,
-  useState,
-  type ChangeEvent,
-  type ReactNode,
-} from 'react';
+import { useMemo, useState, type ChangeEvent, type ReactNode } from 'react';
 
 import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
 import { Button } from '@/components/Button/Button';
@@ -125,16 +119,11 @@ export const AdminMemberListView = ({
   const totalPages = pagination?.totalPages ?? 0;
   const currentPage = pagination?.page ?? filters.page;
 
-  const clampPage = useCallback((page: number) => {
-    setFilters((previous) =>
-      previous.page === page ? previous : { ...previous, page }
-    );
-  }, []);
   useClampListPage({
     page: filters.page,
     totalPages: pagination?.totalPages,
     isPending,
-    clampPage,
+    setFilters,
   });
 
   const dateRangeValue = useMemo<DateRangePopoverProps['value']>(() => {
