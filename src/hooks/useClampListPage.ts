@@ -26,7 +26,7 @@ export const useClampListPage = <T extends ListFiltersWithPage>({
     const safePage = Math.max(totalPages, 1);
     if (page > safePage) {
       setFilters((previous) =>
-        previous.page === safePage ? previous : { ...previous, page: safePage }
+        previous.page > safePage ? { ...previous, page: safePage } : previous
       );
     }
   }, [isPending, page, setFilters, totalPages]);
