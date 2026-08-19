@@ -35,9 +35,10 @@ export const formatAdminMemberPhoneNumber = (
   return `${normalizedPhoneNumber.slice(0, 3)}-${normalizedPhoneNumber.slice(3, 7)}-${normalizedPhoneNumber.slice(7)}`;
 };
 
-/** 페이지 기준 행 번호 (API에 없는 표시용 값) */
+/** 필터링된 전체 개수를 기준으로 내림차순 표시하는 행 번호 */
 export const getAdminMemberRowNumber = (
+  totalCount: number,
   page: number,
   pageSize: number,
   index: number
-) => (page - 1) * pageSize + index + 1;
+) => totalCount - (page - 1) * pageSize - index;

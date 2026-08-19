@@ -13,13 +13,14 @@ import type { AdminMemberListItem } from '@/types/adminMember';
 
 /** 일반 회원 목록에만 필요한 컬럼을 생성한다. */
 export const getMemberListColumns = (
-  { page, pageSize }: AdminMemberListColumnsContext,
+  { page, pageSize, totalCount }: AdminMemberListColumnsContext,
   onOpenDetail: (memberId: string) => void
 ): Column<AdminMemberListItem>[] => [
   {
     key: 'index',
     header: '번호',
-    render: (_row, index) => getAdminMemberRowNumber(page, pageSize, index),
+    render: (_row, index) =>
+      getAdminMemberRowNumber(totalCount, page, pageSize, index),
   },
   {
     key: 'name',

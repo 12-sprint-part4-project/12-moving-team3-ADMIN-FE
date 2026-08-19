@@ -20,6 +20,7 @@ import { toAdminMemberApiDate } from '@/utils/adminMember';
 import type {
   AdminMemberListItem,
   AdminMemberListQuery,
+  AdminMemberSortOrder,
   MemberStatus,
   MemberUserType,
 } from '@/types/adminMember';
@@ -33,16 +34,23 @@ const STATUS_FILTER_OPTIONS = [
   { label: '정지', value: 'SUSPENDED' },
 ] as const;
 
+const SORT_ORDER_OPTIONS = [
+  { label: '가입일 최신순', value: 'DESC' },
+  { label: '가입일 오래된순', value: 'ASC' },
+] as const;
+
 export interface AdminMemberListFilters {
   search?: string;
   status?: MemberStatus;
   startDate?: string;
   endDate?: string;
+  sortOrder: AdminMemberSortOrder;
   page: number;
   pageSize: number;
 }
 
 const INITIAL_FILTERS: AdminMemberListFilters = {
+  sortOrder: 'DESC',
   page: 1,
   pageSize: DEFAULT_PAGE_SIZE,
 };
@@ -56,6 +64,9 @@ const parseMemberStatusFilter = (value: string): MemberStatus | undefined => {
   return undefined;
 };
 
+const parseSortOrder = (value: string): AdminMemberSortOrder =>
+  value === 'ASC' ? 'ASC' : 'DESC';
+
 const toListQuery = (
   userType: MemberUserType,
   filters: AdminMemberListFilters
@@ -63,6 +74,7 @@ const toListQuery = (
   userType,
   page: filters.page,
   pageSize: filters.pageSize,
+  sortOrder: filters.sortOrder,
   ...(filters.search ? { search: filters.search } : {}),
   ...(filters.status ? { status: filters.status } : {}),
   ...(filters.startDate ? { startDate: filters.startDate } : {}),
@@ -72,6 +84,7 @@ const toListQuery = (
 export interface AdminMemberListColumnsContext {
   page: number;
   pageSize: number;
+  totalCount: number;
 }
 
 export interface AdminMemberListViewProps {
@@ -117,6 +130,7 @@ export const AdminMemberListView = ({
   const items = data?.data.items ?? [];
   const pagination = data?.data.pagination;
   const totalPages = pagination?.totalPages ?? 0;
+  const totalCount = pagination?.totalCount ?? 0;
   const currentPage = pagination?.page ?? filters.page;
 
   useClampListPage({
@@ -146,8 +160,9 @@ export const AdminMemberListView = ({
       getColumns({
         page: filters.page,
         pageSize: filters.pageSize,
+        totalCount,
       }),
-    [getColumns, filters.page, filters.pageSize]
+    [getColumns, filters.page, filters.pageSize, totalCount]
   );
 
   const updateFilters = (
@@ -177,6 +192,13 @@ export const AdminMemberListView = ({
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
     updateFilters(
       { status: parseMemberStatusFilter(event.target.value) },
+      { resetPage: true }
+    );
+  };
+
+  const handleSortOrderChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    updateFilters(
+      { sortOrder: parseSortOrder(event.target.value) },
       { resetPage: true }
     );
   };
@@ -278,6 +300,12 @@ export const AdminMemberListView = ({
             value={dateRangeValue}
             onConfirm={handleDateRangeConfirm}
             placeholder="가입일 전체"
+          />
+          <FilterSelect
+            aria-label="가입일 정렬"
+            value={filters.sortOrder}
+            onChange={handleSortOrderChange}
+            options={[...SORT_ORDER_OPTIONS]}
           />
         </>
       }

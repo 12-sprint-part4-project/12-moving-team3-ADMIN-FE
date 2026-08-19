@@ -1,7 +1,21 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { formatAdminMemberPhoneNumber } from './adminMember.ts';
+import {
+  formatAdminMemberPhoneNumber,
+  getAdminMemberRowNumber,
+} from './adminMember.ts';
+
+test('전체 개수를 기준으로 페이지의 행 번호를 역순 계산한다', () => {
+  assert.equal(getAdminMemberRowNumber(25, 1, 10, 0), 25);
+  assert.equal(getAdminMemberRowNumber(25, 2, 10, 0), 15);
+  assert.equal(getAdminMemberRowNumber(25, 3, 10, 4), 1);
+});
+
+test('필터링된 전체 개수를 기준으로 행 번호를 계산한다', () => {
+  assert.equal(getAdminMemberRowNumber(3, 1, 10, 0), 3);
+  assert.equal(getAdminMemberRowNumber(3, 1, 10, 2), 1);
+});
 
 test('하이픈 없는 11자리 국내 휴대전화 번호를 표시 형식으로 변환한다', () => {
   assert.equal(formatAdminMemberPhoneNumber('01012345678'), '010-1234-5678');
