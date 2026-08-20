@@ -40,7 +40,6 @@ const NAMED_ENTITIES: Record<string, string> = {
 interface ParsedTag {
   name: string;
   isClosing: boolean;
-  isSelfClosing: boolean;
 }
 
 interface DecodedEntity {
@@ -99,6 +98,15 @@ const parseTag = (rawTag: string): ParsedTag | null => {
   }
 
   const nameStart = index;
+  const firstNameCharacter = rawTag[index];
+  const startsWithLetter =
+    (firstNameCharacter >= 'a' && firstNameCharacter <= 'z') ||
+    (firstNameCharacter >= 'A' && firstNameCharacter <= 'Z');
+
+  if (!startsWithLetter) {
+    return null;
+  }
+
   while (index < rawTag.length) {
     const character = rawTag[index];
     const isNameCharacter =
@@ -121,7 +129,6 @@ const parseTag = (rawTag: string): ParsedTag | null => {
   return {
     name: rawTag.slice(nameStart, index).toLowerCase(),
     isClosing,
-    isSelfClosing: rawTag.trimEnd().endsWith('/'),
   };
 };
 
@@ -208,7 +215,6 @@ export const htmlToPlainText = (html: string) => {
             }
           } else if (
             !parsedTag.isClosing &&
-            !parsedTag.isSelfClosing &&
             HIDDEN_TAG_NAMES.has(parsedTag.name)
           ) {
             hiddenTagName = parsedTag.name;

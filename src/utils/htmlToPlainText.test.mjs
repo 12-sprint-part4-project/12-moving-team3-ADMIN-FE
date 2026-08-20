@@ -35,6 +35,19 @@ test('script와 style 요소의 내용은 표시하지 않는다', () => {
   );
 });
 
+test('self-closing 표기의 script와 style도 실제 닫는 태그까지 숨긴다', () => {
+  assert.equal(
+    htmlToPlainText('<script />alert("x")</script><p>게시글 내용</p>'),
+    '게시글 내용'
+  );
+  assert.equal(
+    htmlToPlainText(
+      '<STYLE />.title { color: red; }</STYLE><p>게시글 내용</p>'
+    ),
+    '게시글 내용'
+  );
+});
+
 test('HTML 태그가 없는 일반 텍스트와 빈 문자열은 변경하지 않는다', () => {
   assert.equal(
     htmlToPlainText('일반 텍스트\n  기존 공백'),
@@ -45,4 +58,8 @@ test('HTML 태그가 없는 일반 텍스트와 빈 문자열은 변경하지 �
 
 test('알 수 없는 엔티티와 태그가 아닌 꺾쇠 표현은 보존한다', () => {
   assert.equal(htmlToPlainText('1 < 2 &unknown;'), '1 < 2 &unknown;');
+  assert.equal(htmlToPlainText('1 < 2 > 0'), '1 < 2 > 0');
+  assert.equal(htmlToPlainText('<1>숫자</1>'), '<1>숫자</1>');
+  assert.equal(htmlToPlainText('<2026>연도</2026>'), '<2026>연도</2026>');
+  assert.equal(htmlToPlainText('<p>게시글 내용</p>'), '게시글 내용');
 });

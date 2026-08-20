@@ -106,7 +106,7 @@ export const AdminReviewDetailDrawer = ({
           </DetailSection>
 
           <DetailSection title="리뷰 원문">
-            <p className="text-md-regular whitespace-pre-wrap text-black-400 [overflow-wrap:anywhere]">
+            <p className="text-md-regular break-words whitespace-pre-wrap text-black-400">
               {review.content}
             </p>
           </DetailSection>
