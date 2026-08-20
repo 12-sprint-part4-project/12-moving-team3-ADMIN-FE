@@ -55,7 +55,7 @@ export const ReviewManagementContent = () => {
     handleDeletionStatusChange,
     handleDateRangeConfirm,
     handlePageChange,
-    setFilters,
+    replacePage,
     handleResetFilters,
   } = useAdminReviewListFilters();
 
@@ -77,13 +77,13 @@ export const ReviewManagementContent = () => {
   const items = data?.data.items ?? [];
   const pagination = data?.data.pagination;
   const totalPages = pagination?.totalPages ?? 0;
-  const currentPage = pagination?.page ?? filters.page;
+  const currentPage = filters.page;
 
   useClampListPage({
     page: filters.page,
     totalPages: pagination?.totalPages,
     isPending,
-    setFilters,
+    onPageClamp: replacePage,
   });
 
   const columns = useMemo(
