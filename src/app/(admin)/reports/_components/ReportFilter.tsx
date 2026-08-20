@@ -1,4 +1,3 @@
-
 import { DateRangePopover } from '@/components/DateRangePopover/DateRangePopover';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
@@ -40,6 +39,7 @@ export const ReportFilter = ({
       onChange={onSearchChange}
       onSearch={onSearch}
       placeholder="신고 대상 이름, 닉네임, 이메일 검색"
+      searchAction="button"
       className="min-w-64 flex-1"
       aria-label="신고 대상 사용자 검색"
     />

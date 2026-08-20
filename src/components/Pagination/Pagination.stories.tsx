@@ -48,7 +48,7 @@ export const SizeSm: Story = {
   args: {
     size: 'sm',
     page: 1,
-    totalPages: 9,
+    totalPages: 102,
   },
 };
 
@@ -57,7 +57,7 @@ export const SizeLg: Story = {
   args: {
     size: 'lg',
     page: 1,
-    totalPages: 9,
+    totalPages: 102,
   },
 };
 
@@ -66,16 +66,16 @@ export const FirstPage: Story = {
   args: {
     size: 'sm',
     page: 1,
-    totalPages: 9,
+    totalPages: 102,
   },
 };
 
-/** 중간 페이지 — ellipsis 포함 */
+/** 두 번째 10개 구간 */
 export const MiddlePage: Story = {
   args: {
     size: 'sm',
-    page: 5,
-    totalPages: 9,
+    page: 11,
+    totalPages: 102,
   },
 };
 
@@ -83,17 +83,17 @@ export const MiddlePage: Story = {
 export const LastPage: Story = {
   args: {
     size: 'sm',
-    page: 9,
-    totalPages: 9,
+    page: 102,
+    totalPages: 102,
   },
 };
 
-/** lg 중간 페이지 — ellipsis 포함 */
+/** lg 중간 페이지 */
 export const MiddlePageLg: Story = {
   args: {
     size: 'lg',
-    page: 5,
-    totalPages: 9,
+    page: 99,
+    totalPages: 102,
   },
 };
 
@@ -101,17 +101,17 @@ export const MiddlePageLg: Story = {
 export const LastPageLg: Story = {
   args: {
     size: 'lg',
-    page: 9,
-    totalPages: 9,
+    page: 102,
+    totalPages: 102,
   },
 };
 
-/** 페이지 수가 적어 ellipsis 없이 전체 표시 */
+/** 페이지 수가 10보다 적으면 전체 표시 */
 export const FewPages: Story = {
   args: {
     size: 'sm',
     page: 2,
-    totalPages: 4,
+    totalPages: 7,
   },
 };
 
@@ -136,7 +136,7 @@ const InteractivePagination = ({
 
 /** 클릭으로 페이지 전환되는 인터랙티브 예시 */
 export const Interactive: Story = {
-  render: () => <InteractivePagination size="sm" totalPages={9} />,
+  render: () => <InteractivePagination size="sm" totalPages={102} />,
 };
 
 /** sm / lg 비교 */
@@ -145,11 +145,11 @@ export const AllSizes: Story = {
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-2">
         <p className="text-lg-medium text-black-400">Pagination (sm)</p>
-        <InteractivePagination size="sm" totalPages={9} />
+        <InteractivePagination size="sm" totalPages={102} />
       </div>
       <div className="flex flex-col gap-2">
         <p className="text-lg-medium text-black-400">Pagination (lg)</p>
-        <InteractivePagination size="lg" totalPages={9} />
+        <InteractivePagination size="lg" totalPages={102} />
       </div>
     </div>
   ),

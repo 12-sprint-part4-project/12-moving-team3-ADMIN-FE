@@ -162,6 +162,7 @@ export const ReviewManagementContent = () => {
               onChange={handleSearchChange}
               onSearch={handleSearch}
               placeholder="내용, 작성자, 기사 검색"
+              searchAction="button"
               className="min-w-64 flex-1"
               aria-label="리뷰 검색"
             />

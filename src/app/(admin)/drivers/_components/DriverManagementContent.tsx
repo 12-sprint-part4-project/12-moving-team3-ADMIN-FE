@@ -1,8 +1,10 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 
 import { AdminMemberListView } from '@/components/AdminMemberListView/AdminMemberListView';
+import { useDetailSearchParam } from '@/hooks/useDetailSearchParam';
+import { parseUuidDetailId } from '@/utils/detailSearchParams';
 
 import { AdminMoverDetailDrawer } from './AdminMoverDetailDrawer';
 import { getDriverListColumns } from './getDriverListColumns';
@@ -12,11 +14,13 @@ import { getDriverListColumns } from './getDriverListColumns';
  * 고객 목록과 공유하는 필터 로직은 AdminMemberListView에 그대로 위임한다.
  */
 export const DriverManagementContent = () => {
-  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
+  const { detailId, setDetailId: updateSelectedMember } =
+    useDetailSearchParam('memberId');
+  const selectedMemberId = parseUuidDetailId(detailId);
   const getColumns = useCallback(
     (context: Parameters<typeof getDriverListColumns>[0]) =>
-      getDriverListColumns(context, setSelectedMemberId),
-    []
+      getDriverListColumns(context, updateSelectedMember),
+    [updateSelectedMember]
   );
 
   return (
@@ -34,7 +38,7 @@ export const DriverManagementContent = () => {
       <AdminMoverDetailDrawer
         memberId={selectedMemberId}
         open={selectedMemberId !== null}
-        onClose={() => setSelectedMemberId(null)}
+        onClose={() => updateSelectedMember(null)}
       />
     </>
   );
