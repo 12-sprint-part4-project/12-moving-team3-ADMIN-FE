@@ -1,6 +1,9 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
+
+import { useDetailSearchParam } from '@/hooks/useDetailSearchParam';
+import { parseNumericDetailId } from '@/utils/detailSearchParams';
 
 import { AdminChatDetailDrawer } from './AdminChatDetailDrawer';
 import { AdminChatListView } from './AdminChatListView';
@@ -11,10 +14,15 @@ import { getChatListColumns } from './getChatListColumns';
  * 선택한 채팅방 ID를 한곳에서 관리해 목록 컬럼과 Drawer의 책임을 분리한다.
  */
 export const ChatManagementContent = () => {
-  const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
+  const { detailId, setDetailId } = useDetailSearchParam('roomId');
+  const selectedRoomId = parseNumericDetailId(detailId);
+  const handleOpenDetail = useCallback(
+    (roomId: number) => setDetailId(String(roomId)),
+    [setDetailId]
+  );
   const getColumns = useCallback(
-    () => getChatListColumns(setSelectedRoomId),
-    []
+    () => getChatListColumns(handleOpenDetail),
+    [handleOpenDetail]
   );
 
   return (
@@ -23,7 +31,7 @@ export const ChatManagementContent = () => {
       <AdminChatDetailDrawer
         roomId={selectedRoomId}
         open={selectedRoomId !== null}
-        onClose={() => setSelectedRoomId(null)}
+        onClose={() => setDetailId(null)}
       />
     </>
   );

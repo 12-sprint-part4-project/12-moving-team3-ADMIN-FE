@@ -83,6 +83,13 @@ export const Controlled: Story = {
   render: (args) => <ControlledSearchInput {...args} />,
 };
 
+export const WithSearchButton: Story = {
+  args: {
+    searchAction: 'button',
+    className: 'min-w-80',
+  },
+};
+
 export const InFilterBar: Story = {
   render: (args) => <InFilterBarSearchInput {...args} />,
 };

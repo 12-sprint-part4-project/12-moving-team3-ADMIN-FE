@@ -22,13 +22,14 @@ const formatAverageRating = (averageRating: number | null) => {
 
 /** 기사 전용 필드인 닉네임과 평균 평점을 포함한 목록 컬럼을 생성한다. */
 export const getDriverListColumns = (
-  { page, pageSize }: AdminMemberListColumnsContext,
+  { page, pageSize, totalCount }: AdminMemberListColumnsContext,
   onOpenDetail: (memberId: string) => void
 ): Column<AdminMemberListItem>[] => [
   {
     key: 'index',
     header: '번호',
-    render: (_row, index) => getAdminMemberRowNumber(page, pageSize, index),
+    render: (_row, index) =>
+      getAdminMemberRowNumber(totalCount, page, pageSize, index),
   },
   {
     key: 'name',

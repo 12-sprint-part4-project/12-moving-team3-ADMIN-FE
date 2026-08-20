@@ -214,6 +214,7 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
             onChange={handleSearchChange}
             onSearch={handleSearch}
             placeholder="이름, 닉네임, 이메일, 휴대폰 검색"
+            searchAction="button"
             className="min-w-64 flex-1"
             aria-label="채팅방 참여자 검색"
           />

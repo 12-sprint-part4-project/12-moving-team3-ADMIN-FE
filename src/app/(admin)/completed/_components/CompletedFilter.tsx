@@ -1,6 +1,5 @@
 'use client';
 
-
 import { DateRangePopover } from '@/components/DateRangePopover/DateRangePopover';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
@@ -65,6 +64,7 @@ export const CompletedFilter = ({
         onChange={onSearchChange}
         onSearch={handleSearch}
         placeholder="견적 번호, 요청자 이름, 전화번호 검색"
+        searchAction="button"
         aria-label="완료 건 검색"
         className="min-w-64 flex-1"
       />

@@ -9,6 +9,9 @@ export type MemberUserType = 'CUSTOMER' | 'MOVER';
 /** UserStatusInfo.status (목록에서는 관계 부재 시 ACTIVE로 정규화) */
 export type MemberStatus = 'ACTIVE' | 'SUSPENDED';
 
+/** 가입일 정렬 방향 */
+export type AdminMemberSortOrder = 'ASC' | 'DESC';
+
 /** Prisma Region enum */
 export type MemberRegion =
   | 'SEOUL'
@@ -40,6 +43,7 @@ export interface AdminMemberListQuery {
   startDate?: string;
   /** 가입 기간 종료일 (YYYY-MM-DD). startDate 없이 단독 전달 불가 */
   endDate?: string;
+  sortOrder?: AdminMemberSortOrder;
   page?: number;
   pageSize?: number;
 }

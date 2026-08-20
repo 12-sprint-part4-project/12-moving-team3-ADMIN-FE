@@ -1,11 +1,13 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
 import { useAdminReportList } from '@/hooks/useAdminReportList';
 import { useAdminReportStatistics } from '@/hooks/useAdminReportStatistics';
 import { useClampListPage } from '@/hooks/useClampListPage';
+import { useDetailSearchParam } from '@/hooks/useDetailSearchParam';
+import { parseNumericDetailId } from '@/utils/detailSearchParams';
 
 import { useAdminReportListFilters } from '../_hooks/useAdminReportListFilters';
 import { AdminReportDetailDrawer } from './AdminReportDetailDrawer/AdminReportDetailDrawer';
@@ -19,7 +21,8 @@ import { ReportTable } from './ReportTable';
  * 필터 상태와 표시 컴포넌트 사이의 데이터 연결만 담당한다.
  */
 export const ReportManagementContent = () => {
-  const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
+  const { detailId, setDetailId } = useDetailSearchParam('reportId');
+  const selectedReportId = parseNumericDetailId(detailId);
   const {
     filters,
     targetUserSearch,
@@ -55,7 +58,14 @@ export const ReportManagementContent = () => {
     setFilters,
   });
 
-  const columns = useMemo(() => getReportListColumns(setSelectedReportId), []);
+  const handleOpenDetail = useCallback(
+    (reportId: number) => setDetailId(String(reportId)),
+    [setDetailId]
+  );
+  const columns = useMemo(
+    () => getReportListColumns(handleOpenDetail),
+    [handleOpenDetail]
+  );
 
   return (
     <>
@@ -99,7 +109,7 @@ export const ReportManagementContent = () => {
       <AdminReportDetailDrawer
         open={selectedReportId !== null}
         reportId={selectedReportId}
-        onClose={() => setSelectedReportId(null)}
+        onClose={() => setDetailId(null)}
       />
     </>
   );
