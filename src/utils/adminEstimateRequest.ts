@@ -68,14 +68,15 @@ export const formatAdminEstimateRequestNameWithNickname = (
   name: string | null | undefined,
   nickname: string | null | undefined
 ) => {
-  const displayName = formatAdminEstimateRequestNullableText(name);
+  const trimmedName = name?.trim();
+  const displayName = formatAdminEstimateRequestNullableText(trimmedName);
   const trimmedNickname = nickname?.trim();
 
   if (displayName === '-') {
     return formatAdminEstimateRequestNullableText(trimmedNickname);
   }
 
-  if (trimmedNickname && trimmedNickname !== name) {
+  if (trimmedNickname && trimmedNickname !== trimmedName) {
     return `${displayName} (${trimmedNickname})`;
   }
 

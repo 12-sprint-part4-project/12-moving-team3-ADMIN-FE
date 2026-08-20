@@ -1,12 +1,8 @@
 'use client';
 
-import axios from 'axios';
-
-import { Button } from '@/components/Button/Button';
+import { AdminDetailQueryBody } from '@/components/AdminDetailQueryBody/AdminDetailQueryBody';
 import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
-import { EmptyState } from '@/components/EmptyState/EmptyState';
-import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { useAdminEstimateRequestDetail } from '@/hooks/useAdminEstimateRequestDetail';
 import { cn } from '@/lib/utils';
@@ -32,14 +28,6 @@ export interface EstimateDetailDrawerProps {
   estimateRequestId: number | null;
   onClose: () => void;
 }
-
-const getDetailErrorTitle = (error: unknown) => {
-  if (axios.isAxiosError(error) && error.response?.status === 404) {
-    return '견적 요청 정보를 찾을 수 없습니다.';
-  }
-
-  return '견적 요청 상세를 불러오지 못했습니다.';
-};
 
 interface EstimateQuoteListProps {
   quotes: AdminEstimateQuote[];
@@ -190,59 +178,9 @@ const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
   );
 };
 
-interface EstimateDetailBodyProps {
-  estimateRequestId: number;
-}
-
-/**
- * 상세 조회와 본문 상태 분기.
- * Drawer가 열려 있을 때만 마운트되므로 estimateRequestId는 항상 있다.
- */
-const EstimateDetailBody = ({ estimateRequestId }: EstimateDetailBodyProps) => {
-  const { data, error, isPending, isError, isSuccess, refetch } =
-    useAdminEstimateRequestDetail(estimateRequestId);
-
-  const handleRetry = () => {
-    void refetch();
-  };
-
-  if (isPending) {
-    return <LoadingState />;
-  }
-
-  if (isError) {
-    return (
-      <EmptyState
-        title={getDetailErrorTitle(error)}
-        description="잠시 후 다시 시도해 주세요."
-        action={
-          <Button variant="secondary" onClick={handleRetry}>
-            다시 시도
-          </Button>
-        }
-      />
-    );
-  }
-
-  const detail = data?.data ?? null;
-
-  // queryKey는 ID별이지만, 전환 중 이전 캐시가 남아 있으면 다른 견적 상세가 잠깐 보일 수 있다.
-  // 응답 id가 현재 선택과 같을 때만 본문을 그린다.
-  if (!isSuccess || detail == null || detail.id !== estimateRequestId) {
-    return (
-      <EmptyState
-        title="견적 요청 정보가 없습니다."
-        description="선택한 견적 요청을 찾을 수 없습니다."
-      />
-    );
-  }
-
-  return <EstimateDetailContent detail={detail} />;
-};
-
 /**
  * 견적 요청 상세 Drawer.
- * 열림 여부는 estimateRequestId로 계산한다. 조회와 본문은 EstimateDetailBody에 맡긴다.
+ * 열림 여부는 estimateRequestId로 계산한다. 조회와 본문 상태 분기는 AdminDetailQueryBody에 맡긴다.
  * 필수값 누락 건은 500이 아니라 missingFields로 내려오므로 본문에서 원인을 표시한다.
  */
 export const EstimateDetailDrawer = ({
@@ -257,7 +195,15 @@ export const EstimateDetailDrawer = ({
   >
     {estimateRequestId != null ? (
       // id가 있을 때만 본문을 마운트해서 estimateRequestId를 number로 좁힌다.
-      <EstimateDetailBody estimateRequestId={estimateRequestId} />
+      <AdminDetailQueryBody
+        id={estimateRequestId}
+        useDetail={useAdminEstimateRequestDetail}
+        notFoundTitle="견적 요청 정보를 찾을 수 없습니다."
+        errorTitle="견적 요청 상세를 불러오지 못했습니다."
+        emptyTitle="견적 요청 정보가 없습니다."
+        emptyDescription="선택한 견적 요청을 찾을 수 없습니다."
+        renderContent={(detail) => <EstimateDetailContent detail={detail} />}
+      />
     ) : null}
   </DetailDrawer>
 );

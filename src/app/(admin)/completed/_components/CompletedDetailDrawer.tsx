@@ -1,12 +1,8 @@
 'use client';
 
-import axios from 'axios';
-
-import { Button } from '@/components/Button/Button';
+import { AdminDetailQueryBody } from '@/components/AdminDetailQueryBody/AdminDetailQueryBody';
 import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
-import { EmptyState } from '@/components/EmptyState/EmptyState';
-import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { useAdminCompletedDetail } from '@/hooks/useAdminCompletedDetail';
 import {
   formatAdminCompletedMissingFields,
@@ -27,14 +23,6 @@ export interface CompletedDetailDrawerProps {
   estimateRequestId: number | null;
   onClose: () => void;
 }
-
-const getDetailErrorTitle = (error: unknown) => {
-  if (axios.isAxiosError(error) && error.response?.status === 404) {
-    return '완료 건 정보를 찾을 수 없습니다.';
-  }
-
-  return '완료 건 상세를 불러오지 못했습니다.';
-};
 
 interface CompletedDetailContentProps {
   detail: AdminCompletedDetail;
@@ -136,61 +124,9 @@ const CompletedDetailContent = ({ detail }: CompletedDetailContentProps) => {
   );
 };
 
-interface CompletedDetailBodyProps {
-  estimateRequestId: number;
-}
-
-/**
- * 상세 조회와 본문 상태 분기.
- * Drawer가 열려 있을 때만 마운트되므로 estimateRequestId는 항상 있다.
- */
-const CompletedDetailBody = ({
-  estimateRequestId,
-}: CompletedDetailBodyProps) => {
-  const { data, error, isPending, isError, isSuccess, refetch } =
-    useAdminCompletedDetail(estimateRequestId);
-
-  const handleRetry = () => {
-    void refetch();
-  };
-
-  if (isPending) {
-    return <LoadingState />;
-  }
-
-  if (isError) {
-    return (
-      <EmptyState
-        title={getDetailErrorTitle(error)}
-        description="잠시 후 다시 시도해 주세요."
-        action={
-          <Button variant="secondary" onClick={handleRetry}>
-            다시 시도
-          </Button>
-        }
-      />
-    );
-  }
-
-  const detail = data?.data ?? null;
-
-  // queryKey는 ID별이지만, 전환 중 이전 캐시가 남아 있으면 다른 완료 건 상세가 잠깐 보일 수 있다.
-  // 응답 id가 현재 선택과 같을 때만 본문을 그린다.
-  if (!isSuccess || detail == null || detail.id !== estimateRequestId) {
-    return (
-      <EmptyState
-        title="완료 건 정보가 없습니다."
-        description="선택한 완료 건을 찾을 수 없습니다."
-      />
-    );
-  }
-
-  return <CompletedDetailContent detail={detail} />;
-};
-
 /**
  * 완료 건 상세 Drawer.
- * 열림 여부는 estimateRequestId로 계산한다. 조회와 본문은 CompletedDetailBody에 맡긴다.
+ * 열림 여부는 estimateRequestId로 계산한다. 조회와 본문 상태 분기는 AdminDetailQueryBody에 맡긴다.
  */
 export const CompletedDetailDrawer = ({
   estimateRequestId,
@@ -204,7 +140,15 @@ export const CompletedDetailDrawer = ({
   >
     {estimateRequestId != null ? (
       // id가 있을 때만 본문을 마운트해서 estimateRequestId를 number로 좁힌다.
-      <CompletedDetailBody estimateRequestId={estimateRequestId} />
+      <AdminDetailQueryBody
+        id={estimateRequestId}
+        useDetail={useAdminCompletedDetail}
+        notFoundTitle="완료 건 정보를 찾을 수 없습니다."
+        errorTitle="완료 건 상세를 불러오지 못했습니다."
+        emptyTitle="완료 건 정보가 없습니다."
+        emptyDescription="선택한 완료 건을 찾을 수 없습니다."
+        renderContent={(detail) => <CompletedDetailContent detail={detail} />}
+      />
     ) : null}
   </DetailDrawer>
 );
