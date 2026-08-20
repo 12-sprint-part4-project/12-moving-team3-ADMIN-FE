@@ -3,7 +3,6 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   useCallback,
-  useEffect,
   useMemo,
   useState,
   type ChangeEvent,
@@ -22,6 +21,7 @@ import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
 import { useAdminMemberList } from '@/hooks/useAdminMemberList';
+import { useClampListPage } from '@/hooks/useClampListPage';
 import { toAdminMemberApiDate } from '@/utils/adminMember';
 import {
   createAdminMemberListHref,
@@ -196,14 +196,17 @@ export const AdminMemberListView = ({
     [filters, pathname, router, searchParams]
   );
 
-  useEffect(() => {
-    if (isPending || pagination?.totalPages === undefined) return;
+  const handlePageClamp = useCallback(
+    (page: number) => updateFilters({ page }, { replace: true }),
+    [updateFilters]
+  );
 
-    const safePage = Math.max(pagination.totalPages, 1);
-    if (filters.page > safePage) {
-      updateFilters({ page: safePage }, { replace: true });
-    }
-  }, [filters.page, isPending, pagination?.totalPages, updateFilters]);
+  useClampListPage({
+    page: filters.page,
+    totalPages: pagination?.totalPages,
+    isPending,
+    onPageClamp: handlePageClamp,
+  });
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchInput(event.target.value);
@@ -256,7 +259,13 @@ export const AdminMemberListView = ({
 
   const handleResetFilters = () => {
     setSearchInput('');
-    updateFilters(INITIAL_ADMIN_MEMBER_LIST_FILTERS);
+    updateFilters({
+      ...INITIAL_ADMIN_MEMBER_LIST_FILTERS,
+      search: undefined,
+      status: undefined,
+      startDate: undefined,
+      endDate: undefined,
+    });
   };
 
   const hasActiveFilters = Boolean(

@@ -15,10 +15,9 @@ import type {
   AdminReviewDeletionStatus,
   AdminReviewListQuery,
 } from '@/types/adminReview';
+import type { AdminReviewUrlFilters } from '@/utils/adminListSearchParams';
 
-export type AdminReviewListFilters = ReturnType<
-  typeof parseAdminReviewSearchParams
->;
+export type AdminReviewListFilters = AdminReviewUrlFilters;
 
 /** select value → 1~5 | undefined. 알 수 없는 값은 무시한다. */
 const parseRatingFilter = (value: string): number | undefined => {

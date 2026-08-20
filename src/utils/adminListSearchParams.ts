@@ -21,7 +21,12 @@ export const parseAdminListDate = (value: string | null) => {
     : undefined;
 };
 
-const createAdminListHref = (
+export const parseAdminListEnum = <T extends string>(
+  value: string | null,
+  allowedValues: readonly T[]
+) => allowedValues.find((allowedValue) => allowedValue === value);
+
+export const createAdminListHref = (
   pathname: string,
   searchParams: URLSearchParams,
   managedKeys: readonly string[],
@@ -45,17 +50,19 @@ export interface AdminChatUrlFilters {
 }
 
 const CHAT_QUERY_KEYS = ['search', 'roomType', 'page'] as const;
+const CHAT_ROOM_TYPES: readonly AdminChatRoomType[] = [
+  'GENERAL',
+  'DESIGNATED',
+  'COMMUNITY',
+];
 
 export const parseAdminChatSearchParams = (
   searchParams: URLSearchParams
 ): AdminChatUrlFilters => {
-  const roomTypeValue = searchParams.get('roomType');
-  const roomType =
-    roomTypeValue === 'GENERAL' ||
-    roomTypeValue === 'DESIGNATED' ||
-    roomTypeValue === 'COMMUNITY'
-      ? roomTypeValue
-      : undefined;
+  const roomType = parseAdminListEnum(
+    searchParams.get('roomType'),
+    CHAT_ROOM_TYPES
+  );
   const search = searchParams.get('search')?.trim() || undefined;
 
   return {
@@ -95,6 +102,10 @@ const REVIEW_QUERY_KEYS = [
   'endDate',
   'page',
 ] as const;
+const REVIEW_DELETION_STATUSES: readonly AdminReviewDeletionStatus[] = [
+  'ACTIVE',
+  'DELETED',
+];
 
 export const parseAdminReviewSearchParams = (
   searchParams: URLSearchParams
@@ -104,11 +115,10 @@ export const parseAdminReviewSearchParams = (
   const rating = /^[1-5]$/.test(ratingValue ?? '')
     ? Number(ratingValue)
     : undefined;
-  const deletionStatusValue = searchParams.get('deletionStatus');
-  const deletionStatus =
-    deletionStatusValue === 'ACTIVE' || deletionStatusValue === 'DELETED'
-      ? deletionStatusValue
-      : undefined;
+  const deletionStatus = parseAdminListEnum(
+    searchParams.get('deletionStatus'),
+    REVIEW_DELETION_STATUSES
+  );
   const startDate = parseAdminListDate(searchParams.get('startDate'));
   const parsedEndDate = parseAdminListDate(searchParams.get('endDate'));
   const endDate =
@@ -177,10 +187,11 @@ const REPORT_TARGETS: readonly AdminReportTarget[] = [
 export const parseAdminReportSearchParams = (
   searchParams: URLSearchParams
 ): AdminReportUrlFilters => {
-  const statusValue = searchParams.get('status');
-  const status = REPORT_STATUSES.find((value) => value === statusValue);
-  const targetValue = searchParams.get('target');
-  const target = REPORT_TARGETS.find((value) => value === targetValue);
+  const status = parseAdminListEnum(
+    searchParams.get('status'),
+    REPORT_STATUSES
+  );
+  const target = parseAdminListEnum(searchParams.get('target'), REPORT_TARGETS);
   const targetUserKeyword =
     searchParams.get('targetUserKeyword')?.trim() || undefined;
   const reportedFrom = parseAdminListDate(searchParams.get('reportedFrom'));

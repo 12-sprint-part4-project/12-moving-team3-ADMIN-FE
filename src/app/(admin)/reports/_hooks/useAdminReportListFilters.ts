@@ -15,9 +15,10 @@ import {
 
 import type { DateRangePopoverProps } from '@/components/DateRangePopover/DateRangePopover';
 import type { AdminReportListQuery } from '@/types/adminReport';
+import type { AdminReportUrlFilters } from '@/utils/adminListSearchParams';
 
 /** 화면에서 관리하는 필터 상태. API에 전달하지 않는 입력 초안은 별도 상태로 둔다. */
-type AdminReportListFilters = ReturnType<typeof parseAdminReportSearchParams>;
+type AdminReportListFilters = AdminReportUrlFilters;
 
 const toListQuery = (
   filters: AdminReportListFilters

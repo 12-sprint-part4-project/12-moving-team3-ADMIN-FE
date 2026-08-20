@@ -3,7 +3,6 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   useCallback,
-  useEffect,
   useMemo,
   useState,
   type ChangeEvent,
@@ -18,6 +17,7 @@ import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
 import { useAdminChatList } from '@/hooks/useAdminChatList';
+import { useClampListPage } from '@/hooks/useClampListPage';
 import { ADMIN_CHAT_ROOM_TYPE_LABEL } from '@/utils/adminChat';
 import {
   createAdminChatListHref,
@@ -29,6 +29,7 @@ import type {
   AdminChatListQuery,
   AdminChatRoomType,
 } from '@/types/adminChat';
+import type { AdminChatUrlFilters } from '@/utils/adminListSearchParams';
 
 /** 채팅방 유형 필터: 빈 문자열은 roomType 미전달(전체) */
 const ROOM_TYPE_FILTER_OPTIONS = [
@@ -38,9 +39,7 @@ const ROOM_TYPE_FILTER_OPTIONS = [
   { label: ADMIN_CHAT_ROOM_TYPE_LABEL.COMMUNITY, value: 'COMMUNITY' },
 ] as const;
 
-export type AdminChatListFilters = ReturnType<
-  typeof parseAdminChatSearchParams
->;
+export type AdminChatListFilters = AdminChatUrlFilters;
 
 /** select value → AdminChatRoomType | undefined. 알 수 없는 값은 무시한다. */
 const parseRoomTypeFilter = (value: string): AdminChatRoomType | undefined => {
@@ -130,14 +129,17 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
     [filters, pathname, router, searchParams]
   );
 
-  useEffect(() => {
-    if (isPending || pagination?.totalPages === undefined) return;
+  const handlePageClamp = useCallback(
+    (page: number) => updateFilters({ page }, { replace: true }),
+    [updateFilters]
+  );
 
-    const safePage = Math.max(pagination.totalPages, 1);
-    if (filters.page > safePage) {
-      updateFilters({ page: safePage }, { replace: true });
-    }
-  }, [filters.page, isPending, pagination?.totalPages, updateFilters]);
+  useClampListPage({
+    page: filters.page,
+    totalPages: pagination?.totalPages,
+    isPending,
+    onPageClamp: handlePageClamp,
+  });
 
   const columns = useMemo(
     () =>

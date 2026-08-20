@@ -1,10 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
 import { useAdminReportList } from '@/hooks/useAdminReportList';
 import { useAdminReportStatistics } from '@/hooks/useAdminReportStatistics';
+import { useClampListPage } from '@/hooks/useClampListPage';
 import { useDetailSearchParam } from '@/hooks/useDetailSearchParam';
 import { parseNumericDetailId } from '@/utils/detailSearchParams';
 
@@ -50,12 +51,12 @@ export const ReportManagementContent = () => {
   const totalPages = pagination?.totalPages ?? 0;
   const currentPage = filters.page;
 
-  useEffect(() => {
-    if (isPending || pagination?.totalPages === undefined) return;
-
-    const safePage = Math.max(pagination.totalPages, 1);
-    if (filters.page > safePage) replacePage(safePage);
-  }, [filters.page, isPending, pagination?.totalPages, replacePage]);
+  useClampListPage({
+    page: filters.page,
+    totalPages: pagination?.totalPages,
+    isPending,
+    onPageClamp: replacePage,
+  });
 
   const handleOpenDetail = useCallback(
     (reportId: number) => setDetailId(String(reportId)),

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, type ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 
 import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
 import { Button } from '@/components/Button/Button';
@@ -14,6 +14,7 @@ import { useAdminReviewDeleteConfirm } from '@/hooks/useAdminReviewDeleteConfirm
 import { useAdminReviewList } from '@/hooks/useAdminReviewList';
 import { useAdminReviewListFilters } from '@/hooks/useAdminReviewListFilters';
 import { useAdminReviewStatistics } from '@/hooks/useAdminReviewStatistics';
+import { useClampListPage } from '@/hooks/useClampListPage';
 
 import { getReviewListColumns } from './getReviewListColumns';
 import { ReviewDeleteConfirmModal } from './ReviewDeleteConfirmModal';
@@ -78,12 +79,12 @@ export const ReviewManagementContent = () => {
   const totalPages = pagination?.totalPages ?? 0;
   const currentPage = filters.page;
 
-  useEffect(() => {
-    if (isPending || pagination?.totalPages === undefined) return;
-
-    const safePage = Math.max(pagination.totalPages, 1);
-    if (filters.page > safePage) replacePage(safePage);
-  }, [filters.page, isPending, pagination?.totalPages, replacePage]);
+  useClampListPage({
+    page: filters.page,
+    totalPages: pagination?.totalPages,
+    isPending,
+    onPageClamp: replacePage,
+  });
 
   const columns = useMemo(
     () => getReviewListColumns(handleRequestDelete),
