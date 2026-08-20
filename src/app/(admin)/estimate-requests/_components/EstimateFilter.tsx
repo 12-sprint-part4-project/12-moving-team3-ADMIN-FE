@@ -1,13 +1,8 @@
-'use client';
-
-import { useState, type ChangeEvent } from 'react';
-
 import { DateRangePopover } from '@/components/DateRangePopover/DateRangePopover';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
 
-import type { DateRange } from '@/components/DateRangePicker/DateRangePicker';
-import type { AdminEstimateRequestStatus } from '@/types/adminEstimateRequest';
+import type { ComponentProps } from 'react';
 
 const STATUS_OPTIONS = [
   { label: '상태 전체', value: '' },
@@ -18,71 +13,47 @@ const STATUS_OPTIONS = [
 ];
 
 interface EstimateFilterProps {
-  status?: AdminEstimateRequestStatus;
-  dateRange?: DateRange;
-  onSearch: (search: string) => void;
-  onStatusChange: (status?: AdminEstimateRequestStatus) => void;
-  onDateRangeConfirm: (range: DateRange | undefined) => void;
+  searchValue: string;
+  statusValue: string;
+  dateRangeValue: ComponentProps<typeof DateRangePopover>['value'];
+  onSearchChange: ComponentProps<typeof SearchInput>['onChange'];
+  onSearch: ComponentProps<typeof SearchInput>['onSearch'];
+  onStatusChange: ComponentProps<typeof FilterSelect>['onChange'];
+  onDateRangeConfirm: ComponentProps<typeof DateRangePopover>['onConfirm'];
 }
 
-const parseStatus = (value: string): AdminEstimateRequestStatus | undefined => {
-  if (
-    value === 'SUBMITTED' ||
-    value === 'CONFIRMED' ||
-    value === 'EXPIRED' ||
-    value === 'CANCELED'
-  ) {
-    return value;
-  }
-
-  return undefined;
-};
-
+/** 검색·상태·제출일 필터 UI만 담당하는 표현 컴포넌트. */
 export const EstimateFilter = ({
-  status,
-  dateRange,
+  searchValue,
+  statusValue,
+  dateRangeValue,
+  onSearchChange,
   onSearch,
   onStatusChange,
   onDateRangeConfirm,
-}: EstimateFilterProps) => {
-  const [searchInput, setSearchInput] = useState('');
-
-  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(event.target.value);
-  };
-
-  const handleSearch = (value: string) => {
-    onSearch(value.trim());
-  };
-
-  const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    onStatusChange(parseStatus(event.target.value));
-  };
-
-  return (
-    <section
-      className="mt-4 flex flex-wrap items-center gap-2"
-      aria-label="견적 요청 필터"
-    >
-      <SearchInput
-        value={searchInput}
-        onChange={handleSearchChange}
-        onSearch={handleSearch}
-        placeholder="견적 번호, 요청자 이름, 전화번호 검색"
-        aria-label="견적 요청 검색"
-        className="min-w-64 flex-1"
-      />
-      <FilterSelect
-        aria-label="견적 요청 상태"
-        value={status ?? ''}
-        onChange={handleStatusChange}
-        options={STATUS_OPTIONS}
-      />
-      <DateRangePopover
-        value={dateRange}
-        placeholder="기간 전체"
-        onConfirm={onDateRangeConfirm}
-      />
-    </section>
-  );
-};
+}: EstimateFilterProps) => (
+  <section
+    className="mt-4 flex flex-wrap items-center gap-2"
+    aria-label="견적 요청 필터"
+  >
+    <SearchInput
+      value={searchValue}
+      onChange={onSearchChange}
+      onSearch={onSearch}
+      placeholder="견적 번호, 요청자 이름, 전화번호 검색"
+      aria-label="견적 요청 검색"
+      className="min-w-64 flex-1"
+    />
+    <FilterSelect
+      aria-label="견적 요청 상태"
+      value={statusValue}
+      onChange={onStatusChange}
+      options={STATUS_OPTIONS}
+    />
+    <DateRangePopover
+      value={dateRangeValue}
+      placeholder="기간 전체"
+      onConfirm={onDateRangeConfirm}
+    />
+  </section>
+);

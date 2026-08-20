@@ -1,6 +1,5 @@
 import { format } from 'date-fns';
 
-import type { DateRange } from '@/components/DateRangePicker/DateRangePicker';
 import type { StatusBadgeProps } from '@/components/StatusBadge/StatusBadge';
 import type {
   AdminEstimateQuoteStatus,
@@ -140,15 +139,20 @@ export const formatAdminEstimateRequestMissingFields = (
     return field;
   });
 
+/**
+ * 목록 기간 필터 → 통계 query.
+ * startDate가 없으면 전체 기간(undefined)을 넘긴다.
+ */
 export const toAdminEstimateRequestStatisticsQuery = (
-  range?: DateRange
+  startDate?: string,
+  endDate?: string
 ): AdminEstimateRequestStatisticsQuery | undefined => {
-  if (!range?.from) {
+  if (!startDate) {
     return undefined;
   }
 
   return {
-    startDate: toAdminEstimateRequestApiDate(range.from),
-    ...(range.to ? { endDate: toAdminEstimateRequestApiDate(range.to) } : {}),
+    startDate,
+    ...(endDate ? { endDate } : {}),
   };
 };

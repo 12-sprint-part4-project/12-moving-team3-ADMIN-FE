@@ -27,8 +27,7 @@ import type {
 } from '@/types/adminEstimateRequest';
 
 export interface EstimateDetailDrawerProps {
-  open: boolean;
-  /** 목록에서 선택한 견적 요청 ID. null이면 상세 요청을 하지 않는다. */
+  /** 목록에서 선택한 견적 요청 ID. null이면 Drawer를 닫는다. */
   estimateRequestId: number | null;
   onClose: () => void;
 }
@@ -179,76 +178,74 @@ const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
   );
 };
 
+interface EstimateDetailBodyProps {
+  estimateRequestId: number;
+}
+
+/**
+ * 상세 조회와 본문 상태 분기.
+ * Drawer가 열려 있을 때만 마운트되므로 estimateRequestId는 항상 있다.
+ */
+const EstimateDetailBody = ({ estimateRequestId }: EstimateDetailBodyProps) => {
+  const { data, error, isPending, isError, isSuccess, refetch } =
+    useAdminEstimateRequestDetail(estimateRequestId);
+
+  const handleRetry = () => {
+    void refetch();
+  };
+
+  if (isPending) {
+    return <LoadingState />;
+  }
+
+  if (isError) {
+    return (
+      <EmptyState
+        title={getDetailErrorTitle(error)}
+        description="잠시 후 다시 시도해 주세요."
+        action={
+          <Button variant="secondary" onClick={handleRetry}>
+            다시 시도
+          </Button>
+        }
+      />
+    );
+  }
+
+  const detail = data?.data ?? null;
+
+  // queryKey는 ID별이지만, 전환 중 이전 캐시가 남아 있으면 다른 견적 상세가 잠깐 보일 수 있다.
+  // 응답 id가 현재 선택과 같을 때만 본문을 그린다.
+  if (!isSuccess || detail == null || detail.id !== estimateRequestId) {
+    return (
+      <EmptyState
+        title="견적 요청 정보가 없습니다."
+        description="선택한 견적 요청을 찾을 수 없습니다."
+      />
+    );
+  }
+
+  return <EstimateDetailContent detail={detail} />;
+};
+
 /**
  * 견적 요청 상세 Drawer.
- * open + estimateRequestId일 때 상세 API를 호출하고, 로딩·에러 상태를 Drawer 안에서 처리한다.
+ * 열림 여부는 estimateRequestId로 계산한다. 조회와 본문은 EstimateDetailBody에 맡긴다.
  * 필수값 누락 건은 500이 아니라 missingFields로 내려오므로 본문에서 원인을 표시한다.
  */
 export const EstimateDetailDrawer = ({
-  open,
   estimateRequestId,
   onClose,
-}: EstimateDetailDrawerProps) => {
-  const { data, error, isPending, isError, isSuccess, refetch } =
-    useAdminEstimateRequestDetail(estimateRequestId, {
-      enabled: open && estimateRequestId != null,
-    });
-
-  // queryKey가 estimateRequestId별이라 다른 요청을 열 때 이전 data가 섞이지 않는다.
-  const detail = data?.data ?? null;
-  // 응답 id가 현재 선택과 다를 때만 막아, 캐시/전환 중 잘못된 상세가 잠깐 보이지 않게 한다.
-  const isDetailForSelection =
-    detail != null &&
-    estimateRequestId != null &&
-    detail.id === estimateRequestId;
-
-  const renderBody = () => {
-    if (estimateRequestId == null) {
-      return (
-        <p className="text-md-regular text-gray-500">
-          선택한 견적 요청 정보가 없습니다.
-        </p>
-      );
-    }
-
-    if (isPending) {
-      return <LoadingState />;
-    }
-
-    if (isError) {
-      return (
-        <EmptyState
-          title={getDetailErrorTitle(error)}
-          description="잠시 후 다시 시도해 주세요."
-          action={
-            <Button variant="secondary" onClick={() => void refetch()}>
-              다시 시도
-            </Button>
-          }
-        />
-      );
-    }
-
-    if (!isSuccess || !isDetailForSelection) {
-      return (
-        <EmptyState
-          title="견적 요청 정보가 없습니다."
-          description="선택한 견적 요청을 찾을 수 없습니다."
-        />
-      );
-    }
-
-    return <EstimateDetailContent detail={detail} />;
-  };
-
-  return (
-    <DetailDrawer
-      open={open}
-      title="견적 요청 상세 정보"
-      onClose={onClose}
-      size="md"
-    >
-      {renderBody()}
-    </DetailDrawer>
-  );
-};
+}: EstimateDetailDrawerProps) => (
+  <DetailDrawer
+    open={estimateRequestId != null}
+    title="견적 요청 상세 정보"
+    onClose={onClose}
+    size="md"
+  >
+    {estimateRequestId != null ? (
+      // id가 있을 때만 본문을 마운트해서 estimateRequestId를 number로 좁힌다.
+      <EstimateDetailBody estimateRequestId={estimateRequestId} />
+    ) : null}
+  </DetailDrawer>
+);
