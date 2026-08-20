@@ -69,3 +69,11 @@ test('RFC UUID만 회원 상세 ID로 사용한다', () => {
   assert.equal(parseUuidDetailId('0'), null);
   assert.equal(parseUuidDetailId('550e8400-e29b-01d4-a716-446655440000'), null);
 });
+
+test('RFC UUID의 nil과 max sentinel 값을 허용한다', () => {
+  const nilUuid = '00000000-0000-0000-0000-000000000000';
+  const maxUuid = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
+
+  assert.equal(parseUuidDetailId(nilUuid), nilUuid);
+  assert.equal(parseUuidDetailId(maxUuid), maxUuid);
+});
