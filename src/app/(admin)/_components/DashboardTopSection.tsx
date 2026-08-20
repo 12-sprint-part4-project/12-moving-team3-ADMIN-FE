@@ -68,40 +68,51 @@ const KPI_CARDS: KpiCardItem[] = [
   },
 ];
 
+interface DashboardKpiBodyProps {
+  statistics?: AdminDashboardStatistics;
+  isPending: boolean;
+  isError: boolean;
+}
+
+/** 핵심 지표 카드 본문. 로딩 → 실패 → 카드 순으로 한 가지만 보여 준다. */
+const DashboardKpiBody = ({
+  statistics,
+  isPending,
+  isError,
+}: DashboardKpiBodyProps) => {
+  if (isPending) {
+    return <LoadingState />;
+  }
+
+  if (isError || !statistics) {
+    return (
+      <EmptyState
+        title="핵심 지표를 불러오지 못했습니다."
+        description="잠시 후 다시 시도해 주세요."
+      />
+    );
+  }
+
+  return (
+    <StatisticsCardList
+      items={KPI_CARDS.map(
+        ({ key, title, unit, icon, iconBackgroundClassName }) => ({
+          title,
+          value: statistics[key],
+          unit,
+          icon,
+          iconBackgroundClassName,
+        })
+      )}
+    />
+  );
+};
+
 export const DashboardTopSection = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const params = toAdminDashboardStatisticsParams(dateRange);
   const { data, isPending, isError } = useDashboardStatistics(params);
   const statistics = data?.data;
-
-  const renderKpiBody = (): ReactNode => {
-    if (isPending) {
-      return <LoadingState />;
-    }
-
-    if (isError || !statistics) {
-      return (
-        <EmptyState
-          title="핵심 지표를 불러오지 못했습니다."
-          description="잠시 후 다시 시도해 주세요."
-        />
-      );
-    }
-
-    return (
-      <StatisticsCardList
-        items={KPI_CARDS.map(
-          ({ key, title, unit, icon, iconBackgroundClassName }) => ({
-            title,
-            value: statistics[key],
-            unit,
-            icon,
-            iconBackgroundClassName,
-          })
-        )}
-      />
-    );
-  };
 
   return (
     <section className="flex flex-col gap-4 rounded-lg border border-line-200 bg-white p-6">
@@ -110,7 +121,11 @@ export const DashboardTopSection = () => {
         <DateRangePopover value={dateRange} onConfirm={setDateRange} />
       </div>
 
-      {renderKpiBody()}
+      <DashboardKpiBody
+        statistics={statistics}
+        isPending={isPending}
+        isError={isError}
+      />
     </section>
   );
 };

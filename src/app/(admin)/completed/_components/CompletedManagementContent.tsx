@@ -89,7 +89,6 @@ export const CompletedManagementContent = () => {
         onRetry={() => void refetchList()}
       />
       <CompletedDetailDrawer
-        open={selectedEstimateRequestId !== null}
         estimateRequestId={selectedEstimateRequestId}
         onClose={() => setSelectedEstimateRequestId(null)}
       />

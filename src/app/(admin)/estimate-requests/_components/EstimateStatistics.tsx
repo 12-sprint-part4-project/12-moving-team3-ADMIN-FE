@@ -52,52 +52,62 @@ const STATISTICS_ITEMS: StatisticItem[] = [
   },
 ];
 
-export const EstimateStatistics = ({
+/**
+ * 통계 카드 본문 상태 분기.
+ * 에러여도 이전 statistics가 있으면 카드를 유지하고, 데이터가 없을 때만 실패/로딩을 보여 준다.
+ */
+const EstimateStatisticsBody = ({
   statistics,
   isPending,
   isError,
 }: EstimateStatisticsProps) => {
-  const renderBody = (): ReactNode => {
-    if (isPending) {
-      return <LoadingState />;
-    }
+  if (isPending) {
+    return <LoadingState />;
+  }
 
-    if (isError && !statistics) {
-      return (
-        <EmptyState
-          title="견적 요청 통계를 불러오지 못했습니다."
-          description="잠시 후 다시 시도해 주세요."
-        />
-      );
-    }
-
-    if (!statistics) {
-      return <LoadingState />;
-    }
-
+  if (isError && !statistics) {
     return (
-      <StatisticsCardList
-        items={STATISTICS_ITEMS.map(
-          ({ key, title, unit, icon, iconBackgroundClassName }) => ({
-            title,
-            value: statistics[key],
-            unit,
-            icon,
-            iconBackgroundClassName,
-          })
-        )}
-        description="※ 제출일 기준으로 집계되며, 기간 필터만 적용됩니다."
-        gridClassName="xl:grid-cols-4"
+      <EmptyState
+        title="견적 요청 통계를 불러오지 못했습니다."
+        description="잠시 후 다시 시도해 주세요."
       />
     );
-  };
+  }
+
+  if (!statistics) {
+    return <LoadingState />;
+  }
 
   return (
-    <section
-      className="mt-6 w-full rounded-lg border border-line-200 bg-white p-6"
-      aria-label="견적 요청 통계"
-    >
-      {renderBody()}
-    </section>
+    <StatisticsCardList
+      items={STATISTICS_ITEMS.map(
+        ({ key, title, unit, icon, iconBackgroundClassName }) => ({
+          title,
+          value: statistics[key],
+          unit,
+          icon,
+          iconBackgroundClassName,
+        })
+      )}
+      description="※ 제출일 기준으로 집계되며, 기간 필터만 적용됩니다."
+      gridClassName="xl:grid-cols-4"
+    />
   );
 };
+
+export const EstimateStatistics = ({
+  statistics,
+  isPending,
+  isError,
+}: EstimateStatisticsProps) => (
+  <section
+    className="mt-6 w-full rounded-lg border border-line-200 bg-white p-6"
+    aria-label="견적 요청 통계"
+  >
+    <EstimateStatisticsBody
+      statistics={statistics}
+      isPending={isPending}
+      isError={isError}
+    />
+  </section>
+);
