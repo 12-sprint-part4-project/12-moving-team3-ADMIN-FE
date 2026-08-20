@@ -1,13 +1,14 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback } from 'react';
 
 import { PageHeader } from '@/components/PageHeader/PageHeader';
 import { useAdminCompletedList } from '@/hooks/useAdminCompletedList';
 import { useAdminCompletedListFilters } from '@/hooks/useAdminCompletedListFilters';
 import { useAdminCompletedStatistics } from '@/hooks/useAdminCompletedStatistics';
-import { useAdminListSort } from '@/hooks/useAdminListSort';
 import { useClampListPage } from '@/hooks/useClampListPage';
+import { useDetailSearchParam } from '@/hooks/useDetailSearchParam';
+import { parseNumericDetailId } from '@/utils/detailSearchParams';
 
 import { CompletedDetailDrawer } from './CompletedDetailDrawer';
 import { CompletedFilter } from './CompletedFilter';
@@ -19,14 +20,12 @@ import { CompletedTable } from './CompletedTable';
  * 필터·목록·통계·상세 Drawer를 조합한다.
  */
 export const CompletedManagementContent = () => {
-  const [selectedEstimateRequestId, setSelectedEstimateRequestId] = useState<
-    number | null
-  >(null);
-  const { sort, handleSortToggle } = useAdminListSort();
+  const { detailId, setDetailId } = useDetailSearchParam('completedId');
+  const selectedEstimateRequestId = parseNumericDetailId(detailId);
   const {
     filters,
     searchInput,
-    listQuery: filterQuery,
+    listQuery,
     statisticsQuery,
     hasActiveFilters,
     dateRangeValue,
@@ -34,20 +33,16 @@ export const CompletedManagementContent = () => {
     handleSearch,
     handleMoveTypeChange,
     handleDateRangeConfirm,
+    handleSortToggle,
     handlePageChange,
-    setFilters,
+    replacePage,
     handleResetFilters,
   } = useAdminCompletedListFilters();
 
-  const listQuery = useMemo(
-    () => ({ ...filterQuery, sort }),
-    [filterQuery, sort]
+  const handleOpenDetail = useCallback(
+    (estimateRequestId: number) => setDetailId(String(estimateRequestId)),
+    [setDetailId]
   );
-
-  const handleMoveDateSortToggle = () => {
-    handleSortToggle();
-    handlePageChange(1);
-  };
 
   const {
     data: listData,
@@ -65,7 +60,7 @@ export const CompletedManagementContent = () => {
     page: filters.page,
     totalPages: listData?.meta?.totalPages,
     isPending: isListPending,
-    setFilters,
+    onPageClamp: replacePage,
   });
 
   return (
@@ -95,16 +90,16 @@ export const CompletedManagementContent = () => {
         isLoading={isListPending}
         isError={isListError}
         hasActiveFilters={hasActiveFilters}
-        onDetailClick={setSelectedEstimateRequestId}
+        onDetailClick={handleOpenDetail}
         onPageChange={handlePageChange}
         onResetFilters={handleResetFilters}
         onRetry={() => void refetchList()}
-        sort={sort}
-        onSortToggle={handleMoveDateSortToggle}
+        sort={filters.sort}
+        onSortToggle={handleSortToggle}
       />
       <CompletedDetailDrawer
         estimateRequestId={selectedEstimateRequestId}
-        onClose={() => setSelectedEstimateRequestId(null)}
+        onClose={() => setDetailId(null)}
       />
     </>
   );

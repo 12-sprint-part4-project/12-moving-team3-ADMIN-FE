@@ -1,52 +1,22 @@
-import { useMemo, useState, type ChangeEvent } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
 
 import {
   toAdminEstimateRequestApiDate,
   toAdminEstimateRequestStatisticsQuery,
 } from '@/utils/adminEstimateRequest';
+import {
+  createAdminEstimateRequestListHref,
+  ESTIMATE_REQUEST_STATUSES,
+  parseAdminEstimateRequestSearchParams,
+  parseAdminListEnum,
+} from '@/utils/adminListSearchParams';
 
 import type { DateRangePopoverProps } from '@/components/DateRangePopover/DateRangePopover';
-import type {
-  AdminEstimateRequestListQuery,
-  AdminEstimateRequestStatus,
-} from '@/types/adminEstimateRequest';
+import type { AdminEstimateRequestListQuery } from '@/types/adminEstimateRequest';
+import type { AdminEstimateRequestUrlFilters } from '@/utils/adminListSearchParams';
 
-/** BE listQuerySchema 기본 페이지 크기와 동일 */
-const DEFAULT_PAGE_SIZE = 10;
-
-export interface AdminEstimateRequestListFilters {
-  /** 검색 버튼/Enter로 확정된 검색어 */
-  search?: string;
-  /** 미선택(전체) 시 undefined */
-  status?: AdminEstimateRequestStatus;
-  /** 제출일 시작 (YYYY-MM-DD) */
-  startDate?: string;
-  /** 제출일 종료 (YYYY-MM-DD). startDate 없이 단독 사용하지 않는다 */
-  endDate?: string;
-  page: number;
-  pageSize: number;
-}
-
-const INITIAL_FILTERS: AdminEstimateRequestListFilters = {
-  page: 1,
-  pageSize: DEFAULT_PAGE_SIZE,
-};
-
-/** select value → 상태 | undefined. 알 수 없는 값은 무시한다. */
-const parseStatusFilter = (
-  value: string
-): AdminEstimateRequestStatus | undefined => {
-  if (
-    value === 'SUBMITTED' ||
-    value === 'CONFIRMED' ||
-    value === 'EXPIRED' ||
-    value === 'CANCELED'
-  ) {
-    return value;
-  }
-
-  return undefined;
-};
+export type AdminEstimateRequestListFilters = AdminEstimateRequestUrlFilters;
 
 /**
  * UI 필터 → API query.
@@ -57,6 +27,7 @@ const toListQuery = (
 ): AdminEstimateRequestListQuery => ({
   page: filters.page,
   pageSize: filters.pageSize,
+  sort: filters.sort,
   ...(filters.search ? { search: filters.search } : {}),
   ...(filters.status ? { status: filters.status } : {}),
   ...(filters.startDate ? { startDate: filters.startDate } : {}),
@@ -65,14 +36,28 @@ const toListQuery = (
 
 /**
  * 관리자 견적 요청 목록 필터 상태·query 생성.
- * 검색·상태·제출일·페이지와 통계 기간 query를 함께 만든다.
- * page 보정(setFilters)은 목록 응답을 아는 호출부에서 처리한다.
+ * 검색·상태·제출일·정렬·페이지와 통계 기간 query를 URL에서 복원한다.
  */
 export const useAdminEstimateRequestListFilters = () => {
-  const [filters, setFilters] =
-    useState<AdminEstimateRequestListFilters>(INITIAL_FILTERS);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const filters = useMemo(
+    () =>
+      parseAdminEstimateRequestSearchParams(
+        new URLSearchParams(searchParams.toString())
+      ),
+    [searchParams]
+  );
   // 입력창 초안. 검색 버튼/Enter 시에만 filters.search로 반영한다.
-  const [searchInput, setSearchInput] = useState('');
+  const urlSearch = filters.search ?? '';
+  const [syncedSearch, setSyncedSearch] = useState(urlSearch);
+  const [searchInput, setSearchInput] = useState(urlSearch);
+
+  if (syncedSearch !== urlSearch) {
+    setSyncedSearch(urlSearch);
+    setSearchInput(urlSearch);
+  }
 
   const listQuery = useMemo(() => toListQuery(filters), [filters]);
   const statisticsQuery = useMemo(
@@ -100,16 +85,31 @@ export const useAdminEstimateRequestListFilters = () => {
     return { from, to };
   }, [filters.startDate, filters.endDate]);
 
-  const updateFilters = (
-    patch: Partial<AdminEstimateRequestListFilters>,
-    options?: { resetPage?: boolean }
-  ) => {
-    setFilters((prev) => ({
-      ...prev,
-      ...patch,
-      ...(options?.resetPage ? { page: 1 } : {}),
-    }));
-  };
+  const updateFilters = useCallback(
+    (
+      patch: Partial<AdminEstimateRequestListFilters>,
+      options?: { resetPage?: boolean; replace?: boolean }
+    ) => {
+      const nextFilters = {
+        ...filters,
+        ...patch,
+        ...(options?.resetPage ? { page: 1 } : {}),
+      };
+      const href = createAdminEstimateRequestListHref(
+        pathname,
+        new URLSearchParams(searchParams.toString()),
+        nextFilters
+      );
+
+      if (options?.replace) {
+        router.replace(href, { scroll: false });
+        return;
+      }
+
+      router.push(href, { scroll: false });
+    },
+    [filters, pathname, router, searchParams]
+  );
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchInput(event.target.value);
@@ -126,7 +126,12 @@ export const useAdminEstimateRequestListFilters = () => {
 
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
     updateFilters(
-      { status: parseStatusFilter(event.target.value) },
+      {
+        status: parseAdminListEnum(
+          event.target.value,
+          ESTIMATE_REQUEST_STATUSES
+        ),
+      },
       { resetPage: true }
     );
   };
@@ -152,18 +157,36 @@ export const useAdminEstimateRequestListFilters = () => {
     );
   };
 
+  const handleSortToggle = () => {
+    updateFilters(
+      { sort: filters.sort === 'DESC' ? 'ASC' : 'DESC' },
+      { resetPage: true }
+    );
+  };
+
   const handlePageChange = (page: number) => {
     updateFilters({ page });
   };
 
+  const replacePage = useCallback(
+    (page: number) => updateFilters({ page }, { replace: true }),
+    [updateFilters]
+  );
+
   const handleResetFilters = () => {
     setSearchInput('');
-    setFilters(INITIAL_FILTERS);
+    updateFilters({
+      search: undefined,
+      status: undefined,
+      startDate: undefined,
+      endDate: undefined,
+      sort: 'DESC',
+      page: 1,
+    });
   };
 
   return {
     filters,
-    setFilters,
     searchInput,
     listQuery,
     statisticsQuery,
@@ -173,7 +196,9 @@ export const useAdminEstimateRequestListFilters = () => {
     handleSearch,
     handleStatusChange,
     handleDateRangeConfirm,
+    handleSortToggle,
     handlePageChange,
+    replacePage,
     handleResetFilters,
   };
 };

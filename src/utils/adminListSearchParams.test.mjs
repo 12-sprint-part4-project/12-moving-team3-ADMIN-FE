@@ -3,9 +3,13 @@ import test from 'node:test';
 
 import {
   createAdminChatListHref,
+  createAdminCompletedListHref,
+  createAdminEstimateRequestListHref,
   createAdminReportListHref,
   createAdminReviewListHref,
   parseAdminChatSearchParams,
+  parseAdminCompletedSearchParams,
+  parseAdminEstimateRequestSearchParams,
   parseAdminReportSearchParams,
   parseAdminReviewSearchParams,
 } from './adminListSearchParams.ts';
@@ -95,5 +99,83 @@ test('목록 query를 갱신해도 상세 ID와 다른 query를 보존한다', (
       pageSize: 10,
     }),
     '/reviews?view=compact&rating=4&page=2'
+  );
+  assert.equal(
+    createAdminEstimateRequestListHref(
+      '/estimate-requests',
+      new URLSearchParams('estimateRequestId=15&page=4'),
+      { status: 'SUBMITTED', sort: 'DESC', page: 1, pageSize: 10 }
+    ),
+    '/estimate-requests?estimateRequestId=15&status=SUBMITTED'
+  );
+  assert.equal(
+    createAdminEstimateRequestListHref(
+      '/estimate-requests',
+      new URLSearchParams('estimateRequestId=15'),
+      { sort: 'ASC', page: 2, pageSize: 10 }
+    ),
+    '/estimate-requests?estimateRequestId=15&sort=ASC&page=2'
+  );
+  assert.equal(
+    createAdminCompletedListHref(
+      '/completed',
+      new URLSearchParams('completedId=9&page=2&sort=ASC'),
+      { moveType: 'HOME', sort: 'DESC', page: 1, pageSize: 10 }
+    ),
+    '/completed?completedId=9&moveType=HOME'
+  );
+});
+
+test('견적 요청 query의 상태, 날짜, 정렬을 검증한다', () => {
+  assert.deepEqual(
+    parseAdminEstimateRequestSearchParams(
+      new URLSearchParams(
+        'search=%20%EA%B2%AC%EC%A0%81%20&status=CONFIRMED&startDate=2026-08-01&endDate=2026-08-20&sort=ASC&page=3'
+      )
+    ),
+    {
+      search: '견적',
+      status: 'CONFIRMED',
+      startDate: '2026-08-01',
+      endDate: '2026-08-20',
+      sort: 'ASC',
+      page: 3,
+      pageSize: 10,
+    }
+  );
+  assert.deepEqual(
+    parseAdminEstimateRequestSearchParams(
+      new URLSearchParams(
+        'search=%20&status=INVALID&startDate=2026-02-30&endDate=2026-01-01&sort=INVALID&page=0'
+      )
+    ),
+    { sort: 'DESC', page: 1, pageSize: 10 }
+  );
+});
+
+test('완료 건 query의 이사 유형, 날짜, 정렬을 검증한다', () => {
+  assert.deepEqual(
+    parseAdminCompletedSearchParams(
+      new URLSearchParams(
+        'search=%20user%20&moveType=OFFICE&startDate=2026-08-01&endDate=2026-08-20&sort=ASC&page=2'
+      )
+    ),
+    {
+      search: 'user',
+      moveType: 'OFFICE',
+      startDate: '2026-08-01',
+      endDate: '2026-08-20',
+      sort: 'ASC',
+      page: 2,
+      pageSize: 10,
+    }
+  );
+  assert.deepEqual(
+    parseAdminCompletedSearchParams(
+      new URLSearchParams(
+        'moveType=INVALID&startDate=2026-13-01&endDate=2026-01-01&sort=DOWN&page=x'
+      )
+    ),
+    { sort: 'DESC', page: 1, pageSize: 10 }
   );
 });

@@ -1,45 +1,22 @@
-import { useMemo, useState, type ChangeEvent } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
 
 import {
   toAdminCompletedApiDate,
   toAdminCompletedStatisticsQuery,
 } from '@/utils/adminCompleted';
+import {
+  COMPLETED_MOVE_TYPES,
+  createAdminCompletedListHref,
+  parseAdminCompletedSearchParams,
+  parseAdminListEnum,
+} from '@/utils/adminListSearchParams';
 
 import type { DateRangePopoverProps } from '@/components/DateRangePopover/DateRangePopover';
 import type { AdminCompletedListQuery } from '@/types/adminCompleted';
-import type { AdminEstimateRequestMoveType } from '@/types/adminEstimateRequest';
+import type { AdminCompletedUrlFilters } from '@/utils/adminListSearchParams';
 
-/** BE listQuerySchema 기본 페이지 크기와 동일 */
-const DEFAULT_PAGE_SIZE = 10;
-
-export interface AdminCompletedListFilters {
-  /** 검색 버튼/Enter로 확정된 검색어 */
-  search?: string;
-  /** 미선택(전체) 시 undefined */
-  moveType?: AdminEstimateRequestMoveType;
-  /** 이사일 시작 (YYYY-MM-DD) */
-  startDate?: string;
-  /** 이사일 종료 (YYYY-MM-DD). startDate 없이 단독 사용하지 않는다 */
-  endDate?: string;
-  page: number;
-  pageSize: number;
-}
-
-const INITIAL_FILTERS: AdminCompletedListFilters = {
-  page: 1,
-  pageSize: DEFAULT_PAGE_SIZE,
-};
-
-/** select value → 이사 유형 | undefined. 알 수 없는 값은 무시한다. */
-const parseMoveTypeFilter = (
-  value: string
-): AdminEstimateRequestMoveType | undefined => {
-  if (value === 'SMALL' || value === 'HOME' || value === 'OFFICE') {
-    return value;
-  }
-
-  return undefined;
-};
+export type AdminCompletedListFilters = AdminCompletedUrlFilters;
 
 /**
  * UI 필터 → API query.
@@ -50,6 +27,7 @@ const toListQuery = (
 ): AdminCompletedListQuery => ({
   page: filters.page,
   pageSize: filters.pageSize,
+  sort: filters.sort,
   ...(filters.search ? { search: filters.search } : {}),
   ...(filters.moveType ? { moveType: filters.moveType } : {}),
   ...(filters.startDate ? { startDate: filters.startDate } : {}),
@@ -58,14 +36,28 @@ const toListQuery = (
 
 /**
  * 관리자 완료 건 목록 필터 상태·query 생성.
- * 검색·이사 유형·이사일·페이지와 통계 기간 query를 함께 만든다.
- * page 보정(setFilters)은 목록 응답을 아는 호출부에서 처리한다.
+ * 검색·이사 유형·이사일·정렬·페이지와 통계 기간 query를 URL에서 복원한다.
  */
 export const useAdminCompletedListFilters = () => {
-  const [filters, setFilters] =
-    useState<AdminCompletedListFilters>(INITIAL_FILTERS);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const filters = useMemo(
+    () =>
+      parseAdminCompletedSearchParams(
+        new URLSearchParams(searchParams.toString())
+      ),
+    [searchParams]
+  );
   // 입력창 초안. 검색 버튼/Enter 시에만 filters.search로 반영한다.
-  const [searchInput, setSearchInput] = useState('');
+  const urlSearch = filters.search ?? '';
+  const [syncedSearch, setSyncedSearch] = useState(urlSearch);
+  const [searchInput, setSearchInput] = useState(urlSearch);
+
+  if (syncedSearch !== urlSearch) {
+    setSyncedSearch(urlSearch);
+    setSearchInput(urlSearch);
+  }
 
   const listQuery = useMemo(() => toListQuery(filters), [filters]);
   const statisticsQuery = useMemo(
@@ -92,16 +84,31 @@ export const useAdminCompletedListFilters = () => {
     return { from, to };
   }, [filters.startDate, filters.endDate]);
 
-  const updateFilters = (
-    patch: Partial<AdminCompletedListFilters>,
-    options?: { resetPage?: boolean }
-  ) => {
-    setFilters((prev) => ({
-      ...prev,
-      ...patch,
-      ...(options?.resetPage ? { page: 1 } : {}),
-    }));
-  };
+  const updateFilters = useCallback(
+    (
+      patch: Partial<AdminCompletedListFilters>,
+      options?: { resetPage?: boolean; replace?: boolean }
+    ) => {
+      const nextFilters = {
+        ...filters,
+        ...patch,
+        ...(options?.resetPage ? { page: 1 } : {}),
+      };
+      const href = createAdminCompletedListHref(
+        pathname,
+        new URLSearchParams(searchParams.toString()),
+        nextFilters
+      );
+
+      if (options?.replace) {
+        router.replace(href, { scroll: false });
+        return;
+      }
+
+      router.push(href, { scroll: false });
+    },
+    [filters, pathname, router, searchParams]
+  );
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchInput(event.target.value);
@@ -118,7 +125,9 @@ export const useAdminCompletedListFilters = () => {
 
   const handleMoveTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
     updateFilters(
-      { moveType: parseMoveTypeFilter(event.target.value) },
+      {
+        moveType: parseAdminListEnum(event.target.value, COMPLETED_MOVE_TYPES),
+      },
       { resetPage: true }
     );
   };
@@ -144,18 +153,36 @@ export const useAdminCompletedListFilters = () => {
     );
   };
 
+  const handleSortToggle = () => {
+    updateFilters(
+      { sort: filters.sort === 'DESC' ? 'ASC' : 'DESC' },
+      { resetPage: true }
+    );
+  };
+
   const handlePageChange = (page: number) => {
     updateFilters({ page });
   };
 
+  const replacePage = useCallback(
+    (page: number) => updateFilters({ page }, { replace: true }),
+    [updateFilters]
+  );
+
   const handleResetFilters = () => {
     setSearchInput('');
-    setFilters(INITIAL_FILTERS);
+    updateFilters({
+      search: undefined,
+      moveType: undefined,
+      startDate: undefined,
+      endDate: undefined,
+      sort: 'DESC',
+      page: 1,
+    });
   };
 
   return {
     filters,
-    setFilters,
     searchInput,
     listQuery,
     statisticsQuery,
@@ -165,7 +192,9 @@ export const useAdminCompletedListFilters = () => {
     handleSearch,
     handleMoveTypeChange,
     handleDateRangeConfirm,
+    handleSortToggle,
     handlePageChange,
+    replacePage,
     handleResetFilters,
   };
 };
