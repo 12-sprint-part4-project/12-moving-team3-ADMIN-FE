@@ -7,33 +7,16 @@ import {
 } from '@/utils/adminEstimateRequest';
 import {
   createAdminEstimateRequestListHref,
+  ESTIMATE_REQUEST_STATUSES,
   parseAdminEstimateRequestSearchParams,
+  parseAdminListEnum,
 } from '@/utils/adminListSearchParams';
 
 import type { DateRangePopoverProps } from '@/components/DateRangePopover/DateRangePopover';
-import type {
-  AdminEstimateRequestListQuery,
-  AdminEstimateRequestStatus,
-} from '@/types/adminEstimateRequest';
+import type { AdminEstimateRequestListQuery } from '@/types/adminEstimateRequest';
 import type { AdminEstimateRequestUrlFilters } from '@/utils/adminListSearchParams';
 
 export type AdminEstimateRequestListFilters = AdminEstimateRequestUrlFilters;
-
-/** select value → 상태 | undefined. 알 수 없는 값은 무시한다. */
-const parseStatusFilter = (
-  value: string
-): AdminEstimateRequestStatus | undefined => {
-  if (
-    value === 'SUBMITTED' ||
-    value === 'CONFIRMED' ||
-    value === 'EXPIRED' ||
-    value === 'CANCELED'
-  ) {
-    return value;
-  }
-
-  return undefined;
-};
 
 /**
  * UI 필터 → API query.
@@ -143,7 +126,12 @@ export const useAdminEstimateRequestListFilters = () => {
 
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
     updateFilters(
-      { status: parseStatusFilter(event.target.value) },
+      {
+        status: parseAdminListEnum(
+          event.target.value,
+          ESTIMATE_REQUEST_STATUSES
+        ),
+      },
       { resetPage: true }
     );
   };

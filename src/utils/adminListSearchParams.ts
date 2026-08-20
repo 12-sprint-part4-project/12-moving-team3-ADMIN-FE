@@ -26,6 +26,29 @@ export const parseAdminListDate = (value: string | null) => {
     : undefined;
 };
 
+/**
+ * 시작·종료일을 검증한다.
+ * 시작일이 없거나 종료일이 시작일보다 이르면 endDate는 버린다.
+ */
+export const parseAdminListDateRange = (
+  startValue: string | null,
+  endValue: string | null
+): { startDate?: string; endDate?: string } => {
+  const startDate = parseAdminListDate(startValue);
+  if (!startDate) {
+    return {};
+  }
+
+  const parsedEndDate = parseAdminListDate(endValue);
+  const endDate =
+    parsedEndDate && parsedEndDate >= startDate ? parsedEndDate : undefined;
+
+  return {
+    startDate,
+    ...(endDate ? { endDate } : {}),
+  };
+};
+
 export const parseAdminListEnum = <T extends string>(
   value: string | null,
   allowedValues: readonly T[]
@@ -253,12 +276,8 @@ const ESTIMATE_REQUEST_QUERY_KEYS = [
   'sort',
   'page',
 ] as const;
-const ESTIMATE_REQUEST_STATUSES: readonly AdminEstimateRequestStatus[] = [
-  'SUBMITTED',
-  'CONFIRMED',
-  'EXPIRED',
-  'CANCELED',
-];
+export const ESTIMATE_REQUEST_STATUSES: readonly AdminEstimateRequestStatus[] =
+  ['SUBMITTED', 'CONFIRMED', 'EXPIRED', 'CANCELED'];
 
 export const parseAdminEstimateRequestSearchParams = (
   searchParams: URLSearchParams
@@ -268,12 +287,10 @@ export const parseAdminEstimateRequestSearchParams = (
     searchParams.get('status'),
     ESTIMATE_REQUEST_STATUSES
   );
-  const startDate = parseAdminListDate(searchParams.get('startDate'));
-  const parsedEndDate = parseAdminListDate(searchParams.get('endDate'));
-  const endDate =
-    startDate && parsedEndDate && parsedEndDate >= startDate
-      ? parsedEndDate
-      : undefined;
+  const { startDate, endDate } = parseAdminListDateRange(
+    searchParams.get('startDate'),
+    searchParams.get('endDate')
+  );
 
   return {
     ...(search ? { search } : {}),
@@ -318,7 +335,7 @@ const COMPLETED_QUERY_KEYS = [
   'sort',
   'page',
 ] as const;
-const COMPLETED_MOVE_TYPES: readonly AdminEstimateRequestMoveType[] = [
+export const COMPLETED_MOVE_TYPES: readonly AdminEstimateRequestMoveType[] = [
   'SMALL',
   'HOME',
   'OFFICE',
@@ -332,12 +349,10 @@ export const parseAdminCompletedSearchParams = (
     searchParams.get('moveType'),
     COMPLETED_MOVE_TYPES
   );
-  const startDate = parseAdminListDate(searchParams.get('startDate'));
-  const parsedEndDate = parseAdminListDate(searchParams.get('endDate'));
-  const endDate =
-    startDate && parsedEndDate && parsedEndDate >= startDate
-      ? parsedEndDate
-      : undefined;
+  const { startDate, endDate } = parseAdminListDateRange(
+    searchParams.get('startDate'),
+    searchParams.get('endDate')
+  );
 
   return {
     ...(search ? { search } : {}),

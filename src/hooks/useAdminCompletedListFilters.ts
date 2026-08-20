@@ -6,27 +6,17 @@ import {
   toAdminCompletedStatisticsQuery,
 } from '@/utils/adminCompleted';
 import {
+  COMPLETED_MOVE_TYPES,
   createAdminCompletedListHref,
   parseAdminCompletedSearchParams,
+  parseAdminListEnum,
 } from '@/utils/adminListSearchParams';
 
 import type { DateRangePopoverProps } from '@/components/DateRangePopover/DateRangePopover';
 import type { AdminCompletedListQuery } from '@/types/adminCompleted';
-import type { AdminEstimateRequestMoveType } from '@/types/adminEstimateRequest';
 import type { AdminCompletedUrlFilters } from '@/utils/adminListSearchParams';
 
 export type AdminCompletedListFilters = AdminCompletedUrlFilters;
-
-/** select value → 이사 유형 | undefined. 알 수 없는 값은 무시한다. */
-const parseMoveTypeFilter = (
-  value: string
-): AdminEstimateRequestMoveType | undefined => {
-  if (value === 'SMALL' || value === 'HOME' || value === 'OFFICE') {
-    return value;
-  }
-
-  return undefined;
-};
 
 /**
  * UI 필터 → API query.
@@ -135,7 +125,9 @@ export const useAdminCompletedListFilters = () => {
 
   const handleMoveTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
     updateFilters(
-      { moveType: parseMoveTypeFilter(event.target.value) },
+      {
+        moveType: parseAdminListEnum(event.target.value, COMPLETED_MOVE_TYPES),
+      },
       { resetPage: true }
     );
   };
