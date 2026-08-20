@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, type ReactNode } from 'react';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
 
 import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
 import { Button } from '@/components/Button/Button';
@@ -16,9 +16,12 @@ import { useAdminReviewListFilters } from '@/hooks/useAdminReviewListFilters';
 import { useAdminReviewStatistics } from '@/hooks/useAdminReviewStatistics';
 import { useClampListPage } from '@/hooks/useClampListPage';
 
+import { AdminReviewDetailDrawer } from './AdminReviewDetailDrawer';
 import { getReviewListColumns } from './getReviewListColumns';
 import { ReviewDeleteConfirmModal } from './ReviewDeleteConfirmModal';
 import { ReviewStatistics } from './ReviewStatistics';
+
+import type { AdminReviewListItem } from '@/types/adminReview';
 
 /** 별점 필터: 빈 문자열은 rating 미전달(전체) */
 const RATING_FILTER_OPTIONS = [
@@ -42,6 +45,8 @@ const DELETION_STATUS_FILTER_OPTIONS = [
  * 필터·목록·통계·삭제 Confirm 흐름을 조합한다.
  */
 export const ReviewManagementContent = () => {
+  const [selectedReview, setSelectedReview] =
+    useState<AdminReviewListItem | null>(null);
   const {
     filters,
     searchInput,
@@ -86,10 +91,20 @@ export const ReviewManagementContent = () => {
     onPageClamp: replacePage,
   });
 
+  const handleOpenDetail = useCallback((review: AdminReviewListItem) => {
+    setSelectedReview(review);
+  }, []);
   const columns = useMemo(
-    () => getReviewListColumns(handleRequestDelete),
-    [handleRequestDelete]
+    () => getReviewListColumns(handleOpenDetail),
+    [handleOpenDetail]
   );
+
+  const handleConfirmReviewDelete = async () => {
+    const isDeleted = await handleConfirmDelete();
+    if (isDeleted) {
+      setSelectedReview(null);
+    }
+  };
 
   // 회원/신고 목록과 동일: loading → error → empty → table
   const renderListBody = (): ReactNode => {
@@ -189,12 +204,21 @@ export const ReviewManagementContent = () => {
         {renderListBody()}
       </AdminListLayout>
 
+      <AdminReviewDetailDrawer
+        review={selectedReview}
+        open={selectedReview !== null}
+        isDeletePending={isDeletePending}
+        isDeleteConfirmOpen={pendingReviewId != null}
+        onRequestDelete={handleRequestDelete}
+        onClose={() => setSelectedReview(null)}
+      />
+
       <ReviewDeleteConfirmModal
         open={pendingReviewId != null}
         isPending={isDeletePending}
         errorMessage={deleteError ?? undefined}
         onConfirm={() => {
-          void handleConfirmDelete();
+          void handleConfirmReviewDelete();
         }}
         onCancel={handleCancelDelete}
       />

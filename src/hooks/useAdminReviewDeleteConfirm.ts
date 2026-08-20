@@ -33,7 +33,7 @@ export const useAdminReviewDeleteConfirm = () => {
 
   const handleConfirmDelete = async () => {
     if (pendingReviewId == null || isDeletePending) {
-      return;
+      return false;
     }
 
     // 재시도 시 이전 실패 문구를 먼저 지운다.
@@ -43,9 +43,11 @@ export const useAdminReviewDeleteConfirm = () => {
       await deleteMutation.mutateAsync(pendingReviewId);
       // 성공 시 모달만 닫는다. 목록·통계는 mutation onSuccess에서 invalidate한다.
       setPendingReviewId(null);
+      return true;
     } catch {
       // 실패 시 모달을 유지해 재시도·취소를 가능하게 한다.
       setDeleteError(DELETE_ERROR_MESSAGE);
+      return false;
     }
   };
 
