@@ -1,6 +1,11 @@
 import { format } from 'date-fns';
-import { useMemo, useState, type ChangeEvent } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
 
+import {
+  createAdminReportListHref,
+  parseAdminReportSearchParams,
+} from '@/utils/adminListSearchParams';
 import { toAdminReportStatisticsQuery } from '@/utils/adminReport';
 
 import {
@@ -9,30 +14,10 @@ import {
 } from '../_constants/reportFilters';
 
 import type { DateRangePopoverProps } from '@/components/DateRangePopover/DateRangePopover';
-import type {
-  AdminReportListQuery,
-  AdminReportStatus,
-  AdminReportTarget,
-} from '@/types/adminReport';
-
-
-const DEFAULT_PAGE_SIZE = 10;
+import type { AdminReportListQuery } from '@/types/adminReport';
 
 /** 화면에서 관리하는 필터 상태. API에 전달하지 않는 입력 초안은 별도 상태로 둔다. */
-interface AdminReportListFilters {
-  status?: AdminReportStatus;
-  target?: AdminReportTarget;
-  targetUserKeyword?: string;
-  reportedFrom?: string;
-  reportedTo?: string;
-  page: number;
-  pageSize: number;
-}
-
-const INITIAL_FILTERS: AdminReportListFilters = {
-  page: 1,
-  pageSize: DEFAULT_PAGE_SIZE,
-};
+type AdminReportListFilters = ReturnType<typeof parseAdminReportSearchParams>;
 
 const toListQuery = (
   filters: AdminReportListFilters
@@ -55,9 +40,24 @@ const toListQuery = (
  * 검색어는 버튼 또는 Enter로 확정될 때만 Query에 반영한다.
  */
 export const useAdminReportListFilters = () => {
-  const [filters, setFilters] =
-    useState<AdminReportListFilters>(INITIAL_FILTERS);
-  const [targetUserSearch, setTargetUserSearch] = useState('');
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const filters = useMemo(
+    () =>
+      parseAdminReportSearchParams(
+        new URLSearchParams(searchParams.toString())
+      ),
+    [searchParams]
+  );
+  const urlSearch = filters.targetUserKeyword ?? '';
+  const [syncedSearch, setSyncedSearch] = useState(urlSearch);
+  const [targetUserSearch, setTargetUserSearch] = useState(urlSearch);
+
+  if (syncedSearch !== urlSearch) {
+    setSyncedSearch(urlSearch);
+    setTargetUserSearch(urlSearch);
+  }
 
   const listQuery = useMemo(() => toListQuery(filters), [filters]);
   const statisticsQuery = useMemo(
@@ -81,16 +81,31 @@ export const useAdminReportListFilters = () => {
     return { from, to };
   }, [filters.reportedFrom, filters.reportedTo]);
 
-  const updateFilters = (
-    patch: Partial<AdminReportListFilters>,
-    resetPage = false
-  ) => {
-    setFilters((previous) => ({
-      ...previous,
-      ...patch,
-      ...(resetPage ? { page: 1 } : {}),
-    }));
-  };
+  const updateFilters = useCallback(
+    (
+      patch: Partial<AdminReportListFilters>,
+      options?: { resetPage?: boolean; replace?: boolean }
+    ) => {
+      const nextFilters = {
+        ...filters,
+        ...patch,
+        ...(options?.resetPage ? { page: 1 } : {}),
+      };
+      const href = createAdminReportListHref(
+        pathname,
+        new URLSearchParams(searchParams.toString()),
+        nextFilters
+      );
+
+      if (options?.replace) {
+        router.replace(href, { scroll: false });
+        return;
+      }
+
+      router.push(href, { scroll: false });
+    },
+    [filters, pathname, router, searchParams]
+  );
 
   const handleTargetUserSearchChange = (event: ChangeEvent<HTMLInputElement>) =>
     setTargetUserSearch(event.target.value);
@@ -100,27 +115,30 @@ export const useAdminReportListFilters = () => {
     setTargetUserSearch(trimmed);
     updateFilters(
       { targetUserKeyword: trimmed.length > 0 ? trimmed : undefined },
-      true
+      { resetPage: true }
     );
   };
 
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) =>
     updateFilters(
       { status: parseReportStatusFilter(event.target.value) },
-      true
+      { resetPage: true }
     );
 
   const handleTargetChange = (event: ChangeEvent<HTMLSelectElement>) =>
     updateFilters(
       { target: parseReportTargetFilter(event.target.value) },
-      true
+      { resetPage: true }
     );
 
   const handleDateRangeConfirm: DateRangePopoverProps['onConfirm'] = (
     range
   ) => {
     if (!range?.from) {
-      updateFilters({ reportedFrom: undefined, reportedTo: undefined }, true);
+      updateFilters(
+        { reportedFrom: undefined, reportedTo: undefined },
+        { resetPage: true }
+      );
       return;
     }
 
@@ -130,18 +148,29 @@ export const useAdminReportListFilters = () => {
         // 종료일이 없으면 시작일 하루만 조회하도록 reportedTo를 생략한다.
         reportedTo: range.to ? format(range.to, 'yyyy-MM-dd') : undefined,
       },
-      true
+      { resetPage: true }
     );
   };
 
   const handleResetFilters = () => {
     setTargetUserSearch('');
-    setFilters(INITIAL_FILTERS);
+    updateFilters({
+      status: undefined,
+      target: undefined,
+      targetUserKeyword: undefined,
+      reportedFrom: undefined,
+      reportedTo: undefined,
+      page: 1,
+    });
   };
+
+  const replacePage = useCallback(
+    (page: number) => updateFilters({ page }, { replace: true }),
+    [updateFilters]
+  );
 
   return {
     filters,
-    setFilters,
     targetUserSearch,
     listQuery,
     statisticsQuery,
@@ -159,6 +188,7 @@ export const useAdminReportListFilters = () => {
     handleTargetChange,
     handleDateRangeConfirm,
     handlePageChange: (page: number) => updateFilters({ page }),
+    replacePage,
     handleResetFilters,
   };
 };

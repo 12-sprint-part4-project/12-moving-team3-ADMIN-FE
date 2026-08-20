@@ -1,5 +1,10 @@
-import { useMemo, useState, type ChangeEvent } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
 
+import {
+  createAdminReviewListHref,
+  parseAdminReviewSearchParams,
+} from '@/utils/adminListSearchParams';
 import {
   toAdminReviewApiDate,
   toAdminReviewStatisticsQuery,
@@ -11,28 +16,9 @@ import type {
   AdminReviewListQuery,
 } from '@/types/adminReview';
 
-/** BE listQuerySchema 기본 페이지 크기와 동일 */
-const DEFAULT_PAGE_SIZE = 10;
-
-export interface AdminReviewListFilters {
-  /** 검색 버튼/Enter로 확정된 검색어 */
-  search?: string;
-  /** 1~5. 미선택 시 undefined */
-  rating?: number;
-  /** 미선택(전체) 시 undefined */
-  deletionStatus?: AdminReviewDeletionStatus;
-  /** 작성일 시작 (YYYY-MM-DD) */
-  startDate?: string;
-  /** 작성일 종료 (YYYY-MM-DD). startDate 없이 단독 사용하지 않는다 */
-  endDate?: string;
-  page: number;
-  pageSize: number;
-}
-
-const INITIAL_FILTERS: AdminReviewListFilters = {
-  page: 1,
-  pageSize: DEFAULT_PAGE_SIZE,
-};
+export type AdminReviewListFilters = ReturnType<
+  typeof parseAdminReviewSearchParams
+>;
 
 /** select value → 1~5 | undefined. 알 수 없는 값은 무시한다. */
 const parseRatingFilter = (value: string): number | undefined => {
@@ -82,10 +68,25 @@ const toListQuery = (
  * page 보정(setFilters)은 목록 응답을 아는 호출부에서 처리한다.
  */
 export const useAdminReviewListFilters = () => {
-  const [filters, setFilters] =
-    useState<AdminReviewListFilters>(INITIAL_FILTERS);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const filters = useMemo(
+    () =>
+      parseAdminReviewSearchParams(
+        new URLSearchParams(searchParams.toString())
+      ),
+    [searchParams]
+  );
   // 입력창 초안. 검색 버튼/Enter 시에만 filters.search로 반영한다.
-  const [searchInput, setSearchInput] = useState('');
+  const urlSearch = filters.search ?? '';
+  const [syncedSearch, setSyncedSearch] = useState(urlSearch);
+  const [searchInput, setSearchInput] = useState(urlSearch);
+
+  if (syncedSearch !== urlSearch) {
+    setSyncedSearch(urlSearch);
+    setSearchInput(urlSearch);
+  }
 
   const listQuery = useMemo(() => toListQuery(filters), [filters]);
   const statisticsQuery = useMemo(
@@ -117,16 +118,31 @@ export const useAdminReviewListFilters = () => {
     return { from, to };
   }, [filters.startDate, filters.endDate]);
 
-  const updateFilters = (
-    patch: Partial<AdminReviewListFilters>,
-    options?: { resetPage?: boolean }
-  ) => {
-    setFilters((prev) => ({
-      ...prev,
-      ...patch,
-      ...(options?.resetPage ? { page: 1 } : {}),
-    }));
-  };
+  const updateFilters = useCallback(
+    (
+      patch: Partial<AdminReviewListFilters>,
+      options?: { resetPage?: boolean; replace?: boolean }
+    ) => {
+      const nextFilters = {
+        ...filters,
+        ...patch,
+        ...(options?.resetPage ? { page: 1 } : {}),
+      };
+      const href = createAdminReviewListHref(
+        pathname,
+        new URLSearchParams(searchParams.toString()),
+        nextFilters
+      );
+
+      if (options?.replace) {
+        router.replace(href, { scroll: false });
+        return;
+      }
+
+      router.push(href, { scroll: false });
+    },
+    [filters, pathname, router, searchParams]
+  );
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchInput(event.target.value);
@@ -182,14 +198,25 @@ export const useAdminReviewListFilters = () => {
     updateFilters({ page });
   };
 
+  const replacePage = useCallback(
+    (page: number) => updateFilters({ page }, { replace: true }),
+    [updateFilters]
+  );
+
   const handleResetFilters = () => {
     setSearchInput('');
-    setFilters(INITIAL_FILTERS);
+    updateFilters({
+      search: undefined,
+      rating: undefined,
+      deletionStatus: undefined,
+      startDate: undefined,
+      endDate: undefined,
+      page: 1,
+    });
   };
 
   return {
     filters,
-    setFilters,
     searchInput,
     listQuery,
     statisticsQuery,
@@ -201,6 +228,7 @@ export const useAdminReviewListFilters = () => {
     handleDeletionStatusChange,
     handleDateRangeConfirm,
     handlePageChange,
+    replacePage,
     handleResetFilters,
   };
 };

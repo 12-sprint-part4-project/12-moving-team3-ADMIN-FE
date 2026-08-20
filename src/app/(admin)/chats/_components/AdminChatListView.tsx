@@ -1,6 +1,14 @@
 'use client';
 
-import { useMemo, useState, type ChangeEvent, type ReactNode } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ChangeEvent,
+  type ReactNode,
+} from 'react';
 
 import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
 import { Button } from '@/components/Button/Button';
@@ -10,16 +18,17 @@ import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
 import { useAdminChatList } from '@/hooks/useAdminChatList';
-import { useClampListPage } from '@/hooks/useClampListPage';
 import { ADMIN_CHAT_ROOM_TYPE_LABEL } from '@/utils/adminChat';
+import {
+  createAdminChatListHref,
+  parseAdminChatSearchParams,
+} from '@/utils/adminListSearchParams';
 
 import type {
   AdminChatListItem,
   AdminChatListQuery,
   AdminChatRoomType,
 } from '@/types/adminChat';
-
-const DEFAULT_PAGE_SIZE = 10;
 
 /** 채팅방 유형 필터: 빈 문자열은 roomType 미전달(전체) */
 const ROOM_TYPE_FILTER_OPTIONS = [
@@ -29,17 +38,9 @@ const ROOM_TYPE_FILTER_OPTIONS = [
   { label: ADMIN_CHAT_ROOM_TYPE_LABEL.COMMUNITY, value: 'COMMUNITY' },
 ] as const;
 
-export interface AdminChatListFilters {
-  search?: string;
-  roomType?: AdminChatRoomType;
-  page: number;
-  pageSize: number;
-}
-
-const INITIAL_FILTERS: AdminChatListFilters = {
-  page: 1,
-  pageSize: DEFAULT_PAGE_SIZE,
-};
+export type AdminChatListFilters = ReturnType<
+  typeof parseAdminChatSearchParams
+>;
 
 /** select value → AdminChatRoomType | undefined. 알 수 없는 값은 무시한다. */
 const parseRoomTypeFilter = (value: string): AdminChatRoomType | undefined => {
@@ -72,19 +73,28 @@ export interface AdminChatListViewProps {
   ) => Column<AdminChatListItem>[];
 }
 
-/** updateFilters 옵션. 검색·필터 변경 시 page 초기화에 사용한다. */
-interface UpdateFiltersOptions {
-  resetPage?: boolean;
-}
-
 /**
  * 관리자 채팅방 목록 화면.
  * 검색·유형 필터·페이지네이션과 Loading/Empty/Table 구조를 담당한다.
  */
 export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const filters = useMemo(
+    () =>
+      parseAdminChatSearchParams(new URLSearchParams(searchParams.toString())),
+    [searchParams]
+  );
   // 입력창 초안. 검색 버튼/Enter 시에만 실제 조회 Query에 반영한다.
-  const [searchInput, setSearchInput] = useState('');
-  const [filters, setFilters] = useState<AdminChatListFilters>(INITIAL_FILTERS);
+  const urlSearch = filters.search ?? '';
+  const [syncedSearch, setSyncedSearch] = useState(urlSearch);
+  const [searchInput, setSearchInput] = useState(urlSearch);
+
+  if (syncedSearch !== urlSearch) {
+    setSyncedSearch(urlSearch);
+    setSearchInput(urlSearch);
+  }
 
   const listQuery = useMemo(() => toListQuery(filters), [filters]);
   const { data, isPending, isError } = useAdminChatList(listQuery);
@@ -92,14 +102,42 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
   const items = data?.data.items ?? [];
   const pagination = data?.data.pagination;
   const totalPages = pagination?.totalPages ?? 0;
-  const currentPage = pagination?.page ?? filters.page;
+  const currentPage = filters.page;
 
-  useClampListPage({
-    page: filters.page,
-    totalPages: pagination?.totalPages,
-    isPending,
-    setFilters,
-  });
+  const updateFilters = useCallback(
+    (
+      patch: Partial<AdminChatListFilters>,
+      options?: { resetPage?: boolean; replace?: boolean }
+    ) => {
+      const nextFilters = {
+        ...filters,
+        ...patch,
+        ...(options?.resetPage ? { page: 1 } : {}),
+      };
+      const href = createAdminChatListHref(
+        pathname,
+        new URLSearchParams(searchParams.toString()),
+        nextFilters
+      );
+
+      if (options?.replace) {
+        router.replace(href, { scroll: false });
+        return;
+      }
+
+      router.push(href, { scroll: false });
+    },
+    [filters, pathname, router, searchParams]
+  );
+
+  useEffect(() => {
+    if (isPending || pagination?.totalPages === undefined) return;
+
+    const safePage = Math.max(pagination.totalPages, 1);
+    if (filters.page > safePage) {
+      updateFilters({ page: safePage }, { replace: true });
+    }
+  }, [filters.page, isPending, pagination?.totalPages, updateFilters]);
 
   const columns = useMemo(
     () =>
@@ -109,17 +147,6 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
       }),
     [getColumns, filters.page, filters.pageSize]
   );
-
-  const updateFilters = (
-    patch: Partial<AdminChatListFilters>,
-    options?: UpdateFiltersOptions
-  ) => {
-    setFilters((prev) => ({
-      ...prev,
-      ...patch,
-      ...(options?.resetPage ? { page: 1 } : {}),
-    }));
-  };
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchInput(event.target.value);
@@ -147,7 +174,7 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
 
   const handleResetFilters = () => {
     setSearchInput('');
-    setFilters(INITIAL_FILTERS);
+    updateFilters({ search: undefined, roomType: undefined, page: 1 });
   };
 
   const hasActiveFilters = Boolean(filters.search || filters.roomType);
