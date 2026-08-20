@@ -1,6 +1,13 @@
 'use client';
 
-import { useMemo, useState, type ChangeEvent, type ReactNode } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import {
+  useCallback,
+  useMemo,
+  useState,
+  type ChangeEvent,
+  type ReactNode,
+} from 'react';
 
 import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
 import { Button } from '@/components/Button/Button';
@@ -16,6 +23,11 @@ import { SearchInput } from '@/components/SearchInput/SearchInput';
 import { useAdminMemberList } from '@/hooks/useAdminMemberList';
 import { useClampListPage } from '@/hooks/useClampListPage';
 import { toAdminMemberApiDate } from '@/utils/adminMember';
+import {
+  createAdminMemberListHref,
+  INITIAL_ADMIN_MEMBER_LIST_FILTERS,
+  parseAdminMemberListSearchParams,
+} from '@/utils/adminMemberListSearchParams';
 
 import type {
   AdminMemberListItem,
@@ -24,8 +36,9 @@ import type {
   MemberStatus,
   MemberUserType,
 } from '@/types/adminMember';
+import type { AdminMemberListFilters } from '@/utils/adminMemberListSearchParams';
 
-const DEFAULT_PAGE_SIZE = 10;
+export type { AdminMemberListFilters } from '@/utils/adminMemberListSearchParams';
 
 /** 상태 필터: 빈 문자열은 status 미전달(전체) */
 const STATUS_FILTER_OPTIONS = [
@@ -38,22 +51,6 @@ const SORT_ORDER_OPTIONS = [
   { label: '가입일 최신순', value: 'DESC' },
   { label: '가입일 오래된순', value: 'ASC' },
 ] as const;
-
-export interface AdminMemberListFilters {
-  search?: string;
-  status?: MemberStatus;
-  startDate?: string;
-  endDate?: string;
-  sortOrder: AdminMemberSortOrder;
-  page: number;
-  pageSize: number;
-}
-
-const INITIAL_FILTERS: AdminMemberListFilters = {
-  sortOrder: 'DESC',
-  page: 1,
-  pageSize: DEFAULT_PAGE_SIZE,
-};
 
 /** select value → MemberStatus | undefined. 알 수 없는 값은 무시한다. */
 const parseMemberStatusFilter = (value: string): MemberStatus | undefined => {
@@ -116,10 +113,25 @@ export const AdminMemberListView = ({
   errorTitle,
   getColumns,
 }: AdminMemberListViewProps) => {
-  // 입력창 초안. 검색 버튼/Enter 시에만 실제 조회 Query에 반영한다.
-  const [searchInput, setSearchInput] = useState('');
-  const [filters, setFilters] =
-    useState<AdminMemberListFilters>(INITIAL_FILTERS);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const filters = useMemo(
+    () =>
+      parseAdminMemberListSearchParams(
+        new URLSearchParams(searchParams.toString())
+      ),
+    [searchParams]
+  );
+  // 입력 중인 초안은 URL과 분리하고, 실제 검색 또는 history 이동 때만 동기화한다.
+  const urlSearch = filters.search ?? '';
+  const [syncedSearch, setSyncedSearch] = useState(urlSearch);
+  const [searchInput, setSearchInput] = useState(urlSearch);
+
+  if (syncedSearch !== urlSearch) {
+    setSyncedSearch(urlSearch);
+    setSearchInput(urlSearch);
+  }
 
   const listQuery = useMemo(
     () => toListQuery(userType, filters),
@@ -131,14 +143,7 @@ export const AdminMemberListView = ({
   const pagination = data?.data.pagination;
   const totalPages = pagination?.totalPages ?? 0;
   const totalCount = pagination?.totalCount ?? 0;
-  const currentPage = pagination?.page ?? filters.page;
-
-  useClampListPage({
-    page: filters.page,
-    totalPages: pagination?.totalPages,
-    isPending,
-    setFilters,
-  });
+  const currentPage = filters.page;
 
   const dateRangeValue = useMemo<DateRangePopoverProps['value']>(() => {
     if (!filters.startDate) {
@@ -165,16 +170,43 @@ export const AdminMemberListView = ({
     [getColumns, filters.page, filters.pageSize, totalCount]
   );
 
-  const updateFilters = (
-    patch: Partial<AdminMemberListFilters>,
-    options?: { resetPage?: boolean }
-  ) => {
-    setFilters((prev) => ({
-      ...prev,
-      ...patch,
-      ...(options?.resetPage ? { page: 1 } : {}),
-    }));
-  };
+  const updateFilters = useCallback(
+    (
+      patch: Partial<AdminMemberListFilters>,
+      options?: { resetPage?: boolean; replace?: boolean }
+    ) => {
+      const nextFilters = {
+        ...filters,
+        ...patch,
+        ...(options?.resetPage ? { page: 1 } : {}),
+      };
+      const href = createAdminMemberListHref(
+        pathname,
+        new URLSearchParams(searchParams.toString()),
+        nextFilters
+      );
+
+      if (options?.replace) {
+        router.replace(href, { scroll: false });
+        return;
+      }
+
+      router.push(href, { scroll: false });
+    },
+    [filters, pathname, router, searchParams]
+  );
+
+  const handlePageClamp = useCallback(
+    (page: number) => updateFilters({ page }, { replace: true }),
+    [updateFilters]
+  );
+
+  useClampListPage({
+    page: filters.page,
+    totalPages: pagination?.totalPages,
+    isPending,
+    onPageClamp: handlePageClamp,
+  });
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchInput(event.target.value);
@@ -227,7 +259,13 @@ export const AdminMemberListView = ({
 
   const handleResetFilters = () => {
     setSearchInput('');
-    setFilters(INITIAL_FILTERS);
+    updateFilters({
+      ...INITIAL_ADMIN_MEMBER_LIST_FILTERS,
+      search: undefined,
+      status: undefined,
+      startDate: undefined,
+      endDate: undefined,
+    });
   };
 
   const hasActiveFilters = Boolean(

@@ -36,7 +36,7 @@ export const ReportManagementContent = () => {
     handleTargetChange,
     handleDateRangeConfirm,
     handlePageChange,
-    setFilters,
+    replacePage,
     handleResetFilters,
   } = useAdminReportListFilters();
   const { data, isPending, isError } = useAdminReportList(listQuery);
@@ -49,13 +49,13 @@ export const ReportManagementContent = () => {
   const items = data?.data.items ?? [];
   const pagination = data?.data.pagination;
   const totalPages = pagination?.totalPages ?? 0;
-  const currentPage = pagination?.page ?? filters.page;
+  const currentPage = filters.page;
 
   useClampListPage({
     page: filters.page,
     totalPages: pagination?.totalPages,
     isPending,
-    setFilters,
+    onPageClamp: replacePage,
   });
 
   const handleOpenDetail = useCallback(
