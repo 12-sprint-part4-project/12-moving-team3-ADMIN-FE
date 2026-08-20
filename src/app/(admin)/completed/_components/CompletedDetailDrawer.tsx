@@ -48,6 +48,10 @@ const CompletedDetailContent = ({ detail }: CompletedDetailContentProps) => {
   const basicInformation: [string, string][] = [
     ['견적 번호', String(detail.id)],
     ['요청자 이름', detail.userName],
+    [
+      '요청자 닉네임',
+      formatAdminEstimateRequestNullableText(detail.userNickname),
+    ],
     ['이사 유형', formatAdminEstimateRequestMoveType(detail.moveType)],
     [
       '출발지 우편번호',
@@ -74,6 +78,10 @@ const CompletedDetailContent = ({ detail }: CompletedDetailContentProps) => {
     [
       '기사명',
       formatAdminEstimateRequestNullableText(confirmedQuote?.moverName),
+    ],
+    [
+      '기사 닉네임',
+      formatAdminEstimateRequestNullableText(confirmedQuote?.moverNickname),
     ],
     ['견적 금액', formatAdminCompletedPrice(confirmedQuote?.price ?? null)],
     ['코멘트', formatAdminEstimateRequestNullableText(confirmedQuote?.comment)],

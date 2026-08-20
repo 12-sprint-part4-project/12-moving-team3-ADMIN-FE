@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { PageHeader } from '@/components/PageHeader/PageHeader';
 import { useAdminCompletedList } from '@/hooks/useAdminCompletedList';
 import { useAdminCompletedListFilters } from '@/hooks/useAdminCompletedListFilters';
 import { useAdminCompletedStatistics } from '@/hooks/useAdminCompletedStatistics';
+import { useAdminListSort } from '@/hooks/useAdminListSort';
 import { useClampListPage } from '@/hooks/useClampListPage';
 
 import { CompletedDetailDrawer } from './CompletedDetailDrawer';
@@ -21,10 +22,11 @@ export const CompletedManagementContent = () => {
   const [selectedEstimateRequestId, setSelectedEstimateRequestId] = useState<
     number | null
   >(null);
+  const { sort, handleSortToggle } = useAdminListSort();
   const {
     filters,
     searchInput,
-    listQuery,
+    listQuery: filterQuery,
     statisticsQuery,
     hasActiveFilters,
     dateRangeValue,
@@ -36,6 +38,16 @@ export const CompletedManagementContent = () => {
     setFilters,
     handleResetFilters,
   } = useAdminCompletedListFilters();
+
+  const listQuery = useMemo(
+    () => ({ ...filterQuery, sort }),
+    [filterQuery, sort]
+  );
+
+  const handleMoveDateSortToggle = () => {
+    handleSortToggle();
+    handlePageChange(1);
+  };
 
   const {
     data: listData,
@@ -87,6 +99,8 @@ export const CompletedManagementContent = () => {
         onPageChange={handlePageChange}
         onResetFilters={handleResetFilters}
         onRetry={() => void refetchList()}
+        sort={sort}
+        onSortToggle={handleMoveDateSortToggle}
       />
       <CompletedDetailDrawer
         estimateRequestId={selectedEstimateRequestId}

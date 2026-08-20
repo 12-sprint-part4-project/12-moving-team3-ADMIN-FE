@@ -21,6 +21,7 @@ const MISSING_FIELD_LABEL: Record<AdminCompletedDetailMissingField, string> = {
   price: '견적 금액',
   confirmedQuote: '확정 견적',
   'confirmedQuote.moverName': '확정 견적 기사명',
+  'confirmedQuote.moverNickname': '확정 견적 기사 닉네임',
   'confirmedQuote.price': '확정 견적 금액',
   'confirmedQuote.createdAt': '확정 견적 생성일',
 };

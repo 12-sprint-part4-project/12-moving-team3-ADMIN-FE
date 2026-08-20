@@ -60,6 +60,28 @@ export const formatAdminEstimateRequestNullableText = (
   return value;
 };
 
+/**
+ * 이름 옆에 닉네임을 보조 표기한다.
+ * 닉네임이 없거나 이름과 같으면 이름만 반환한다.
+ */
+export const formatAdminEstimateRequestNameWithNickname = (
+  name: string | null | undefined,
+  nickname: string | null | undefined
+) => {
+  const displayName = formatAdminEstimateRequestNullableText(name);
+  const trimmedNickname = nickname?.trim();
+
+  if (displayName === '-') {
+    return formatAdminEstimateRequestNullableText(trimmedNickname);
+  }
+
+  if (trimmedNickname && trimmedNickname !== name) {
+    return `${displayName} (${trimmedNickname})`;
+  }
+
+  return displayName;
+};
+
 export const formatAdminEstimateRequestSubmittedAt = (
   submittedAt: string | null
 ) => {

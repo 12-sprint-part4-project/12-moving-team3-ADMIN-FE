@@ -1,10 +1,11 @@
-
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { cn } from '@/lib/utils';
 
 import type { ReactNode } from 'react';
 
 type CellAlign = 'left' | 'center' | 'right';
+
+type AriaSort = 'ascending' | 'descending' | 'none';
 
 const DEFAULT_EMPTY_MESSAGE = '데이터가 없습니다.';
 
@@ -19,6 +20,8 @@ export interface Column<T> {
   render?: (row: T, index: number) => ReactNode;
   align?: CellAlign;
   className?: string;
+  /** 정렬 가능 컬럼의 현재 방향. th의 aria-sort에 전달한다. */
+  ariaSort?: AriaSort;
 }
 
 export interface DataTableProps<T> {
@@ -113,15 +116,14 @@ export const DataTable = <T,>({
   return (
     <div className={cn('w-full overflow-x-auto', className)}>
       <table className="w-full border-collapse text-left">
-        {caption ? (
-          <caption className="sr-only">{caption}</caption>
-        ) : null}
+        {caption ? <caption className="sr-only">{caption}</caption> : null}
         <thead>
           <tr className="border-b border-line-200 bg-background-200">
             {columns.map((column) => (
               <th
                 key={column.key}
                 scope="col"
+                aria-sort={column.ariaSort}
                 className={cn(
                   'px-4 py-3 text-md-semibold whitespace-nowrap text-black-400',
                   CELL_ALIGN_CLASS[column.align ?? 'left'],

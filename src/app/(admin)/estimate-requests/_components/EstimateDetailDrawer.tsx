@@ -16,6 +16,7 @@ import {
   formatAdminEstimateQuoteStatus,
   formatAdminEstimateRequestMissingFields,
   formatAdminEstimateRequestMoveType,
+  formatAdminEstimateRequestNameWithNickname,
   formatAdminEstimateRequestNullableText,
   formatAdminEstimateRequestSubmittedAt,
   hasAdminEstimateRequestMissingFields,
@@ -62,14 +63,21 @@ const EstimateQuoteList = ({
         const statusLabel = forceDeletedStatus
           ? '삭제'
           : formatAdminEstimateQuoteStatus(quote.status);
+        const moverLabel = formatAdminEstimateRequestNameWithNickname(
+          quote.moverName,
+          quote.moverNickname
+        );
 
         return (
           <li
             key={quote.id}
             className="flex items-center justify-between gap-3 text-xs-medium"
           >
-            <span className="text-black-400">
-              {formatAdminEstimateRequestNullableText(quote.moverName)}
+            <span
+              className="min-w-0 truncate text-black-400"
+              title={moverLabel}
+            >
+              {moverLabel}
             </span>
             <span className="ml-auto text-black-400">
               {formatAdminEstimateQuotePrice(quote.price)}
@@ -108,6 +116,10 @@ const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
   const basicInformation: [string, string][] = [
     ['견적 번호', String(detail.id)],
     ['요청자 이름', detail.userName],
+    [
+      '요청자 닉네임',
+      formatAdminEstimateRequestNullableText(detail.userNickname),
+    ],
     ['이사 유형', formatAdminEstimateRequestMoveType(detail.moveType)],
     [
       '출발지 우편번호',

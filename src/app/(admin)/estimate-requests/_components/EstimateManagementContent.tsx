@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { PageHeader } from '@/components/PageHeader/PageHeader';
 import { useAdminEstimateRequestList } from '@/hooks/useAdminEstimateRequestList';
 import { useAdminEstimateRequestListFilters } from '@/hooks/useAdminEstimateRequestListFilters';
 import { useAdminEstimateRequestStatistics } from '@/hooks/useAdminEstimateRequestStatistics';
+import { useAdminListSort } from '@/hooks/useAdminListSort';
 import { useClampListPage } from '@/hooks/useClampListPage';
 
 import { EstimateDetailDrawer } from './EstimateDetailDrawer';
@@ -21,10 +22,11 @@ export const EstimateManagementContent = () => {
   const [selectedEstimateRequestId, setSelectedEstimateRequestId] = useState<
     number | null
   >(null);
+  const { sort, handleSortToggle } = useAdminListSort();
   const {
     filters,
     searchInput,
-    listQuery,
+    listQuery: filterQuery,
     statisticsQuery,
     hasActiveFilters,
     dateRangeValue,
@@ -36,6 +38,16 @@ export const EstimateManagementContent = () => {
     setFilters,
     handleResetFilters,
   } = useAdminEstimateRequestListFilters();
+
+  const listQuery = useMemo(
+    () => ({ ...filterQuery, sort }),
+    [filterQuery, sort]
+  );
+
+  const handleSubmittedAtSortToggle = () => {
+    handleSortToggle();
+    handlePageChange(1);
+  };
 
   const {
     data: listData,
@@ -87,6 +99,8 @@ export const EstimateManagementContent = () => {
         onPageChange={handlePageChange}
         onResetFilters={handleResetFilters}
         onRetry={() => void refetchList()}
+        sort={sort}
+        onSortToggle={handleSubmittedAtSortToggle}
       />
       <EstimateDetailDrawer
         estimateRequestId={selectedEstimateRequestId}
