@@ -8,13 +8,12 @@ import {
 import type { Column } from '@/components/DataTable/DataTable';
 import type { AdminReviewListItem } from '@/types/adminReview';
 
-
 /**
  * 관리자 리뷰 목록 DataTable 컬럼.
- * 삭제 요청 핸들러만 외부에서 주입한다.
+ * 상세 열기 핸들러만 외부에서 주입한다.
  */
 export const getReviewListColumns = (
-  onRequestDelete: (reviewId: number) => void
+  onOpenDetail: (review: AdminReviewListItem) => void
 ): Column<AdminReviewListItem>[] => [
   {
     key: 'id',
@@ -108,22 +107,15 @@ export const getReviewListColumns = (
     key: 'actions',
     header: '관리',
     align: 'center',
-    // 이미 삭제된 리뷰는 삭제 버튼을 숨긴다.
-    render: (row) => {
-      if (row.deletedAt != null) {
-        return '-';
-      }
-
-      return (
-        <Button
-          variant="danger"
-          className="px-3 py-1.5 text-sm-medium"
-          aria-label={`리뷰 ${row.id} 삭제`}
-          onClick={() => onRequestDelete(row.id)}
-        >
-          삭제
-        </Button>
-      );
-    },
+    render: (row) => (
+      <Button
+        variant="secondary"
+        className="px-3 py-1.5 text-sm-medium"
+        aria-label={`리뷰 ${row.id} 상세 보기`}
+        onClick={() => onOpenDetail(row)}
+      >
+        상세 보기
+      </Button>
+    ),
   },
 ];

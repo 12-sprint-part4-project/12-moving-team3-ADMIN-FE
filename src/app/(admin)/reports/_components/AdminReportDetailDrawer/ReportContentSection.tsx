@@ -1,4 +1,3 @@
-
 import { DetailField } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 import {
@@ -7,6 +6,7 @@ import {
   getAdminReportContentSummary,
   hasMeaningfulContentTitle,
 } from '@/utils/adminReport';
+import { htmlToPlainText } from '@/utils/htmlToPlainText';
 
 import { DetailMultilineField } from './DetailMultilineField';
 import { formatNullableDateTime } from './helpers';
@@ -63,8 +63,14 @@ export const ReportContentSection = ({
   isDeleteContentSelected,
   onToggleDeleteContent,
 }: ReportContentSectionProps) => {
-  const { content, category, availableActions, status, reportedContent, target } =
-    detail;
+  const {
+    content,
+    category,
+    availableActions,
+    status,
+    reportedContent,
+    target,
+  } = detail;
   // BE 허용 여부만 본다. USER/MESSAGE·이미 삭제는 canDeleteContent=false다.
   const canDeleteContent = availableActions?.canDeleteContent === true;
   const isDeleteDisabled = status !== 'PENDING';
@@ -95,9 +101,7 @@ export const ReportContentSection = ({
 
     return (
       <DetailSection title="신고된 콘텐츠 정보">
-        <p className="text-md-regular text-gray-500">
-          프로필 정보가 없습니다.
-        </p>
+        <p className="text-md-regular text-gray-500">프로필 정보가 없습니다.</p>
       </DetailSection>
     );
   }
@@ -122,7 +126,12 @@ export const ReportContentSection = ({
 
   const summary = getAdminReportContentSummary(content);
   const showTitle = hasMeaningfulContentTitle(content);
-  const bodyText = content.body?.trim() ? content.body : null;
+  const rawBodyText = content.body?.trim() ? content.body : null;
+  const displayBodyText =
+    content.type === 'ARTICLE' && rawBodyText
+      ? htmlToPlainText(rawBodyText)
+      : rawBodyText;
+  const bodyText = displayBodyText?.trim() ? displayBodyText : null;
 
   return (
     <DetailSection title="신고된 콘텐츠 정보">
@@ -130,15 +139,6 @@ export const ReportContentSection = ({
         {/* 유형별 검토 핵심(별점·원글 등)을 먼저 보여 본문 맥락을 잡는다. */}
         {summary ? (
           <p className="text-md-semibold text-black-400">{summary.text}</p>
-        ) : null}
-        {!bodyText && content.type === 'CHAT_ROOM' ? (
-          <div className="flex flex-col gap-1 text-md-regular text-gray-500">
-            <p>
-              채팅방 자체에는 본문이 없습니다. 아래 부가 정보로 확인해 주세요.
-            </p>
-            {/* 욕설 근거는 방 단위가 아니라 MESSAGE 대상 신고의 본문으로 본다. */}
-            <p>욕설/비방 근거는 메시지(MESSAGE) 단위 신고로 확인해 주세요.</p>
-          </div>
         ) : null}
         <dl className="flex flex-col gap-2 text-md-medium">
           {showTitle ? (

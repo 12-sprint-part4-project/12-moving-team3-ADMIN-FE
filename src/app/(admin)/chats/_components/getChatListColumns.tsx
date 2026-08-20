@@ -17,6 +17,11 @@ export const getChatListColumns = (
   onOpenDetail: (roomId: number) => void
 ): Column<AdminChatListItem>[] => [
   {
+    key: 'id',
+    header: '채팅방 ID',
+    render: (row) => row.id,
+  },
+  {
     key: 'participants',
     header: '참여자',
     className: 'max-w-80',
