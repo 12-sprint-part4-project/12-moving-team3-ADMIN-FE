@@ -2,7 +2,6 @@ import { format } from 'date-fns';
 
 import { formatAdminEstimateQuotePrice } from '@/utils/adminEstimateRequest';
 
-import type { DateRange } from '@/components/DateRangePicker/DateRangePicker';
 import type {
   AdminCompletedDetailMissingField,
   AdminCompletedListMissingField,
@@ -22,6 +21,7 @@ const MISSING_FIELD_LABEL: Record<AdminCompletedDetailMissingField, string> = {
   price: '견적 금액',
   confirmedQuote: '확정 견적',
   'confirmedQuote.moverName': '확정 견적 기사명',
+  'confirmedQuote.moverNickname': '확정 견적 기사 닉네임',
   'confirmedQuote.price': '확정 견적 금액',
   'confirmedQuote.createdAt': '확정 견적 생성일',
 };
@@ -62,15 +62,20 @@ export const formatAdminCompletedMissingFields = (
     return field;
   });
 
+/**
+ * 목록 기간 필터 → 통계 query.
+ * startDate가 없으면 전체 기간(undefined)을 넘긴다.
+ */
 export const toAdminCompletedStatisticsQuery = (
-  range?: DateRange
+  startDate?: string,
+  endDate?: string
 ): AdminCompletedStatisticsQuery | undefined => {
-  if (!range?.from) {
+  if (!startDate) {
     return undefined;
   }
 
   return {
-    startDate: toAdminCompletedApiDate(range.from),
-    ...(range.to ? { endDate: toAdminCompletedApiDate(range.to) } : {}),
+    startDate,
+    ...(endDate ? { endDate } : {}),
   };
 };

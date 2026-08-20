@@ -3,6 +3,9 @@ export type AdminEstimateRequestStatus =
 
 export type AdminEstimateRequestMoveType = 'SMALL' | 'HOME' | 'OFFICE';
 
+/** 목록 정렬 방향. BE sortDirectionSchema와 동일 */
+export type AdminListSortDirection = 'ASC' | 'DESC';
+
 /** 목록 응답에서 누락될 수 있는 필수 필드명 */
 export type AdminEstimateRequestListMissingField =
   'moveType' | 'departureAddress' | 'arrivalAddress' | 'submittedAt';
@@ -22,6 +25,8 @@ export interface AdminEstimateRequestListQuery {
   status?: AdminEstimateRequestStatus;
   startDate?: string;
   endDate?: string;
+  /** 제출일 정렬. 미전달 시 BE 기본값 DESC */
+  sort?: AdminListSortDirection;
 }
 
 export interface AdminEstimateRequestListItem {
@@ -73,6 +78,8 @@ export type AdminEstimateQuoteStatus = 'PENDING' | 'CONFIRMED' | 'REJECTED';
 export interface AdminEstimateQuote {
   id: number;
   moverName: string | null;
+  /** 기사 닉네임. 기사 정보가 없으면 null */
+  moverNickname: string | null;
   price: number | null;
   status: AdminEstimateQuoteStatus;
   /** ISO date-time */
@@ -82,6 +89,8 @@ export interface AdminEstimateQuote {
 export interface AdminEstimateRequestDetail {
   id: number;
   userName: string;
+  /** 요청자 닉네임 */
+  userNickname: string;
   moveType: AdminEstimateRequestMoveType | null;
   departureAddress: string | null;
   arrivalAddress: string | null;

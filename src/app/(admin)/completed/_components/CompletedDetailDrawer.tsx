@@ -1,12 +1,8 @@
 'use client';
 
-import axios from 'axios';
-
-import { Button } from '@/components/Button/Button';
+import { AdminDetailQueryBody } from '@/components/AdminDetailQueryBody/AdminDetailQueryBody';
 import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
-import { EmptyState } from '@/components/EmptyState/EmptyState';
-import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { useAdminCompletedDetail } from '@/hooks/useAdminCompletedDetail';
 import {
   formatAdminCompletedMissingFields,
@@ -23,19 +19,10 @@ import {
 import type { AdminCompletedDetail } from '@/types/adminCompleted';
 
 export interface CompletedDetailDrawerProps {
-  open: boolean;
-  /** 목록에서 선택한 완료 건 ID. null이면 상세 요청을 하지 않는다. */
+  /** 목록에서 선택한 완료 건 ID. null이면 Drawer를 닫는다. */
   estimateRequestId: number | null;
   onClose: () => void;
 }
-
-const getDetailErrorTitle = (error: unknown) => {
-  if (axios.isAxiosError(error) && error.response?.status === 404) {
-    return '완료 건 정보를 찾을 수 없습니다.';
-  }
-
-  return '완료 건 상세를 불러오지 못했습니다.';
-};
 
 interface CompletedDetailContentProps {
   detail: AdminCompletedDetail;
@@ -49,6 +36,10 @@ const CompletedDetailContent = ({ detail }: CompletedDetailContentProps) => {
   const basicInformation: [string, string][] = [
     ['견적 번호', String(detail.id)],
     ['요청자 이름', detail.userName],
+    [
+      '요청자 닉네임',
+      formatAdminEstimateRequestNullableText(detail.userNickname),
+    ],
     ['이사 유형', formatAdminEstimateRequestMoveType(detail.moveType)],
     [
       '출발지 우편번호',
@@ -75,6 +66,10 @@ const CompletedDetailContent = ({ detail }: CompletedDetailContentProps) => {
     [
       '기사명',
       formatAdminEstimateRequestNullableText(confirmedQuote?.moverName),
+    ],
+    [
+      '기사 닉네임',
+      formatAdminEstimateRequestNullableText(confirmedQuote?.moverNickname),
     ],
     ['견적 금액', formatAdminCompletedPrice(confirmedQuote?.price ?? null)],
     ['코멘트', formatAdminEstimateRequestNullableText(confirmedQuote?.comment)],
@@ -131,71 +126,29 @@ const CompletedDetailContent = ({ detail }: CompletedDetailContentProps) => {
 
 /**
  * 완료 건 상세 Drawer.
- * open + estimateRequestId일 때 상세 API를 호출하고, 로딩·에러 상태를 Drawer 안에서 처리한다.
+ * 열림 여부는 estimateRequestId로 계산한다. 조회와 본문 상태 분기는 AdminDetailQueryBody에 맡긴다.
  */
 export const CompletedDetailDrawer = ({
-  open,
   estimateRequestId,
   onClose,
-}: CompletedDetailDrawerProps) => {
-  const { data, error, isPending, isError, isSuccess, refetch } =
-    useAdminCompletedDetail(estimateRequestId, {
-      enabled: open && estimateRequestId != null,
-    });
-
-  const detail = data?.data ?? null;
-  const isDetailForSelection =
-    detail != null &&
-    estimateRequestId != null &&
-    detail.id === estimateRequestId;
-
-  const renderBody = () => {
-    if (estimateRequestId == null) {
-      return (
-        <p className="text-md-regular text-gray-500">
-          선택한 완료 건 정보가 없습니다.
-        </p>
-      );
-    }
-
-    if (isPending) {
-      return <LoadingState />;
-    }
-
-    if (isError) {
-      return (
-        <EmptyState
-          title={getDetailErrorTitle(error)}
-          description="잠시 후 다시 시도해 주세요."
-          action={
-            <Button variant="secondary" onClick={() => void refetch()}>
-              다시 시도
-            </Button>
-          }
-        />
-      );
-    }
-
-    if (!isSuccess || !isDetailForSelection) {
-      return (
-        <EmptyState
-          title="완료 건 정보가 없습니다."
-          description="선택한 완료 건을 찾을 수 없습니다."
-        />
-      );
-    }
-
-    return <CompletedDetailContent detail={detail} />;
-  };
-
-  return (
-    <DetailDrawer
-      open={open}
-      title="완료 건 상세 정보"
-      onClose={onClose}
-      size="md"
-    >
-      {renderBody()}
-    </DetailDrawer>
-  );
-};
+}: CompletedDetailDrawerProps) => (
+  <DetailDrawer
+    open={estimateRequestId != null}
+    title="완료 건 상세 정보"
+    onClose={onClose}
+    size="md"
+  >
+    {estimateRequestId != null ? (
+      // id가 있을 때만 본문을 마운트해서 estimateRequestId를 number로 좁힌다.
+      <AdminDetailQueryBody
+        id={estimateRequestId}
+        useDetail={useAdminCompletedDetail}
+        notFoundTitle="완료 건 정보를 찾을 수 없습니다."
+        errorTitle="완료 건 상세를 불러오지 못했습니다."
+        emptyTitle="완료 건 정보가 없습니다."
+        emptyDescription="선택한 완료 건을 찾을 수 없습니다."
+        renderContent={(detail) => <CompletedDetailContent detail={detail} />}
+      />
+    ) : null}
+  </DetailDrawer>
+);

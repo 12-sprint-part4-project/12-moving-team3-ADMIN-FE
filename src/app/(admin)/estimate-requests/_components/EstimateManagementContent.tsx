@@ -4,64 +4,51 @@ import { useMemo, useState } from 'react';
 
 import { PageHeader } from '@/components/PageHeader/PageHeader';
 import { useAdminEstimateRequestList } from '@/hooks/useAdminEstimateRequestList';
+import { useAdminEstimateRequestListFilters } from '@/hooks/useAdminEstimateRequestListFilters';
 import { useAdminEstimateRequestStatistics } from '@/hooks/useAdminEstimateRequestStatistics';
+import { useAdminListSort } from '@/hooks/useAdminListSort';
 import { useClampListPage } from '@/hooks/useClampListPage';
-import {
-  toAdminEstimateRequestApiDate,
-  toAdminEstimateRequestStatisticsQuery,
-} from '@/utils/adminEstimateRequest';
 
 import { EstimateDetailDrawer } from './EstimateDetailDrawer';
 import { EstimateFilter } from './EstimateFilter';
 import { EstimateStatistics } from './EstimateStatistics';
 import { EstimateTable } from './EstimateTable';
 
-import type { DateRange } from '@/components/DateRangePicker/DateRangePicker';
-import type {
-  AdminEstimateRequestListQuery,
-  AdminEstimateRequestStatus,
-} from '@/types/adminEstimateRequest';
-
-const DEFAULT_PAGE_SIZE = 10;
-
-interface EstimateRequestFilters {
-  search?: string;
-  status?: AdminEstimateRequestStatus;
-  startDate?: string;
-  endDate?: string;
-  page: number;
-  pageSize: number;
-}
-
-const INITIAL_FILTERS: EstimateRequestFilters = {
-  page: 1,
-  pageSize: DEFAULT_PAGE_SIZE,
-};
-
+/**
+ * 관리자 견적 요청 관리 화면 본문.
+ * 필터·목록·통계·상세 Drawer를 조합한다.
+ */
 export const EstimateManagementContent = () => {
   const [selectedEstimateRequestId, setSelectedEstimateRequestId] = useState<
     number | null
   >(null);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [filterResetKey, setFilterResetKey] = useState(0);
-  const [filters, setFilters] =
-    useState<EstimateRequestFilters>(INITIAL_FILTERS);
+  const { sort, handleSortToggle } = useAdminListSort();
+  const {
+    filters,
+    searchInput,
+    listQuery: filterQuery,
+    statisticsQuery,
+    hasActiveFilters,
+    dateRangeValue,
+    handleSearchChange,
+    handleSearch,
+    handleStatusChange,
+    handleDateRangeConfirm,
+    handlePageChange,
+    setFilters,
+    handleResetFilters,
+  } = useAdminEstimateRequestListFilters();
 
-  const listQuery = useMemo<AdminEstimateRequestListQuery>(
-    () => ({
-      page: filters.page,
-      pageSize: filters.pageSize,
-      ...(filters.search ? { search: filters.search } : {}),
-      ...(filters.status ? { status: filters.status } : {}),
-      ...(filters.startDate ? { startDate: filters.startDate } : {}),
-      ...(filters.endDate ? { endDate: filters.endDate } : {}),
-    }),
-    [filters]
+  const listQuery = useMemo(
+    () => ({ ...filterQuery, sort }),
+    [filterQuery, sort]
   );
-  const statisticsQuery = useMemo(
-    () => toAdminEstimateRequestStatisticsQuery(dateRange),
-    [dateRange]
-  );
+
+  const handleSubmittedAtSortToggle = () => {
+    handleSortToggle();
+    handlePageChange(1);
+  };
+
   const {
     data: listData,
     isPending: isListPending,
@@ -81,64 +68,6 @@ export const EstimateManagementContent = () => {
     setFilters,
   });
 
-  const updateFilters = (
-    patch: Partial<EstimateRequestFilters>,
-    resetPage = false
-  ) => {
-    setFilters((previous) => ({
-      ...previous,
-      ...patch,
-      ...(resetPage ? { page: 1 } : {}),
-    }));
-  };
-
-  const handleOpenDetail = (estimateRequestId: number) => {
-    setSelectedEstimateRequestId(estimateRequestId);
-  };
-
-  const handleCloseDetail = () => {
-    setSelectedEstimateRequestId(null);
-  };
-
-  const handleSearch = (search: string) => {
-    updateFilters({ search: search || undefined }, true);
-  };
-
-  const handleStatusChange = (status?: AdminEstimateRequestStatus) => {
-    updateFilters({ status }, true);
-  };
-
-  const handleDateRangeConfirm = (range: DateRange | undefined) => {
-    setDateRange(range);
-
-    if (!range?.from) {
-      updateFilters({ startDate: undefined, endDate: undefined }, true);
-      return;
-    }
-
-    updateFilters(
-      {
-        startDate: toAdminEstimateRequestApiDate(range.from),
-        endDate: range.to ? toAdminEstimateRequestApiDate(range.to) : undefined,
-      },
-      true
-    );
-  };
-
-  const handlePageChange = (page: number) => {
-    updateFilters({ page });
-  };
-
-  const handleResetFilters = () => {
-    setDateRange(undefined);
-    setFilters(INITIAL_FILTERS);
-    setFilterResetKey((previous) => previous + 1);
-  };
-
-  const hasActiveFilters = Boolean(
-    filters.search || filters.status || filters.startDate || filters.endDate
-  );
-
   return (
     <>
       <PageHeader
@@ -151,29 +80,31 @@ export const EstimateManagementContent = () => {
         isError={isStatisticsError}
       />
       <EstimateFilter
-        key={filterResetKey}
-        status={filters.status}
-        dateRange={dateRange}
+        searchValue={searchInput}
+        statusValue={filters.status ?? ''}
+        dateRangeValue={dateRangeValue}
+        onSearchChange={handleSearchChange}
         onSearch={handleSearch}
         onStatusChange={handleStatusChange}
         onDateRangeConfirm={handleDateRangeConfirm}
       />
       <EstimateTable
         items={listData?.data ?? []}
-        page={listData?.meta?.page ?? filters.page}
+        page={filters.page}
         totalPages={listData?.meta?.totalPages ?? 0}
         isLoading={isListPending}
         isError={isListError}
         hasActiveFilters={hasActiveFilters}
-        onDetailClick={handleOpenDetail}
+        onDetailClick={setSelectedEstimateRequestId}
         onPageChange={handlePageChange}
         onResetFilters={handleResetFilters}
         onRetry={() => void refetchList()}
+        sort={sort}
+        onSortToggle={handleSubmittedAtSortToggle}
       />
       <EstimateDetailDrawer
-        open={selectedEstimateRequestId !== null}
         estimateRequestId={selectedEstimateRequestId}
-        onClose={handleCloseDetail}
+        onClose={() => setSelectedEstimateRequestId(null)}
       />
     </>
   );

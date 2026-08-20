@@ -4,6 +4,7 @@ import { Button } from '@/components/Button/Button';
 import { DataTable, type Column } from '@/components/DataTable/DataTable';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { Pagination } from '@/components/Pagination/Pagination';
+import { SortableColumnHeader } from '@/components/SortableColumnHeader/SortableColumnHeader';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { TruncatedText } from '@/components/TruncatedText/TruncatedText';
 import {
@@ -19,6 +20,7 @@ import {
 } from '@/utils/adminEstimateRequest';
 
 import type { AdminCompletedListItem } from '@/types/adminCompleted';
+import type { AdminListSortDirection } from '@/types/adminEstimateRequest';
 
 export interface CompletedTableProps {
   items: AdminCompletedListItem[];
@@ -31,10 +33,14 @@ export interface CompletedTableProps {
   onPageChange: (page: number) => void;
   onResetFilters: () => void;
   onRetry: () => void;
+  sort: AdminListSortDirection;
+  onSortToggle: () => void;
 }
 
 const getCompletedColumns = (
-  onDetailClick: CompletedTableProps['onDetailClick']
+  onDetailClick: CompletedTableProps['onDetailClick'],
+  sort: AdminListSortDirection,
+  onSortToggle: CompletedTableProps['onSortToggle']
 ): Column<AdminCompletedListItem>[] => [
   { key: 'id', header: '견적 번호', accessor: 'id' },
   {
@@ -86,7 +92,14 @@ const getCompletedColumns = (
   },
   {
     key: 'moveDate',
-    header: '이사일',
+    header: (
+      <SortableColumnHeader
+        label="이사일"
+        sort={sort}
+        onToggle={onSortToggle}
+      />
+    ),
+    ariaSort: sort === 'ASC' ? 'ascending' : 'descending',
     render: (row) => formatAdminCompletedMoveDate(row.moveDate),
   },
   {
@@ -151,6 +164,8 @@ export const CompletedTable = ({
   onPageChange,
   onResetFilters,
   onRetry,
+  sort,
+  onSortToggle,
 }: CompletedTableProps) => (
   <section className="mt-4" aria-label="완료 건 목록">
     <div className="overflow-hidden rounded-lg border border-line-200 bg-white">
@@ -186,7 +201,7 @@ export const CompletedTable = ({
         />
       ) : (
         <DataTable
-          columns={getCompletedColumns(onDetailClick)}
+          columns={getCompletedColumns(onDetailClick, sort, onSortToggle)}
           data={items}
           rowKey="id"
           loading={isLoading}

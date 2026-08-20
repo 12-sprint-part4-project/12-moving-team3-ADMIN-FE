@@ -1,4 +1,7 @@
-import type { AdminEstimateRequestMoveType } from '@/types/adminEstimateRequest';
+import type {
+  AdminEstimateRequestMoveType,
+  AdminListSortDirection,
+} from '@/types/adminEstimateRequest';
 
 /** 목록 응답에서 누락될 수 있는 필수 필드명 */
 export type AdminCompletedListMissingField =
@@ -18,6 +21,7 @@ export type AdminCompletedDetailMissingField =
   | 'arrivalDetailAddress'
   | 'confirmedQuote'
   | 'confirmedQuote.moverName'
+  | 'confirmedQuote.moverNickname'
   | 'confirmedQuote.price'
   | 'confirmedQuote.createdAt';
 
@@ -28,6 +32,8 @@ export interface AdminCompletedListQuery {
   moveType?: AdminEstimateRequestMoveType;
   startDate?: string;
   endDate?: string;
+  /** 이사일 정렬. 미전달 시 BE 기본값 DESC */
+  sort?: AdminListSortDirection;
 }
 
 export interface AdminCompletedListItem {
@@ -75,6 +81,8 @@ export interface AdminCompletedStatisticsResponse {
 
 export interface AdminConfirmedQuote {
   moverName: string | null;
+  /** 확정 견적 기사 닉네임. 기사 정보가 없으면 null */
+  moverNickname: string | null;
   price: number | null;
   comment: string | null;
   /** ISO date-time. 누락 시 null */
@@ -84,6 +92,8 @@ export interface AdminConfirmedQuote {
 export interface AdminCompletedDetail {
   id: number;
   userName: string;
+  /** 요청자 닉네임 */
+  userNickname: string;
   moveType: AdminEstimateRequestMoveType | null;
   departureAddress: string | null;
   departureDetailAddress: string | null;

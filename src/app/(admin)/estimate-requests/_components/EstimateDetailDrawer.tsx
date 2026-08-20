@@ -1,12 +1,8 @@
 'use client';
 
-import axios from 'axios';
-
-import { Button } from '@/components/Button/Button';
+import { AdminDetailQueryBody } from '@/components/AdminDetailQueryBody/AdminDetailQueryBody';
 import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
-import { EmptyState } from '@/components/EmptyState/EmptyState';
-import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { useAdminEstimateRequestDetail } from '@/hooks/useAdminEstimateRequestDetail';
 import { cn } from '@/lib/utils';
@@ -16,6 +12,7 @@ import {
   formatAdminEstimateQuoteStatus,
   formatAdminEstimateRequestMissingFields,
   formatAdminEstimateRequestMoveType,
+  formatAdminEstimateRequestNameWithNickname,
   formatAdminEstimateRequestNullableText,
   formatAdminEstimateRequestSubmittedAt,
   hasAdminEstimateRequestMissingFields,
@@ -27,19 +24,10 @@ import type {
 } from '@/types/adminEstimateRequest';
 
 export interface EstimateDetailDrawerProps {
-  open: boolean;
-  /** 목록에서 선택한 견적 요청 ID. null이면 상세 요청을 하지 않는다. */
+  /** 목록에서 선택한 견적 요청 ID. null이면 Drawer를 닫는다. */
   estimateRequestId: number | null;
   onClose: () => void;
 }
-
-const getDetailErrorTitle = (error: unknown) => {
-  if (axios.isAxiosError(error) && error.response?.status === 404) {
-    return '견적 요청 정보를 찾을 수 없습니다.';
-  }
-
-  return '견적 요청 상세를 불러오지 못했습니다.';
-};
 
 interface EstimateQuoteListProps {
   quotes: AdminEstimateQuote[];
@@ -63,14 +51,21 @@ const EstimateQuoteList = ({
         const statusLabel = forceDeletedStatus
           ? '삭제'
           : formatAdminEstimateQuoteStatus(quote.status);
+        const moverLabel = formatAdminEstimateRequestNameWithNickname(
+          quote.moverName,
+          quote.moverNickname
+        );
 
         return (
           <li
             key={quote.id}
             className="flex items-center justify-between gap-3 text-xs-medium"
           >
-            <span className="text-black-400">
-              {formatAdminEstimateRequestNullableText(quote.moverName)}
+            <span
+              className="min-w-0 truncate text-black-400"
+              title={moverLabel}
+            >
+              {moverLabel}
             </span>
             <span className="ml-auto text-black-400">
               {formatAdminEstimateQuotePrice(quote.price)}
@@ -109,6 +104,10 @@ const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
   const basicInformation: [string, string][] = [
     ['견적 번호', String(detail.id)],
     ['요청자 이름', detail.userName],
+    [
+      '요청자 닉네임',
+      formatAdminEstimateRequestNullableText(detail.userNickname),
+    ],
     ['이사 유형', formatAdminEstimateRequestMoveType(detail.moveType)],
     [
       '출발지 우편번호',
@@ -181,74 +180,30 @@ const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
 
 /**
  * 견적 요청 상세 Drawer.
- * open + estimateRequestId일 때 상세 API를 호출하고, 로딩·에러 상태를 Drawer 안에서 처리한다.
+ * 열림 여부는 estimateRequestId로 계산한다. 조회와 본문 상태 분기는 AdminDetailQueryBody에 맡긴다.
  * 필수값 누락 건은 500이 아니라 missingFields로 내려오므로 본문에서 원인을 표시한다.
  */
 export const EstimateDetailDrawer = ({
-  open,
   estimateRequestId,
   onClose,
-}: EstimateDetailDrawerProps) => {
-  const { data, error, isPending, isError, isSuccess, refetch } =
-    useAdminEstimateRequestDetail(estimateRequestId, {
-      enabled: open && estimateRequestId != null,
-    });
-
-  // queryKey가 estimateRequestId별이라 다른 요청을 열 때 이전 data가 섞이지 않는다.
-  const detail = data?.data ?? null;
-  // 응답 id가 현재 선택과 다를 때만 막아, 캐시/전환 중 잘못된 상세가 잠깐 보이지 않게 한다.
-  const isDetailForSelection =
-    detail != null &&
-    estimateRequestId != null &&
-    detail.id === estimateRequestId;
-
-  const renderBody = () => {
-    if (estimateRequestId == null) {
-      return (
-        <p className="text-md-regular text-gray-500">
-          선택한 견적 요청 정보가 없습니다.
-        </p>
-      );
-    }
-
-    if (isPending) {
-      return <LoadingState />;
-    }
-
-    if (isError) {
-      return (
-        <EmptyState
-          title={getDetailErrorTitle(error)}
-          description="잠시 후 다시 시도해 주세요."
-          action={
-            <Button variant="secondary" onClick={() => void refetch()}>
-              다시 시도
-            </Button>
-          }
-        />
-      );
-    }
-
-    if (!isSuccess || !isDetailForSelection) {
-      return (
-        <EmptyState
-          title="견적 요청 정보가 없습니다."
-          description="선택한 견적 요청을 찾을 수 없습니다."
-        />
-      );
-    }
-
-    return <EstimateDetailContent detail={detail} />;
-  };
-
-  return (
-    <DetailDrawer
-      open={open}
-      title="견적 요청 상세 정보"
-      onClose={onClose}
-      size="md"
-    >
-      {renderBody()}
-    </DetailDrawer>
-  );
-};
+}: EstimateDetailDrawerProps) => (
+  <DetailDrawer
+    open={estimateRequestId != null}
+    title="견적 요청 상세 정보"
+    onClose={onClose}
+    size="md"
+  >
+    {estimateRequestId != null ? (
+      // id가 있을 때만 본문을 마운트해서 estimateRequestId를 number로 좁힌다.
+      <AdminDetailQueryBody
+        id={estimateRequestId}
+        useDetail={useAdminEstimateRequestDetail}
+        notFoundTitle="견적 요청 정보를 찾을 수 없습니다."
+        errorTitle="견적 요청 상세를 불러오지 못했습니다."
+        emptyTitle="견적 요청 정보가 없습니다."
+        emptyDescription="선택한 견적 요청을 찾을 수 없습니다."
+        renderContent={(detail) => <EstimateDetailContent detail={detail} />}
+      />
+    ) : null}
+  </DetailDrawer>
+);

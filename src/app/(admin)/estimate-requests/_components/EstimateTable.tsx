@@ -4,6 +4,7 @@ import { Button } from '@/components/Button/Button';
 import { DataTable, type Column } from '@/components/DataTable/DataTable';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { Pagination } from '@/components/Pagination/Pagination';
+import { SortableColumnHeader } from '@/components/SortableColumnHeader/SortableColumnHeader';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { TruncatedText } from '@/components/TruncatedText/TruncatedText';
 import {
@@ -16,7 +17,10 @@ import {
   hasAdminEstimateRequestMissingFields,
 } from '@/utils/adminEstimateRequest';
 
-import type { AdminEstimateRequestListItem } from '@/types/adminEstimateRequest';
+import type {
+  AdminEstimateRequestListItem,
+  AdminListSortDirection,
+} from '@/types/adminEstimateRequest';
 
 export interface EstimateTableProps {
   items: AdminEstimateRequestListItem[];
@@ -29,10 +33,14 @@ export interface EstimateTableProps {
   onPageChange: (page: number) => void;
   onResetFilters: () => void;
   onRetry: () => void;
+  sort: AdminListSortDirection;
+  onSortToggle: () => void;
 }
 
 const getEstimateRequestColumns = (
-  onDetailClick: EstimateTableProps['onDetailClick']
+  onDetailClick: EstimateTableProps['onDetailClick'],
+  sort: AdminListSortDirection,
+  onSortToggle: EstimateTableProps['onSortToggle']
 ): Column<AdminEstimateRequestListItem>[] => [
   { key: 'id', header: '견적 번호', accessor: 'id' },
   {
@@ -84,7 +92,14 @@ const getEstimateRequestColumns = (
   },
   {
     key: 'submittedAt',
-    header: '제출일',
+    header: (
+      <SortableColumnHeader
+        label="제출일"
+        sort={sort}
+        onToggle={onSortToggle}
+      />
+    ),
+    ariaSort: sort === 'ASC' ? 'ascending' : 'descending',
     render: (row) => formatAdminEstimateRequestSubmittedAt(row.submittedAt),
   },
   {
@@ -156,6 +171,8 @@ export const EstimateTable = ({
   onPageChange,
   onResetFilters,
   onRetry,
+  sort,
+  onSortToggle,
 }: EstimateTableProps) => (
   <section className="mt-4" aria-label="견적 요청 목록">
     <div className="overflow-hidden rounded-lg border border-line-200 bg-white">
@@ -191,7 +208,11 @@ export const EstimateTable = ({
         />
       ) : (
         <DataTable
-          columns={getEstimateRequestColumns(onDetailClick)}
+          columns={getEstimateRequestColumns(
+            onDetailClick,
+            sort,
+            onSortToggle
+          )}
           data={items}
           rowKey="id"
           loading={isLoading}
