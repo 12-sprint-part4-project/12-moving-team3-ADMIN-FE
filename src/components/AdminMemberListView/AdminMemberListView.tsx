@@ -287,6 +287,7 @@ export const AdminMemberListView = ({
             onChange={handleSearchChange}
             onSearch={handleSearch}
             placeholder="이름, 이메일, 휴대폰 검색"
+            searchAction="button"
             className="min-w-64 flex-1"
             aria-label={searchAriaLabel}
           />

@@ -9,6 +9,7 @@ import {
   type KeyboardEvent,
 } from 'react';
 
+import { Button } from '@/components/Button/Button';
 import { cn } from '@/lib/utils';
 
 export const SEARCH_INPUT_VARIANTS = cva(
@@ -17,8 +18,7 @@ export const SEARCH_INPUT_VARIANTS = cva(
     variants: {
       disabled: {
         true: 'cursor-not-allowed border-line-100 bg-background-200 text-gray-300',
-        false:
-          'border-line-200 text-black-400 focus-within:border-blue-300',
+        false: 'border-line-200 text-black-400 focus-within:border-blue-300',
       },
     },
     defaultVariants: {
@@ -28,9 +28,16 @@ export const SEARCH_INPUT_VARIANTS = cva(
 );
 
 export interface SearchInputProps
-  extends Omit<
+  extends
+    Omit<
       InputHTMLAttributes<HTMLInputElement>,
-      'type' | 'size' | 'disabled' | 'className' | 'onChange' | 'value' | 'defaultValue'
+      | 'type'
+      | 'size'
+      | 'disabled'
+      | 'className'
+      | 'onChange'
+      | 'value'
+      | 'defaultValue'
     >,
     VariantProps<typeof SEARCH_INPUT_VARIANTS> {
   value?: string;
@@ -40,6 +47,8 @@ export interface SearchInputProps
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   /** 검색 버튼 클릭 또는 Enter 입력 시 호출. 현재 입력값을 인자로 전달한다. */
   onSearch?: (value: string) => void;
+  /** icon은 돋보기 클릭, button은 입력창 옆 텍스트 버튼으로 검색한다. */
+  searchAction?: 'icon' | 'button';
   className?: string;
 }
 
@@ -50,6 +59,7 @@ export const SearchInput = ({
   disabled = false,
   onChange,
   onSearch,
+  searchAction = 'icon',
   onKeyDown,
   className,
   id,
@@ -84,23 +94,36 @@ export const SearchInput = ({
     }
   };
 
-  return (
+  const input = (
     <div
-      className={cn(SEARCH_INPUT_VARIANTS({ disabled }), className)}
+      className={cn(
+        SEARCH_INPUT_VARIANTS({ disabled }),
+        searchAction === 'button' ? 'min-w-0 flex-1' : className
+      )}
       data-disabled={disabled || undefined}
     >
-      <button
-        type="button"
-        onClick={() => handleSearch()}
-        disabled={disabled}
-        className={cn(
-          'flex size-5 shrink-0 items-center justify-center text-gray-400',
-          disabled && 'cursor-not-allowed text-gray-300'
-        )}
-        aria-label="검색"
-      >
-        <Search className="size-5" aria-hidden />
-      </button>
+      {searchAction === 'icon' ? (
+        <button
+          type="button"
+          onClick={() => handleSearch()}
+          disabled={disabled}
+          className={cn(
+            'flex size-5 shrink-0 items-center justify-center text-gray-400',
+            disabled && 'cursor-not-allowed text-gray-300'
+          )}
+          aria-label="검색"
+        >
+          <Search className="size-5" aria-hidden />
+        </button>
+      ) : (
+        <Search
+          className={cn(
+            'size-5 shrink-0 text-gray-400',
+            disabled && 'text-gray-300'
+          )}
+          aria-hidden
+        />
+      )}
 
       <input
         {...rest}
@@ -125,4 +148,21 @@ export const SearchInput = ({
       />
     </div>
   );
+
+  if (searchAction === 'button') {
+    return (
+      <div className={cn('flex items-center gap-2', className)}>
+        {input}
+        <Button
+          disabled={disabled}
+          className="h-9 shrink-0 px-5 py-1.5"
+          onClick={() => handleSearch()}
+        >
+          검색
+        </Button>
+      </div>
+    );
+  }
+
+  return input;
 };

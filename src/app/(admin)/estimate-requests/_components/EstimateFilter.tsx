@@ -52,7 +52,9 @@ export const EstimateFilter = ({
   };
 
   const handleSearch = (value: string) => {
-    onSearch(value.trim());
+    const trimmed = value.trim();
+    setSearchInput(trimmed);
+    onSearch(trimmed);
   };
 
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -69,6 +71,7 @@ export const EstimateFilter = ({
         onChange={handleSearchChange}
         onSearch={handleSearch}
         placeholder="견적 번호, 요청자 이름, 전화번호 검색"
+        searchAction="button"
         aria-label="견적 요청 검색"
         className="min-w-64 flex-1"
       />
