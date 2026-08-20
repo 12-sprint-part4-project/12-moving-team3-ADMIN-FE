@@ -1,4 +1,9 @@
 import type { AdminChatRoomType } from '@/types/adminChat';
+import type {
+  AdminEstimateRequestMoveType,
+  AdminEstimateRequestStatus,
+  AdminListSortDirection,
+} from '@/types/adminEstimateRequest';
 import type { AdminReportStatus, AdminReportTarget } from '@/types/adminReport';
 import type { AdminReviewDeletionStatus } from '@/types/adminReview';
 
@@ -223,5 +228,138 @@ export const createAdminReportListHref = (
     targetUserKeyword: filters.targetUserKeyword,
     reportedFrom: filters.reportedFrom,
     reportedTo: filters.reportedTo,
+    page: filters.page > 1 ? String(filters.page) : undefined,
+  });
+
+/** 잘못된 정렬값은 기본값 DESC로 처리한다. */
+const parseAdminListSort = (value: string | null): AdminListSortDirection =>
+  value === 'ASC' ? 'ASC' : 'DESC';
+
+export interface AdminEstimateRequestUrlFilters {
+  search?: string;
+  status?: AdminEstimateRequestStatus;
+  startDate?: string;
+  endDate?: string;
+  sort: AdminListSortDirection;
+  page: number;
+  pageSize: number;
+}
+
+const ESTIMATE_REQUEST_QUERY_KEYS = [
+  'search',
+  'status',
+  'startDate',
+  'endDate',
+  'sort',
+  'page',
+] as const;
+const ESTIMATE_REQUEST_STATUSES: readonly AdminEstimateRequestStatus[] = [
+  'SUBMITTED',
+  'CONFIRMED',
+  'EXPIRED',
+  'CANCELED',
+];
+
+export const parseAdminEstimateRequestSearchParams = (
+  searchParams: URLSearchParams
+): AdminEstimateRequestUrlFilters => {
+  const search = searchParams.get('search')?.trim() || undefined;
+  const status = parseAdminListEnum(
+    searchParams.get('status'),
+    ESTIMATE_REQUEST_STATUSES
+  );
+  const startDate = parseAdminListDate(searchParams.get('startDate'));
+  const parsedEndDate = parseAdminListDate(searchParams.get('endDate'));
+  const endDate =
+    startDate && parsedEndDate && parsedEndDate >= startDate
+      ? parsedEndDate
+      : undefined;
+
+  return {
+    ...(search ? { search } : {}),
+    ...(status ? { status } : {}),
+    ...(startDate ? { startDate } : {}),
+    ...(endDate ? { endDate } : {}),
+    sort: parseAdminListSort(searchParams.get('sort')),
+    page: parseAdminListPage(searchParams.get('page')),
+    pageSize: DEFAULT_ADMIN_LIST_PAGE_SIZE,
+  };
+};
+
+export const createAdminEstimateRequestListHref = (
+  pathname: string,
+  searchParams: URLSearchParams,
+  filters: AdminEstimateRequestUrlFilters
+) =>
+  createAdminListHref(pathname, searchParams, ESTIMATE_REQUEST_QUERY_KEYS, {
+    search: filters.search,
+    status: filters.status,
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+    sort: filters.sort === 'ASC' ? 'ASC' : undefined,
+    page: filters.page > 1 ? String(filters.page) : undefined,
+  });
+
+export interface AdminCompletedUrlFilters {
+  search?: string;
+  moveType?: AdminEstimateRequestMoveType;
+  startDate?: string;
+  endDate?: string;
+  sort: AdminListSortDirection;
+  page: number;
+  pageSize: number;
+}
+
+const COMPLETED_QUERY_KEYS = [
+  'search',
+  'moveType',
+  'startDate',
+  'endDate',
+  'sort',
+  'page',
+] as const;
+const COMPLETED_MOVE_TYPES: readonly AdminEstimateRequestMoveType[] = [
+  'SMALL',
+  'HOME',
+  'OFFICE',
+];
+
+export const parseAdminCompletedSearchParams = (
+  searchParams: URLSearchParams
+): AdminCompletedUrlFilters => {
+  const search = searchParams.get('search')?.trim() || undefined;
+  const moveType = parseAdminListEnum(
+    searchParams.get('moveType'),
+    COMPLETED_MOVE_TYPES
+  );
+  const startDate = parseAdminListDate(searchParams.get('startDate'));
+  const parsedEndDate = parseAdminListDate(searchParams.get('endDate'));
+  const endDate =
+    startDate && parsedEndDate && parsedEndDate >= startDate
+      ? parsedEndDate
+      : undefined;
+
+  return {
+    ...(search ? { search } : {}),
+    ...(moveType ? { moveType } : {}),
+    ...(startDate ? { startDate } : {}),
+    ...(endDate ? { endDate } : {}),
+    sort: parseAdminListSort(searchParams.get('sort')),
+    page: parseAdminListPage(searchParams.get('page')),
+    pageSize: DEFAULT_ADMIN_LIST_PAGE_SIZE,
+  };
+};
+
+export const createAdminCompletedListHref = (
+  pathname: string,
+  searchParams: URLSearchParams,
+  filters: AdminCompletedUrlFilters
+) =>
+  createAdminListHref(pathname, searchParams, COMPLETED_QUERY_KEYS, {
+    search: filters.search,
+    moveType: filters.moveType,
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+    sort: filters.sort === 'ASC' ? 'ASC' : undefined,
     page: filters.page > 1 ? String(filters.page) : undefined,
   });
