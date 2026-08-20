@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 
 import { AdminMemberListView } from '@/components/AdminMemberListView/AdminMemberListView';
 import { useDetailSearchParam } from '@/hooks/useDetailSearchParam';
+import { parseUuidDetailId } from '@/utils/detailSearchParams';
 
 import { AdminCustomerDetailDrawer } from './AdminCustomerDetailDrawer';
 import { getMemberListColumns } from './getMemberListColumns';
@@ -13,8 +14,9 @@ import { getMemberListColumns } from './getMemberListColumns';
  * 공통 목록의 검색·필터 동작은 유지하고 선택 회원 상태만 라우트에서 소유한다.
  */
 export const MemberManagementContent = () => {
-  const { detailId: selectedMemberId, setDetailId: updateSelectedMember } =
+  const { detailId, setDetailId: updateSelectedMember } =
     useDetailSearchParam('memberId');
+  const selectedMemberId = parseUuidDetailId(detailId);
 
   const getColumns = useCallback(
     (context: Parameters<typeof getMemberListColumns>[0]) =>
