@@ -206,7 +206,6 @@ const REPORT_STATUSES: readonly AdminReportStatus[] = [
 const REPORT_TARGETS: readonly AdminReportTarget[] = [
   'USER',
   'REVIEW',
-  'CHAT_ROOM',
   'MESSAGE',
   'ARTICLE',
   'COMMENT',

@@ -73,6 +73,12 @@ test('신고 query의 상태, 대상, 날짜 범위를 검증한다', () => {
       pageSize: 10,
     }
   );
+  assert.deepEqual(
+    parseAdminReportSearchParams(
+      new URLSearchParams('target=CHAT_ROOM&page=1')
+    ),
+    { page: 1, pageSize: 10 }
+  );
 });
 
 test('목록 query를 갱신해도 상세 ID와 다른 query를 보존한다', () => {
