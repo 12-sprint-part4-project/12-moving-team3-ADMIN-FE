@@ -91,11 +91,11 @@ const getFocusableChildren = (panel: HTMLElement) => {
 export const detailDrawerRootVariants = cva('fixed inset-0 z-50');
 
 export const detailDrawerOverlayVariants = cva(
-  'absolute inset-0 cursor-pointer border-0 bg-black-500/50 p-0'
+  'absolute inset-0 z-0 cursor-pointer border-0 bg-black-500/50 p-0'
 );
 
 export const detailDrawerPanelVariants = cva(
-  'absolute inset-y-0 right-0 flex h-full w-full flex-col border-l border-line-200 bg-white outline-none animate-drawer-in motion-reduce:animate-none',
+  'absolute inset-y-0 right-0 z-10 flex h-full w-full flex-col border-l border-line-200 bg-white outline-none animate-drawer-in motion-reduce:animate-none',
   {
     variants: {
       size: {

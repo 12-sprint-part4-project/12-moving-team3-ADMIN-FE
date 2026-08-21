@@ -28,6 +28,7 @@ import {
   INITIAL_ADMIN_MEMBER_LIST_FILTERS,
   parseAdminMemberListSearchParams,
 } from '@/utils/adminMemberListSearchParams';
+import { navigateSearchHref } from '@/utils/navigateSearchHref';
 
 import type {
   AdminMemberListItem,
@@ -182,18 +183,13 @@ export const AdminMemberListView = ({
       };
       const href = createAdminMemberListHref(
         pathname,
-        new URLSearchParams(searchParams.toString()),
+        new URLSearchParams(window.location.search),
         nextFilters
       );
 
-      if (options?.replace) {
-        router.replace(href, { scroll: false });
-        return;
-      }
-
-      router.push(href, { scroll: false });
+      navigateSearchHref(router, href, { replace: options?.replace });
     },
-    [filters, pathname, router, searchParams]
+    [filters, pathname, router]
   );
 
   const handlePageClamp = useCallback(

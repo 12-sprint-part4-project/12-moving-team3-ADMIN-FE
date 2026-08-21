@@ -11,6 +11,7 @@ import {
   parseAdminCompletedSearchParams,
   parseAdminListEnum,
 } from '@/utils/adminListSearchParams';
+import { navigateSearchHref } from '@/utils/navigateSearchHref';
 
 import type { DateRangePopoverProps } from '@/components/DateRangePopover/DateRangePopover';
 import type { AdminCompletedListQuery } from '@/types/adminCompleted';
@@ -96,18 +97,13 @@ export const useAdminCompletedListFilters = () => {
       };
       const href = createAdminCompletedListHref(
         pathname,
-        new URLSearchParams(searchParams.toString()),
+        new URLSearchParams(window.location.search),
         nextFilters
       );
 
-      if (options?.replace) {
-        router.replace(href, { scroll: false });
-        return;
-      }
-
-      router.push(href, { scroll: false });
+      navigateSearchHref(router, href, { replace: options?.replace });
     },
-    [filters, pathname, router, searchParams]
+    [filters, pathname, router]
   );
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
