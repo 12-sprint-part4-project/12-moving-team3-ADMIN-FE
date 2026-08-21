@@ -1,0 +1,10 @@
+{
+  "common": {
+    "login": "登录",
+    "logout": "退出登录"
+  },
+  "navigation": {
+    "dashboard": "仪表盘",
+    "members": "会员管理"
+  }
+}

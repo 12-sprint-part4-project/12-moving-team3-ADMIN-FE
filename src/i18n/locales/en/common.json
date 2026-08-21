@@ -1,0 +1,10 @@
+{
+  "common": {
+    "login": "Log in",
+    "logout": "Log out"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "members": "Members"
+  }
+}
