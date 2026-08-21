@@ -378,6 +378,162 @@
       "emptyDescription": "선택한 완료 건을 찾을 수 없습니다."
     }
   },
+  "reports": {
+    "title": "신고 관리",
+    "description": "신고 목록을 조회하고 상태를 확인할 수 있습니다.",
+    "common": {
+      "retry": "잠시 후 다시 시도해 주세요.",
+      "retryAction": "다시 시도"
+    },
+    "unit": { "items": "건" },
+    "status": {
+      "PENDING": "대기",
+      "RESOLVED": "처리 완료",
+      "REJECTED": "반려"
+    },
+    "target": {
+      "USER": "사용자",
+      "REVIEW": "리뷰",
+      "MESSAGE": "메시지",
+      "ARTICLE": "게시글",
+      "COMMENT": "댓글"
+    },
+    "category": {
+      "INAPPROPRIATE_PROFILE": "부적절한 프로필",
+      "ABUSIVE_LANGUAGE": "욕설 및 비방"
+    },
+    "userType": { "CUSTOMER": "일반 회원", "MOVER": "기사" },
+    "account": { "active": "정상", "suspended": "정지됨", "withdrawn": "탈퇴" },
+    "presence": {
+      "active": "정상",
+      "deleted": "삭제됨",
+      "missing": "대상 없음"
+    },
+    "presenceHint": {
+      "deleted": "이 대상은 삭제되어 현재 서비스에 노출되지 않습니다.",
+      "missing": "신고 대상을 확인할 수 없습니다."
+    },
+    "filter": {
+      "searchPlaceholder": "신고 대상 이름, 닉네임, 이메일 검색",
+      "searchLabel": "신고 대상 사용자 검색",
+      "allStatuses": "전체",
+      "allTargets": "전체",
+      "allDates": "신고일 전체"
+    },
+    "fields": {
+      "reportId": "신고 ID",
+      "status": "신고 상태",
+      "targetType": "신고 대상 타입",
+      "targetId": "신고 대상 ID",
+      "category": "신고 카테고리",
+      "reporter": "신고자",
+      "target": "신고 대상",
+      "createdAt": "신고일",
+      "actions": "관리",
+      "admin": "처리 관리자",
+      "name": "이름",
+      "nickname": "닉네임",
+      "email": "이메일",
+      "userType": "유저 타입",
+      "accountStatus": "계정 상태",
+      "withdrawnAt": "탈퇴일",
+      "targetStatus": "대상 상태",
+      "deletedAt": "삭제일",
+      "reportCount": "신고 횟수",
+      "title": "제목",
+      "body": "본문",
+      "contentCreatedAt": "생성일"
+    },
+    "statistics": {
+      "label": "신고 통계",
+      "total": "전체 신고",
+      "error": "신고 통계를 불러오지 못했습니다.",
+      "description": "※ 신고일 기준으로 집계되며, 기간 필터만 적용됩니다."
+    },
+    "list": {
+      "label": "신고 목록",
+      "error": "신고 목록을 불러오지 못했습니다.",
+      "noResults": "검색 결과가 없습니다.",
+      "empty": "등록된 신고가 없습니다.",
+      "changeFilters": "검색 조건을 변경한 후 다시 시도해 주세요.",
+      "resetFilters": "필터 초기화"
+    },
+    "detail": {
+      "title": "신고 상세",
+      "basicInfo": "신고 기본 정보",
+      "reporterInfo": "신고자 정보",
+      "targetInfo": "신고 대상 정보",
+      "contentInfo": "신고된 콘텐츠 정보",
+      "noSelection": "선택한 신고 정보가 없습니다.",
+      "empty": "신고 정보가 없습니다.",
+      "notFound": "선택한 신고를 찾을 수 없습니다.",
+      "error": "신고 상세를 불러오지 못했습니다.",
+      "noAdmin": "담당자 없음",
+      "unexpectedProfileTarget": "이 신고는 프로필 유형인데 대상이 회원이 아닙니다. 신고 기본 정보의 대상 타입·ID를 확인해 주세요.",
+      "suspendDisabled": "처리 완료·반려된 신고는 정지 조치를 선택할 수 없습니다.",
+      "deleteDisabled": "처리 완료·반려된 신고는 콘텐츠 삭제 조치를 선택할 수 없습니다.",
+      "missingTargetContent": "신고 대상이 존재하지 않아 콘텐츠를 표시할 수 없습니다.",
+      "noContent": "신고된 콘텐츠가 없습니다.",
+      "noProfile": "프로필 정보가 없습니다.",
+      "deletedContentHint": "이 콘텐츠는 삭제되어 현재 서비스에 노출되지 않습니다."
+    },
+    "action": {
+      "SUSPEND_TARGET_USER": "7일 정지",
+      "DELETE_REPORTED_CONTENT": "콘텐츠 삭제"
+    },
+    "resolve": {
+      "action": "신고 처리",
+      "title": "신고를 처리하시겠습니까?",
+      "selectedActions": "선택한 조치",
+      "noActions": "선택된 조치가 없습니다.",
+      "warning": "처리 결과는 되돌리기 어렵습니다. 신중히 확인해 주세요.",
+      "confirm": "신고 처리 확인",
+      "success": "신고를 처리했습니다."
+    },
+    "reject": {
+      "action": "신고 반려",
+      "title": "신고를 반려하시겠습니까?",
+      "description": "반려 시 사용자나 콘텐츠에 별도의 조치를 하지 않습니다. 신고 상태만 반려로 변경됩니다.",
+      "confirm": "신고 반려 확인",
+      "success": "신고를 반려했습니다."
+    },
+    "contentDeletionSupported": "삭제 지원",
+    "viewDetail": "상세 보기",
+    "decisionError": "요청에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+    "profileImageAlt": "{{name}} 프로필 이미지",
+    "metadata": {
+      "rating": "별점",
+      "estimateRequestId": "견적 요청 ID",
+      "quoteId": "견적 ID",
+      "lastMessageAt": "마지막 메시지",
+      "messageType": "메시지 유형",
+      "roomId": "채팅방 ID",
+      "category": "게시글 카테고리",
+      "postId": "원글 ID",
+      "postTitle": "원글 제목",
+      "postDeletedAt": "원글 삭제일",
+      "userType": "유저 타입"
+    },
+    "metadataValue": {
+      "userType": { "CUSTOMER": "일반 회원", "MOVER": "기사" },
+      "messageType": { "TEXT": "텍스트", "IMAGE": "이미지" },
+      "category": {
+        "MOVING_TIP": "이사 팁",
+        "QUESTION": "질문",
+        "REVIEW": "후기",
+        "ETC": "기타",
+        "FURNITURE_SHARE": "가구 나눔"
+      }
+    },
+    "summary": {
+      "review": "리뷰",
+      "reviewWithRating": "리뷰 · ★{{rating}}",
+      "comment": "댓글",
+      "commentWithPost": "댓글 · 원글: {{postTitle}}",
+      "message": "메시지 · {{type}}",
+      "article": "게시글 · {{category}}"
+    }
+  },
   "reviews": {
     "title": "리뷰 관리",
     "description": "리뷰 목록을 확인하고 작성자·기사 정보를 조회할 수 있습니다.",

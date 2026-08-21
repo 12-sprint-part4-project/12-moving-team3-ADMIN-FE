@@ -390,6 +390,166 @@
       "emptyDescription": "The selected completed move could not be found."
     }
   },
+  "reports": {
+    "title": "Report Management",
+    "description": "View reports and check their status.",
+    "common": {
+      "retry": "Please try again later.",
+      "retryAction": "Try again"
+    },
+    "unit": { "items": "reports" },
+    "status": {
+      "PENDING": "Pending",
+      "RESOLVED": "Resolved",
+      "REJECTED": "Rejected"
+    },
+    "target": {
+      "USER": "User",
+      "REVIEW": "Review",
+      "MESSAGE": "Message",
+      "ARTICLE": "Post",
+      "COMMENT": "Comment"
+    },
+    "category": {
+      "INAPPROPRIATE_PROFILE": "Inappropriate Profile",
+      "ABUSIVE_LANGUAGE": "Abusive Language"
+    },
+    "userType": { "CUSTOMER": "Customer", "MOVER": "Mover" },
+    "account": {
+      "active": "Active",
+      "suspended": "Suspended",
+      "withdrawn": "Withdrawn"
+    },
+    "presence": {
+      "active": "Active",
+      "deleted": "Deleted",
+      "missing": "Missing"
+    },
+    "presenceHint": {
+      "deleted": "This target has been deleted and is no longer visible.",
+      "missing": "The reported target could not be found."
+    },
+    "filter": {
+      "searchPlaceholder": "Search target name, nickname, or email",
+      "searchLabel": "Search reported users",
+      "allStatuses": "All",
+      "allTargets": "All",
+      "allDates": "All report dates"
+    },
+    "fields": {
+      "reportId": "Report ID",
+      "status": "Report Status",
+      "targetType": "Target Type",
+      "targetId": "Target ID",
+      "category": "Report Category",
+      "reporter": "Reporter",
+      "target": "Reported Target",
+      "createdAt": "Reported At",
+      "actions": "Actions",
+      "admin": "Processing Admin",
+      "name": "Name",
+      "nickname": "Nickname",
+      "email": "Email",
+      "userType": "User Type",
+      "accountStatus": "Account Status",
+      "withdrawnAt": "Withdrawn At",
+      "targetStatus": "Target Status",
+      "deletedAt": "Deleted At",
+      "reportCount": "Report Count",
+      "title": "Title",
+      "body": "Content",
+      "contentCreatedAt": "Created At"
+    },
+    "statistics": {
+      "label": "Report statistics",
+      "total": "Total Reports",
+      "error": "Failed to load report statistics.",
+      "description": "Based on report date; only the date range filter applies."
+    },
+    "list": {
+      "label": "Report list",
+      "error": "Failed to load reports.",
+      "noResults": "No search results found.",
+      "empty": "There are no reports.",
+      "changeFilters": "Change the filters and try again.",
+      "resetFilters": "Reset filters"
+    },
+    "detail": {
+      "title": "Report Details",
+      "basicInfo": "Basic Report Information",
+      "reporterInfo": "Reporter Information",
+      "targetInfo": "Reported Target Information",
+      "contentInfo": "Reported Content Information",
+      "noSelection": "No report is selected.",
+      "empty": "Report information is unavailable.",
+      "notFound": "The selected report could not be found.",
+      "error": "Failed to load report details.",
+      "noAdmin": "Unassigned",
+      "unexpectedProfileTarget": "This profile report does not target a user. Check the target type and ID.",
+      "suspendDisabled": "A suspension cannot be selected for a resolved or rejected report.",
+      "deleteDisabled": "Content deletion cannot be selected for a resolved or rejected report.",
+      "missingTargetContent": "The content cannot be displayed because the target does not exist.",
+      "noContent": "There is no reported content.",
+      "noProfile": "Profile information is unavailable.",
+      "deletedContentHint": "This content has been deleted and is no longer visible."
+    },
+    "action": {
+      "SUSPEND_TARGET_USER": "Suspend for 7 Days",
+      "DELETE_REPORTED_CONTENT": "Delete Content"
+    },
+    "resolve": {
+      "action": "Resolve Report",
+      "title": "Resolve this report?",
+      "selectedActions": "Selected actions",
+      "noActions": "No actions selected.",
+      "warning": "This result is difficult to reverse. Please review carefully.",
+      "confirm": "Confirm Resolution",
+      "success": "The report was resolved."
+    },
+    "reject": {
+      "action": "Reject Report",
+      "title": "Reject this report?",
+      "description": "Rejecting takes no action against the user or content and only changes the report status.",
+      "confirm": "Confirm Rejection",
+      "success": "The report was rejected."
+    },
+    "contentDeletionSupported": "Deletion Available",
+    "viewDetail": "View details",
+    "decisionError": "The request failed. Please try again later.",
+    "profileImageAlt": "{{name}} profile image",
+    "metadata": {
+      "rating": "Rating",
+      "estimateRequestId": "Estimate Request ID",
+      "quoteId": "Quote ID",
+      "lastMessageAt": "Last Message",
+      "messageType": "Message Type",
+      "roomId": "Chat Room ID",
+      "category": "Post Category",
+      "postId": "Original Post ID",
+      "postTitle": "Original Post Title",
+      "postDeletedAt": "Original Post Deleted At",
+      "userType": "User Type"
+    },
+    "metadataValue": {
+      "userType": { "CUSTOMER": "Customer", "MOVER": "Mover" },
+      "messageType": { "TEXT": "Text", "IMAGE": "Image" },
+      "category": {
+        "MOVING_TIP": "Moving Tip",
+        "QUESTION": "Question",
+        "REVIEW": "Review",
+        "ETC": "Other",
+        "FURNITURE_SHARE": "Furniture Sharing"
+      }
+    },
+    "summary": {
+      "review": "Review",
+      "reviewWithRating": "Review · ★{{rating}}",
+      "comment": "Comment",
+      "commentWithPost": "Comment · Post: {{postTitle}}",
+      "message": "Message · {{type}}",
+      "article": "Post · {{category}}"
+    }
+  },
   "reviews": {
     "title": "Review Management",
     "description": "View reviews and their author and mover information.",

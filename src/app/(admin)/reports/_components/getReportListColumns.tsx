@@ -2,10 +2,7 @@ import { Button } from '@/components/Button/Button';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { TruncatedText } from '@/components/TruncatedText/TruncatedText';
 import {
-  ADMIN_REPORT_CATEGORY_LABEL,
   ADMIN_REPORT_STATUS_BADGE_VARIANT,
-  ADMIN_REPORT_STATUS_LABEL,
-  ADMIN_REPORT_TARGET_LABEL,
   formatAdminReportCreatedAt,
   formatAdminReportReporter,
   formatAdminReportTarget,
@@ -16,6 +13,7 @@ import type {
   AdminReportListItem,
   AdminReportTarget,
 } from '@/types/adminReport';
+import type { TFunction } from 'i18next';
 
 const CONTENT_DELETION_SUPPORTED_TARGETS: ReadonlySet<AdminReportTarget> =
   new Set(['ARTICLE', 'COMMENT', 'REVIEW']);
@@ -26,40 +24,44 @@ const supportsContentDeletion = (row: AdminReportListItem) =>
 
 /** 신고 목록 표시 규칙과 상세 열기 액션을 컬럼 정의로 묶는다. */
 export const getReportListColumns = (
-  onOpenDetail: (reportId: number) => void
+  onOpenDetail: (reportId: number) => void,
+  t: TFunction
 ): Column<AdminReportListItem>[] => [
-  { key: 'id', header: '신고 ID', accessor: 'id' },
+  { key: 'id', header: t('reports.fields.reportId'), accessor: 'id' },
   {
     key: 'status',
-    header: '상태',
+    header: t('reports.fields.status'),
     align: 'center',
     render: (row) => (
       <StatusBadge
         variant={ADMIN_REPORT_STATUS_BADGE_VARIANT[row.status]}
-        label={ADMIN_REPORT_STATUS_LABEL[row.status]}
+        label={t(`reports.status.${row.status}`)}
       />
     ),
   },
   {
     key: 'target',
-    header: '대상 유형',
+    header: t('reports.fields.targetType'),
     render: (row) => (
       <div className="flex items-center gap-2">
-        <span>{ADMIN_REPORT_TARGET_LABEL[row.target]}</span>
+        <span>{t(`reports.target.${row.target}`)}</span>
         {supportsContentDeletion(row) ? (
-          <StatusBadge variant="neutral" label="삭제 지원" />
+          <StatusBadge
+            variant="neutral"
+            label={t('reports.contentDeletionSupported')}
+          />
         ) : null}
       </div>
     ),
   },
   {
     key: 'category',
-    header: '신고 유형',
-    render: (row) => ADMIN_REPORT_CATEGORY_LABEL[row.category],
+    header: t('reports.fields.category'),
+    render: (row) => t(`reports.category.${row.category}`),
   },
   {
     key: 'reporter',
-    header: '신고자',
+    header: t('reports.fields.reporter'),
     render: (row) => (
       <TruncatedText
         value={formatAdminReportReporter(row.reporter)}
@@ -69,7 +71,7 @@ export const getReportListColumns = (
   },
   {
     key: 'targetInfo',
-    header: '신고 대상',
+    header: t('reports.fields.target'),
     render: (row) => (
       <TruncatedText
         value={formatAdminReportTarget(row.target, row.targetInfo)}
@@ -79,12 +81,12 @@ export const getReportListColumns = (
   },
   {
     key: 'createdAt',
-    header: '신고일',
+    header: t('reports.fields.createdAt'),
     render: (row) => formatAdminReportCreatedAt(row.createdAt),
   },
   {
     key: 'actions',
-    header: '관리',
+    header: t('reports.fields.actions'),
     align: 'center',
     render: (row) => (
       <Button
@@ -92,7 +94,7 @@ export const getReportListColumns = (
         className="px-3 py-1.5 text-sm-medium"
         onClick={() => onOpenDetail(row.id)}
       >
-        상세 보기
+        {t('reports.viewDetail')}
       </Button>
     ),
   },

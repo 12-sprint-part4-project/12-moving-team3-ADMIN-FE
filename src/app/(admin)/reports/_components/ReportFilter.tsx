@@ -1,12 +1,9 @@
+import { useTranslation } from 'react-i18next';
+
 import { DateRangePopover } from '@/components/DateRangePopover/DateRangePopover';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
 import { SearchResetButton } from '@/components/SearchResetButton/SearchResetButton';
-
-import {
-  REPORT_STATUS_FILTER_OPTIONS,
-  REPORT_TARGET_FILTER_OPTIONS,
-} from '../_constants/reportFilters';
 
 import type { ComponentProps } from 'react';
 
@@ -35,34 +32,59 @@ export const ReportFilter = ({
   onTargetChange,
   onDateRangeConfirm,
   onReset,
-}: ReportFilterProps) => (
-  <>
-    <SearchInput
-      value={searchValue}
-      onChange={onSearchChange}
-      onSearch={onSearch}
-      placeholder="신고 대상 이름, 닉네임, 이메일 검색"
-      searchAction="button"
-      className="min-w-64 flex-1"
-      aria-label="신고 대상 사용자 검색"
-    />
-    <FilterSelect
-      aria-label="상태"
-      value={statusValue}
-      onChange={onStatusChange}
-      options={REPORT_STATUS_FILTER_OPTIONS}
-    />
-    <FilterSelect
-      aria-label="대상 유형"
-      value={targetValue}
-      onChange={onTargetChange}
-      options={REPORT_TARGET_FILTER_OPTIONS}
-    />
-    <DateRangePopover
-      value={dateRangeValue}
-      onConfirm={onDateRangeConfirm}
-      placeholder="신고일 전체"
-    />
-    <SearchResetButton onClick={onReset} />
-  </>
-);
+}: ReportFilterProps) => {
+  const { t } = useTranslation();
+  const statusOptions = ['', 'PENDING', 'RESOLVED', 'REJECTED'].map(
+    (value) => ({
+      value,
+      label: value
+        ? t(`reports.status.${value}`)
+        : t('reports.filter.allStatuses'),
+    })
+  );
+  const targetOptions = [
+    '',
+    'USER',
+    'REVIEW',
+    'MESSAGE',
+    'ARTICLE',
+    'COMMENT',
+  ].map((value) => ({
+    value,
+    label: value
+      ? t(`reports.target.${value}`)
+      : t('reports.filter.allTargets'),
+  }));
+
+  return (
+    <>
+      <SearchInput
+        value={searchValue}
+        onChange={onSearchChange}
+        onSearch={onSearch}
+        placeholder={t('reports.filter.searchPlaceholder')}
+        searchAction="button"
+        className="min-w-64 flex-1"
+        aria-label={t('reports.filter.searchLabel')}
+      />
+      <FilterSelect
+        aria-label={t('reports.fields.status')}
+        value={statusValue}
+        onChange={onStatusChange}
+        options={statusOptions}
+      />
+      <FilterSelect
+        aria-label={t('reports.fields.targetType')}
+        value={targetValue}
+        onChange={onTargetChange}
+        options={targetOptions}
+      />
+      <DateRangePopover
+        value={dateRangeValue}
+        onConfirm={onDateRangeConfirm}
+        placeholder={t('reports.filter.allDates')}
+      />
+      <SearchResetButton onClick={onReset} />
+    </>
+  );
+};

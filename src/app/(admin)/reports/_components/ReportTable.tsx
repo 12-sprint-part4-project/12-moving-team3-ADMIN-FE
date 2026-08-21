@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { Button } from '@/components/Button/Button';
 import { DataTable, type Column } from '@/components/DataTable/DataTable';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
@@ -23,13 +25,14 @@ export const ReportTable = ({
   hasActiveFilters,
   onResetFilters,
 }: ReportTableProps) => {
+  const { t } = useTranslation();
   if (isPending) return <LoadingState />;
 
   if (isError) {
     return (
       <EmptyState
-        title="신고 목록을 불러오지 못했습니다."
-        description="잠시 후 다시 시도해 주세요."
+        title={t('reports.list.error')}
+        description={t('reports.common.retry')}
       />
     );
   }
@@ -38,17 +41,17 @@ export const ReportTable = ({
     return (
       <EmptyState
         title={
-          hasActiveFilters ? '검색 결과가 없습니다.' : '등록된 신고가 없습니다.'
+          hasActiveFilters
+            ? t('reports.list.noResults')
+            : t('reports.list.empty')
         }
         description={
-          hasActiveFilters
-            ? '검색 조건을 변경한 후 다시 시도해 주세요.'
-            : undefined
+          hasActiveFilters ? t('reports.list.changeFilters') : undefined
         }
         action={
           hasActiveFilters ? (
             <Button variant="secondary" onClick={onResetFilters}>
-              필터 초기화
+              {t('reports.list.resetFilters')}
             </Button>
           ) : undefined
         }
@@ -57,6 +60,11 @@ export const ReportTable = ({
   }
 
   return (
-    <DataTable columns={columns} data={items} rowKey="id" caption="신고 목록" />
+    <DataTable
+      columns={columns}
+      data={items}
+      rowKey="id"
+      caption={t('reports.list.label')}
+    />
   );
 };

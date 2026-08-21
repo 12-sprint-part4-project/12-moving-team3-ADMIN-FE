@@ -378,6 +378,163 @@
       "emptyDescription": "找不到所选已完成订单。"
     }
   },
+  "reports": {
+    "title": "举报管理",
+    "description": "查看举报列表和处理状态。",
+    "common": { "retry": "请稍后重试。", "retryAction": "重试" },
+    "unit": { "items": "条" },
+    "status": {
+      "PENDING": "待处理",
+      "RESOLVED": "已处理",
+      "REJECTED": "已驳回"
+    },
+    "target": {
+      "USER": "用户",
+      "REVIEW": "评价",
+      "MESSAGE": "消息",
+      "ARTICLE": "帖子",
+      "COMMENT": "评论"
+    },
+    "category": {
+      "INAPPROPRIATE_PROFILE": "不当个人资料",
+      "ABUSIVE_LANGUAGE": "辱骂或诽谤"
+    },
+    "userType": { "CUSTOMER": "普通用户", "MOVER": "搬家师傅" },
+    "account": {
+      "active": "正常",
+      "suspended": "已停用",
+      "withdrawn": "已注销"
+    },
+    "presence": {
+      "active": "正常",
+      "deleted": "已删除",
+      "missing": "目标不存在"
+    },
+    "presenceHint": {
+      "deleted": "该目标已删除，当前不再显示。",
+      "missing": "无法确认举报目标。"
+    },
+    "filter": {
+      "searchPlaceholder": "搜索目标姓名、昵称或邮箱",
+      "searchLabel": "搜索被举报用户",
+      "allStatuses": "全部",
+      "allTargets": "全部",
+      "allDates": "全部举报日期"
+    },
+    "fields": {
+      "reportId": "举报 ID",
+      "status": "举报状态",
+      "targetType": "目标类型",
+      "targetId": "目标 ID",
+      "category": "举报类别",
+      "reporter": "举报人",
+      "target": "举报目标",
+      "createdAt": "举报日期",
+      "actions": "操作",
+      "admin": "处理管理员",
+      "name": "姓名",
+      "nickname": "昵称",
+      "email": "邮箱",
+      "userType": "用户类型",
+      "accountStatus": "账号状态",
+      "withdrawnAt": "注销日期",
+      "targetStatus": "目标状态",
+      "deletedAt": "删除日期",
+      "reportCount": "被举报次数",
+      "title": "标题",
+      "body": "正文",
+      "contentCreatedAt": "创建日期"
+    },
+    "statistics": {
+      "label": "举报统计",
+      "total": "举报总数",
+      "error": "无法加载举报统计。",
+      "description": "按举报日期统计，仅应用日期范围筛选。"
+    },
+    "list": {
+      "label": "举报列表",
+      "error": "无法加载举报列表。",
+      "noResults": "没有搜索结果。",
+      "empty": "暂无举报。",
+      "changeFilters": "请修改筛选条件后重试。",
+      "resetFilters": "重置筛选"
+    },
+    "detail": {
+      "title": "举报详情",
+      "basicInfo": "举报基本信息",
+      "reporterInfo": "举报人信息",
+      "targetInfo": "举报目标信息",
+      "contentInfo": "被举报内容信息",
+      "noSelection": "未选择举报。",
+      "empty": "没有举报信息。",
+      "notFound": "找不到所选举报。",
+      "error": "无法加载举报详情。",
+      "noAdmin": "尚未分配",
+      "unexpectedProfileTarget": "此个人资料举报的目标不是用户，请检查目标类型和 ID。",
+      "suspendDisabled": "已处理或已驳回的举报无法选择停用操作。",
+      "deleteDisabled": "已处理或已驳回的举报无法选择删除内容。",
+      "missingTargetContent": "举报目标不存在，无法显示内容。",
+      "noContent": "没有被举报的内容。",
+      "noProfile": "没有个人资料信息。",
+      "deletedContentHint": "该内容已删除，当前不再显示。"
+    },
+    "action": {
+      "SUSPEND_TARGET_USER": "停用 7 天",
+      "DELETE_REPORTED_CONTENT": "删除内容"
+    },
+    "resolve": {
+      "action": "处理举报",
+      "title": "要处理此举报吗？",
+      "selectedActions": "已选操作",
+      "noActions": "未选择操作。",
+      "warning": "处理结果难以撤销，请仔细确认。",
+      "confirm": "确认处理",
+      "success": "举报已处理。"
+    },
+    "reject": {
+      "action": "驳回举报",
+      "title": "要驳回此举报吗？",
+      "description": "驳回不会对用户或内容采取其他措施，只会更改举报状态。",
+      "confirm": "确认驳回",
+      "success": "举报已驳回。"
+    },
+    "contentDeletionSupported": "支持删除",
+    "viewDetail": "查看详情",
+    "decisionError": "请求失败，请稍后重试。",
+    "profileImageAlt": "{{name}}的个人资料图片",
+    "metadata": {
+      "rating": "评分",
+      "estimateRequestId": "报价请求 ID",
+      "quoteId": "报价 ID",
+      "lastMessageAt": "最后消息",
+      "messageType": "消息类型",
+      "roomId": "聊天室 ID",
+      "category": "帖子类别",
+      "postId": "原帖 ID",
+      "postTitle": "原帖标题",
+      "postDeletedAt": "原帖删除日期",
+      "userType": "用户类型"
+    },
+    "metadataValue": {
+      "userType": { "CUSTOMER": "普通用户", "MOVER": "搬家师傅" },
+      "messageType": { "TEXT": "文本", "IMAGE": "图片" },
+      "category": {
+        "MOVING_TIP": "搬家技巧",
+        "QUESTION": "问题",
+        "REVIEW": "评价",
+        "ETC": "其他",
+        "FURNITURE_SHARE": "家具分享"
+      }
+    },
+    "summary": {
+      "review": "评价",
+      "reviewWithRating": "评价 · ★{{rating}}",
+      "comment": "评论",
+      "commentWithPost": "评论 · 原帖：{{postTitle}}",
+      "message": "消息 · {{type}}",
+      "article": "帖子 · {{category}}"
+    }
+  },
   "reviews": {
     "title": "评价管理",
     "description": "查看评价列表以及发布者和搬家师傅信息。",
