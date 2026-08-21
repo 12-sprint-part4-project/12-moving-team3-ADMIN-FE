@@ -172,3 +172,17 @@
 body {
   font-family: var(--font-sans);
 }
+
+@layer base {
+  button:not(:disabled):not([aria-disabled='true']),
+  a[href]:not([aria-disabled='true']),
+  select:not(:disabled):not([aria-disabled='true']),
+  input:is([type='button'], [type='submit'], [type='reset']):not(:disabled):not(
+      [aria-disabled='true']
+    ),
+  label[for]:not([aria-disabled='true']),
+  summary:not([aria-disabled='true']),
+  [role='button']:not([aria-disabled='true']) {
+    cursor: pointer;
+  }
+}
