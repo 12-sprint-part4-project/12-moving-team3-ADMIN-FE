@@ -327,6 +327,69 @@
     },
     "viewDetail": "View details"
   },
+  "completed": {
+    "title": "Completed Move Management",
+    "description": "View completed estimate requests.",
+    "common": { "retry": "Please try again later." },
+    "unit": { "items": "items", "currency": "KRW" },
+    "moveType": { "all": "All move types" },
+    "filter": {
+      "label": "Completed move filters",
+      "searchPlaceholder": "Search request ID, requester, or phone",
+      "searchLabel": "Search completed moves",
+      "moveTypeLabel": "Move type",
+      "allMoveDates": "All move dates"
+    },
+    "statistics": {
+      "label": "Completed move statistics",
+      "totalCount": "Completed Moves",
+      "averagePrice": "Average Completed Quote",
+      "totalPrice": "Total Completed Quote Value",
+      "rounded": "Average values are rounded to the nearest whole number.",
+      "description": "Based on move date; only the date filter is applied.",
+      "error": "Failed to load completed move statistics."
+    },
+    "fields": {
+      "moveType": "Move Type",
+      "departureAddress": "Departure",
+      "departureDetailAddress": "Departure Details",
+      "departureZipCode": "Departure Postal Code",
+      "arrivalAddress": "Arrival",
+      "arrivalDetailAddress": "Arrival Details",
+      "arrivalZipCode": "Arrival Postal Code",
+      "moveDate": "Move Date",
+      "mover": "Matched Mover",
+      "price": "Quote Price",
+      "confirmedQuote": "Confirmed Quote",
+      "confirmedQuote_moverName": "Confirmed Quote Mover",
+      "confirmedQuote_moverNickname": "Confirmed Quote Mover Nickname",
+      "confirmedQuote_price": "Confirmed Quote Price",
+      "confirmedQuote_createdAt": "Confirmed Quote Created At",
+      "data": "Data",
+      "moverName": "Mover",
+      "moverNickname": "Mover Nickname",
+      "comment": "Comment",
+      "quoteCreatedAt": "Quote Created At"
+    },
+    "list": {
+      "label": "Completed move list",
+      "error": "Failed to load completed moves.",
+      "retry": "Try again",
+      "noResults": "No search results.",
+      "empty": "There are no completed moves.",
+      "changeFilters": "Change the search filters and try again.",
+      "resetFilters": "Reset filters"
+    },
+    "detail": {
+      "title": "Completed Move Details",
+      "confirmedQuote": "Confirmed Quote",
+      "noConfirmedQuote": "Confirmed quote information is unavailable.",
+      "notFound": "The completed move could not be found.",
+      "error": "Failed to load completed move details.",
+      "empty": "Completed move information is unavailable.",
+      "emptyDescription": "The selected completed move could not be found."
+    }
+  },
   "language": {
     "selectorLabel": "Select language"
   },

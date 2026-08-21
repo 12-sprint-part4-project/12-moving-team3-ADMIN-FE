@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '@/components/PageHeader/PageHeader';
 import { useAdminCompletedList } from '@/hooks/useAdminCompletedList';
@@ -20,6 +21,7 @@ import { CompletedTable } from './CompletedTable';
  * 필터·목록·통계·상세 Drawer를 조합한다.
  */
 export const CompletedManagementContent = () => {
+  const { t } = useTranslation();
   const { detailId, setDetailId } = useDetailSearchParam('completedId');
   const selectedEstimateRequestId = parseNumericDetailId(detailId);
   const {
@@ -66,8 +68,8 @@ export const CompletedManagementContent = () => {
   return (
     <>
       <PageHeader
-        title="완료 건 관리"
-        description="완료된 견적 요청 내역을 조회 할 수 있습니다."
+        title={t('completed.title')}
+        description={t('completed.description')}
       />
       <CompletedStatistics
         statistics={statisticsData?.data}

@@ -315,6 +315,69 @@
     },
     "viewDetail": "查看详情"
   },
+  "completed": {
+    "title": "已完成订单管理",
+    "description": "查看已完成的报价请求。",
+    "common": { "retry": "请稍后重试。" },
+    "unit": { "items": "项", "currency": "韩元" },
+    "moveType": { "all": "全部搬家类型" },
+    "filter": {
+      "label": "已完成订单筛选",
+      "searchPlaceholder": "搜索请求编号、申请人或手机号",
+      "searchLabel": "搜索已完成订单",
+      "moveTypeLabel": "搬家类型",
+      "allMoveDates": "全部搬家日期"
+    },
+    "statistics": {
+      "label": "已完成订单统计",
+      "totalCount": "已完成订单数",
+      "averagePrice": "平均完成报价金额",
+      "totalPrice": "完成报价总金额",
+      "rounded": "平均金额四舍五入至整数。",
+      "description": "以搬家日期为基准，仅应用日期筛选。",
+      "error": "无法加载已完成订单统计。"
+    },
+    "fields": {
+      "moveType": "搬家类型",
+      "departureAddress": "出发地",
+      "departureDetailAddress": "出发地详细地址",
+      "departureZipCode": "出发地邮编",
+      "arrivalAddress": "目的地",
+      "arrivalDetailAddress": "目的地详细地址",
+      "arrivalZipCode": "目的地邮编",
+      "moveDate": "搬家日期",
+      "mover": "已匹配师傅",
+      "price": "报价金额",
+      "confirmedQuote": "已确认报价",
+      "confirmedQuote_moverName": "确认报价师傅",
+      "confirmedQuote_moverNickname": "确认报价师傅昵称",
+      "confirmedQuote_price": "确认报价金额",
+      "confirmedQuote_createdAt": "确认报价创建日期",
+      "data": "数据",
+      "moverName": "搬家师傅",
+      "moverNickname": "师傅昵称",
+      "comment": "备注",
+      "quoteCreatedAt": "报价创建日期"
+    },
+    "list": {
+      "label": "已完成订单列表",
+      "error": "无法加载已完成订单列表。",
+      "retry": "重试",
+      "noResults": "没有搜索结果。",
+      "empty": "暂无已完成订单。",
+      "changeFilters": "请更改搜索条件后重试。",
+      "resetFilters": "重置筛选"
+    },
+    "detail": {
+      "title": "已完成订单详情",
+      "confirmedQuote": "已确认报价",
+      "noConfirmedQuote": "暂无已确认报价信息。",
+      "notFound": "找不到已完成订单。",
+      "error": "无法加载已完成订单详情。",
+      "empty": "暂无已完成订单信息。",
+      "emptyDescription": "找不到所选已完成订单。"
+    }
+  },
   "language": {
     "selectorLabel": "选择语言"
   },

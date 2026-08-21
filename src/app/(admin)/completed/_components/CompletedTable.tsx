@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
+
 import { Button } from '@/components/Button/Button';
 import { DataTable, type Column } from '@/components/DataTable/DataTable';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
@@ -21,6 +23,7 @@ import {
 
 import type { AdminCompletedListItem } from '@/types/adminCompleted';
 import type { AdminListSortDirection } from '@/types/adminEstimateRequest';
+import type { TFunction } from 'i18next';
 
 export interface CompletedTableProps {
   items: AdminCompletedListItem[];
@@ -40,29 +43,31 @@ export interface CompletedTableProps {
 const getCompletedColumns = (
   onDetailClick: CompletedTableProps['onDetailClick'],
   sort: AdminListSortDirection,
-  onSortToggle: CompletedTableProps['onSortToggle']
+  onSortToggle: CompletedTableProps['onSortToggle'],
+  t: TFunction,
+  locale: string
 ): Column<AdminCompletedListItem>[] => [
-  { key: 'id', header: '견적 번호', accessor: 'id' },
+  { key: 'id', header: t('estimates.fields.id'), accessor: 'id' },
   {
     key: 'userName',
-    header: '요청자 이름',
+    header: t('estimates.fields.userName'),
     render: (row) => (
       <TruncatedText value={row.userName} className="max-w-28" />
     ),
   },
   {
     key: 'phoneNumber',
-    header: '전화번호',
+    header: t('estimates.fields.phoneNumber'),
     render: (row) => formatAdminEstimateRequestPhoneNumber(row.phoneNumber),
   },
   {
     key: 'moveType',
-    header: '이사 유형',
-    render: (row) => formatAdminEstimateRequestMoveType(row.moveType),
+    header: t('estimates.fields.moveType'),
+    render: (row) => formatAdminEstimateRequestMoveType(row.moveType, t),
   },
   {
     key: 'departureAddress',
-    header: '출발지',
+    header: t('estimates.fields.departureAddress'),
     render: (row) => {
       const address = formatAdminEstimateRequestNullableText(
         row.departureAddress
@@ -77,7 +82,7 @@ const getCompletedColumns = (
   },
   {
     key: 'arrivalAddress',
-    header: '도착지',
+    header: t('estimates.fields.arrivalAddress'),
     render: (row) => {
       const address = formatAdminEstimateRequestNullableText(
         row.arrivalAddress
@@ -94,7 +99,7 @@ const getCompletedColumns = (
     key: 'moveDate',
     header: (
       <SortableColumnHeader
-        label="이사일"
+        label={t('completed.fields.moveDate')}
         sort={sort}
         onToggle={onSortToggle}
       />
@@ -104,7 +109,7 @@ const getCompletedColumns = (
   },
   {
     key: 'mover',
-    header: '매칭 기사',
+    header: t('estimates.fields.mover'),
     render: (row) => {
       const mover = formatAdminEstimateRequestNullableText(row.mover);
 
@@ -113,12 +118,12 @@ const getCompletedColumns = (
   },
   {
     key: 'price',
-    header: '견적 금액',
-    render: (row) => formatAdminCompletedPrice(row.price),
+    header: t('completed.fields.price'),
+    render: (row) => formatAdminCompletedPrice(row.price, t, locale),
   },
   {
     key: 'missingFields',
-    header: '데이터',
+    header: t('completed.fields.data'),
     align: 'center',
     render: (row) => {
       if (!hasAdminCompletedMissingFields(row.missingFields)) {
@@ -126,20 +131,29 @@ const getCompletedColumns = (
       }
 
       const missingLabels = formatAdminCompletedMissingFields(
-        row.missingFields
+        row.missingFields,
+        t
       );
 
       return (
-        <span title={`누락: ${missingLabels.join(', ')}`}>
-          <StatusBadge variant="danger" label="정보 누락" />
-          <span className="sr-only">누락 필드: {missingLabels.join(', ')}</span>
+        <span
+          title={t('estimates.missing.title', {
+            fields: missingLabels.join(', '),
+          })}
+        >
+          <StatusBadge variant="danger" label={t('estimates.missing.badge')} />
+          <span className="sr-only">
+            {t('estimates.missing.fields', {
+              fields: missingLabels.join(', '),
+            })}
+          </span>
         </span>
       );
     },
   },
   {
     key: 'action',
-    header: '작업',
+    header: t('estimates.fields.actions'),
     align: 'center',
     render: (row) => (
       <Button
@@ -147,7 +161,7 @@ const getCompletedColumns = (
         className="px-3 py-1.5 text-sm-medium"
         onClick={() => onDetailClick(row.id)}
       >
-        상세 보기
+        {t('estimates.viewDetail')}
       </Button>
     ),
   },
@@ -166,57 +180,64 @@ export const CompletedTable = ({
   onRetry,
   sort,
   onSortToggle,
-}: CompletedTableProps) => (
-  <section className="mt-4" aria-label="완료 건 목록">
-    <div className="overflow-hidden rounded-lg border border-line-200 bg-white">
-      {isError ? (
-        <EmptyState
-          title="완료 건 목록을 불러오지 못했습니다."
-          description="잠시 후 다시 시도해 주세요."
-          action={
-            <Button variant="secondary" onClick={onRetry}>
-              다시 시도
-            </Button>
-          }
-        />
-      ) : !isLoading && items.length === 0 ? (
-        <EmptyState
-          title={
-            hasActiveFilters
-              ? '검색 결과가 없습니다.'
-              : '등록된 완료 건이 없습니다.'
-          }
-          description={
-            hasActiveFilters
-              ? '검색 조건을 변경한 후 다시 시도해 주세요.'
-              : undefined
-          }
-          action={
-            hasActiveFilters ? (
-              <Button variant="secondary" onClick={onResetFilters}>
-                필터 초기화
+}: CompletedTableProps) => {
+  const { t, i18n } = useTranslation();
+  return (
+    <section className="mt-4" aria-label={t('completed.list.label')}>
+      <div className="overflow-hidden rounded-lg border border-line-200 bg-white">
+        {isError ? (
+          <EmptyState
+            title={t('completed.list.error')}
+            description={t('completed.common.retry')}
+            action={
+              <Button variant="secondary" onClick={onRetry}>
+                {t('completed.list.retry')}
               </Button>
-            ) : undefined
-          }
-        />
-      ) : (
-        <DataTable
-          columns={getCompletedColumns(onDetailClick, sort, onSortToggle)}
-          data={items}
-          rowKey="id"
-          loading={isLoading}
-          caption="완료 건 목록"
-        />
-      )}
-    </div>
-    {totalPages > 0 ? (
-      <div className="mt-6 flex justify-center">
-        <Pagination
-          page={page}
-          totalPages={totalPages}
-          onPageChange={onPageChange}
-        />
+            }
+          />
+        ) : !isLoading && items.length === 0 ? (
+          <EmptyState
+            title={
+              hasActiveFilters
+                ? t('completed.list.noResults')
+                : t('completed.list.empty')
+            }
+            description={
+              hasActiveFilters ? t('completed.list.changeFilters') : undefined
+            }
+            action={
+              hasActiveFilters ? (
+                <Button variant="secondary" onClick={onResetFilters}>
+                  {t('completed.list.resetFilters')}
+                </Button>
+              ) : undefined
+            }
+          />
+        ) : (
+          <DataTable
+            columns={getCompletedColumns(
+              onDetailClick,
+              sort,
+              onSortToggle,
+              t,
+              i18n.language
+            )}
+            data={items}
+            rowKey="id"
+            loading={isLoading}
+            caption={t('completed.list.label')}
+          />
+        )}
       </div>
-    ) : null}
-  </section>
-);
+      {totalPages > 0 ? (
+        <div className="mt-6 flex justify-center">
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+          />
+        </div>
+      ) : null}
+    </section>
+  );
+};
