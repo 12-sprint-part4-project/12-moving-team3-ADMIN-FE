@@ -1,7 +1,47 @@
 {
   "common": {
     "login": "Log in",
-    "logout": "Log out"
+    "logout": "Log out",
+    "search": "Search",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "loading": "Loading..."
+  },
+  "auth": {
+    "brand": "Moving",
+    "title": "Admin Login",
+    "description": "Log in with your admin account to access the admin portal.",
+    "email": {
+      "label": "Email",
+      "placeholder": "Enter your email"
+    },
+    "password": {
+      "label": "Password",
+      "placeholder": "Enter your password",
+      "show": "Show password",
+      "hide": "Hide password"
+    },
+    "validation": {
+      "emailRequired": "Please enter your email.",
+      "emailInvalid": "Please enter a valid email address.",
+      "passwordRequired": "Please enter your password."
+    },
+    "error": {
+      "invalidCredentials": "Login failed. Please check your email and password.",
+      "unexpected": "Login failed. Please try again later."
+    }
+  },
+  "pagination": {
+    "label": "Pagination",
+    "first": "First page",
+    "previous": "Previous page",
+    "page": "Page {{page}}",
+    "next": "Next page",
+    "last": "Last page"
+  },
+  "dateRange": {
+    "select": "Select date range",
+    "allPeriod": "All dates"
   },
   "language": {
     "selectorLabel": "Select language"

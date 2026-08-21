@@ -1,7 +1,47 @@
 {
   "common": {
     "login": "登录",
-    "logout": "退出登录"
+    "logout": "退出登录",
+    "search": "搜索",
+    "confirm": "确认",
+    "cancel": "取消",
+    "loading": "加载中..."
+  },
+  "auth": {
+    "brand": "Moving",
+    "title": "管理员登录",
+    "description": "请使用管理员账号登录以访问管理后台。",
+    "email": {
+      "label": "邮箱",
+      "placeholder": "请输入邮箱"
+    },
+    "password": {
+      "label": "密码",
+      "placeholder": "请输入密码",
+      "show": "显示密码",
+      "hide": "隐藏密码"
+    },
+    "validation": {
+      "emailRequired": "请输入邮箱。",
+      "emailInvalid": "请输入有效的邮箱地址。",
+      "passwordRequired": "请输入密码。"
+    },
+    "error": {
+      "invalidCredentials": "登录失败，请检查邮箱和密码。",
+      "unexpected": "登录失败，请稍后重试。"
+    }
+  },
+  "pagination": {
+    "label": "分页导航",
+    "first": "第一页",
+    "previous": "上一页",
+    "page": "第{{page}}页",
+    "next": "下一页",
+    "last": "最后一页"
+  },
+  "dateRange": {
+    "select": "选择日期范围",
+    "allPeriod": "全部日期"
   },
   "language": {
     "selectorLabel": "选择语言"

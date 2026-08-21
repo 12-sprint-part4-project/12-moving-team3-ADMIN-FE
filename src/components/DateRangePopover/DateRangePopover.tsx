@@ -4,6 +4,7 @@ import { format, isSameDay } from 'date-fns';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Calendar } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/Button/Button';
 import {
@@ -47,10 +48,11 @@ const formatDateRange = (value?: DateRange) => {
 export const DateRangePopover = ({
   value,
   onConfirm,
-  placeholder = '전체 기간',
+  placeholder,
   className,
   triggerClassName,
 }: DateRangePopoverProps) => {
+  const { t } = useTranslation();
   // popover를 위한 고유 ID
   const popoverId = useId();
   const shouldReduceMotion = useReducedMotion();
@@ -61,13 +63,17 @@ export const DateRangePopover = ({
   // wrapper ref (outside click 감지·Escape 후 트리거 포커스 복귀에 사용)
   const wrapperRef = useRef<HTMLDivElement>(null);
   const isOpenRef = useRef(isOpen);
-  isOpenRef.current = isOpen;
   // 버튼에 표시될 날짜 문자열
-  const dateRangeLabel = formatDateRange(value) ?? placeholder;
+  const dateRangeLabel =
+    formatDateRange(value) ?? placeholder ?? t('dateRange.allPeriod');
   const popoverTransition = {
     duration: shouldReduceMotion ? 0 : POPOVER_MOTION_DURATION_SEC,
     ease: 'easeOut',
   } as const;
+
+  useEffect(() => {
+    isOpenRef.current = isOpen;
+  }, [isOpen]);
 
   // 버튼 클릭시 팝오버 열고 닫기
   const handleTriggerClick = () => {
@@ -167,7 +173,7 @@ export const DateRangePopover = ({
             key="date-range-popover"
             id={popoverId}
             role="dialog"
-            aria-label="날짜 범위 선택"
+            aria-label={t('dateRange.select')}
             initial={{ opacity: 0, y: -POPOVER_MOTION_OFFSET_PX }}
             animate={{ opacity: 1, y: 0 }}
             exit={{
@@ -187,13 +193,13 @@ export const DateRangePopover = ({
             {/* 취소/확인 버튼 영역 */}
             <div className="flex justify-end gap-2 border-t border-line-200 p-4">
               <Button variant="outlined" onClick={handleSelectAllPeriod}>
-                전체 기간
+                {t('dateRange.allPeriod')}
               </Button>
               <Button variant="secondary" onClick={handleCancel}>
-                취소
+                {t('common.cancel')}
               </Button>
               <Button variant="solid" onClick={handleConfirm}>
-                확인
+                {t('common.confirm')}
               </Button>
             </div>
           </motion.div>

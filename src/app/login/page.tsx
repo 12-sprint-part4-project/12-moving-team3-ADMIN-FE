@@ -4,8 +4,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { Eye, EyeOff, Lock, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
 import { AdminHeader } from '@/components/AdminHeader/AdminHeader';
@@ -13,23 +14,25 @@ import { Button } from '@/components/Button/Button';
 import { Input } from '@/components/Input/Input';
 import { useAdminLogin } from '@/hooks/useAdminLogin';
 
-const adminLoginFormSchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .min(1, '이메일을 입력해 주세요.')
-    .email('올바른 이메일 형식을 입력해 주세요.'),
-  password: z.string().min(1, '비밀번호를 입력해 주세요.'),
-});
+import type { TFunction } from 'i18next';
 
-type AdminLoginFormValues = z.infer<typeof adminLoginFormSchema>;
+const createAdminLoginFormSchema = (t: TFunction) =>
+  z.object({
+    email: z
+      .string()
+      .trim()
+      .min(1, t('auth.validation.emailRequired'))
+      .email(t('auth.validation.emailInvalid')),
+    password: z.string().min(1, t('auth.validation.passwordRequired')),
+  });
 
-const DEFAULT_LOGIN_ERROR_MESSAGE =
-  '로그인에 실패했습니다. 이메일과 비밀번호를 확인해 주세요.';
+type AdminLoginFormValues = z.infer<
+  ReturnType<typeof createAdminLoginFormSchema>
+>;
 
-const getLoginErrorMessage = (error: unknown): string => {
+const getLoginErrorMessage = (error: unknown, t: TFunction): string => {
   if (!axios.isAxiosError(error)) {
-    return '로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+    return t('auth.error.unexpected');
   }
 
   const responseData = error.response?.data;
@@ -46,15 +49,20 @@ const getLoginErrorMessage = (error: unknown): string => {
     return responseData.error.message;
   }
 
-  return DEFAULT_LOGIN_ERROR_MESSAGE;
+  return t('auth.error.invalidCredentials');
 };
 
 const LoginPage = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   // 비로그인 /login 진입 시 /me·/refresh를 호출하지 않는다.
   // 관리자 영역 새로고침 복구는 AdminAuthGuard + axios interceptor가 담당한다.
   const loginMutation = useAdminLogin();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const adminLoginFormSchema = useMemo(
+    () => createAdminLoginFormSchema(t),
+    [t]
+  );
 
   const {
     control,
@@ -84,7 +92,7 @@ const LoginPage = () => {
       router.push('/');
     } catch (error) {
       setError('root', {
-        message: getLoginErrorMessage(error),
+        message: getLoginErrorMessage(error, t),
       });
     }
   });
@@ -100,10 +108,10 @@ const LoginPage = () => {
           className="flex w-full max-w-md flex-col gap-8"
         >
           <div className="flex flex-col items-center gap-2 text-center">
-            <p className="text-3xl-bold text-blue-300">무빙</p>
-            <h1 className="text-2xl-bold text-black-400">관리자 로그인</h1>
+            <p className="text-3xl-bold text-blue-300">{t('auth.brand')}</p>
+            <h1 className="text-2xl-bold text-black-400">{t('auth.title')}</h1>
             <p className="text-md-medium text-gray-500">
-              관리자 계정으로 로그인하여 관리자 페이지를 이용하세요.
+              {t('auth.description')}
             </p>
           </div>
 
@@ -114,9 +122,9 @@ const LoginPage = () => {
               render={({ field }) => (
                 <Input
                   {...field}
-                  label="이메일"
+                  label={t('auth.email.label')}
                   type="email"
-                  placeholder="이메일을 입력하세요"
+                  placeholder={t('auth.email.placeholder')}
                   autoComplete="email"
                   disabled={isLoginPending}
                   errorMessage={errors.email?.message}
@@ -130,9 +138,9 @@ const LoginPage = () => {
               render={({ field }) => (
                 <Input
                   {...field}
-                  label="비밀번호"
+                  label={t('auth.password.label')}
                   type={isPasswordVisible ? 'text' : 'password'}
-                  placeholder="비밀번호를 입력하세요"
+                  placeholder={t('auth.password.placeholder')}
                   autoComplete="current-password"
                   disabled={isLoginPending}
                   errorMessage={errors.password?.message}
@@ -146,8 +154,8 @@ const LoginPage = () => {
                       className="flex size-5 items-center justify-center text-gray-400 enabled:hover:text-gray-500 disabled:cursor-not-allowed disabled:text-gray-300"
                       aria-label={
                         isPasswordVisible
-                          ? '비밀번호 숨기기'
-                          : '비밀번호 표시하기'
+                          ? t('auth.password.hide')
+                          : t('auth.password.show')
                       }
                     >
                       {isPasswordVisible ? (
@@ -174,7 +182,7 @@ const LoginPage = () => {
             loading={isLoginPending}
             className="w-full"
           >
-            로그인
+            {t('common.login')}
           </Button>
         </form>
       </main>

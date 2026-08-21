@@ -1,7 +1,47 @@
 {
   "common": {
     "login": "로그인",
-    "logout": "로그아웃"
+    "logout": "로그아웃",
+    "search": "검색",
+    "confirm": "확인",
+    "cancel": "취소",
+    "loading": "불러오는 중..."
+  },
+  "auth": {
+    "brand": "무빙",
+    "title": "관리자 로그인",
+    "description": "관리자 계정으로 로그인하여 관리자 페이지를 이용하세요.",
+    "email": {
+      "label": "이메일",
+      "placeholder": "이메일을 입력하세요"
+    },
+    "password": {
+      "label": "비밀번호",
+      "placeholder": "비밀번호를 입력하세요",
+      "show": "비밀번호 표시하기",
+      "hide": "비밀번호 숨기기"
+    },
+    "validation": {
+      "emailRequired": "이메일을 입력해 주세요.",
+      "emailInvalid": "올바른 이메일 형식을 입력해 주세요.",
+      "passwordRequired": "비밀번호를 입력해 주세요."
+    },
+    "error": {
+      "invalidCredentials": "로그인에 실패했습니다. 이메일과 비밀번호를 확인해 주세요.",
+      "unexpected": "로그인에 실패했습니다. 잠시 후 다시 시도해 주세요."
+    }
+  },
+  "pagination": {
+    "label": "페이지네이션",
+    "first": "첫 페이지",
+    "previous": "이전 페이지",
+    "page": "{{page}}페이지",
+    "next": "다음 페이지",
+    "last": "마지막 페이지"
+  },
+  "dateRange": {
+    "select": "날짜 범위 선택",
+    "allPeriod": "전체 기간"
   },
   "language": {
     "selectorLabel": "언어 선택"

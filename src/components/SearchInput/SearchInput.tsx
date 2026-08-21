@@ -8,6 +8,7 @@ import {
   type InputHTMLAttributes,
   type KeyboardEvent,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/Button/Button';
 import { cn } from '@/lib/utils';
@@ -55,7 +56,7 @@ export interface SearchInputProps
 export const SearchInput = ({
   value,
   defaultValue,
-  placeholder = '검색',
+  placeholder,
   disabled = false,
   onChange,
   onSearch,
@@ -69,9 +70,11 @@ export const SearchInput = ({
   'aria-labelledby': ariaLabelledBy,
   ...rest
 }: SearchInputProps) => {
+  const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
+  const resolvedPlaceholder = placeholder ?? t('common.search');
   const resolvedAriaLabel =
-    ariaLabel ?? (ariaLabelledBy ? undefined : placeholder || '검색');
+    ariaLabel ?? (ariaLabelledBy ? undefined : resolvedPlaceholder);
 
   const handleSearch = (searchValue?: string) => {
     if (disabled) {
@@ -111,7 +114,7 @@ export const SearchInput = ({
             'flex size-5 shrink-0 items-center justify-center text-gray-400',
             disabled && 'cursor-not-allowed text-gray-300'
           )}
-          aria-label="검색"
+          aria-label={t('common.search')}
         >
           <Search className="size-5" aria-hidden />
         </button>
@@ -133,7 +136,7 @@ export const SearchInput = ({
         type="search"
         value={value}
         defaultValue={defaultValue}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         disabled={disabled}
         autoComplete={autoComplete ?? 'off'}
         aria-label={resolvedAriaLabel}
@@ -158,7 +161,7 @@ export const SearchInput = ({
           className="h-9 shrink-0 px-5 py-1.5"
           onClick={() => handleSearch()}
         >
-          검색
+          {t('common.search')}
         </Button>
       </div>
     );

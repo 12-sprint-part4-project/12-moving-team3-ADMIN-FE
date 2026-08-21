@@ -1,7 +1,16 @@
-import type { Preview } from '@storybook/nextjs-vite';
+import { I18nProvider } from '../src/providers/I18nProvider';
 import '../src/app/globals.css';
 
+import type { Preview } from '@storybook/nextjs-vite';
+
 const preview: Preview = {
+  decorators: [
+    (Story) => (
+      <I18nProvider>
+        <Story />
+      </I18nProvider>
+    ),
+  ],
   parameters: {
     controls: {
       matchers: {
