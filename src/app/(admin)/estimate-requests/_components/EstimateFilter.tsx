@@ -1,6 +1,7 @@
 import { DateRangePopover } from '@/components/DateRangePopover/DateRangePopover';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
+import { SearchResetButton } from '@/components/SearchResetButton/SearchResetButton';
 
 import type { ComponentProps } from 'react';
 
@@ -20,6 +21,7 @@ interface EstimateFilterProps {
   onSearch: ComponentProps<typeof SearchInput>['onSearch'];
   onStatusChange: ComponentProps<typeof FilterSelect>['onChange'];
   onDateRangeConfirm: ComponentProps<typeof DateRangePopover>['onConfirm'];
+  onReset: () => void;
 }
 
 /** 검색·상태·제출일 필터 UI만 담당하는 표현 컴포넌트. */
@@ -31,6 +33,7 @@ export const EstimateFilter = ({
   onSearch,
   onStatusChange,
   onDateRangeConfirm,
+  onReset,
 }: EstimateFilterProps) => (
   <section
     className="mt-4 flex flex-wrap items-center gap-2"
@@ -56,5 +59,6 @@ export const EstimateFilter = ({
       placeholder="기간 전체"
       onConfirm={onDateRangeConfirm}
     />
+    <SearchResetButton onClick={onReset} />
   </section>
 );

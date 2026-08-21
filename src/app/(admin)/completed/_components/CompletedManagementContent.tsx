@@ -82,6 +82,7 @@ export const CompletedManagementContent = () => {
         onSearch={handleSearch}
         onMoveTypeChange={handleMoveTypeChange}
         onDateRangeConfirm={handleDateRangeConfirm}
+        onReset={handleResetFilters}
       />
       <CompletedTable
         items={listData?.data ?? []}

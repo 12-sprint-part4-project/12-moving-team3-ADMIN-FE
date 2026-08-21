@@ -82,6 +82,7 @@ export const EstimateManagementContent = () => {
         onSearch={handleSearch}
         onStatusChange={handleStatusChange}
         onDateRangeConfirm={handleDateRangeConfirm}
+        onReset={handleResetFilters}
       />
       <EstimateTable
         items={listData?.data ?? []}
