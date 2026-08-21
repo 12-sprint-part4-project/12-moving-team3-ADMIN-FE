@@ -5,12 +5,14 @@
     "search": "검색",
     "confirm": "확인",
     "cancel": "취소",
-    "loading": "불러오는 중..."
+    "loading": "불러오는 중...",
+    "noData": "데이터가 없습니다."
   },
   "auth": {
     "brand": "무빙",
     "title": "관리자 로그인",
     "description": "관리자 계정으로 로그인하여 관리자 페이지를 이용하세요.",
+    "checking": "인증 확인 중...",
     "email": {
       "label": "이메일",
       "placeholder": "이메일을 입력하세요"

@@ -5,12 +5,14 @@
     "search": "搜索",
     "confirm": "确认",
     "cancel": "取消",
-    "loading": "加载中..."
+    "loading": "加载中...",
+    "noData": "暂无数据。"
   },
   "auth": {
     "brand": "Moving",
     "title": "管理员登录",
     "description": "请使用管理员账号登录以访问管理后台。",
+    "checking": "正在验证身份...",
     "email": {
       "label": "邮箱",
       "placeholder": "请输入邮箱"

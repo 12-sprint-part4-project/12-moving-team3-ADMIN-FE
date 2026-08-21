@@ -1,3 +1,7 @@
+'use client';
+
+import { useTranslation } from 'react-i18next';
+
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { cn } from '@/lib/utils';
 
@@ -6,8 +10,6 @@ import type { ReactNode } from 'react';
 type CellAlign = 'left' | 'center' | 'right';
 
 type AriaSort = 'ascending' | 'descending' | 'none';
-
-const DEFAULT_EMPTY_MESSAGE = '데이터가 없습니다.';
 
 /**
  * 한 열의 표시 규칙.
@@ -107,11 +109,13 @@ export const DataTable = <T,>({
   data,
   rowKey,
   loading = false,
-  emptyMessage = DEFAULT_EMPTY_MESSAGE,
+  emptyMessage,
   caption,
   className,
 }: DataTableProps<T>) => {
+  const { t } = useTranslation();
   const columnCount = columns.length;
+  const resolvedEmptyMessage = emptyMessage ?? t('common.noData');
 
   return (
     <div className={cn('w-full overflow-x-auto', className)}>
@@ -149,7 +153,7 @@ export const DataTable = <T,>({
                 colSpan={columnCount}
                 className="px-4 py-10 text-center text-md-medium text-gray-500"
               >
-                {emptyMessage}
+                {resolvedEmptyMessage}
               </td>
             </tr>
           ) : (

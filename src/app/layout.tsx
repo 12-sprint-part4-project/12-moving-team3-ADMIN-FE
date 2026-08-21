@@ -16,8 +16,8 @@ const pretendard = localFont({
 });
 
 export const metadata: Metadata = {
-  title: '무빙 관리자',
-  description: '무빙 서비스 관리자 페이지',
+  title: 'Moving Admin',
+  description: 'Moving service administration portal',
 };
 
 export default function RootLayout({

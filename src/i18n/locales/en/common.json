@@ -5,12 +5,14 @@
     "search": "Search",
     "confirm": "Confirm",
     "cancel": "Cancel",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "noData": "No data available."
   },
   "auth": {
     "brand": "Moving",
     "title": "Admin Login",
     "description": "Log in with your admin account to access the admin portal.",
+    "checking": "Checking authentication...",
     "email": {
       "label": "Email",
       "placeholder": "Enter your email"
