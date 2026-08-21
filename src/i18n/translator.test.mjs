@@ -18,6 +18,24 @@ test('선택 언어의 번역을 반환한다', () => {
   assert.equal(createTranslator('zh-CN')('common.language'), '语言');
 });
 
+test('로그인·헤더·사이드바 기능별 리소스를 번역한다', () => {
+  const en = createTranslator('en');
+  const zhCN = createTranslator('zh-CN');
+
+  assert.equal(en('auth.adminLogin'), 'Admin Login');
+  assert.equal(en('header.logout'), 'Log out');
+  assert.equal(en('sidebar.members'), 'Member Management');
+  assert.equal(zhCN('auth.adminLogin'), '管理员登录');
+  assert.equal(zhCN('header.logout'), '退出登录');
+  assert.equal(zhCN('sidebar.members'), '会员管理');
+});
+
+test('관리자 이름을 번역하지 않고 헤더 문구에 삽입한다', () => {
+  const t = createTranslator('en');
+
+  assert.equal(t('header.userMenu', { name: '관리자 Kim' }), '관리자 Kim menu');
+});
+
 test('번역이 없으면 한국어 리소스와 번역 키 순서로 fallback한다', () => {
   const resources = {
     ko: { common: { greeting: '안녕하세요' } },

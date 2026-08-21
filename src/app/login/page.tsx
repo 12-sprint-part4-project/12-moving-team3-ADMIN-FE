@@ -12,24 +12,38 @@ import { AdminHeader } from '@/components/AdminHeader/AdminHeader';
 import { Button } from '@/components/Button/Button';
 import { Input } from '@/components/Input/Input';
 import { useAdminLogin } from '@/hooks/useAdminLogin';
+import { useI18n } from '@/i18n/I18nProvider';
+
+import type { TranslationKey } from '@/i18n/translator';
 
 const adminLoginFormSchema = z.object({
   email: z
     .string()
     .trim()
-    .min(1, '이메일을 입력해 주세요.')
-    .email('올바른 이메일 형식을 입력해 주세요.'),
-  password: z.string().min(1, '비밀번호를 입력해 주세요.'),
+    .min(1, 'auth.emailRequired')
+    .email('auth.emailInvalid'),
+  password: z.string().min(1, 'auth.passwordRequired'),
 });
 
 type AdminLoginFormValues = z.infer<typeof adminLoginFormSchema>;
 
-const DEFAULT_LOGIN_ERROR_MESSAGE =
-  '로그인에 실패했습니다. 이메일과 비밀번호를 확인해 주세요.';
+const DEFAULT_LOGIN_ERROR_MESSAGE = 'auth.loginFailed';
+const UNEXPECTED_LOGIN_ERROR_MESSAGE = 'auth.unexpectedError';
+
+const LOGIN_TRANSLATION_KEYS = new Set<TranslationKey>([
+  'auth.emailRequired',
+  'auth.emailInvalid',
+  'auth.passwordRequired',
+  DEFAULT_LOGIN_ERROR_MESSAGE,
+  UNEXPECTED_LOGIN_ERROR_MESSAGE,
+]);
+
+const isLoginTranslationKey = (message: string): message is TranslationKey =>
+  LOGIN_TRANSLATION_KEYS.has(message as TranslationKey);
 
 const getLoginErrorMessage = (error: unknown): string => {
   if (!axios.isAxiosError(error)) {
-    return '로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+    return UNEXPECTED_LOGIN_ERROR_MESSAGE;
   }
 
   const responseData = error.response?.data;
@@ -51,6 +65,7 @@ const getLoginErrorMessage = (error: unknown): string => {
 
 const LoginPage = () => {
   const router = useRouter();
+  const { t } = useI18n();
   // 비로그인 /login 진입 시 /me·/refresh를 호출하지 않는다.
   // 관리자 영역 새로고침 복구는 AdminAuthGuard + axios interceptor가 담당한다.
   const loginMutation = useAdminLogin();
@@ -71,6 +86,10 @@ const LoginPage = () => {
   });
 
   const isLoginPending = isSubmitting || loginMutation.isPending;
+  const getLocalizedErrorMessage = (message?: string) => {
+    if (!message) return undefined;
+    return isLoginTranslationKey(message) ? t(message) : message;
+  };
 
   const onSubmit = handleSubmit(async (values) => {
     clearErrors('root');
@@ -100,10 +119,12 @@ const LoginPage = () => {
           className="flex w-full max-w-md flex-col gap-8"
         >
           <div className="flex flex-col items-center gap-2 text-center">
-            <p className="text-3xl-bold text-blue-300">무빙</p>
-            <h1 className="text-2xl-bold text-black-400">관리자 로그인</h1>
+            <p className="text-3xl-bold text-blue-300">{t('common.brand')}</p>
+            <h1 className="text-2xl-bold text-black-400">
+              {t('auth.adminLogin')}
+            </h1>
             <p className="text-md-medium text-gray-500">
-              관리자 계정으로 로그인하여 관리자 페이지를 이용하세요.
+              {t('auth.description')}
             </p>
           </div>
 
@@ -114,12 +135,12 @@ const LoginPage = () => {
               render={({ field }) => (
                 <Input
                   {...field}
-                  label="이메일"
+                  label={t('auth.email')}
                   type="email"
-                  placeholder="이메일을 입력하세요"
+                  placeholder={t('auth.emailPlaceholder')}
                   autoComplete="email"
                   disabled={isLoginPending}
-                  errorMessage={errors.email?.message}
+                  errorMessage={getLocalizedErrorMessage(errors.email?.message)}
                   leftIcon={<User className="size-5" aria-hidden />}
                 />
               )}
@@ -130,12 +151,14 @@ const LoginPage = () => {
               render={({ field }) => (
                 <Input
                   {...field}
-                  label="비밀번호"
+                  label={t('auth.password')}
                   type={isPasswordVisible ? 'text' : 'password'}
-                  placeholder="비밀번호를 입력하세요"
+                  placeholder={t('auth.passwordPlaceholder')}
                   autoComplete="current-password"
                   disabled={isLoginPending}
-                  errorMessage={errors.password?.message}
+                  errorMessage={getLocalizedErrorMessage(
+                    errors.password?.message
+                  )}
                   leftIcon={<Lock className="size-5" aria-hidden />}
                   rightIcon={
                     <button
@@ -146,8 +169,8 @@ const LoginPage = () => {
                       className="flex size-5 items-center justify-center text-gray-400 enabled:hover:text-gray-500 disabled:cursor-not-allowed disabled:text-gray-300"
                       aria-label={
                         isPasswordVisible
-                          ? '비밀번호 숨기기'
-                          : '비밀번호 표시하기'
+                          ? t('auth.hidePassword')
+                          : t('auth.showPassword')
                       }
                     >
                       {isPasswordVisible ? (
@@ -164,7 +187,7 @@ const LoginPage = () => {
 
           {errors.root?.message ? (
             <p role="alert" className="text-md-medium text-red-200">
-              {errors.root.message}
+              {getLocalizedErrorMessage(errors.root.message)}
             </p>
           ) : null}
 
@@ -174,13 +197,13 @@ const LoginPage = () => {
             loading={isLoginPending}
             className="w-full"
           >
-            로그인
+            {t('auth.submit')}
           </Button>
         </form>
       </main>
 
       <footer className="px-6 py-6 text-center text-xs-medium text-gray-400">
-        © 2024 Moving. All rights reserved.
+        {t('auth.copyright')}
       </footer>
     </div>
   );

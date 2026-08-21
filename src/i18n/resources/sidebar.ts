@@ -1,0 +1,43 @@
+import type { Language } from '../config.ts';
+
+export const SIDEBAR_MESSAGES: Record<Language, Record<string, string>> = {
+  ko: {
+    dashboard: '대시보드',
+    members: '회원 관리',
+    drivers: '기사 관리',
+    estimateRequests: '견적 요청 관리',
+    completed: '완료 건 관리',
+    chats: '채팅 관리',
+    reports: '신고 관리',
+    reviews: '리뷰 관리',
+    expand: '사이드바 펼치기',
+    collapse: '사이드바 접기',
+    navigation: '관리자 메뉴',
+  },
+  en: {
+    dashboard: 'Dashboard',
+    members: 'Member Management',
+    drivers: 'Mover Management',
+    estimateRequests: 'Estimate Request Management',
+    completed: 'Completed Move Management',
+    chats: 'Chat Management',
+    reports: 'Report Management',
+    reviews: 'Review Management',
+    expand: 'Expand sidebar',
+    collapse: 'Collapse sidebar',
+    navigation: 'Admin navigation',
+  },
+  'zh-CN': {
+    dashboard: '仪表板',
+    members: '会员管理',
+    drivers: '搬家师傅管理',
+    estimateRequests: '报价请求管理',
+    completed: '已完成搬家管理',
+    chats: '聊天管理',
+    reports: '举报管理',
+    reviews: '评价管理',
+    expand: '展开侧边栏',
+    collapse: '收起侧边栏',
+    navigation: '管理员导航',
+  },
+};

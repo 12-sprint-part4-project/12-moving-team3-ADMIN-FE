@@ -5,6 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 
+import { LanguageSelect } from '@/components/LanguageSelect/LanguageSelect';
+import { useI18n } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 
 export interface AdminHeaderProps {
@@ -32,10 +34,10 @@ export interface AdminHeaderProps {
   className?: string;
 }
 
-const DefaultLogo = () => (
+const DefaultLogo = ({ alt }: { alt: string }) => (
   <Image
     src="/logo.svg"
-    alt="무빙"
+    alt={alt}
     width={82}
     height={32}
     className="h-8 w-auto"
@@ -44,7 +46,7 @@ const DefaultLogo = () => (
 );
 
 export const AdminHeader = ({
-  title = '관리자 페이지',
+  title,
   logo,
   logoLinkEnabled = true,
   showUserMenu = true,
@@ -55,6 +57,7 @@ export const AdminHeader = ({
   onUserMenuClick,
   className,
 }: AdminHeaderProps) => {
+  const { t } = useI18n();
   const menuId = useId();
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -116,62 +119,75 @@ export const AdminHeader = ({
         {logoLinkEnabled ? (
           <Link
             href="/"
-            aria-label="대시보드로 이동"
+            aria-label={t('header.dashboardLink')}
             className="inline-flex shrink-0 items-center"
           >
-            {logo ?? <DefaultLogo />}
+            {logo ?? <DefaultLogo alt={t('header.brand')} />}
           </Link>
         ) : (
-          (logo ?? <DefaultLogo />)
+          (logo ?? <DefaultLogo alt={t('header.brand')} />)
         )}
         <span className="h-4 w-px bg-line-200" aria-hidden />
-        <h1 className="text-lg-medium text-black-400">{title}</h1>
+        <h1 className="text-lg-medium text-black-400">
+          {title ?? t('header.title')}
+        </h1>
       </div>
 
-      {showUserMenu ? (
-        <div ref={menuRef} className="relative">
-          <button
-            ref={triggerRef}
-            type="button"
-            onClick={handleMenuToggle}
-            aria-expanded={isMenuOpen}
-            aria-controls={isMenuOpen ? menuId : undefined}
-            aria-haspopup="true"
-            aria-label={userName ? `${userName} 메뉴` : '관리자 메뉴'}
-            className="flex items-center gap-2 text-md-medium text-black-300"
-          >
-            <User className="size-5" aria-hidden />
-            {userName ? <span>{userName}</span> : null}
-            <ChevronDown className="size-4" aria-hidden />
-          </button>
-
-          {isMenuOpen ? (
-            <div
-              id={menuId}
-              className="absolute top-full right-0 z-10 mt-2 min-w-52 overflow-hidden rounded-lg border border-line-200 bg-white py-1"
+      <div className="flex items-center gap-3">
+        <LanguageSelect />
+        {showUserMenu ? (
+          <div ref={menuRef} className="relative">
+            <button
+              ref={triggerRef}
+              type="button"
+              onClick={handleMenuToggle}
+              aria-expanded={isMenuOpen}
+              aria-controls={isMenuOpen ? menuId : undefined}
+              aria-haspopup="true"
+              aria-label={
+                userName
+                  ? t('header.userMenu', { name: userName })
+                  : t('header.adminMenu')
+              }
+              className="flex items-center gap-2 text-md-medium text-black-300"
             >
-              {userName || userEmail ? (
-                <div className="border-b border-line-200 px-4 py-3">
-                  {userName ? (
-                    <p className="text-md-medium text-black-300">{userName}</p>
-                  ) : null}
-                  {userEmail ? (
-                    <p className="text-xs-medium text-gray-500">{userEmail}</p>
-                  ) : null}
-                </div>
-              ) : null}
-              <button
-                type="button"
-                onClick={handleLogout}
-                disabled={isLoggingOut || !onLogout}
-                className="flex w-full px-4 py-2.5 text-left text-md-medium text-black-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+              <User className="size-5" aria-hidden />
+              {userName ? <span>{userName}</span> : null}
+              <ChevronDown className="size-4" aria-hidden />
+            </button>
+
+            {isMenuOpen ? (
+              <div
+                id={menuId}
+                className="absolute top-full right-0 z-10 mt-2 min-w-52 overflow-hidden rounded-lg border border-line-200 bg-white py-1"
               >
-                {isLoggingOut ? '로그아웃 중...' : '로그아웃'}
-              </button>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
+                {userName || userEmail ? (
+                  <div className="border-b border-line-200 px-4 py-3">
+                    {userName ? (
+                      <p className="text-md-medium text-black-300">
+                        {userName}
+                      </p>
+                    ) : null}
+                    {userEmail ? (
+                      <p className="text-xs-medium text-gray-500">
+                        {userEmail}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut || !onLogout}
+                  className="flex w-full px-4 py-2.5 text-left text-md-medium text-black-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isLoggingOut ? t('header.loggingOut') : t('header.logout')}
+                </button>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
     </header>
   );
 };
