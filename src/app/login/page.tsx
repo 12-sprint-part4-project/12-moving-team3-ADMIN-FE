@@ -140,6 +140,7 @@ const LoginPage = () => {
                   rightIcon={
                     <button
                       type="button"
+                      tabIndex={-1}
                       onClick={() => setIsPasswordVisible((prev) => !prev)}
                       disabled={isLoginPending}
                       className="flex size-5 items-center justify-center text-gray-400 enabled:hover:text-gray-500 disabled:cursor-not-allowed disabled:text-gray-300"
