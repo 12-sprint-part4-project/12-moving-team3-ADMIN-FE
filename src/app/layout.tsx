@@ -1,5 +1,6 @@
 import localFont from 'next/font/local';
 
+import { I18nProvider } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 import { QueryProvider } from '@/providers/QueryProvider';
 
@@ -26,11 +27,13 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="ko"
       className={cn(pretendard.variable, 'h-full overflow-hidden antialiased')}
     >
       <body className="flex h-full flex-col overflow-hidden">
-        <QueryProvider>{children}</QueryProvider>
+        <I18nProvider>
+          <QueryProvider>{children}</QueryProvider>
+        </I18nProvider>
       </body>
     </html>
   );
