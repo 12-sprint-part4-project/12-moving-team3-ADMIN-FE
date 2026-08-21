@@ -43,6 +43,86 @@
     "select": "날짜 범위 선택",
     "allPeriod": "전체 기간"
   },
+  "dashboard": {
+    "title": "대시보드",
+    "description": "관리자님, 오늘도 무빙과 함께하세요.",
+    "units": { "people": "명", "items": "건", "count": "{{count}}건" },
+    "kpi": {
+      "title": "핵심 지표",
+      "users": "유저 수",
+      "estimateRequests": "견적 요청 수",
+      "quotes": "견적 수",
+      "completed": "완료 건수",
+      "pendingReports": "미처리 신고 수"
+    },
+    "period": { "day": "오늘", "week": "최근 7일", "month": "최근 30일" },
+    "trend": {
+      "title": "견적 요청 추이",
+      "periodLabel": "추이 집계 단위",
+      "series": "견적 요청",
+      "accessibleLabel": "날짜별 견적 요청 건수",
+      "count": "{{label}}: {{count}}건"
+    },
+    "status": {
+      "title": "견적 요청 상태 현황",
+      "period": "(최근 30일 기준)",
+      "description": "※ 최근 30일 동안 제출된 견적 요청을 기준으로 집계합니다."
+    },
+    "requestStatus": {
+      "submitted": "요청",
+      "confirmed": "매칭 완료",
+      "completed": "이사 완료",
+      "expired": "만료",
+      "canceled": "취소",
+      "total": "총 요청"
+    },
+    "error": {
+      "kpi": "핵심 지표를 불러오지 못했습니다.",
+      "trend": "견적 요청 추이를 불러오지 못했습니다.",
+      "status": "견적 요청 상태를 불러오지 못했습니다.",
+      "recent": "최근 활동을 불러오지 못했습니다.",
+      "retry": "잠시 후 다시 시도해 주세요."
+    },
+    "recent": {
+      "viewAll": "전체보기",
+      "period": "(최근 7일)",
+      "reports": "최근 신고 건",
+      "members": "최근 가입 회원",
+      "completed": "최근 완료 건",
+      "emptyReports": "최근 신고가 없습니다.",
+      "emptyMembers": "최근 가입 회원이 없습니다.",
+      "emptyCompleted": "최근 완료 건이 없습니다."
+    },
+    "columns": {
+      "reportedAt": "신고일",
+      "reportTarget": "신고 대상",
+      "reportReason": "신고 사유",
+      "status": "상태",
+      "nickname": "닉네임",
+      "email": "이메일",
+      "joinedAt": "가입일",
+      "requestId": "요청 번호",
+      "customerName": "고객명",
+      "moveDate": "이사일",
+      "driverName": "기사명"
+    },
+    "reportTarget": {
+      "USER": "회원",
+      "REVIEW": "리뷰",
+      "MESSAGE": "메시지",
+      "ARTICLE": "게시글",
+      "COMMENT": "댓글"
+    },
+    "reportCategory": {
+      "INAPPROPRIATE_PROFILE": "부적절한 프로필",
+      "ABUSIVE_LANGUAGE": "욕설/비방"
+    },
+    "reportStatus": {
+      "PENDING": "대기",
+      "RESOLVED": "처리 완료",
+      "REJECTED": "반려"
+    }
+  },
   "language": {
     "selectorLabel": "언어 선택"
   },

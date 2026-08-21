@@ -43,6 +43,94 @@
     "select": "Select date range",
     "allPeriod": "All dates"
   },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Welcome back. Manage Moving with confidence today.",
+    "units": {
+      "people": "users",
+      "items": "items",
+      "count": "{{count}} items"
+    },
+    "kpi": {
+      "title": "Key Metrics",
+      "users": "Users",
+      "estimateRequests": "Estimate Requests",
+      "quotes": "Quotes",
+      "completed": "Completed Moves",
+      "pendingReports": "Pending Reports"
+    },
+    "period": {
+      "day": "Today",
+      "week": "Last 7 days",
+      "month": "Last 30 days"
+    },
+    "trend": {
+      "title": "Estimate Request Trend",
+      "periodLabel": "Trend period",
+      "series": "Estimate Requests",
+      "accessibleLabel": "Estimate requests by date",
+      "count": "{{label}}: {{count}} requests"
+    },
+    "status": {
+      "title": "Estimate Request Status",
+      "period": "(Last 30 days)",
+      "description": "Based on estimate requests submitted in the last 30 days."
+    },
+    "requestStatus": {
+      "submitted": "Submitted",
+      "confirmed": "Matched",
+      "completed": "Move Completed",
+      "expired": "Expired",
+      "canceled": "Canceled",
+      "total": "Total Requests"
+    },
+    "error": {
+      "kpi": "Failed to load key metrics.",
+      "trend": "Failed to load the estimate request trend.",
+      "status": "Failed to load estimate request statuses.",
+      "recent": "Failed to load recent activity.",
+      "retry": "Please try again later."
+    },
+    "recent": {
+      "viewAll": "View all",
+      "period": "(Last 7 days)",
+      "reports": "Recent Reports",
+      "members": "New Members",
+      "completed": "Recent Completions",
+      "emptyReports": "There are no recent reports.",
+      "emptyMembers": "There are no new members.",
+      "emptyCompleted": "There are no recent completions."
+    },
+    "columns": {
+      "reportedAt": "Reported At",
+      "reportTarget": "Target",
+      "reportReason": "Reason",
+      "status": "Status",
+      "nickname": "Nickname",
+      "email": "Email",
+      "joinedAt": "Joined At",
+      "requestId": "Request ID",
+      "customerName": "Customer",
+      "moveDate": "Move Date",
+      "driverName": "Mover"
+    },
+    "reportTarget": {
+      "USER": "Member",
+      "REVIEW": "Review",
+      "MESSAGE": "Message",
+      "ARTICLE": "Post",
+      "COMMENT": "Comment"
+    },
+    "reportCategory": {
+      "INAPPROPRIATE_PROFILE": "Inappropriate Profile",
+      "ABUSIVE_LANGUAGE": "Abusive Language"
+    },
+    "reportStatus": {
+      "PENDING": "Pending",
+      "RESOLVED": "Resolved",
+      "REJECTED": "Rejected"
+    }
+  },
   "language": {
     "selectorLabel": "Select language"
   },

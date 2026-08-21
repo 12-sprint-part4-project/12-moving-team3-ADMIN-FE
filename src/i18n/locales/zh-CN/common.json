@@ -43,6 +43,86 @@
     "select": "选择日期范围",
     "allPeriod": "全部日期"
   },
+  "dashboard": {
+    "title": "仪表盘",
+    "description": "管理员，今天也请与 Moving 一起高效管理。",
+    "units": { "people": "人", "items": "项", "count": "{{count}}项" },
+    "kpi": {
+      "title": "核心指标",
+      "users": "用户数",
+      "estimateRequests": "报价请求数",
+      "quotes": "报价数",
+      "completed": "已完成订单",
+      "pendingReports": "待处理举报"
+    },
+    "period": { "day": "今天", "week": "最近7天", "month": "最近30天" },
+    "trend": {
+      "title": "报价请求趋势",
+      "periodLabel": "趋势统计周期",
+      "series": "报价请求",
+      "accessibleLabel": "按日期统计的报价请求数",
+      "count": "{{label}}：{{count}}项"
+    },
+    "status": {
+      "title": "报价请求状态",
+      "period": "（最近30天）",
+      "description": "以最近30天内提交的报价请求为基准统计。"
+    },
+    "requestStatus": {
+      "submitted": "已提交",
+      "confirmed": "已匹配",
+      "completed": "搬家完成",
+      "expired": "已过期",
+      "canceled": "已取消",
+      "total": "请求总数"
+    },
+    "error": {
+      "kpi": "无法加载核心指标。",
+      "trend": "无法加载报价请求趋势。",
+      "status": "无法加载报价请求状态。",
+      "recent": "无法加载最近活动。",
+      "retry": "请稍后重试。"
+    },
+    "recent": {
+      "viewAll": "查看全部",
+      "period": "（最近7天）",
+      "reports": "最近举报",
+      "members": "最近注册会员",
+      "completed": "最近完成订单",
+      "emptyReports": "暂无最近举报。",
+      "emptyMembers": "暂无最近注册会员。",
+      "emptyCompleted": "暂无最近完成订单。"
+    },
+    "columns": {
+      "reportedAt": "举报日期",
+      "reportTarget": "举报对象",
+      "reportReason": "举报原因",
+      "status": "状态",
+      "nickname": "昵称",
+      "email": "邮箱",
+      "joinedAt": "注册日期",
+      "requestId": "请求编号",
+      "customerName": "客户姓名",
+      "moveDate": "搬家日期",
+      "driverName": "搬家师傅"
+    },
+    "reportTarget": {
+      "USER": "会员",
+      "REVIEW": "评价",
+      "MESSAGE": "消息",
+      "ARTICLE": "帖子",
+      "COMMENT": "评论"
+    },
+    "reportCategory": {
+      "INAPPROPRIATE_PROFILE": "不当个人资料",
+      "ABUSIVE_LANGUAGE": "辱骂或诽谤"
+    },
+    "reportStatus": {
+      "PENDING": "待处理",
+      "RESOLVED": "已处理",
+      "REJECTED": "已驳回"
+    }
+  },
   "language": {
     "selectorLabel": "选择语言"
   },
