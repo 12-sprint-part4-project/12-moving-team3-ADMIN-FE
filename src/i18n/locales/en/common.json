@@ -390,6 +390,68 @@
       "emptyDescription": "The selected completed move could not be found."
     }
   },
+  "reviews": {
+    "title": "Review Management",
+    "description": "View reviews and their author and mover information.",
+    "common": { "retry": "Please try again later." },
+    "unit": { "items": "reviews", "points": "points" },
+    "status": { "active": "Active", "deleted": "Deleted" },
+    "filter": {
+      "searchPlaceholder": "Search content, authors, or movers",
+      "searchLabel": "Search reviews",
+      "allRatings": "All ratings",
+      "ratingOption": "{{rating}} stars",
+      "allStatuses": "All",
+      "deletionStatus": "Deletion status",
+      "allCreatedDates": "All creation dates"
+    },
+    "fields": {
+      "reviewId": "Review ID",
+      "quoteId": "Quote ID",
+      "author": "Author",
+      "authorEmail": "Author Email",
+      "mover": "Mover",
+      "moverEmail": "Mover Email",
+      "rating": "Rating",
+      "content": "Review",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "deletedAt": "Deleted At",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "statistics": {
+      "label": "Review statistics",
+      "total": "Total Reviews",
+      "averageRating": "Average Rating",
+      "deleted": "Deleted Reviews",
+      "excludesDeleted": "Deleted reviews are not included.",
+      "description": "Based on creation date; only the date range filter applies.",
+      "error": "Failed to load review statistics."
+    },
+    "list": {
+      "label": "Review list",
+      "error": "Failed to load reviews.",
+      "noResults": "No search results found.",
+      "empty": "There are no reviews.",
+      "changeFilters": "Change the filters and try again.",
+      "resetFilters": "Reset filters"
+    },
+    "detail": {
+      "title": "Review Details",
+      "reviewInfo": "Review Information",
+      "peopleInfo": "Author and Mover Information",
+      "originalContent": "Original Review"
+    },
+    "delete": {
+      "action": "Delete Review",
+      "title": "Delete this review?",
+      "description": "Deleted reviews will be excluded from the list.",
+      "confirm": "Delete"
+    },
+    "viewDetail": "View details",
+    "viewDetailLabel": "View details for review {{id}}"
+  },
   "language": {
     "selectorLabel": "Select language"
   },

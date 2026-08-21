@@ -378,6 +378,68 @@
       "emptyDescription": "선택한 완료 건을 찾을 수 없습니다."
     }
   },
+  "reviews": {
+    "title": "리뷰 관리",
+    "description": "리뷰 목록을 확인하고 작성자·기사 정보를 조회할 수 있습니다.",
+    "common": { "retry": "잠시 후 다시 시도해 주세요." },
+    "unit": { "items": "건", "points": "점" },
+    "status": { "active": "활성", "deleted": "삭제됨" },
+    "filter": {
+      "searchPlaceholder": "내용, 작성자, 기사 검색",
+      "searchLabel": "리뷰 검색",
+      "allRatings": "전체 별점",
+      "ratingOption": "{{rating}}점",
+      "allStatuses": "전체",
+      "deletionStatus": "삭제 상태",
+      "allCreatedDates": "작성일 전체"
+    },
+    "fields": {
+      "reviewId": "리뷰 ID",
+      "quoteId": "견적 ID",
+      "author": "작성자",
+      "authorEmail": "작성자 이메일",
+      "mover": "기사",
+      "moverEmail": "기사 이메일",
+      "rating": "별점",
+      "content": "리뷰 내용",
+      "createdAt": "작성일",
+      "updatedAt": "수정일",
+      "deletedAt": "삭제일",
+      "status": "상태",
+      "actions": "관리"
+    },
+    "statistics": {
+      "label": "리뷰 통계",
+      "total": "전체 리뷰",
+      "averageRating": "평균 평점",
+      "deleted": "삭제된 리뷰",
+      "excludesDeleted": "삭제된 리뷰는 포함되지 않습니다.",
+      "description": "※ 작성일 기준으로 집계되며, 기간 필터만 적용됩니다.",
+      "error": "리뷰 통계를 불러오지 못했습니다."
+    },
+    "list": {
+      "label": "리뷰 목록",
+      "error": "리뷰 목록을 불러오지 못했습니다.",
+      "noResults": "검색 결과가 없습니다.",
+      "empty": "등록된 리뷰가 없습니다.",
+      "changeFilters": "검색 조건을 변경한 후 다시 시도해 주세요.",
+      "resetFilters": "필터 초기화"
+    },
+    "detail": {
+      "title": "리뷰 상세",
+      "reviewInfo": "리뷰 정보",
+      "peopleInfo": "작성자·기사 정보",
+      "originalContent": "리뷰 원문"
+    },
+    "delete": {
+      "action": "리뷰 삭제",
+      "title": "리뷰를 삭제하시겠습니까?",
+      "description": "삭제된 리뷰는 목록에서 제외됩니다.",
+      "confirm": "삭제"
+    },
+    "viewDetail": "상세 보기",
+    "viewDetailLabel": "리뷰 {{id}} 상세 보기"
+  },
   "language": {
     "selectorLabel": "언어 선택"
   },

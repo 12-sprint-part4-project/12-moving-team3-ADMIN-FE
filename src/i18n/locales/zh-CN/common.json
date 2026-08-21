@@ -378,6 +378,68 @@
       "emptyDescription": "找不到所选已完成订单。"
     }
   },
+  "reviews": {
+    "title": "评价管理",
+    "description": "查看评价列表以及发布者和搬家师傅信息。",
+    "common": { "retry": "请稍后重试。" },
+    "unit": { "items": "条", "points": "分" },
+    "status": { "active": "有效", "deleted": "已删除" },
+    "filter": {
+      "searchPlaceholder": "搜索内容、发布者或搬家师傅",
+      "searchLabel": "搜索评价",
+      "allRatings": "全部评分",
+      "ratingOption": "{{rating}}分",
+      "allStatuses": "全部",
+      "deletionStatus": "删除状态",
+      "allCreatedDates": "全部创建日期"
+    },
+    "fields": {
+      "reviewId": "评价 ID",
+      "quoteId": "报价 ID",
+      "author": "发布者",
+      "authorEmail": "发布者邮箱",
+      "mover": "搬家师傅",
+      "moverEmail": "搬家师傅邮箱",
+      "rating": "评分",
+      "content": "评价内容",
+      "createdAt": "创建日期",
+      "updatedAt": "修改日期",
+      "deletedAt": "删除日期",
+      "status": "状态",
+      "actions": "操作"
+    },
+    "statistics": {
+      "label": "评价统计",
+      "total": "评价总数",
+      "averageRating": "平均评分",
+      "deleted": "已删除评价",
+      "excludesDeleted": "不包括已删除的评价。",
+      "description": "按创建日期统计，仅应用日期范围筛选。",
+      "error": "无法加载评价统计。"
+    },
+    "list": {
+      "label": "评价列表",
+      "error": "无法加载评价列表。",
+      "noResults": "没有搜索结果。",
+      "empty": "暂无评价。",
+      "changeFilters": "请修改筛选条件后重试。",
+      "resetFilters": "重置筛选"
+    },
+    "detail": {
+      "title": "评价详情",
+      "reviewInfo": "评价信息",
+      "peopleInfo": "发布者和搬家师傅信息",
+      "originalContent": "评价原文"
+    },
+    "delete": {
+      "action": "删除评价",
+      "title": "要删除此评价吗？",
+      "description": "已删除的评价将从列表中排除。",
+      "confirm": "删除"
+    },
+    "viewDetail": "查看详情",
+    "viewDetailLabel": "查看评价 {{id}} 的详情"
+  },
   "language": {
     "selectorLabel": "选择语言"
   },
