@@ -1,10 +1,10 @@
+import { useTranslation } from 'react-i18next';
+
 import {
   DetailField,
   formatRegion,
   formatServices,
-  REGION_LABEL,
 } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
-
 
 import { DetailMultilineField } from './DetailMultilineField';
 import { formatCareer, formatNullableText } from './helpers';
@@ -15,17 +15,19 @@ import type {
   AdminReportDetailReportedMoverProfileContent,
   AdminReportDetailMoverServiceRegion,
 } from '@/types/adminReport';
+import type { TFunction } from 'i18next';
 
 /** 서비스 지역 배열 → 한글 라벨 콤마 구분 */
 const formatServiceRegions = (
-  serviceRegions: AdminReportDetailMoverServiceRegion[]
+  serviceRegions: AdminReportDetailMoverServiceRegion[],
+  t: TFunction
 ) => {
   if (serviceRegions.length === 0) {
     return '-';
   }
 
   return serviceRegions
-    .map(({ region }) => REGION_LABEL[region] ?? region)
+    .map(({ region }) => t(`members.region.${region}`))
     .join(', ');
 };
 
@@ -48,37 +50,61 @@ interface ReportReportedUserProfileContentProps {
 
 const MoverReportedProfileFields = ({
   content,
-}: MoverReportedProfileFieldsProps) => (
-  <>
-    <DetailField label="이름" value={content.name} />
-    <DetailField label="닉네임" value={content.nickname} />
-    <DetailMultilineField
-      label="한 줄 소개"
-      value={formatNullableText(content.shortDescription)}
-    />
-    <DetailMultilineField
-      label="상세 소개"
-      value={formatNullableText(content.description)}
-    />
-    <DetailField label="경력" value={formatCareer(content.career)} />
-    <DetailField label="제공 서비스" value={formatServices(content.service)} />
-    <DetailField
-      label="서비스 지역"
-      value={formatServiceRegions(content.serviceRegions)}
-    />
-  </>
-);
+}: MoverReportedProfileFieldsProps) => {
+  const { t } = useTranslation();
+  return (
+    <>
+      <DetailField label={t('reports.fields.name')} value={content.name} />
+      <DetailField
+        label={t('reports.fields.nickname')}
+        value={content.nickname}
+      />
+      <DetailMultilineField
+        label={t('members.fields.shortDescription')}
+        value={formatNullableText(content.shortDescription)}
+      />
+      <DetailMultilineField
+        label={t('members.fields.description')}
+        value={formatNullableText(content.description)}
+      />
+      <DetailField
+        label={t('members.fields.career')}
+        value={formatCareer(content.career, t)}
+      />
+      <DetailField
+        label={t('members.fields.serviceTypes')}
+        value={formatServices(content.service, t)}
+      />
+      <DetailField
+        label={t('members.fields.serviceRegions')}
+        value={formatServiceRegions(content.serviceRegions, t)}
+      />
+    </>
+  );
+};
 
 const CustomerReportedProfileFields = ({
   content,
-}: CustomerReportedProfileFieldsProps) => (
-  <>
-    <DetailField label="이름" value={content.name} />
-    <DetailField label="닉네임" value={content.nickname} />
-    <DetailField label="이용 서비스" value={formatServices(content.service)} />
-    <DetailField label="지역" value={formatRegion(content.region)} />
-  </>
-);
+}: CustomerReportedProfileFieldsProps) => {
+  const { t } = useTranslation();
+  return (
+    <>
+      <DetailField label={t('reports.fields.name')} value={content.name} />
+      <DetailField
+        label={t('reports.fields.nickname')}
+        value={content.nickname}
+      />
+      <DetailField
+        label={t('members.fields.services')}
+        value={formatServices(content.service, t)}
+      />
+      <DetailField
+        label={t('members.fields.region')}
+        value={formatRegion(content.region, t)}
+      />
+    </>
+  );
+};
 
 /**
  * USER 신고 reportedContent 프로필.

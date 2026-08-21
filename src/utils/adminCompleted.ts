@@ -2,11 +2,14 @@ import { format } from 'date-fns';
 
 import { formatAdminEstimateQuotePrice } from '@/utils/adminEstimateRequest';
 
+import { formatLocalizedDate } from './formatLocalizedDate.ts';
+
 import type {
   AdminCompletedDetailMissingField,
   AdminCompletedListMissingField,
   AdminCompletedStatisticsQuery,
 } from '@/types/adminCompleted';
+import type { TFunction } from 'i18next';
 
 const MISSING_FIELD_LABEL: Record<AdminCompletedDetailMissingField, string> = {
   moveType: '이사 유형',
@@ -30,16 +33,22 @@ export const toAdminCompletedApiDate = (date: Date) =>
   format(date, 'yyyy-MM-dd');
 
 /** 이사일 표시용 YYYY-MM-DD. null이면 '-' */
-export const formatAdminCompletedMoveDate = (moveDate: string | null) => {
+export const formatAdminCompletedMoveDate = (
+  moveDate: string | null,
+  locale: string
+) => {
   if (moveDate == null) {
     return '-';
   }
 
-  return moveDate.split('T')[0] ?? moveDate;
+  return formatLocalizedDate(moveDate, locale);
 };
 
-export const formatAdminCompletedPrice = (price: number | null) =>
-  formatAdminEstimateQuotePrice(price);
+export const formatAdminCompletedPrice = (
+  price: number | null,
+  t?: TFunction,
+  locale?: string
+) => formatAdminEstimateQuotePrice(price, t, locale);
 
 export const hasAdminCompletedMissingFields = (
   missingFields: readonly string[]
@@ -52,11 +61,14 @@ export const hasAdminCompletedMissingFields = (
 export const formatAdminCompletedMissingFields = (
   missingFields: readonly (
     AdminCompletedListMissingField | AdminCompletedDetailMissingField | string
-  )[]
+  )[],
+  t?: TFunction
 ) =>
   missingFields.map((field) => {
     if (Object.hasOwn(MISSING_FIELD_LABEL, field)) {
-      return MISSING_FIELD_LABEL[field as AdminCompletedDetailMissingField];
+      return t
+        ? t(`completed.fields.${field.replaceAll('.', '_')}`)
+        : MISSING_FIELD_LABEL[field as AdminCompletedDetailMissingField];
     }
 
     return field;

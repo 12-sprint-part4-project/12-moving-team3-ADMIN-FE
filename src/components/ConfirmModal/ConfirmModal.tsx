@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/Button/Button';
 import { cn } from '@/lib/utils';
@@ -51,8 +52,8 @@ export const ConfirmModal = ({
   open,
   title,
   description,
-  confirmText = '확인',
-  cancelText = '취소',
+  confirmText,
+  cancelText,
   onConfirm,
   onCancel,
   className,
@@ -60,6 +61,7 @@ export const ConfirmModal = ({
   confirmDisabled = false,
   errorMessage,
 }: ConfirmModalProps) => {
+  const { t } = useTranslation();
   const titleId = useId();
   const descriptionId = useId();
   const errorId = useId();
@@ -201,7 +203,7 @@ export const ConfirmModal = ({
             onClick={onCancel}
             disabled={confirmLoading}
           >
-            {cancelText}
+            {cancelText ?? t('common.cancel')}
           </Button>
           <Button
             variant="solid"
@@ -209,7 +211,7 @@ export const ConfirmModal = ({
             loading={confirmLoading}
             disabled={confirmDisabled || confirmLoading}
           >
-            {confirmText}
+            {confirmText ?? t('common.confirm')}
           </Button>
         </div>
       </div>

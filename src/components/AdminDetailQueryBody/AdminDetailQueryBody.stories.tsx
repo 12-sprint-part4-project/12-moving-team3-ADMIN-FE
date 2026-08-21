@@ -46,6 +46,8 @@ const meta: Meta<typeof AdminDetailQueryBody<StoryDetail>> = {
     id: SELECTED_ID,
     notFoundTitle: '정보를 찾을 수 없습니다.',
     errorTitle: '상세를 불러오지 못했습니다.',
+    errorDescription: '잠시 후 다시 시도해 주세요.',
+    retryLabel: '다시 시도',
     emptyTitle: '정보가 없습니다.',
     emptyDescription: '선택한 항목을 찾을 수 없습니다.',
     renderContent,

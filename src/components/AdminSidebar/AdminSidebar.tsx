@@ -1,9 +1,5 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useEffect, useId, useRef, useState, type MouseEvent } from 'react';
-import { createPortal } from 'react-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   CircleAlert,
@@ -17,11 +13,16 @@ import {
   Users,
   type LucideIcon,
 } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useId, useRef, useState, type MouseEvent } from 'react';
+import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils';
 
 interface AdminMenuItem {
-  label: string;
+  labelKey: string;
   href: string;
   icon: LucideIcon;
 }
@@ -39,14 +40,18 @@ export interface AdminSidebarProps {
 }
 
 const ADMIN_MENU_ITEMS: AdminMenuItem[] = [
-  { label: '대시보드', href: '/', icon: LayoutDashboard },
-  { label: '회원 관리', href: '/members', icon: Users },
-  { label: '기사 관리', href: '/drivers', icon: Truck },
-  { label: '견적 요청 관리', href: '/estimate-requests', icon: ClipboardList },
-  { label: '완료 건 관리', href: '/completed', icon: CircleCheck },
-  { label: '채팅 관리', href: '/chats', icon: MessageCircle },
-  { label: '신고 관리', href: '/reports', icon: CircleAlert },
-  { label: '리뷰 관리', href: '/reviews', icon: Star },
+  { labelKey: 'navigation.dashboard', href: '/', icon: LayoutDashboard },
+  { labelKey: 'navigation.members', href: '/members', icon: Users },
+  { labelKey: 'navigation.drivers', href: '/drivers', icon: Truck },
+  {
+    labelKey: 'navigation.estimateRequests',
+    href: '/estimate-requests',
+    icon: ClipboardList,
+  },
+  { labelKey: 'navigation.completed', href: '/completed', icon: CircleCheck },
+  { labelKey: 'navigation.chats', href: '/chats', icon: MessageCircle },
+  { labelKey: 'navigation.reports', href: '/reports', icon: CircleAlert },
+  { labelKey: 'navigation.reviews', href: '/reviews', icon: Star },
 ];
 
 const isActiveMenu = (pathname: string, href: string) =>
@@ -80,9 +85,6 @@ const SidebarPortalTooltip = ({ label, top, left }: SidebarTooltipState) =>
 /** 접힌 너비(w-14)에서 px-2를 뺀 아이콘 열. 펼쳐도 아이콘이 가운데 자리에 남는다. */
 const ICON_COLUMN_CLASS_NAME = 'flex w-10 shrink-0 justify-center';
 
-const EXPAND_SIDEBAR_LABEL = '사이드바 펼치기';
-const COLLAPSE_SIDEBAR_LABEL = '사이드바 접기';
-
 /** Tailwind w-14 / w-45와 동일한 rem 값 */
 const SIDEBAR_COLLAPSED_WIDTH = '3.5rem';
 const SIDEBAR_EXPANDED_WIDTH = '11.25rem';
@@ -93,6 +95,7 @@ export const AdminSidebar = ({
   className,
   defaultCollapsed = true,
 }: AdminSidebarProps) => {
+  const { t } = useTranslation();
   const pathname = usePathname();
   const navId = useId();
   const asideRef = useRef<HTMLElement>(null);
@@ -116,9 +119,7 @@ export const AdminSidebar = ({
     setTooltip(null);
   };
 
-  const toggleLabel = isCollapsed
-    ? EXPAND_SIDEBAR_LABEL
-    : COLLAPSE_SIDEBAR_LABEL;
+  const toggleLabel = isCollapsed ? t('sidebar.expand') : t('sidebar.collapse');
 
   const sidebarTransition = {
     duration: shouldReduceMotion ? 0 : SIDEBAR_MOTION_DURATION_SEC,
@@ -169,10 +170,11 @@ export const AdminSidebar = ({
           </span>
         </button>
 
-        <nav id={navId} aria-label="관리자 메뉴">
+        <nav id={navId} aria-label={t('sidebar.navigationLabel')}>
           <ul className="flex flex-col gap-1">
-            {ADMIN_MENU_ITEMS.map(({ label, href, icon: Icon }) => {
+            {ADMIN_MENU_ITEMS.map(({ labelKey, href, icon: Icon }) => {
               const isActive = isActiveMenu(pathname, href);
+              const label = t(labelKey);
 
               return (
                 <li key={href} className="min-w-0">

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-
+import { useTranslation } from 'react-i18next';
 
 import { DataTable, type Column } from '@/components/DataTable/DataTable';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
@@ -12,10 +12,7 @@ import { useDashboardRecentActivities } from '@/hooks/useDashboardRecentActiviti
 import { formatAdminDashboardMoveDate } from '@/utils/adminDashboard';
 import { formatAdminMemberJoinedAt } from '@/utils/adminMember';
 import {
-  ADMIN_REPORT_CATEGORY_LABEL,
   ADMIN_REPORT_STATUS_BADGE_VARIANT,
-  ADMIN_REPORT_STATUS_LABEL,
-  ADMIN_REPORT_TARGET_LABEL,
   formatAdminReportCreatedAt,
 } from '@/utils/adminReport';
 
@@ -43,106 +40,111 @@ const DashboardPanel = ({
   subtitle,
   viewAllHref,
   children,
-}: DashboardPanelProps) => (
-  <article className="flex min-w-0 flex-col rounded-lg border border-line-200 bg-white">
-    <div className="flex items-start justify-between gap-3 px-6 pt-6 pb-4">
-      <div className="min-w-0">
-        <h2 className="text-xl-bold text-black-400">{title}</h2>
-        <p className="mt-1 text-md-regular text-gray-500">{subtitle}</p>
+}: DashboardPanelProps) => {
+  const { t } = useTranslation();
+
+  return (
+    <article className="flex min-w-0 flex-col rounded-lg border border-line-200 bg-white">
+      <div className="flex items-start justify-between gap-3 px-6 pt-6 pb-4">
+        <div className="min-w-0">
+          <h2 className="text-xl-bold text-black-400">{title}</h2>
+          <p className="mt-1 text-md-regular text-gray-500">{subtitle}</p>
+        </div>
+        <Link
+          href={viewAllHref}
+          className="shrink-0 text-md-medium text-blue-300 hover:underline"
+        >
+          {t('dashboard.recent.viewAll')}
+        </Link>
       </div>
-      <Link
-        href={viewAllHref}
-        className="shrink-0 text-md-medium text-blue-300 hover:underline"
-      >
-        전체보기
-      </Link>
-    </div>
-    {children}
-  </article>
-);
+      {children}
+    </article>
+  );
+};
 
-const RECENT_REPORT_COLUMNS: Column<AdminDashboardRecentReport>[] = [
-  {
-    key: 'createdAt',
-    header: '신고일',
-    render: (row) => formatAdminReportCreatedAt(row.createdAt),
-  },
-  {
-    key: 'target',
-    header: '신고 대상',
-    render: (row) => ADMIN_REPORT_TARGET_LABEL[row.target],
-  },
-  {
-    key: 'reason',
-    header: '신고 사유',
-    render: (row) => ADMIN_REPORT_CATEGORY_LABEL[row.category],
-  },
-  {
-    key: 'status',
-    header: '상태',
-    align: 'center',
-    render: (row) => (
-      <StatusBadge
-        variant={ADMIN_REPORT_STATUS_BADGE_VARIANT[row.status]}
-        label={ADMIN_REPORT_STATUS_LABEL[row.status]}
-      />
-    ),
-  },
-];
+export const DashboardBottomSection = () => {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage ?? 'ko';
+  const { data, isPending, isError } = useDashboardRecentActivities();
+  const activities = data?.data;
 
-const RECENT_MEMBER_COLUMNS: Column<AdminDashboardRecentUser>[] = [
-  {
-    key: 'nickname',
-    header: '닉네임',
-    render: (row) => (
-      <TruncatedText value={row.nickname} className="max-w-28" />
-    ),
-  },
-  {
-    key: 'email',
-    header: '이메일',
-    render: (row) => <TruncatedText value={row.email} className="max-w-40" />,
-  },
-  {
-    key: 'joinedAt',
-    header: '가입일',
-    render: (row) => formatAdminMemberJoinedAt(row.createdAt),
-  },
-];
-
-const RECENT_COMPLETED_COLUMNS: Column<AdminDashboardRecentCompletedRequest>[] =
-  [
+  const recentReportColumns: Column<AdminDashboardRecentReport>[] = [
     {
-      key: 'requestId',
-      header: '요청 번호',
-      render: (row) => row.id,
+      key: 'createdAt',
+      header: t('dashboard.columns.reportedAt'),
+      render: (row) => formatAdminReportCreatedAt(row.createdAt, locale),
     },
     {
-      key: 'customerName',
-      header: '고객명',
+      key: 'target',
+      header: t('dashboard.columns.reportTarget'),
+      render: (row) => t(`dashboard.reportTarget.${row.target}`),
+    },
+    {
+      key: 'reason',
+      header: t('dashboard.columns.reportReason'),
+      render: (row) => t(`dashboard.reportCategory.${row.category}`),
+    },
+    {
+      key: 'status',
+      header: t('dashboard.columns.status'),
+      align: 'center',
       render: (row) => (
-        <TruncatedText value={row.user.name} className="max-w-28" />
+        <StatusBadge
+          variant={ADMIN_REPORT_STATUS_BADGE_VARIANT[row.status]}
+          label={t(`dashboard.reportStatus.${row.status}`)}
+        />
+      ),
+    },
+  ];
+  const recentMemberColumns: Column<AdminDashboardRecentUser>[] = [
+    {
+      key: 'nickname',
+      header: t('dashboard.columns.nickname'),
+      render: (row) => (
+        <TruncatedText value={row.nickname} className="max-w-28" />
       ),
     },
     {
-      key: 'moveDate',
-      header: '이사일',
-      render: (row) => formatAdminDashboardMoveDate(row.moveDate),
+      key: 'email',
+      header: t('dashboard.columns.email'),
+      render: (row) => <TruncatedText value={row.email} className="max-w-40" />,
     },
     {
-      key: 'driverName',
-      header: '기사명',
-      render: (row) => {
-        const driverName = row.confirmedQuote?.mover.name ?? '-';
-
-        return <TruncatedText value={driverName} className="max-w-28" />;
-      },
+      key: 'joinedAt',
+      header: t('dashboard.columns.joinedAt'),
+      render: (row) => formatAdminMemberJoinedAt(row.createdAt, locale),
     },
   ];
-
-export const DashboardBottomSection = () => {
-  const { data, isPending, isError } = useDashboardRecentActivities();
-  const activities = data?.data;
+  const recentCompletedColumns: Column<AdminDashboardRecentCompletedRequest>[] =
+    [
+      {
+        key: 'requestId',
+        header: t('dashboard.columns.requestId'),
+        render: (row) => row.id,
+      },
+      {
+        key: 'customerName',
+        header: t('dashboard.columns.customerName'),
+        render: (row) => (
+          <TruncatedText value={row.user.name} className="max-w-28" />
+        ),
+      },
+      {
+        key: 'moveDate',
+        header: t('dashboard.columns.moveDate'),
+        render: (row) => formatAdminDashboardMoveDate(row.moveDate, locale),
+      },
+      {
+        key: 'driverName',
+        header: t('dashboard.columns.driverName'),
+        render: (row) => (
+          <TruncatedText
+            value={row.confirmedQuote?.mover.name ?? '-'}
+            className="max-w-28"
+          />
+        ),
+      },
+    ];
 
   if (isPending) {
     return <LoadingState />;
@@ -151,8 +153,8 @@ export const DashboardBottomSection = () => {
   if (isError || !activities) {
     return (
       <EmptyState
-        title="최근 활동을 불러오지 못했습니다."
-        description="잠시 후 다시 시도해 주세요."
+        title={t('dashboard.error.recent')}
+        description={t('dashboard.error.retry')}
       />
     );
   }
@@ -162,47 +164,47 @@ export const DashboardBottomSection = () => {
   return (
     <section className="grid grid-cols-1 gap-3 xl:grid-cols-3">
       <DashboardPanel
-        title="최근 신고 건"
-        subtitle="(최근 7일)"
+        title={t('dashboard.recent.reports')}
+        subtitle={t('dashboard.recent.period')}
         viewAllHref="/reports"
       >
         <DataTable
           className={DASHBOARD_TABLE_CLASS_NAME}
-          columns={RECENT_REPORT_COLUMNS}
+          columns={recentReportColumns}
           data={recentReports}
           rowKey="id"
-          caption="최근 신고 건"
-          emptyMessage="최근 신고가 없습니다."
+          caption={t('dashboard.recent.reports')}
+          emptyMessage={t('dashboard.recent.emptyReports')}
         />
       </DashboardPanel>
 
       <DashboardPanel
-        title="최근 가입 회원"
-        subtitle="(최근 7일)"
+        title={t('dashboard.recent.members')}
+        subtitle={t('dashboard.recent.period')}
         viewAllHref="/members"
       >
         <DataTable
           className={DASHBOARD_TABLE_CLASS_NAME}
-          columns={RECENT_MEMBER_COLUMNS}
+          columns={recentMemberColumns}
           data={recentUsers}
           rowKey="id"
-          caption="최근 가입 회원"
-          emptyMessage="최근 가입 회원이 없습니다."
+          caption={t('dashboard.recent.members')}
+          emptyMessage={t('dashboard.recent.emptyMembers')}
         />
       </DashboardPanel>
 
       <DashboardPanel
-        title="최근 완료 건"
-        subtitle="(최근 7일)"
+        title={t('dashboard.recent.completed')}
+        subtitle={t('dashboard.recent.period')}
         viewAllHref="/completed"
       >
         <DataTable
           className={DASHBOARD_TABLE_CLASS_NAME}
-          columns={RECENT_COMPLETED_COLUMNS}
+          columns={recentCompletedColumns}
           data={recentCompletedRequests}
           rowKey="id"
-          caption="최근 완료 건"
-          emptyMessage="최근 완료 건이 없습니다."
+          caption={t('dashboard.recent.completed')}
+          emptyMessage={t('dashboard.recent.emptyCompleted')}
         />
       </DashboardPanel>
     </section>

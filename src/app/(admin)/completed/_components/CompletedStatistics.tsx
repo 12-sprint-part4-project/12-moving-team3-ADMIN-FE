@@ -1,4 +1,5 @@
 import { CircleCheck, CircleDollarSign, Wallet } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
@@ -15,9 +16,9 @@ interface CompletedStatisticsProps {
 
 interface StatisticItem {
   key: keyof AdminCompletedStatistics;
-  title: string;
-  unit?: string;
-  description?: string;
+  titleKey: string;
+  unitKey: string;
+  descriptionKey?: string;
   icon: ReactNode;
   iconBackgroundClassName: string;
 }
@@ -25,23 +26,23 @@ interface StatisticItem {
 const STATISTICS_ITEMS: StatisticItem[] = [
   {
     key: 'totalCompletedCount',
-    title: '완료 건수',
-    unit: '건',
+    titleKey: 'completed.statistics.totalCount',
+    unitKey: 'completed.unit.items',
     icon: <CircleCheck className="size-6 text-green-200" />,
     iconBackgroundClassName: 'bg-green-100',
   },
   {
     key: 'averageCompletedPrice',
-    title: '평균 완료 견적 금액',
-    unit: '원',
-    description: '※ 평균 금액은 소수점 이하를 반올림하여 표시합니다.',
+    titleKey: 'completed.statistics.averagePrice',
+    unitKey: 'completed.unit.currency',
+    descriptionKey: 'completed.statistics.rounded',
     icon: <CircleDollarSign className="size-6 text-blue-300" />,
     iconBackgroundClassName: 'bg-blue-100',
   },
   {
     key: 'totalCompletedPrice',
-    title: '총 완료 견적 금액',
-    unit: '원',
+    titleKey: 'completed.statistics.totalPrice',
+    unitKey: 'completed.unit.currency',
     icon: <Wallet className="size-6 text-yellow-100" />,
     iconBackgroundClassName: 'bg-yellow-50',
   },
@@ -49,7 +50,8 @@ const STATISTICS_ITEMS: StatisticItem[] = [
 
 const formatStatisticValue = (
   key: keyof AdminCompletedStatistics,
-  statistics: AdminCompletedStatistics
+  statistics: AdminCompletedStatistics,
+  locale: string
 ) => {
   const value = statistics[key];
 
@@ -57,7 +59,7 @@ const formatStatisticValue = (
     return value;
   }
 
-  return new Intl.NumberFormat('ko-KR').format(value);
+  return new Intl.NumberFormat(locale).format(value);
 };
 
 /**
@@ -69,6 +71,7 @@ const CompletedStatisticsBody = ({
   isPending,
   isError,
 }: CompletedStatisticsProps) => {
+  const { t, i18n } = useTranslation();
   if (isPending) {
     return <LoadingState />;
   }
@@ -76,8 +79,8 @@ const CompletedStatisticsBody = ({
   if (isError && !statistics) {
     return (
       <EmptyState
-        title="완료 건 통계를 불러오지 못했습니다."
-        description="잠시 후 다시 시도해 주세요."
+        title={t('completed.statistics.error')}
+        description={t('completed.common.retry')}
       />
     );
   }
@@ -89,16 +92,23 @@ const CompletedStatisticsBody = ({
   return (
     <StatisticsCardList
       items={STATISTICS_ITEMS.map(
-        ({ key, title, unit, description, icon, iconBackgroundClassName }) => ({
-          title,
-          value: formatStatisticValue(key, statistics),
-          unit,
-          description,
+        ({
+          key,
+          titleKey,
+          unitKey,
+          descriptionKey,
+          icon,
+          iconBackgroundClassName,
+        }) => ({
+          title: t(titleKey),
+          value: formatStatisticValue(key, statistics, i18n.language),
+          unit: t(unitKey),
+          description: descriptionKey ? t(descriptionKey) : undefined,
           icon,
           iconBackgroundClassName,
         })
       )}
-      description="※ 이사일 기준으로 집계되며, 기간 필터만 적용됩니다."
+      description={t('completed.statistics.description')}
       gridClassName="xl:grid-cols-3"
     />
   );
@@ -108,15 +118,18 @@ export const CompletedStatistics = ({
   statistics,
   isPending,
   isError,
-}: CompletedStatisticsProps) => (
-  <section
-    className="mt-6 w-full rounded-lg border border-line-200 bg-white p-6"
-    aria-label="완료 건 통계"
-  >
-    <CompletedStatisticsBody
-      statistics={statistics}
-      isPending={isPending}
-      isError={isError}
-    />
-  </section>
-);
+}: CompletedStatisticsProps) => {
+  const { t } = useTranslation();
+  return (
+    <section
+      className="mt-6 w-full rounded-lg border border-line-200 bg-white p-6"
+      aria-label={t('completed.statistics.label')}
+    >
+      <CompletedStatisticsBody
+        statistics={statistics}
+        isPending={isPending}
+        isError={isError}
+      />
+    </section>
+  );
+};

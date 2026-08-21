@@ -1,9 +1,5 @@
-import {
-  CircleAlert,
-  CircleCheck,
-  CircleX,
-  ClipboardList,
-} from 'lucide-react';
+import { CircleAlert, CircleCheck, CircleX, ClipboardList } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
@@ -20,8 +16,7 @@ interface ReportStatisticsProps {
 
 interface StatisticItem {
   key: keyof AdminReportStatistics;
-  title: string;
-  unit: string;
+  titleKey: string;
   icon: ReactNode;
   iconBackgroundClassName: string;
 }
@@ -29,29 +24,25 @@ interface StatisticItem {
 const STATISTICS_ITEMS: StatisticItem[] = [
   {
     key: 'totalReportCount',
-    title: '전체 신고',
-    unit: '건',
+    titleKey: 'reports.statistics.total',
     icon: <ClipboardList className="size-6 text-blue-300" />,
     iconBackgroundClassName: 'bg-blue-100',
   },
   {
     key: 'pendingReportCount',
-    title: '대기',
-    unit: '건',
+    titleKey: 'reports.status.PENDING',
     icon: <CircleAlert className="size-6 text-yellow-100" />,
     iconBackgroundClassName: 'bg-yellow-50',
   },
   {
     key: 'resolvedReportCount',
-    title: '처리 완료',
-    unit: '건',
+    titleKey: 'reports.status.RESOLVED',
     icon: <CircleCheck className="size-6 text-green-200" />,
     iconBackgroundClassName: 'bg-green-100',
   },
   {
     key: 'rejectedReportCount',
-    title: '반려',
-    unit: '건',
+    titleKey: 'reports.status.REJECTED',
     icon: <CircleX className="size-6 text-red-200" />,
     iconBackgroundClassName: 'bg-red-100',
   },
@@ -62,6 +53,7 @@ export const ReportStatistics = ({
   isPending,
   isError,
 }: ReportStatisticsProps) => {
+  const { t, i18n } = useTranslation();
   const renderBody = (): ReactNode => {
     if (isPending) {
       return <LoadingState />;
@@ -70,8 +62,8 @@ export const ReportStatistics = ({
     if (isError && !statistics) {
       return (
         <EmptyState
-          title="신고 통계를 불러오지 못했습니다."
-          description="잠시 후 다시 시도해 주세요."
+          title={t('reports.statistics.error')}
+          description={t('reports.common.retry')}
         />
       );
     }
@@ -83,15 +75,15 @@ export const ReportStatistics = ({
     return (
       <StatisticsCardList
         items={STATISTICS_ITEMS.map(
-          ({ key, title, unit, icon, iconBackgroundClassName }) => ({
-            title,
-            value: statistics[key],
-            unit,
+          ({ key, titleKey, icon, iconBackgroundClassName }) => ({
+            title: t(titleKey),
+            value: statistics[key].toLocaleString(i18n.resolvedLanguage),
+            unit: t('reports.unit.items'),
             icon,
             iconBackgroundClassName,
           })
         )}
-        description="※ 신고일 기준으로 집계되며, 기간 필터만 적용됩니다."
+        description={t('reports.statistics.description')}
         gridClassName="xl:grid-cols-4"
       />
     );
@@ -100,7 +92,7 @@ export const ReportStatistics = ({
   return (
     <section
       className="mt-6 w-full rounded-lg border border-line-200 bg-white p-6"
-      aria-label="신고 통계"
+      aria-label={t('reports.statistics.label')}
     >
       {renderBody()}
     </section>

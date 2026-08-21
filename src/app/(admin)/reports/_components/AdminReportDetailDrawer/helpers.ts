@@ -8,6 +8,7 @@ import type {
   AdminReportDetailTargetInfo,
   AdminReportProcessAction,
 } from '@/types/adminReport';
+import type { TFunction } from 'i18next';
 
 /** 선택 목록에 Action을 토글한다. 이후 처리 Modal이 같은 배열을 요청 body로 쓴다. */
 export const toggleReportProcessAction = (
@@ -31,29 +32,29 @@ export const formatNullableText = (value: string | null | undefined) => {
 };
 
 /** 날짜 필드용. null이면 '-' */
-export const formatNullableDateTime = (iso: string | null) => {
+export const formatNullableDateTime = (iso: string | null, locale: string) => {
   if (!iso) {
     return '-';
   }
 
-  return formatAdminReportCreatedAt(iso);
+  return formatAdminReportCreatedAt(iso, locale);
 };
 
-export const formatAdminLabel = (detail: AdminReportDetail) => {
+export const formatAdminLabel = (detail: AdminReportDetail, t?: TFunction) => {
   if (!detail.admin) {
-    return '담당자 없음';
+    return t ? t('reports.detail.noAdmin') : '담당자 없음';
   }
 
   return `${detail.admin.name} (${detail.admin.email})`;
 };
 
 /** API 실패 메시지. 404는 신고 없음으로 구분해 안내한다. */
-export const getDetailErrorTitle = (error: unknown) => {
+export const getDetailErrorTitle = (error: unknown, t?: TFunction) => {
   if (axios.isAxiosError(error) && error.response?.status === 404) {
-    return '신고 정보를 찾을 수 없습니다.';
+    return t ? t('reports.detail.notFound') : '신고 정보를 찾을 수 없습니다.';
   }
 
-  return '신고 상세를 불러오지 못했습니다.';
+  return t ? t('reports.detail.error') : '신고 상세를 불러오지 못했습니다.';
 };
 
 const DEFAULT_DECISION_ERROR_MESSAGE =
@@ -64,9 +65,12 @@ const DEFAULT_DECISION_ERROR_MESSAGE =
  * 서버가 내려준 message를 우선 쓰고(잘못된 Action·이미 처리·대상 없음·인증·서버 오류),
  * 없으면 공통 fallback을 쓴다.
  */
-export const getAdminReportDecisionErrorMessage = (error: unknown): string => {
+export const getAdminReportDecisionErrorMessage = (
+  error: unknown,
+  t?: TFunction
+): string => {
   if (!axios.isAxiosError(error)) {
-    return DEFAULT_DECISION_ERROR_MESSAGE;
+    return t ? t('reports.decisionError') : DEFAULT_DECISION_ERROR_MESSAGE;
   }
 
   const responseData = error.response?.data;
@@ -83,7 +87,7 @@ export const getAdminReportDecisionErrorMessage = (error: unknown): string => {
     return responseData.error.message;
   }
 
-  return DEFAULT_DECISION_ERROR_MESSAGE;
+  return t ? t('reports.decisionError') : DEFAULT_DECISION_ERROR_MESSAGE;
 };
 
 /** exists/isDeleted를 관리자가 읽기 쉬운 단일 상태로 합친다. */
@@ -126,10 +130,10 @@ export const TARGET_PRESENCE_HINT: Record<TargetPresenceStatus, string | null> =
   };
 
 /** 경력 null이면 '-', 있으면 n년 */
-export const formatCareer = (career: number | null) => {
+export const formatCareer = (career: number | null, t?: TFunction) => {
   if (career == null) {
     return '-';
   }
 
-  return `${career}년`;
+  return t ? t('members.mover.careerValue', { career }) : `${career}년`;
 };

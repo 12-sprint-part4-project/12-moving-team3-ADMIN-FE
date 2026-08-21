@@ -1,7 +1,8 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
+
 import { ConfirmModal } from '@/components/ConfirmModal/ConfirmModal';
-import { ADMIN_REPORT_PROCESS_ACTION_LABEL } from '@/utils/adminReport';
 
 import type { AdminReportProcessAction } from '@/types/adminReport';
 
@@ -27,33 +28,32 @@ export const AdminReportResolveConfirmModal = ({
   onClose,
   onConfirm,
 }: AdminReportResolveConfirmModalProps) => {
+  const { t } = useTranslation();
   const hasSelectedActions = selectedActions.length > 0;
 
   return (
     <ConfirmModal
       open={open}
-      title="신고를 처리하시겠습니까?"
+      title={t('reports.resolve.title')}
       description={
         <div className="flex flex-col gap-3">
           <div className="flex flex-col gap-1">
-            <p>선택한 조치</p>
+            <p>{t('reports.resolve.selectedActions')}</p>
             {hasSelectedActions ? (
               <ul className="list-disc space-y-1 pl-5 text-black-400">
                 {selectedActions.map((action) => (
-                  <li key={action}>
-                    {ADMIN_REPORT_PROCESS_ACTION_LABEL[action]}
-                  </li>
+                  <li key={action}>{t(`reports.action.${action}`)}</li>
                 ))}
               </ul>
             ) : (
-              <p className="text-gray-400">선택된 조치가 없습니다.</p>
+              <p className="text-gray-400">{t('reports.resolve.noActions')}</p>
             )}
           </div>
-          <p>처리 결과는 되돌리기 어렵습니다. 신중히 확인해 주세요.</p>
+          <p>{t('reports.resolve.warning')}</p>
         </div>
       }
-      confirmText="신고 처리 확인"
-      cancelText="취소"
+      confirmText={t('reports.resolve.confirm')}
+      cancelText={t('common.cancel')}
       confirmLoading={isPending}
       confirmDisabled={!hasSelectedActions}
       errorMessage={errorMessage}

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { DetailField } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 import {
@@ -24,6 +26,7 @@ const ReportContentMetadataFields = ({
   /** 요약 줄에 이미 쓴 키는 중복 노출하지 않는다. */
   excludeKeys?: string[];
 }): ReactNode => {
+  const { t, i18n } = useTranslation();
   const excluded = new Set(excludeKeys ?? []);
   const entries = Object.entries(metadata).filter(
     ([key]) => !excluded.has(key)
@@ -36,19 +39,26 @@ const ReportContentMetadataFields = ({
   return entries.map(([key, value]) => (
     <DetailField
       key={key}
-      label={ADMIN_REPORT_CONTENT_METADATA_LABEL[key] ?? key}
-      value={formatAdminReportContentMetadataValue(key, value)}
+      label={t(`reports.metadata.${key}`, {
+        defaultValue: ADMIN_REPORT_CONTENT_METADATA_LABEL[key] ?? key,
+      })}
+      value={formatAdminReportContentMetadataValue(
+        key,
+        value,
+        t,
+        i18n.resolvedLanguage ?? 'ko'
+      )}
     />
   ));
 };
 
 /** content null일 때 안내 문구. soft-delete 원본은 content로 내려오므로 삭제됨 ≠ 본문 없음이다. */
-const getEmptyContentMessage = (detail: AdminReportDetail) => {
+const getEmptyContentMessageKey = (detail: AdminReportDetail) => {
   if (!detail.targetInfo.exists) {
-    return '신고 대상이 존재하지 않아 콘텐츠를 표시할 수 없습니다.';
+    return 'reports.detail.missingTargetContent';
   }
 
-  return '신고된 콘텐츠가 없습니다.';
+  return 'reports.detail.noContent';
 };
 
 export interface ReportContentSectionProps {
@@ -63,6 +73,8 @@ export const ReportContentSection = ({
   isDeleteContentSelected,
   onToggleDeleteContent,
 }: ReportContentSectionProps) => {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage ?? 'ko';
   const {
     content,
     category,
@@ -77,13 +89,11 @@ export const ReportContentSection = ({
 
   const deleteActionToggle = canDeleteContent ? (
     <ReportProcessActionToggle
-      label="콘텐츠 삭제"
+      label={t('reports.action.DELETE_REPORTED_CONTENT')}
       selected={isDeleteContentSelected}
       disabled={isDeleteDisabled}
       disabledReason={
-        isDeleteDisabled
-          ? '처리 완료·반려된 신고는 콘텐츠 삭제 Action을 선택할 수 없습니다.'
-          : null
+        isDeleteDisabled ? t('reports.detail.deleteDisabled') : null
       }
       onToggle={onToggleDeleteContent}
     />
@@ -93,15 +103,17 @@ export const ReportContentSection = ({
   if (target === 'USER') {
     if (reportedContent?.type === 'USER') {
       return (
-        <DetailSection title="신고된 콘텐츠 정보">
+        <DetailSection title={t('reports.detail.contentInfo')}>
           <ReportReportedUserProfileContent content={reportedContent} />
         </DetailSection>
       );
     }
 
     return (
-      <DetailSection title="신고된 콘텐츠 정보">
-        <p className="text-md-regular text-gray-500">프로필 정보가 없습니다.</p>
+      <DetailSection title={t('reports.detail.contentInfo')}>
+        <p className="text-md-regular text-gray-500">
+          {t('reports.detail.noProfile')}
+        </p>
       </DetailSection>
     );
   }
@@ -113,10 +125,10 @@ export const ReportContentSection = ({
 
   if (!content) {
     return (
-      <DetailSection title="신고된 콘텐츠 정보">
+      <DetailSection title={t('reports.detail.contentInfo')}>
         <div className="flex flex-col gap-3">
           <p className="text-md-regular text-gray-500">
-            {getEmptyContentMessage(detail)}
+            {t(getEmptyContentMessageKey(detail))}
           </p>
           {deleteActionToggle}
         </div>
@@ -124,7 +136,7 @@ export const ReportContentSection = ({
     );
   }
 
-  const summary = getAdminReportContentSummary(content);
+  const summary = getAdminReportContentSummary(content, t);
   const showTitle = hasMeaningfulContentTitle(content);
   const rawBodyText = content.body?.trim() ? content.body : null;
   const displayBodyText =
@@ -134,7 +146,7 @@ export const ReportContentSection = ({
   const bodyText = displayBodyText?.trim() ? displayBodyText : null;
 
   return (
-    <DetailSection title="신고된 콘텐츠 정보">
+    <DetailSection title={t('reports.detail.contentInfo')}>
       <div className="flex flex-col gap-3">
         {/* 유형별 검토 핵심(별점·원글 등)을 먼저 보여 본문 맥락을 잡는다. */}
         {summary ? (
@@ -142,19 +154,25 @@ export const ReportContentSection = ({
         ) : null}
         <dl className="flex flex-col gap-2 text-md-medium">
           {showTitle ? (
-            <DetailField label="제목" value={content.title ?? '-'} />
+            <DetailField
+              label={t('reports.fields.title')}
+              value={content.title ?? '-'}
+            />
           ) : null}
           {bodyText ? (
-            <DetailMultilineField label="본문" value={bodyText} />
+            <DetailMultilineField
+              label={t('reports.fields.body')}
+              value={bodyText}
+            />
           ) : null}
           {/* soft-delete 원본 조회 — 생성일·삭제일은 값 없어도 필드를 항상 노출한다. */}
           <DetailField
-            label="생성일"
-            value={formatNullableDateTime(content.createdAt)}
+            label={t('reports.fields.contentCreatedAt')}
+            value={formatNullableDateTime(content.createdAt, locale)}
           />
           <DetailField
-            label="삭제일"
-            value={formatNullableDateTime(content.deletedAt)}
+            label={t('reports.fields.deletedAt')}
+            value={formatNullableDateTime(content.deletedAt, locale)}
           />
           {content.metadata ? (
             <ReportContentMetadataFields
@@ -166,7 +184,7 @@ export const ReportContentSection = ({
         {/* soft-delete 원본은 보여 주되, 서비스 미노출임을 대상 섹션과 같은 톤으로 안내한다. */}
         {content.deletedAt ? (
           <p className="text-md-regular text-gray-500">
-            이 콘텐츠는 삭제되어 현재 서비스에 노출되지 않습니다.
+            {t('reports.detail.deletedContentHint')}
           </p>
         ) : null}
         {deleteActionToggle}

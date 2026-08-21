@@ -1,18 +1,13 @@
 import { format } from 'date-fns';
 
+import { formatLocalizedDateTime } from './formatLocalizedDate.ts';
+
 /** API 쿼리용 YYYY-MM-DD */
 export const toAdminMemberApiDate = (date: Date) => format(date, 'yyyy-MM-dd');
 
 /** 목록·상세 가입일/일시 표시 */
-export const formatAdminMemberJoinedAt = (iso: string) => {
-  const date = new Date(iso);
-
-  if (Number.isNaN(date.getTime())) {
-    return iso;
-  }
-
-  return format(date, 'yyyy-MM-dd HH:mm');
-};
+export const formatAdminMemberJoinedAt = (iso: string, locale: string) =>
+  formatLocalizedDateTime(iso, locale);
 
 /** 회원·기사 전화번호 표시. 국내 휴대전화 번호만 하이픈 형식으로 변환한다. */
 export const formatAdminMemberPhoneNumber = (

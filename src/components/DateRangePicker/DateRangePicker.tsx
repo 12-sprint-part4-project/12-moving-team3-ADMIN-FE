@@ -1,11 +1,19 @@
 'use client';
 
-import { endOfToday } from 'date-fns';
-import { ko } from 'date-fns/locale';
+import { endOfToday, type Locale } from 'date-fns';
+import { enUS, ko, zhCN } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { DayPicker } from 'react-day-picker';
+import { useTranslation } from 'react-i18next';
 
+import { resolveLanguage, type SupportedLanguage } from '@/i18n/config';
 import { cn } from '@/lib/utils';
+
+const DATE_LOCALES: Record<SupportedLanguage, Locale> = {
+  ko,
+  en: enUS,
+  'zh-CN': zhCN,
+};
 
 export interface DateRange {
   from: Date;
@@ -25,13 +33,16 @@ export const DateRangePicker = ({
   defaultMonth = value?.from ?? new Date(),
   className,
 }: DateRangePickerProps) => {
+  const { t, i18n } = useTranslation();
+  const language = resolveLanguage(i18n.resolvedLanguage ?? i18n.language);
+
   return (
     <DayPicker
       mode="range"
       defaultMonth={defaultMonth}
       selected={value}
       navLayout="after"
-      locale={ko}
+      locale={DATE_LOCALES[language]}
       onSelect={(range) => {
         if (!range?.from) {
           onChange(undefined);
@@ -88,7 +99,7 @@ export const DateRangePicker = ({
         range_end:
           'date-range-end bg-blue-100 [&>button]:rounded-l-none [&>button]:bg-blue-300 [&>button]:text-white',
       }}
-      aria-label="날짜 범위 선택"
+      aria-label={t('dateRange.select')}
     />
   );
 };

@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
+
 import { ConfirmModal } from '@/components/ConfirmModal/ConfirmModal';
 
 export interface ReviewDeleteConfirmModalProps {
@@ -21,15 +23,19 @@ export const ReviewDeleteConfirmModal = ({
   errorMessage,
   onConfirm,
   onCancel,
-}: ReviewDeleteConfirmModalProps) => (
-  <ConfirmModal
-    open={open}
-    title="리뷰를 삭제하시겠습니까?"
-    description="삭제된 리뷰는 목록에서 제외됩니다."
-    confirmText="삭제"
-    confirmLoading={isPending}
-    errorMessage={errorMessage}
-    onConfirm={onConfirm}
-    onCancel={onCancel}
-  />
-);
+}: ReviewDeleteConfirmModalProps) => {
+  const { t } = useTranslation();
+
+  return (
+    <ConfirmModal
+      open={open}
+      title={t('reviews.delete.title')}
+      description={t('reviews.delete.description')}
+      confirmText={t('reviews.delete.confirm')}
+      confirmLoading={isPending}
+      errorMessage={errorMessage}
+      onConfirm={onConfirm}
+      onCancel={onCancel}
+    />
+  );
+};

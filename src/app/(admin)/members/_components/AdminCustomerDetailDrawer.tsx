@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
+
 import {
   AdminMemberAccountStatusSection,
   AdminMemberBasicInfoSection,
@@ -23,6 +25,7 @@ interface CustomerDetailContentProps {
 }
 
 const CustomerDetailContent = ({ detail }: CustomerDetailContentProps) => {
+  const { t } = useTranslation();
   const customerProfile = detail.customerProfile;
 
   return (
@@ -31,15 +34,15 @@ const CustomerDetailContent = ({ detail }: CustomerDetailContentProps) => {
       <AdminMemberAccountStatusSection detail={detail} />
 
       {customerProfile ? (
-        <DetailSection title="회원 프로필">
+        <DetailSection title={t('members.customer.profile')}>
           <dl className="flex flex-col gap-2 text-md-medium">
             <DetailField
-              label="희망 지역"
-              value={formatRegion(customerProfile.region)}
+              label={t('members.fields.preferredRegion')}
+              value={formatRegion(customerProfile.region, t)}
             />
             <DetailField
-              label="이용 서비스"
-              value={formatServices(customerProfile.service)}
+              label={t('members.fields.services')}
+              value={formatServices(customerProfile.service, t)}
             />
           </dl>
         </DetailSection>
@@ -56,14 +59,17 @@ export const AdminCustomerDetailDrawer = ({
   memberId,
   open,
   onClose,
-}: AdminCustomerDetailDrawerProps) => (
-  <AdminMemberDetailDrawerShell
-    memberId={memberId}
-    open={open}
-    onClose={onClose}
-    title="회원 상세"
-    errorTitle="회원 상세를 불러오지 못했습니다."
-    emptyTitle="회원 정보가 없습니다."
-    renderContent={(detail) => <CustomerDetailContent detail={detail} />}
-  />
-);
+}: AdminCustomerDetailDrawerProps) => {
+  const { t } = useTranslation();
+  return (
+    <AdminMemberDetailDrawerShell
+      memberId={memberId}
+      open={open}
+      onClose={onClose}
+      title={t('members.customer.detailTitle')}
+      errorTitle={t('members.customer.detailError')}
+      emptyTitle={t('members.customer.detailEmpty')}
+      renderContent={(detail) => <CustomerDetailContent detail={detail} />}
+    />
+  );
+};

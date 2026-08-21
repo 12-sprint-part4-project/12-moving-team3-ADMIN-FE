@@ -1,0 +1,703 @@
+{
+  "common": {
+    "login": "로그인",
+    "logout": "로그아웃",
+    "search": "검색",
+    "confirm": "확인",
+    "cancel": "취소",
+    "loading": "불러오는 중...",
+    "noData": "데이터가 없습니다.",
+    "searchReset": "검색 초기화"
+  },
+  "auth": {
+    "brand": "무빙",
+    "title": "관리자 로그인",
+    "description": "관리자 계정으로 로그인하여 관리자 페이지를 이용하세요.",
+    "checking": "인증 확인 중...",
+    "email": {
+      "label": "이메일",
+      "placeholder": "이메일을 입력하세요"
+    },
+    "password": {
+      "label": "비밀번호",
+      "placeholder": "비밀번호를 입력하세요",
+      "show": "비밀번호 표시하기",
+      "hide": "비밀번호 숨기기"
+    },
+    "validation": {
+      "emailRequired": "이메일을 입력해 주세요.",
+      "emailInvalid": "올바른 이메일 형식을 입력해 주세요.",
+      "passwordRequired": "비밀번호를 입력해 주세요."
+    },
+    "error": {
+      "invalidCredentials": "로그인에 실패했습니다. 이메일과 비밀번호를 확인해 주세요.",
+      "unexpected": "로그인에 실패했습니다. 잠시 후 다시 시도해 주세요."
+    }
+  },
+  "pagination": {
+    "label": "페이지네이션",
+    "first": "첫 페이지",
+    "previous": "이전 페이지",
+    "page": "{{page}}페이지",
+    "next": "다음 페이지",
+    "last": "마지막 페이지"
+  },
+  "dateRange": {
+    "select": "날짜 범위 선택",
+    "allPeriod": "전체 기간"
+  },
+  "dashboard": {
+    "title": "대시보드",
+    "description": "관리자님, 오늘도 무빙과 함께하세요.",
+    "units": { "people": "명", "items": "건", "count": "{{count}}건" },
+    "kpi": {
+      "title": "핵심 지표",
+      "users": "유저 수",
+      "estimateRequests": "견적 요청 수",
+      "quotes": "견적 수",
+      "completed": "완료 건수",
+      "pendingReports": "미처리 신고 수"
+    },
+    "period": { "day": "오늘", "week": "최근 7일", "month": "최근 30일" },
+    "trend": {
+      "title": "견적 요청 추이",
+      "periodLabel": "추이 집계 단위",
+      "series": "견적 요청",
+      "accessibleLabel": "날짜별 견적 요청 건수",
+      "count": "{{label}}: {{count}}건"
+    },
+    "status": {
+      "title": "견적 요청 상태 현황",
+      "period": "(최근 30일 기준)",
+      "description": "※ 최근 30일 동안 제출된 견적 요청을 기준으로 집계합니다."
+    },
+    "requestStatus": {
+      "submitted": "요청",
+      "confirmed": "매칭 완료",
+      "completed": "이사 완료",
+      "expired": "만료",
+      "canceled": "취소",
+      "total": "총 요청"
+    },
+    "error": {
+      "kpi": "핵심 지표를 불러오지 못했습니다.",
+      "trend": "견적 요청 추이를 불러오지 못했습니다.",
+      "status": "견적 요청 상태를 불러오지 못했습니다.",
+      "recent": "최근 활동을 불러오지 못했습니다.",
+      "retry": "잠시 후 다시 시도해 주세요."
+    },
+    "recent": {
+      "viewAll": "전체보기",
+      "period": "(최근 7일)",
+      "reports": "최근 신고 건",
+      "members": "최근 가입 회원",
+      "completed": "최근 완료 건",
+      "emptyReports": "최근 신고가 없습니다.",
+      "emptyMembers": "최근 가입 회원이 없습니다.",
+      "emptyCompleted": "최근 완료 건이 없습니다."
+    },
+    "columns": {
+      "reportedAt": "신고일",
+      "reportTarget": "신고 대상",
+      "reportReason": "신고 사유",
+      "status": "상태",
+      "nickname": "닉네임",
+      "email": "이메일",
+      "joinedAt": "가입일",
+      "requestId": "요청 번호",
+      "customerName": "고객명",
+      "moveDate": "이사일",
+      "driverName": "기사명"
+    },
+    "reportTarget": {
+      "USER": "회원",
+      "REVIEW": "리뷰",
+      "MESSAGE": "메시지",
+      "ARTICLE": "게시글",
+      "COMMENT": "댓글"
+    },
+    "reportCategory": {
+      "INAPPROPRIATE_PROFILE": "부적절한 프로필",
+      "ABUSIVE_LANGUAGE": "욕설/비방"
+    },
+    "reportStatus": {
+      "PENDING": "대기",
+      "RESOLVED": "처리 완료",
+      "REJECTED": "반려"
+    }
+  },
+  "members": {
+    "common": { "retry": "잠시 후 다시 시도해 주세요." },
+    "status": { "all": "상태 전체", "active": "활성", "suspended": "정지" },
+    "list": {
+      "noResults": "검색 결과가 없습니다.",
+      "changeFilters": "검색 조건을 변경한 후 다시 시도해 주세요.",
+      "resetFilters": "필터 초기화",
+      "searchPlaceholder": "이름, 이메일, 휴대폰 검색",
+      "statusLabel": "상태",
+      "allJoinDates": "가입일 전체",
+      "joinDateSort": "가입일 정렬",
+      "newest": "가입일 최신순",
+      "oldest": "가입일 오래된순"
+    },
+    "columns": {
+      "number": "번호",
+      "status": "상태",
+      "actions": "관리",
+      "viewDetail": "상세 보기"
+    },
+    "fields": {
+      "name": "이름",
+      "nickname": "닉네임",
+      "email": "이메일",
+      "phone": "전화번호",
+      "joinedAt": "가입일",
+      "rating": "평점",
+      "suspendedAt": "정지 시작일",
+      "suspendedUntil": "정지 종료일",
+      "reportCount": "신고 횟수",
+      "preferredRegion": "희망 지역",
+      "services": "이용 서비스",
+      "serviceTypes": "서비스 유형",
+      "serviceRegions": "서비스 지역",
+      "career": "경력",
+      "shortDescription": "한 줄 소개",
+      "description": "상세 소개",
+      "averageRating": "평균 평점",
+      "reviewCount": "리뷰 수",
+      "confirmedQuotes": "확정 견적 수"
+    },
+    "detail": {
+      "basicInfo": "기본 정보",
+      "accountStatus": "계정 상태",
+      "notFoundDescription": "선택한 회원을 찾을 수 없습니다."
+    },
+    "action": {
+      "suspend": {
+        "title": "회원을 7일 정지하시겠습니까?",
+        "description": "정지 기간 동안 해당 회원은 서비스 이용이 제한됩니다.",
+        "confirm": "7일 정지"
+      },
+      "activate": {
+        "title": "회원 계정을 활성화하시겠습니까?",
+        "description": "활성화 후 해당 회원은 다시 서비스를 이용할 수 있습니다.",
+        "confirm": "계정 활성화"
+      },
+      "error": "상태 변경에 실패했습니다. 잠시 후 다시 시도해 주세요."
+    },
+    "customer": {
+      "title": "회원 관리",
+      "description": "일반 회원 목록을 조회하고 검색·필터할 수 있습니다.",
+      "caption": "일반 회원 목록",
+      "searchLabel": "회원 검색",
+      "empty": "등록된 회원이 없습니다.",
+      "error": "회원 목록을 불러오지 못했습니다.",
+      "profile": "회원 프로필",
+      "detailTitle": "회원 상세",
+      "detailError": "회원 상세를 불러오지 못했습니다.",
+      "detailEmpty": "회원 정보가 없습니다."
+    },
+    "mover": {
+      "title": "기사 관리",
+      "description": "기사 목록을 조회하고 검색·필터할 수 있습니다.",
+      "caption": "기사 목록",
+      "searchLabel": "기사 검색",
+      "empty": "등록된 기사가 없습니다.",
+      "error": "기사 목록을 불러오지 못했습니다.",
+      "profile": "기사 프로필",
+      "statistics": "기사 통계",
+      "careerValue": "{{career}}년",
+      "detailTitle": "기사 상세",
+      "detailError": "기사 상세를 불러오지 못했습니다.",
+      "detailEmpty": "기사 정보가 없습니다."
+    },
+    "moveType": {
+      "SMALL": "소형 이사",
+      "HOME": "가정 이사",
+      "OFFICE": "사무실 이사"
+    },
+    "region": {
+      "SEOUL": "서울",
+      "GYEONGGI": "경기",
+      "INCHEON": "인천",
+      "GANGWON": "강원",
+      "CHUNGBUK": "충북",
+      "CHUNGNAM": "충남",
+      "SEJONG": "세종",
+      "DAEJEON": "대전",
+      "JEONBUK": "전북",
+      "GWANGJU_JEONNAM": "광주·전남",
+      "GYEONGBUK": "경북",
+      "DAEGU": "대구",
+      "ULSAN": "울산",
+      "GYEONGNAM": "경남",
+      "BUSAN": "부산",
+      "JEJU": "제주"
+    }
+  },
+  "estimates": {
+    "title": "견적 요청 관리",
+    "description": "견적 요청 내역을 조회할 수 있습니다.",
+    "unit": "건",
+    "price": "{{price}}원",
+    "common": { "retry": "잠시 후 다시 시도해 주세요." },
+    "filter": {
+      "label": "견적 요청 필터",
+      "searchPlaceholder": "견적 번호, 요청자 이름, 전화번호 검색",
+      "searchLabel": "견적 요청 검색",
+      "statusLabel": "견적 요청 상태",
+      "allDates": "기간 전체"
+    },
+    "status": {
+      "all": "상태 전체",
+      "SUBMITTED": "대기 중",
+      "CONFIRMED": "매칭 완료",
+      "EXPIRED": "만료",
+      "CANCELED": "취소"
+    },
+    "quoteStatus": {
+      "PENDING": "대기",
+      "CONFIRMED": "확정",
+      "REJECTED": "반려",
+      "DELETED": "삭제"
+    },
+    "moveType": {
+      "SMALL": "소형이사",
+      "HOME": "가정이사",
+      "OFFICE": "사무실이사"
+    },
+    "fields": {
+      "id": "견적 번호",
+      "userName": "요청자 이름",
+      "userNickname": "요청자 닉네임",
+      "phoneNumber": "전화번호",
+      "moveType": "이사 유형",
+      "departureAddress": "출발지",
+      "departureDetailAddress": "출발지 상세",
+      "departureZipCode": "출발지 우편번호",
+      "arrivalAddress": "도착지",
+      "arrivalDetailAddress": "도착지 상세",
+      "arrivalZipCode": "도착지 우편번호",
+      "submittedAt": "제출일",
+      "status": "상태",
+      "estimateCount": "견적 수",
+      "mover": "매칭 기사",
+      "actions": "작업"
+    },
+    "statistics": {
+      "label": "견적 요청 통계",
+      "error": "견적 요청 통계를 불러오지 못했습니다.",
+      "description": "※ 제출일 기준으로 집계되며, 기간 필터만 적용됩니다."
+    },
+    "list": {
+      "label": "견적 요청 목록",
+      "error": "견적 요청 목록을 불러오지 못했습니다.",
+      "retry": "다시 시도",
+      "noResults": "검색 결과가 없습니다.",
+      "empty": "등록된 견적 요청이 없습니다.",
+      "changeFilters": "검색 조건을 변경한 후 다시 시도해 주세요.",
+      "resetFilters": "필터 초기화"
+    },
+    "missing": {
+      "title": "누락: {{fields}}",
+      "badge": "정보 누락",
+      "fields": "누락 필드: {{fields}}",
+      "description": "필수 정보가 누락된 데이터입니다. 누락 필드: {{fields}}"
+    },
+    "detail": {
+      "title": "견적 요청 상세 정보",
+      "basicInfo": "기본 정보",
+      "activeQuotes": "활성 견적 ({{count}}건)",
+      "deletedQuotes": "삭제된 견적 ({{count}}건)",
+      "noActiveQuotes": "활성 견적이 없습니다.",
+      "noDeletedQuotes": "삭제된 견적이 없습니다.",
+      "notFound": "견적 요청 정보를 찾을 수 없습니다.",
+      "error": "견적 요청 상세를 불러오지 못했습니다.",
+      "empty": "견적 요청 정보가 없습니다.",
+      "emptyDescription": "선택한 견적 요청을 찾을 수 없습니다."
+    },
+    "viewDetail": "상세 보기"
+  },
+  "completed": {
+    "title": "완료 건 관리",
+    "description": "완료된 견적 요청 내역을 조회할 수 있습니다.",
+    "common": { "retry": "잠시 후 다시 시도해 주세요." },
+    "unit": { "items": "건", "currency": "원" },
+    "moveType": { "all": "이사 유형 전체" },
+    "filter": {
+      "label": "완료 건 필터",
+      "searchPlaceholder": "견적 번호, 요청자 이름, 전화번호 검색",
+      "searchLabel": "완료 건 검색",
+      "moveTypeLabel": "이사 유형",
+      "allMoveDates": "이사일 기간 전체"
+    },
+    "statistics": {
+      "label": "완료 건 통계",
+      "totalCount": "완료 건수",
+      "averagePrice": "평균 완료 견적 금액",
+      "totalPrice": "총 완료 견적 금액",
+      "rounded": "※ 평균 금액은 소수점 이하를 반올림하여 표시합니다.",
+      "description": "※ 이사일 기준으로 집계되며, 기간 필터만 적용됩니다.",
+      "error": "완료 건 통계를 불러오지 못했습니다."
+    },
+    "fields": {
+      "moveType": "이사 유형",
+      "departureAddress": "출발지",
+      "departureDetailAddress": "출발지 상세",
+      "departureZipCode": "출발지 우편번호",
+      "arrivalAddress": "도착지",
+      "arrivalDetailAddress": "도착지 상세",
+      "arrivalZipCode": "도착지 우편번호",
+      "moveDate": "이사일",
+      "mover": "매칭 기사",
+      "price": "견적 금액",
+      "confirmedQuote": "확정 견적",
+      "confirmedQuote_moverName": "확정 견적 기사명",
+      "confirmedQuote_moverNickname": "확정 견적 기사 닉네임",
+      "confirmedQuote_price": "확정 견적 금액",
+      "confirmedQuote_createdAt": "확정 견적 생성일",
+      "data": "데이터",
+      "moverName": "기사명",
+      "moverNickname": "기사 닉네임",
+      "comment": "코멘트",
+      "quoteCreatedAt": "견적 생성일"
+    },
+    "list": {
+      "label": "완료 건 목록",
+      "error": "완료 건 목록을 불러오지 못했습니다.",
+      "retry": "다시 시도",
+      "noResults": "검색 결과가 없습니다.",
+      "empty": "등록된 완료 건이 없습니다.",
+      "changeFilters": "검색 조건을 변경한 후 다시 시도해 주세요.",
+      "resetFilters": "필터 초기화"
+    },
+    "detail": {
+      "title": "완료 건 상세 정보",
+      "confirmedQuote": "확정 견적",
+      "noConfirmedQuote": "확정 견적 정보가 없습니다.",
+      "notFound": "완료 건 정보를 찾을 수 없습니다.",
+      "error": "완료 건 상세를 불러오지 못했습니다.",
+      "empty": "완료 건 정보가 없습니다.",
+      "emptyDescription": "선택한 완료 건을 찾을 수 없습니다."
+    }
+  },
+  "chats": {
+    "title": "채팅 관리",
+    "description": "채팅방 목록을 조회하고 검색·필터할 수 있습니다.",
+    "common": {
+      "retry": "잠시 후 다시 시도해 주세요.",
+      "retryAction": "다시 시도"
+    },
+    "roomType": {
+      "GENERAL": "일반",
+      "DESIGNATED": "지정 견적",
+      "COMMUNITY": "커뮤니티"
+    },
+    "userType": { "CUSTOMER": "고객", "MOVER": "기사" },
+    "participant": { "active": "참여 중", "left": "이탈", "withdrawn": "탈퇴" },
+    "filter": {
+      "allTypes": "전체",
+      "searchPlaceholder": "이름, 닉네임, 이메일, 휴대폰 검색",
+      "searchLabel": "채팅방 참여자 검색"
+    },
+    "fields": {
+      "roomId": "채팅방 ID",
+      "participants": "참여자",
+      "roomType": "채팅방 유형",
+      "lastMessage": "마지막 메시지",
+      "lastMessageAt": "마지막 메시지 시각",
+      "createdAt": "생성일",
+      "actions": "관리",
+      "estimateRequestId": "견적 요청 ID",
+      "quoteId": "견적 ID",
+      "designatedMoverId": "지정 기사 ID",
+      "communityPostId": "커뮤니티 게시글 ID",
+      "name": "이름",
+      "nickname": "닉네임",
+      "email": "이메일",
+      "userType": "회원 유형",
+      "joinedAt": "참여 시각",
+      "leftStatus": "이탈 여부",
+      "leftAt": "이탈 시각",
+      "withdrawnStatus": "탈퇴 여부"
+    },
+    "list": {
+      "label": "채팅방 목록",
+      "error": "채팅방 목록을 불러오지 못했습니다.",
+      "noResults": "검색 결과가 없습니다.",
+      "empty": "등록된 채팅방이 없습니다.",
+      "changeFilters": "검색 조건을 변경한 후 다시 시도해 주세요.",
+      "resetFilters": "필터 초기화"
+    },
+    "detail": {
+      "title": "채팅방 상세",
+      "basicInfo": "채팅방 기본 정보",
+      "linkedInfo": "연결 정보",
+      "participantInfo": "참여자 정보",
+      "noParticipants": "참여자가 없습니다.",
+      "noSelection": "선택한 채팅방 정보가 없습니다.",
+      "error": "채팅방 상세를 불러오지 못했습니다.",
+      "empty": "채팅방 정보가 없습니다.",
+      "notFound": "선택한 채팅방을 찾을 수 없습니다."
+    },
+    "messages": {
+      "title": "메시지 히스토리",
+      "none": "메시지 없음",
+      "imageMessage": "이미지 메시지",
+      "filtered": "필터링됨",
+      "imageAlt": "채팅 이미지",
+      "imageError": "이미지를 불러올 수 없습니다.",
+      "loading": "메시지를 불러오는 중...",
+      "error": "메시지를 불러오지 못했습니다.",
+      "empty": "메시지 내역이 없습니다.",
+      "loadOlder": "이전 메시지 더 보기",
+      "loadOlderError": "이전 메시지를 불러오지 못했습니다.",
+      "refresh": "메시지 새로고침"
+    },
+    "viewDetail": "상세 보기"
+  },
+  "reports": {
+    "title": "신고 관리",
+    "description": "신고 목록을 조회하고 상태를 확인할 수 있습니다.",
+    "common": {
+      "retry": "잠시 후 다시 시도해 주세요.",
+      "retryAction": "다시 시도"
+    },
+    "unit": { "items": "건" },
+    "status": {
+      "PENDING": "대기",
+      "RESOLVED": "처리 완료",
+      "REJECTED": "반려"
+    },
+    "target": {
+      "USER": "사용자",
+      "REVIEW": "리뷰",
+      "MESSAGE": "메시지",
+      "ARTICLE": "게시글",
+      "COMMENT": "댓글"
+    },
+    "category": {
+      "INAPPROPRIATE_PROFILE": "부적절한 프로필",
+      "ABUSIVE_LANGUAGE": "욕설 및 비방"
+    },
+    "userType": { "CUSTOMER": "일반 회원", "MOVER": "기사" },
+    "account": { "active": "정상", "suspended": "정지됨", "withdrawn": "탈퇴" },
+    "presence": {
+      "active": "정상",
+      "deleted": "삭제됨",
+      "missing": "대상 없음"
+    },
+    "presenceHint": {
+      "deleted": "이 대상은 삭제되어 현재 서비스에 노출되지 않습니다.",
+      "missing": "신고 대상을 확인할 수 없습니다."
+    },
+    "filter": {
+      "searchPlaceholder": "신고 대상 이름, 닉네임, 이메일 검색",
+      "searchLabel": "신고 대상 사용자 검색",
+      "allStatuses": "전체",
+      "allTargets": "전체",
+      "allDates": "신고일 전체"
+    },
+    "fields": {
+      "reportId": "신고 ID",
+      "status": "신고 상태",
+      "targetType": "신고 대상 타입",
+      "targetId": "신고 대상 ID",
+      "category": "신고 카테고리",
+      "reporter": "신고자",
+      "target": "신고 대상",
+      "createdAt": "신고일",
+      "actions": "관리",
+      "admin": "처리 관리자",
+      "name": "이름",
+      "nickname": "닉네임",
+      "email": "이메일",
+      "userType": "유저 타입",
+      "accountStatus": "계정 상태",
+      "withdrawnAt": "탈퇴일",
+      "targetStatus": "대상 상태",
+      "deletedAt": "삭제일",
+      "reportCount": "신고 횟수",
+      "title": "제목",
+      "body": "본문",
+      "contentCreatedAt": "생성일"
+    },
+    "statistics": {
+      "label": "신고 통계",
+      "total": "전체 신고",
+      "error": "신고 통계를 불러오지 못했습니다.",
+      "description": "※ 신고일 기준으로 집계되며, 기간 필터만 적용됩니다."
+    },
+    "list": {
+      "label": "신고 목록",
+      "error": "신고 목록을 불러오지 못했습니다.",
+      "noResults": "검색 결과가 없습니다.",
+      "empty": "등록된 신고가 없습니다.",
+      "changeFilters": "검색 조건을 변경한 후 다시 시도해 주세요.",
+      "resetFilters": "필터 초기화"
+    },
+    "detail": {
+      "title": "신고 상세",
+      "basicInfo": "신고 기본 정보",
+      "reporterInfo": "신고자 정보",
+      "targetInfo": "신고 대상 정보",
+      "contentInfo": "신고된 콘텐츠 정보",
+      "noSelection": "선택한 신고 정보가 없습니다.",
+      "empty": "신고 정보가 없습니다.",
+      "notFound": "선택한 신고를 찾을 수 없습니다.",
+      "error": "신고 상세를 불러오지 못했습니다.",
+      "noAdmin": "담당자 없음",
+      "unexpectedProfileTarget": "이 신고는 프로필 유형인데 대상이 회원이 아닙니다. 신고 기본 정보의 대상 타입·ID를 확인해 주세요.",
+      "suspendDisabled": "처리 완료·반려된 신고는 정지 조치를 선택할 수 없습니다.",
+      "deleteDisabled": "처리 완료·반려된 신고는 콘텐츠 삭제 조치를 선택할 수 없습니다.",
+      "missingTargetContent": "신고 대상이 존재하지 않아 콘텐츠를 표시할 수 없습니다.",
+      "noContent": "신고된 콘텐츠가 없습니다.",
+      "noProfile": "프로필 정보가 없습니다.",
+      "deletedContentHint": "이 콘텐츠는 삭제되어 현재 서비스에 노출되지 않습니다."
+    },
+    "action": {
+      "SUSPEND_TARGET_USER": "7일 정지",
+      "DELETE_REPORTED_CONTENT": "콘텐츠 삭제"
+    },
+    "resolve": {
+      "action": "신고 처리",
+      "title": "신고를 처리하시겠습니까?",
+      "selectedActions": "선택한 조치",
+      "noActions": "선택된 조치가 없습니다.",
+      "warning": "처리 결과는 되돌리기 어렵습니다. 신중히 확인해 주세요.",
+      "confirm": "신고 처리 확인",
+      "success": "신고를 처리했습니다."
+    },
+    "reject": {
+      "action": "신고 반려",
+      "title": "신고를 반려하시겠습니까?",
+      "description": "반려 시 사용자나 콘텐츠에 별도의 조치를 하지 않습니다. 신고 상태만 반려로 변경됩니다.",
+      "confirm": "신고 반려 확인",
+      "success": "신고를 반려했습니다."
+    },
+    "contentDeletionSupported": "삭제 지원",
+    "viewDetail": "상세 보기",
+    "decisionError": "요청에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+    "profileImageAlt": "{{name}} 프로필 이미지",
+    "metadata": {
+      "rating": "별점",
+      "estimateRequestId": "견적 요청 ID",
+      "quoteId": "견적 ID",
+      "lastMessageAt": "마지막 메시지",
+      "messageType": "메시지 유형",
+      "roomId": "채팅방 ID",
+      "category": "게시글 카테고리",
+      "postId": "원글 ID",
+      "postTitle": "원글 제목",
+      "postDeletedAt": "원글 삭제일",
+      "userType": "유저 타입"
+    },
+    "metadataValue": {
+      "userType": { "CUSTOMER": "일반 회원", "MOVER": "기사" },
+      "messageType": { "TEXT": "텍스트", "IMAGE": "이미지" },
+      "category": {
+        "MOVING_TIP": "이사 팁",
+        "QUESTION": "질문",
+        "REVIEW": "후기",
+        "ETC": "기타",
+        "FURNITURE_SHARE": "가구 나눔"
+      }
+    },
+    "summary": {
+      "review": "리뷰",
+      "reviewWithRating": "리뷰 · ★{{rating}}",
+      "comment": "댓글",
+      "commentWithPost": "댓글 · 원글: {{postTitle}}",
+      "message": "메시지 · {{type}}",
+      "article": "게시글 · {{category}}"
+    }
+  },
+  "reviews": {
+    "title": "리뷰 관리",
+    "description": "리뷰 목록을 확인하고 작성자·기사 정보를 조회할 수 있습니다.",
+    "common": { "retry": "잠시 후 다시 시도해 주세요." },
+    "unit": { "items": "건", "points": "점" },
+    "status": { "active": "활성", "deleted": "삭제됨" },
+    "filter": {
+      "searchPlaceholder": "내용, 작성자, 기사 검색",
+      "searchLabel": "리뷰 검색",
+      "allRatings": "전체 별점",
+      "ratingOption": "{{rating}}점",
+      "allStatuses": "전체",
+      "deletionStatus": "삭제 상태",
+      "allCreatedDates": "작성일 전체"
+    },
+    "fields": {
+      "reviewId": "리뷰 ID",
+      "quoteId": "견적 ID",
+      "author": "작성자",
+      "authorEmail": "작성자 이메일",
+      "mover": "기사",
+      "moverEmail": "기사 이메일",
+      "rating": "별점",
+      "content": "리뷰 내용",
+      "createdAt": "작성일",
+      "updatedAt": "수정일",
+      "deletedAt": "삭제일",
+      "status": "상태",
+      "actions": "관리"
+    },
+    "statistics": {
+      "label": "리뷰 통계",
+      "total": "전체 리뷰",
+      "averageRating": "평균 평점",
+      "deleted": "삭제된 리뷰",
+      "excludesDeleted": "삭제된 리뷰는 포함되지 않습니다.",
+      "description": "※ 작성일 기준으로 집계되며, 기간 필터만 적용됩니다.",
+      "error": "리뷰 통계를 불러오지 못했습니다."
+    },
+    "list": {
+      "label": "리뷰 목록",
+      "error": "리뷰 목록을 불러오지 못했습니다.",
+      "noResults": "검색 결과가 없습니다.",
+      "empty": "등록된 리뷰가 없습니다.",
+      "changeFilters": "검색 조건을 변경한 후 다시 시도해 주세요.",
+      "resetFilters": "필터 초기화"
+    },
+    "detail": {
+      "title": "리뷰 상세",
+      "reviewInfo": "리뷰 정보",
+      "peopleInfo": "작성자·기사 정보",
+      "originalContent": "리뷰 원문"
+    },
+    "delete": {
+      "action": "리뷰 삭제",
+      "title": "리뷰를 삭제하시겠습니까?",
+      "description": "삭제된 리뷰는 목록에서 제외됩니다.",
+      "confirm": "삭제"
+    },
+    "viewDetail": "상세 보기",
+    "viewDetailLabel": "리뷰 {{id}} 상세 보기"
+  },
+  "language": {
+    "selectorLabel": "언어 선택"
+  },
+  "header": {
+    "title": "관리자 페이지",
+    "logoAlt": "무빙",
+    "goToDashboard": "대시보드로 이동",
+    "adminMenu": "관리자 메뉴",
+    "userMenu": "{{userName}} 메뉴",
+    "loggingOut": "로그아웃 중..."
+  },
+  "sidebar": {
+    "navigationLabel": "관리자 메뉴",
+    "expand": "사이드바 펼치기",
+    "collapse": "사이드바 접기"
+  },
+  "navigation": {
+    "dashboard": "대시보드",
+    "members": "회원 관리",
+    "drivers": "기사 관리",
+    "estimateRequests": "견적 요청 관리",
+    "completed": "완료 건 관리",
+    "chats": "채팅 관리",
+    "reports": "신고 관리",
+    "reviews": "리뷰 관리"
+  }
+}

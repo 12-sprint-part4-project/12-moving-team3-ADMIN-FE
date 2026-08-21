@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { formatLocalizedDateTime } from './formatLocalizedDate.ts';
 
 import type { StatusBadgeProps } from '@/components/StatusBadge/StatusBadge';
 import type {
@@ -13,6 +13,7 @@ import type {
   AdminReportTargetInfo,
   AdminReportUserType,
 } from '@/types/adminReport';
+import type { TFunction } from 'i18next';
 
 /** 상태 → 한글 라벨. enum 원문을 그대로 노출하지 않기 위해 매핑한다. */
 export const ADMIN_REPORT_STATUS_LABEL: Record<AdminReportStatus, string> = {
@@ -117,8 +118,16 @@ const getMetadataEnumLabel = <T extends string>(
 /** metadata key별 값 라벨. 매핑이 없으면 null */
 export const getMetadataLabel = (
   key: string,
-  value: unknown
+  value: unknown,
+  t?: TFunction
 ): string | null => {
+  if (t && typeof value === 'string') {
+    if (key === 'userType' || key === 'messageType' || key === 'category') {
+      return t(`reports.metadataValue.${key}.${value}`, {
+        defaultValue: value,
+      });
+    }
+  }
   switch (key) {
     case 'userType':
       return getMetadataEnumLabel(ADMIN_REPORT_USER_TYPE_LABEL, value);
@@ -163,7 +172,8 @@ export const hasMeaningfulContentTitle = (
  * 요약에 쓴 metadata 키는 아래에서 중복 노출하지 않는다.
  */
 export const getAdminReportContentSummary = (
-  content: AdminReportDetailContent
+  content: AdminReportDetailContent,
+  t?: TFunction
 ): { text: string; usedMetadataKeys: string[] } | null => {
   const meta = content.metadata ?? {};
 
@@ -171,7 +181,16 @@ export const getAdminReportContentSummary = (
     case 'REVIEW': {
       const rating = typeof meta.rating === 'number' ? meta.rating : null;
       return {
-        text: rating != null ? `리뷰 · ★${rating}` : '리뷰',
+        text: t
+          ? t(
+              rating != null
+                ? 'reports.summary.reviewWithRating'
+                : 'reports.summary.review',
+              { rating }
+            )
+          : rating != null
+            ? `리뷰 · ★${rating}`
+            : '리뷰',
         usedMetadataKeys: rating != null ? ['rating'] : [],
       };
     }
@@ -181,21 +200,38 @@ export const getAdminReportContentSummary = (
           ? meta.postTitle.trim()
           : null;
       return {
-        text: postTitle ? `댓글 · 원글: ${postTitle}` : '댓글',
+        text: t
+          ? t(
+              postTitle
+                ? 'reports.summary.commentWithPost'
+                : 'reports.summary.comment',
+              { postTitle }
+            )
+          : postTitle
+            ? `댓글 · 원글: ${postTitle}`
+            : '댓글',
         usedMetadataKeys: postTitle ? ['postTitle'] : [],
       };
     }
     case 'MESSAGE': {
-      const typeLabel = getMetadataLabel('messageType', meta.messageType);
+      const typeLabel = getMetadataLabel('messageType', meta.messageType, t);
       return {
-        text: typeLabel ? `메시지 · ${typeLabel}` : '메시지',
+        text: t
+          ? t('reports.summary.message', { type: typeLabel ?? '' })
+          : typeLabel
+            ? `메시지 · ${typeLabel}`
+            : '메시지',
         usedMetadataKeys: typeLabel ? ['messageType'] : [],
       };
     }
     case 'ARTICLE': {
-      const categoryLabel = getMetadataLabel('category', meta.category);
+      const categoryLabel = getMetadataLabel('category', meta.category, t);
       return {
-        text: categoryLabel ? `게시글 · ${categoryLabel}` : '게시글',
+        text: t
+          ? t('reports.summary.article', { category: categoryLabel ?? '' })
+          : categoryLabel
+            ? `게시글 · ${categoryLabel}`
+            : '게시글',
         usedMetadataKeys: categoryLabel ? ['category'] : [],
       };
     }
@@ -207,17 +243,19 @@ export const getAdminReportContentSummary = (
 /** metadata value를 관리자가 읽기 쉬운 문자열로 변환한다. */
 export const formatAdminReportContentMetadataValue = (
   key: string,
-  value: unknown
+  value: unknown,
+  t?: TFunction,
+  locale?: string
 ): string => {
   if (value === null || value === undefined) {
     return '-';
   }
 
   if (key === 'rating' && typeof value === 'number') {
-    return `★${value}`;
+    return `★${new Intl.NumberFormat(locale).format(value)}`;
   }
 
-  const mappedLabel = getMetadataLabel(key, value);
+  const mappedLabel = getMetadataLabel(key, value, t);
   if (mappedLabel != null) {
     return mappedLabel;
   }
@@ -226,14 +264,18 @@ export const formatAdminReportContentMetadataValue = (
     (key === 'lastMessageAt' || key === 'postDeletedAt') &&
     typeof value === 'string'
   ) {
-    return formatAdminReportCreatedAt(value);
+    return formatAdminReportCreatedAt(value, locale ?? 'ko');
   }
 
   if (typeof value === 'string') {
     return value.trim() === '' ? '-' : value;
   }
 
-  if (typeof value === 'number' || typeof value === 'boolean') {
+  if (typeof value === 'number') {
+    return new Intl.NumberFormat(locale).format(value);
+  }
+
+  if (typeof value === 'boolean') {
     return String(value);
   }
 
@@ -245,15 +287,8 @@ export const formatAdminReportContentMetadataValue = (
 };
 
 /** 목록·상세 신고일 표시 (회원 목록과 동일 포맷) */
-export const formatAdminReportCreatedAt = (iso: string) => {
-  const date = new Date(iso);
-
-  if (Number.isNaN(date.getTime())) {
-    return iso;
-  }
-
-  return format(date, 'yyyy-MM-dd HH:mm');
-};
+export const formatAdminReportCreatedAt = (iso: string, locale: string) =>
+  formatLocalizedDateTime(iso, locale);
 
 /** 신고자 셀 표시명. 닉네임이 있으면 이름 옆에 보조로 붙인다. */
 export const formatAdminReportReporter = (reporter: {

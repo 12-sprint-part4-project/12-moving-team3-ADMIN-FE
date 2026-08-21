@@ -1,20 +1,17 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
+
 import {
   AdminMemberAccountStatusSection,
   AdminMemberBasicInfoSection,
   AdminMemberDetailDrawerShell,
   DetailField,
   formatServices,
-  REGION_LABEL,
 } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 
-import type {
-  AdminMemberDetail,
-  MoverProfile,
-  MoverServiceRegion,
-} from '@/types/adminMember';
+import type { AdminMemberDetail, MoverProfile } from '@/types/adminMember';
 
 export interface AdminMoverDetailDrawerProps {
   memberId: string | null;
@@ -22,12 +19,15 @@ export interface AdminMoverDetailDrawerProps {
   onClose: () => void;
 }
 
-const formatCareer = (career: number | null) => {
+const formatCareer = (
+  career: number | null,
+  t: ReturnType<typeof useTranslation>['t']
+) => {
   if (career == null) {
     return '-';
   }
 
-  return `${career}년`;
+  return t('members.mover.careerValue', { career });
 };
 
 const formatAverageRating = (averageRating: number | null) => {
@@ -38,60 +38,71 @@ const formatAverageRating = (averageRating: number | null) => {
   return averageRating.toFixed(1);
 };
 
-const formatServiceRegions = (serviceRegions: MoverServiceRegion[]) => {
-  if (serviceRegions.length === 0) {
-    return '-';
-  }
-
-  return serviceRegions
-    .map(({ region }) => REGION_LABEL[region] ?? region)
-    .join(', ');
-};
-
 interface MoverProfileSectionProps {
   profile: MoverProfile;
 }
 
-const MoverProfileSection = ({ profile }: MoverProfileSectionProps) => (
-  <DetailSection title="기사 프로필">
-    <dl className="flex flex-col gap-2 text-md-medium">
-      <DetailField
-        label="서비스 유형"
-        value={formatServices(profile.service)}
-      />
-      <DetailField
-        label="서비스 지역"
-        value={formatServiceRegions(profile.serviceRegions)}
-      />
-      <DetailField label="경력" value={formatCareer(profile.career)} />
-      <DetailField
-        label="한 줄 소개"
-        value={profile.shortDescription?.trim() || '-'}
-      />
-      <DetailField
-        label="상세 소개"
-        value={profile.description?.trim() || '-'}
-      />
-    </dl>
-  </DetailSection>
-);
+const MoverProfileSection = ({ profile }: MoverProfileSectionProps) => {
+  const { t } = useTranslation();
+  const serviceRegions =
+    profile.serviceRegions.length === 0
+      ? '-'
+      : profile.serviceRegions
+          .map(({ region }) => t(`members.region.${region}`))
+          .join(', ');
+  return (
+    <DetailSection title={t('members.mover.profile')}>
+      <dl className="flex flex-col gap-2 text-md-medium">
+        <DetailField
+          label={t('members.fields.serviceTypes')}
+          value={formatServices(profile.service, t)}
+        />
+        <DetailField
+          label={t('members.fields.serviceRegions')}
+          value={serviceRegions}
+        />
+        <DetailField
+          label={t('members.fields.career')}
+          value={formatCareer(profile.career, t)}
+        />
+        <DetailField
+          label={t('members.fields.shortDescription')}
+          value={profile.shortDescription?.trim() || '-'}
+        />
+        <DetailField
+          label={t('members.fields.description')}
+          value={profile.description?.trim() || '-'}
+        />
+      </dl>
+    </DetailSection>
+  );
+};
 
 interface MoverStatsSectionProps {
   detail: AdminMemberDetail;
 }
 
-const MoverStatsSection = ({ detail }: MoverStatsSectionProps) => (
-  <DetailSection title="기사 통계">
-    <dl className="flex flex-col gap-2 text-md-medium">
-      <DetailField
-        label="평균 평점"
-        value={formatAverageRating(detail.averageRating)}
-      />
-      <DetailField label="리뷰 수" value={detail.reviewCount} />
-      <DetailField label="확정 견적 수" value={detail.confirmedQuoteCount} />
-    </dl>
-  </DetailSection>
-);
+const MoverStatsSection = ({ detail }: MoverStatsSectionProps) => {
+  const { t } = useTranslation();
+  return (
+    <DetailSection title={t('members.mover.statistics')}>
+      <dl className="flex flex-col gap-2 text-md-medium">
+        <DetailField
+          label={t('members.fields.averageRating')}
+          value={formatAverageRating(detail.averageRating)}
+        />
+        <DetailField
+          label={t('members.fields.reviewCount')}
+          value={detail.reviewCount}
+        />
+        <DetailField
+          label={t('members.fields.confirmedQuotes')}
+          value={detail.confirmedQuoteCount}
+        />
+      </dl>
+    </DetailSection>
+  );
+};
 
 interface MoverDetailContentProps {
   detail: AdminMemberDetail;
@@ -118,14 +129,17 @@ export const AdminMoverDetailDrawer = ({
   memberId,
   open,
   onClose,
-}: AdminMoverDetailDrawerProps) => (
-  <AdminMemberDetailDrawerShell
-    memberId={memberId}
-    open={open}
-    onClose={onClose}
-    title="기사 상세"
-    errorTitle="기사 상세를 불러오지 못했습니다."
-    emptyTitle="기사 정보가 없습니다."
-    renderContent={(detail) => <MoverDetailContent detail={detail} />}
-  />
-);
+}: AdminMoverDetailDrawerProps) => {
+  const { t } = useTranslation();
+  return (
+    <AdminMemberDetailDrawerShell
+      memberId={memberId}
+      open={open}
+      onClose={onClose}
+      title={t('members.mover.detailTitle')}
+      errorTitle={t('members.mover.detailError')}
+      emptyTitle={t('members.mover.detailEmpty')}
+      renderContent={(detail) => <MoverDetailContent detail={detail} />}
+    />
+  );
+};

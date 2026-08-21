@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
+
 import {
   DetailField,
   formatNullableDateTime,
@@ -10,18 +12,11 @@ import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { useAdminChatDetail } from '@/hooks/useAdminChatDetail';
-import {
-  ADMIN_CHAT_ROOM_TYPE_LABEL,
-  ADMIN_CHAT_USER_TYPE_LABEL,
-} from '@/utils/adminChat';
 import { formatAdminMemberJoinedAt } from '@/utils/adminMember';
 
 import { AdminChatMessageList } from './AdminChatMessageList';
 
-import type {
-  AdminChatDetail,
-  AdminChatParticipant,
-} from '@/types/adminChat';
+import type { AdminChatDetail, AdminChatParticipant } from '@/types/adminChat';
 
 export interface AdminChatDetailDrawerProps {
   open: boolean;
@@ -35,25 +30,29 @@ interface ChatBasicInfoSectionProps {
 }
 
 /** 채팅방 ID·유형·생성/마지막 메시지 시각 */
-const ChatBasicInfoSection = ({ detail }: ChatBasicInfoSectionProps) => (
-  <DetailSection title="채팅방 기본 정보">
-    <dl className="flex flex-col gap-2 text-md-medium">
-      <DetailField label="채팅방 ID" value={detail.id} />
-      <DetailField
-        label="채팅방 유형"
-        value={ADMIN_CHAT_ROOM_TYPE_LABEL[detail.roomType]}
-      />
-      <DetailField
-        label="생성일"
-        value={formatAdminMemberJoinedAt(detail.createdAt)}
-      />
-      <DetailField
-        label="마지막 메시지 시각"
-        value={formatNullableDateTime(detail.lastMessageAt)}
-      />
-    </dl>
-  </DetailSection>
-);
+const ChatBasicInfoSection = ({ detail }: ChatBasicInfoSectionProps) => {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage ?? 'ko';
+  return (
+    <DetailSection title={t('chats.detail.basicInfo')}>
+      <dl className="flex flex-col gap-2 text-md-medium">
+        <DetailField label={t('chats.fields.roomId')} value={detail.id} />
+        <DetailField
+          label={t('chats.fields.roomType')}
+          value={t(`chats.roomType.${detail.roomType}`)}
+        />
+        <DetailField
+          label={t('chats.fields.createdAt')}
+          value={formatAdminMemberJoinedAt(detail.createdAt, locale)}
+        />
+        <DetailField
+          label={t('chats.fields.lastMessageAt')}
+          value={formatNullableDateTime(detail.lastMessageAt, locale)}
+        />
+      </dl>
+    </DetailSection>
+  );
+};
 
 interface ChatLinkedInfoSectionProps {
   detail: AdminChatDetail;
@@ -70,29 +69,33 @@ interface ChatLinkedField {
  * 전부 null이면 섹션 자체를 숨긴다.
  */
 const ChatLinkedInfoSection = ({ detail }: ChatLinkedInfoSectionProps) => {
+  const { t } = useTranslation();
   const linkedFields: ChatLinkedField[] = [];
 
   if (detail.estimateRequestId != null) {
     linkedFields.push({
-      label: '견적 요청 ID',
+      label: t('chats.fields.estimateRequestId'),
       value: detail.estimateRequestId,
     });
   }
 
   if (detail.quoteId != null) {
-    linkedFields.push({ label: '견적 ID', value: detail.quoteId });
+    linkedFields.push({
+      label: t('chats.fields.quoteId'),
+      value: detail.quoteId,
+    });
   }
 
   if (detail.designatedMoverId != null) {
     linkedFields.push({
-      label: '지정 기사 ID',
+      label: t('chats.fields.designatedMoverId'),
       value: detail.designatedMoverId,
     });
   }
 
   if (detail.communityPostId != null) {
     linkedFields.push({
-      label: '커뮤니티 게시글 ID',
+      label: t('chats.fields.communityPostId'),
       value: detail.communityPostId,
     });
   }
@@ -102,7 +105,7 @@ const ChatLinkedInfoSection = ({ detail }: ChatLinkedInfoSectionProps) => {
   }
 
   return (
-    <DetailSection title="연결 정보">
+    <DetailSection title={t('chats.detail.linkedInfo')}>
       <dl className="flex flex-col gap-2 text-md-medium">
         {linkedFields.map(({ label, value }) => (
           <DetailField key={label} label={label} value={value} />
@@ -118,42 +121,59 @@ interface ChatParticipantBlockProps {
 
 /** 참여자 1명 블록. 여러 명을 DetailField 한 줄에 몰지 않기 위해 분리한다. */
 const ChatParticipantBlock = ({ participant }: ChatParticipantBlockProps) => {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage ?? 'ko';
   const isLeft = participant.leftAt != null;
 
   return (
     <div className="rounded-lg border border-line-100 bg-background-100 p-3">
       <dl className="flex flex-col gap-2 text-md-medium">
-        <DetailField label="이름" value={participant.name} />
-        <DetailField label="닉네임" value={participant.nickname} />
-        <DetailField label="이메일" value={participant.email} />
+        <DetailField label={t('chats.fields.name')} value={participant.name} />
         <DetailField
-          label="회원 유형"
-          value={ADMIN_CHAT_USER_TYPE_LABEL[participant.userType]}
+          label={t('chats.fields.nickname')}
+          value={participant.nickname}
         />
         <DetailField
-          label="참여 시각"
-          value={formatAdminMemberJoinedAt(participant.joinedAt)}
+          label={t('chats.fields.email')}
+          value={participant.email}
+        />
+        <DetailField
+          label={t('chats.fields.userType')}
+          value={t(`chats.userType.${participant.userType}`)}
+        />
+        <DetailField
+          label={t('chats.fields.joinedAt')}
+          value={formatAdminMemberJoinedAt(participant.joinedAt, locale)}
         />
         <div className="flex items-center justify-between gap-4">
-          <dt className="shrink-0 text-gray-500">이탈 여부</dt>
+          <dt className="shrink-0 text-gray-500">
+            {t('chats.fields.leftStatus')}
+          </dt>
           <dd>
             <StatusBadge
               variant={isLeft ? 'neutral' : 'success'}
-              label={isLeft ? '이탈' : '참여 중'}
+              label={t(
+                isLeft ? 'chats.participant.left' : 'chats.participant.active'
+              )}
             />
           </dd>
         </div>
         {isLeft ? (
           <DetailField
-            label="이탈 시각"
-            value={formatNullableDateTime(participant.leftAt)}
+            label={t('chats.fields.leftAt')}
+            value={formatNullableDateTime(participant.leftAt, locale)}
           />
         ) : null}
         {participant.isDeleted ? (
           <div className="flex items-center justify-between gap-4">
-            <dt className="shrink-0 text-gray-500">탈퇴 여부</dt>
+            <dt className="shrink-0 text-gray-500">
+              {t('chats.fields.withdrawnStatus')}
+            </dt>
             <dd>
-              <StatusBadge variant="danger" label="탈퇴" />
+              <StatusBadge
+                variant="danger"
+                label={t('chats.participant.withdrawn')}
+              />
             </dd>
           </div>
         ) : null}
@@ -168,22 +188,27 @@ interface ChatParticipantsSectionProps {
 
 const ChatParticipantsSection = ({
   participants,
-}: ChatParticipantsSectionProps) => (
-  <DetailSection title="참여자 정보">
-    {participants.length === 0 ? (
-      <p className="text-md-regular text-gray-500">참여자가 없습니다.</p>
-    ) : (
-      <div className="flex flex-col gap-3">
-        {participants.map((participant) => (
-          <ChatParticipantBlock
-            key={participant.id}
-            participant={participant}
-          />
-        ))}
-      </div>
-    )}
-  </DetailSection>
-);
+}: ChatParticipantsSectionProps) => {
+  const { t } = useTranslation();
+  return (
+    <DetailSection title={t('chats.detail.participantInfo')}>
+      {participants.length === 0 ? (
+        <p className="text-md-regular text-gray-500">
+          {t('chats.detail.noParticipants')}
+        </p>
+      ) : (
+        <div className="flex flex-col gap-3">
+          {participants.map((participant) => (
+            <ChatParticipantBlock
+              key={participant.id}
+              participant={participant}
+            />
+          ))}
+        </div>
+      )}
+    </DetailSection>
+  );
+};
 
 interface ChatDetailContentProps {
   detail: AdminChatDetail;
@@ -214,6 +239,7 @@ export const AdminChatDetailDrawer = ({
   roomId,
   onClose,
 }: AdminChatDetailDrawerProps) => {
+  const { t } = useTranslation();
   const { data, isPending, isError, isSuccess } = useAdminChatDetail(
     roomId ?? undefined,
     {
@@ -230,7 +256,7 @@ export const AdminChatDetailDrawer = ({
     if (roomId == null) {
       return (
         <p className="text-md-regular text-gray-500">
-          선택한 채팅방 정보가 없습니다.
+          {t('chats.detail.noSelection')}
         </p>
       );
     }
@@ -242,8 +268,8 @@ export const AdminChatDetailDrawer = ({
     if (isError) {
       return (
         <EmptyState
-          title="채팅방 상세를 불러오지 못했습니다."
-          description="잠시 후 다시 시도해 주세요."
+          title={t('chats.detail.error')}
+          description={t('chats.common.retry')}
         />
       );
     }
@@ -251,19 +277,22 @@ export const AdminChatDetailDrawer = ({
     if (!isSuccess || !isDetailForSelection) {
       return (
         <EmptyState
-          title="채팅방 정보가 없습니다."
-          description="선택한 채팅방을 찾을 수 없습니다."
+          title={t('chats.detail.empty')}
+          description={t('chats.detail.notFound')}
         />
       );
     }
 
-    return (
-      <ChatDetailContent detail={detail} roomId={roomId} open={open} />
-    );
+    return <ChatDetailContent detail={detail} roomId={roomId} open={open} />;
   };
 
   return (
-    <DetailDrawer open={open} title="채팅방 상세" size="lg" onClose={onClose}>
+    <DetailDrawer
+      open={open}
+      title={t('chats.detail.title')}
+      size="lg"
+      onClose={onClose}
+    >
       {renderBody()}
     </DetailDrawer>
   );

@@ -1,6 +1,7 @@
 import localFont from 'next/font/local';
 
 import { cn } from '@/lib/utils';
+import { I18nProvider } from '@/providers/I18nProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
 
 import './globals.css';
@@ -15,8 +16,8 @@ const pretendard = localFont({
 });
 
 export const metadata: Metadata = {
-  title: '무빙 관리자',
-  description: '무빙 서비스 관리자 페이지',
+  title: 'Moving Admin',
+  description: 'Moving service administration portal',
 };
 
 export default function RootLayout({
@@ -26,11 +27,13 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="ko"
       className={cn(pretendard.variable, 'h-full overflow-hidden antialiased')}
     >
       <body className="flex h-full flex-col overflow-hidden">
-        <QueryProvider>{children}</QueryProvider>
+        <I18nProvider>
+          <QueryProvider>{children}</QueryProvider>
+        </I18nProvider>
       </body>
     </html>
   );

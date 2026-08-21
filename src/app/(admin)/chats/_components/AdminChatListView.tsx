@@ -8,6 +8,7 @@ import {
   type ChangeEvent,
   type ReactNode,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
 import { Button } from '@/components/Button/Button';
@@ -19,7 +20,6 @@ import { SearchInput } from '@/components/SearchInput/SearchInput';
 import { SearchResetButton } from '@/components/SearchResetButton/SearchResetButton';
 import { useAdminChatList } from '@/hooks/useAdminChatList';
 import { useClampListPage } from '@/hooks/useClampListPage';
-import { ADMIN_CHAT_ROOM_TYPE_LABEL } from '@/utils/adminChat';
 import {
   createAdminChatListHref,
   parseAdminChatSearchParams,
@@ -32,14 +32,6 @@ import type {
   AdminChatRoomType,
 } from '@/types/adminChat';
 import type { AdminChatUrlFilters } from '@/utils/adminListSearchParams';
-
-/** 채팅방 유형 필터: 빈 문자열은 roomType 미전달(전체) */
-const ROOM_TYPE_FILTER_OPTIONS = [
-  { label: '전체', value: '' },
-  { label: ADMIN_CHAT_ROOM_TYPE_LABEL.GENERAL, value: 'GENERAL' },
-  { label: ADMIN_CHAT_ROOM_TYPE_LABEL.DESIGNATED, value: 'DESIGNATED' },
-  { label: ADMIN_CHAT_ROOM_TYPE_LABEL.COMMUNITY, value: 'COMMUNITY' },
-] as const;
 
 export type AdminChatListFilters = AdminChatUrlFilters;
 
@@ -79,6 +71,7 @@ export interface AdminChatListViewProps {
  * 검색·유형 필터·페이지네이션과 Loading/Empty/Table 구조를 담당한다.
  */
 export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
+  const { t } = useTranslation();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const filters = useMemo(
@@ -176,6 +169,12 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
   };
 
   const hasActiveFilters = Boolean(filters.search || filters.roomType);
+  const roomTypeOptions = ['', 'GENERAL', 'DESIGNATED', 'COMMUNITY'].map(
+    (value) => ({
+      value,
+      label: value ? t(`chats.roomType.${value}`) : t('chats.filter.allTypes'),
+    })
+  );
 
   const renderListBody = (): ReactNode => {
     if (isPending) {
@@ -185,8 +184,8 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
     if (isError) {
       return (
         <EmptyState
-          title="채팅방 목록을 불러오지 못했습니다."
-          description="잠시 후 다시 시도해 주세요."
+          title={t('chats.list.error')}
+          description={t('chats.common.retry')}
         />
       );
     }
@@ -195,19 +194,15 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
       return (
         <EmptyState
           title={
-            hasActiveFilters
-              ? '검색 결과가 없습니다.'
-              : '등록된 채팅방이 없습니다.'
+            hasActiveFilters ? t('chats.list.noResults') : t('chats.list.empty')
           }
           description={
-            hasActiveFilters
-              ? '검색 조건을 변경한 후 다시 시도해 주세요.'
-              : undefined
+            hasActiveFilters ? t('chats.list.changeFilters') : undefined
           }
           action={
             hasActiveFilters ? (
               <Button variant="secondary" onClick={handleResetFilters}>
-                필터 초기화
+                {t('chats.list.resetFilters')}
               </Button>
             ) : undefined
           }
@@ -220,15 +215,15 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
         columns={columns}
         data={items}
         rowKey="id"
-        caption="채팅방 목록"
+        caption={t('chats.list.label')}
       />
     );
   };
 
   return (
     <AdminListLayout
-      title="채팅 관리"
-      description="채팅방 목록을 조회하고 검색·필터할 수 있습니다."
+      title={t('chats.title')}
+      description={t('chats.description')}
       page={currentPage}
       totalPages={totalPages}
       onPageChange={handlePageChange}
@@ -238,18 +233,21 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
             value={searchInput}
             onChange={handleSearchChange}
             onSearch={handleSearch}
-            placeholder="이름, 닉네임, 이메일, 휴대폰 검색"
+            placeholder={t('chats.filter.searchPlaceholder')}
             searchAction="button"
             className="min-w-64 flex-1"
-            aria-label="채팅방 참여자 검색"
+            aria-label={t('chats.filter.searchLabel')}
           />
           <FilterSelect
-            aria-label="채팅방 유형"
+            aria-label={t('chats.fields.roomType')}
             value={filters.roomType ?? ''}
             onChange={handleRoomTypeChange}
-            options={[...ROOM_TYPE_FILTER_OPTIONS]}
+            options={roomTypeOptions}
           />
-          <SearchResetButton onClick={handleResetFilters} />
+          <SearchResetButton
+            label={t('common.searchReset')}
+            onClick={handleResetFilters}
+          />
         </>
       }
     >

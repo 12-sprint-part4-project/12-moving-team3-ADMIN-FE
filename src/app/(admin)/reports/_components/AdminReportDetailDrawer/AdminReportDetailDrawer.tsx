@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/Button/Button';
 import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
@@ -11,7 +12,6 @@ import {
   useResolveAdminReport,
 } from '@/hooks/useAdminReportDecisionMutation';
 import { useAdminReportDetail } from '@/hooks/useAdminReportDetail';
-
 
 import { AdminReportDecisionSuccessToast } from './AdminReportDecisionSuccessToast';
 import { AdminReportRejectConfirmModal } from './AdminReportRejectConfirmModal';
@@ -123,6 +123,7 @@ const ReportDetailDrawerChrome = ({
   onClose,
   onRetry,
 }: ReportDetailDrawerChromeProps) => {
+  const { t } = useTranslation();
   const [selectedActions, setSelectedActions] = useState<
     AdminReportProcessAction[]
   >([]);
@@ -220,10 +221,10 @@ const ReportDetailDrawerChrome = ({
 
       setActiveModal(null);
       setSelectedActions([]);
-      showSuccessToast('신고를 처리했습니다.');
+      showSuccessToast(t('reports.resolve.success'));
     } catch (error) {
       // 실패 시 Modal·선택 Action을 유지해 재시도할 수 있게 한다. 캐시는 mutation onSuccess에서만 갱신된다.
-      setDecisionError(getAdminReportDecisionErrorMessage(error));
+      setDecisionError(getAdminReportDecisionErrorMessage(error, t));
     }
   };
 
@@ -244,9 +245,9 @@ const ReportDetailDrawerChrome = ({
 
       setActiveModal(null);
       setSelectedActions([]);
-      showSuccessToast('신고를 반려했습니다.');
+      showSuccessToast(t('reports.reject.success'));
     } catch (error) {
-      setDecisionError(getAdminReportDecisionErrorMessage(error));
+      setDecisionError(getAdminReportDecisionErrorMessage(error, t));
     }
   };
 
@@ -265,7 +266,7 @@ const ReportDetailDrawerChrome = ({
     if (displayReportId == null) {
       return (
         <p className="text-md-regular text-gray-500">
-          선택한 신고 정보가 없습니다.
+          {t('reports.detail.noSelection')}
         </p>
       );
     }
@@ -278,15 +279,11 @@ const ReportDetailDrawerChrome = ({
     if (isError) {
       return (
         <EmptyState
-          title={getDetailErrorTitle(error)}
-          description="잠시 후 다시 시도해 주세요."
+          title={getDetailErrorTitle(error, t)}
+          description={t('reports.common.retry')}
           action={
-            <Button
-              variant="secondary"
-              loading={isFetching}
-              onClick={onRetry}
-            >
-              다시 시도
+            <Button variant="secondary" loading={isFetching} onClick={onRetry}>
+              {t('reports.common.retryAction')}
             </Button>
           }
         />
@@ -295,8 +292,8 @@ const ReportDetailDrawerChrome = ({
 
     return (
       <EmptyState
-        title="신고 정보가 없습니다."
-        description="선택한 신고를 찾을 수 없습니다."
+        title={t('reports.detail.empty')}
+        description={t('reports.detail.notFound')}
       />
     );
   };
@@ -311,7 +308,7 @@ const ReportDetailDrawerChrome = ({
           disabled={isDecisionPending}
           onClick={handleOpenRejectModal}
         >
-          신고 반려
+          {t('reports.reject.action')}
         </Button>
         <Button
           variant="solid"
@@ -319,7 +316,7 @@ const ReportDetailDrawerChrome = ({
           disabled={!hasSelectedActions || isDecisionPending}
           onClick={handleOpenResolveModal}
         >
-          신고 처리
+          {t('reports.resolve.action')}
         </Button>
       </div>
     ) : undefined;
@@ -328,7 +325,7 @@ const ReportDetailDrawerChrome = ({
     <>
       <DetailDrawer
         open={open}
-        title="신고 상세"
+        title={t('reports.detail.title')}
         onClose={handleCloseDrawer}
         footer={footer}
         disableKeyboardEvents={activeModal !== null}
@@ -397,9 +394,7 @@ export const AdminReportDetailDrawer = ({
   const detail = data?.data ?? null;
   // 응답 id가 표시 대상과 다를 때만 막아, 캐시/전환 중 잘못된 상세가 잠깐 보이지 않게 한다.
   const isDetailForSelection =
-    detail != null &&
-    activeReportId != null &&
-    detail.id === activeReportId;
+    detail != null && activeReportId != null && detail.id === activeReportId;
 
   return (
     <ReportDetailDrawerChrome

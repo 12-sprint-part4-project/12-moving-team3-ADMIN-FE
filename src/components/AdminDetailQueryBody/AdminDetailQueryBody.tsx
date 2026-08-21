@@ -43,14 +43,13 @@ export interface AdminDetailQueryBodyProps<TDetail extends AdminDetailEntity> {
   notFoundTitle: string;
   /** 404가 아닌 조회 실패 EmptyState 제목 */
   errorTitle: string;
+  errorDescription: string;
+  retryLabel: string;
   emptyTitle: string;
   emptyDescription: string;
   renderContent: (detail: TDetail) => ReactNode;
   className?: string;
 }
-
-const ERROR_DESCRIPTION = '잠시 후 다시 시도해 주세요.';
-const RETRY_LABEL = '다시 시도';
 
 const getQueryErrorTitle = (
   error: unknown,
@@ -73,6 +72,8 @@ export const AdminDetailQueryBody = <TDetail extends AdminDetailEntity>({
   useDetail,
   notFoundTitle,
   errorTitle,
+  errorDescription,
+  retryLabel,
   emptyTitle,
   emptyDescription,
   renderContent,
@@ -93,10 +94,10 @@ export const AdminDetailQueryBody = <TDetail extends AdminDetailEntity>({
       <EmptyState
         className={className}
         title={getQueryErrorTitle(error, notFoundTitle, errorTitle)}
-        description={ERROR_DESCRIPTION}
+        description={errorDescription}
         action={
           <Button variant="secondary" onClick={handleRetry}>
-            {RETRY_LABEL}
+            {retryLabel}
           </Button>
         }
       />

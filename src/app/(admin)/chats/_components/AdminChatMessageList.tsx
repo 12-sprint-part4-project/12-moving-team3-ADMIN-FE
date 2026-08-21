@@ -3,6 +3,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { RefreshCw } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/Button/Button';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
@@ -51,7 +52,8 @@ interface AdminChatMessageItemProps {
 }
 
 const AdminChatMessageItem = ({ message }: AdminChatMessageItemProps) => {
-  const senderLabel = formatAdminChatUserLabel(message.sender);
+  const { t, i18n } = useTranslation();
+  const senderLabel = formatAdminChatUserLabel(message.sender, t);
   // 필터링된 메시지는 관리자가 원문을 보도록 rawContent를 우선 표시한다.
   // content/rawContent API 계약은 유지하고, 표시만 UI에서 선택한다.
   const displayContent =
@@ -64,16 +66,22 @@ const AdminChatMessageItem = ({ message }: AdminChatMessageItemProps) => {
       <div className="flex flex-wrap items-center gap-2">
         <p className="text-md-semibold text-black-400">{senderLabel}</p>
         {message.sender.isDeleted ? (
-          <StatusBadge variant="danger" label="탈퇴" />
+          <StatusBadge
+            variant="danger"
+            label={t('chats.participant.withdrawn')}
+          />
         ) : null}
         {message.isFiltered ? (
-          <StatusBadge variant="warning" label="필터링됨" />
+          <StatusBadge variant="warning" label={t('chats.messages.filtered')} />
         ) : null}
         <time
           className="ml-auto text-xs-medium text-gray-400"
           dateTime={message.createdAt}
         >
-          {formatAdminMemberJoinedAt(message.createdAt)}
+          {formatAdminMemberJoinedAt(
+            message.createdAt,
+            i18n.resolvedLanguage ?? 'ko'
+          )}
         </time>
       </div>
 
@@ -89,7 +97,7 @@ const AdminChatMessageItem = ({ message }: AdminChatMessageItemProps) => {
                   {/* eslint-disable-next-line @next/next/no-img-element -- Presigned URL은 next/image remotePatterns 없이 img로 표시한다. */}
                   <img
                     src={url}
-                    alt="채팅 이미지"
+                    alt={t('chats.messages.imageAlt')}
                     className="max-h-48 w-full object-contain"
                   />
                 </li>
@@ -97,7 +105,7 @@ const AdminChatMessageItem = ({ message }: AdminChatMessageItemProps) => {
             </ul>
           ) : (
             <p className="text-md-regular text-gray-500">
-              이미지를 불러올 수 없습니다.
+              {t('chats.messages.imageError')}
             </p>
           )
         ) : (
@@ -119,6 +127,7 @@ export const AdminChatMessageList = ({
   roomId,
   enabled,
 }: AdminChatMessageListProps) => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   /** 더 보기 전에 화면에 있던 메시지 스냅샷. 첫 페이지만 볼 때는 비어 있다. */
   const [frozenMessages, setFrozenMessages] = useState<AdminChatMessage[]>([]);
@@ -196,17 +205,17 @@ export const AdminChatMessageList = ({
 
   const renderBody = () => {
     if (isInitialLoading) {
-      return <LoadingState message="메시지를 불러오는 중..." />;
+      return <LoadingState message={t('chats.messages.loading')} />;
     }
 
     if (isError && before === undefined) {
       return (
         <EmptyState
-          title="메시지를 불러오지 못했습니다."
-          description="잠시 후 다시 시도해 주세요."
+          title={t('chats.messages.error')}
+          description={t('chats.common.retry')}
           action={
             <Button variant="secondary" onClick={() => void refetch()}>
-              다시 시도
+              {t('chats.common.retryAction')}
             </Button>
           }
         />
@@ -216,7 +225,7 @@ export const AdminChatMessageList = ({
     if (messages.length === 0) {
       return (
         <p className="py-6 text-center text-md-regular text-gray-500">
-          메시지 내역이 없습니다.
+          {t('chats.messages.empty')}
         </p>
       );
     }
@@ -237,11 +246,11 @@ export const AdminChatMessageList = ({
             disabled={isFetching || (!canLoadOlder && !canRetryLoadOlder)}
             onClick={handleLoadOlder}
           >
-            이전 메시지 더 보기
+            {t('chats.messages.loadOlder')}
           </Button>
           {canRetryLoadOlder ? (
             <p className="text-xs-medium text-red-200">
-              이전 메시지를 불러오지 못했습니다.
+              {t('chats.messages.loadOlderError')}
             </p>
           ) : null}
         </div>
@@ -251,7 +260,7 @@ export const AdminChatMessageList = ({
 
   return (
     <DetailSection
-      title="메시지 히스토리"
+      title={t('chats.messages.title')}
       headerAction={
         <Button
           variant="secondary"
@@ -259,8 +268,8 @@ export const AdminChatMessageList = ({
           loading={isRefreshing}
           disabled={!enabled || isFetching}
           onClick={handleRefresh}
-          aria-label="메시지 새로고침"
-          title="메시지 새로고침"
+          aria-label={t('chats.messages.refresh')}
+          title={t('chats.messages.refresh')}
         >
           <RefreshCw className="size-4" aria-hidden />
         </Button>

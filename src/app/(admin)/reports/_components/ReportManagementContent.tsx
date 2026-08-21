@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
 import { useAdminReportList } from '@/hooks/useAdminReportList';
@@ -21,6 +22,7 @@ import { ReportTable } from './ReportTable';
  * 필터 상태와 표시 컴포넌트 사이의 데이터 연결만 담당한다.
  */
 export const ReportManagementContent = () => {
+  const { t, i18n } = useTranslation();
   const { detailId, setDetailId } = useDetailSearchParam('reportId');
   const selectedReportId = parseNumericDetailId(detailId);
   const {
@@ -63,15 +65,16 @@ export const ReportManagementContent = () => {
     [setDetailId]
   );
   const columns = useMemo(
-    () => getReportListColumns(handleOpenDetail),
-    [handleOpenDetail]
+    () =>
+      getReportListColumns(handleOpenDetail, t, i18n.resolvedLanguage ?? 'ko'),
+    [handleOpenDetail, i18n.resolvedLanguage, t]
   );
 
   return (
     <>
       <AdminListLayout
-        title="신고 관리"
-        description="신고 목록을 조회하고 상태를 확인할 수 있습니다."
+        title={t('reports.title')}
+        description={t('reports.description')}
         page={currentPage}
         totalPages={totalPages}
         onPageChange={handlePageChange}

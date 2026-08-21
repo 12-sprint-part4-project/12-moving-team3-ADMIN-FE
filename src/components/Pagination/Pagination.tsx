@@ -7,6 +7,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils';
 
@@ -117,6 +118,7 @@ export const Pagination = ({
   className,
   ...rest
 }: PaginationProps) => {
+  const { t } = useTranslation();
   const resolvedSize = size ?? 'sm';
   // 범위를 벗어나면 클램프해 잘못된 page prop에도 UI가 깨지지 않게 한다.
   const currentPage = Math.min(Math.max(page, 1), Math.max(totalPages, 1));
@@ -133,14 +135,14 @@ export const Pagination = ({
 
   return (
     <nav
-      aria-label="페이지네이션"
+      aria-label={t('pagination.label')}
       className={cn(paginationRootVariants({ size: resolvedSize }), className)}
       {...rest}
     >
       <PaginationItem
         size={resolvedSize}
         disabled={!canGoPrev}
-        aria-label="첫 페이지"
+        aria-label={t('pagination.first')}
         onClick={() => handlePageChange(1)}
       >
         <ChevronsLeft
@@ -155,7 +157,7 @@ export const Pagination = ({
       <PaginationItem
         size={resolvedSize}
         disabled={!canGoPrev}
-        aria-label="이전 페이지"
+        aria-label={t('pagination.previous')}
         onClick={() => handlePageChange(currentPage - 1)}
       >
         <ChevronLeft
@@ -175,7 +177,7 @@ export const Pagination = ({
             <PaginationItem
               key={pageNumber}
               size={resolvedSize}
-              aria-label={`${pageNumber}페이지`}
+              aria-label={t('pagination.page', { page: pageNumber })}
               aria-current={isActive ? 'page' : undefined}
               onClick={() => handlePageChange(pageNumber)}
             >
@@ -200,7 +202,7 @@ export const Pagination = ({
       <PaginationItem
         size={resolvedSize}
         disabled={!canGoNext}
-        aria-label="다음 페이지"
+        aria-label={t('pagination.next')}
         onClick={() => handlePageChange(currentPage + 1)}
       >
         <ChevronRight
@@ -215,7 +217,7 @@ export const Pagination = ({
       <PaginationItem
         size={resolvedSize}
         disabled={!canGoNext}
-        aria-label="마지막 페이지"
+        aria-label={t('pagination.last')}
         onClick={() => handlePageChange(totalPages)}
       >
         <ChevronsRight

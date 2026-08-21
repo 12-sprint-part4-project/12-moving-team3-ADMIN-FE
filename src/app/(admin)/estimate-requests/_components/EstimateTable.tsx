@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
+
 import { Button } from '@/components/Button/Button';
 import { DataTable, type Column } from '@/components/DataTable/DataTable';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
@@ -21,6 +23,7 @@ import type {
   AdminEstimateRequestListItem,
   AdminListSortDirection,
 } from '@/types/adminEstimateRequest';
+import type { TFunction } from 'i18next';
 
 export interface EstimateTableProps {
   items: AdminEstimateRequestListItem[];
@@ -40,29 +43,31 @@ export interface EstimateTableProps {
 const getEstimateRequestColumns = (
   onDetailClick: EstimateTableProps['onDetailClick'],
   sort: AdminListSortDirection,
-  onSortToggle: EstimateTableProps['onSortToggle']
+  onSortToggle: EstimateTableProps['onSortToggle'],
+  t: TFunction,
+  locale: string
 ): Column<AdminEstimateRequestListItem>[] => [
-  { key: 'id', header: '견적 번호', accessor: 'id' },
+  { key: 'id', header: t('estimates.fields.id'), accessor: 'id' },
   {
     key: 'userName',
-    header: '요청자 이름',
+    header: t('estimates.fields.userName'),
     render: (row) => (
       <TruncatedText value={row.userName} className="max-w-28" />
     ),
   },
   {
     key: 'phoneNumber',
-    header: '전화번호',
+    header: t('estimates.fields.phoneNumber'),
     render: (row) => formatAdminEstimateRequestPhoneNumber(row.phoneNumber),
   },
   {
     key: 'moveType',
-    header: '이사 유형',
-    render: (row) => formatAdminEstimateRequestMoveType(row.moveType),
+    header: t('estimates.fields.moveType'),
+    render: (row) => formatAdminEstimateRequestMoveType(row.moveType, t),
   },
   {
     key: 'departureAddress',
-    header: '출발지',
+    header: t('estimates.fields.departureAddress'),
     render: (row) => {
       const address = formatAdminEstimateRequestNullableText(
         row.departureAddress
@@ -77,7 +82,7 @@ const getEstimateRequestColumns = (
   },
   {
     key: 'arrivalAddress',
-    header: '도착지',
+    header: t('estimates.fields.arrivalAddress'),
     render: (row) => {
       const address = formatAdminEstimateRequestNullableText(
         row.arrivalAddress
@@ -94,21 +99,23 @@ const getEstimateRequestColumns = (
     key: 'submittedAt',
     header: (
       <SortableColumnHeader
-        label="제출일"
+        label={t('estimates.fields.submittedAt')}
         sort={sort}
         onToggle={onSortToggle}
       />
     ),
     ariaSort: sort === 'ASC' ? 'ascending' : 'descending',
-    render: (row) => formatAdminEstimateRequestSubmittedAt(row.submittedAt),
+    render: (row) =>
+      formatAdminEstimateRequestSubmittedAt(row.submittedAt, locale),
   },
   {
     key: 'status',
-    header: '상태',
+    header: t('estimates.fields.status'),
     align: 'center',
     render: (row) => {
       const missingLabels = formatAdminEstimateRequestMissingFields(
-        row.missingFields
+        row.missingFields,
+        t
       );
       const hasMissingFields = hasAdminEstimateRequestMissingFields(
         row.missingFields
@@ -116,12 +123,24 @@ const getEstimateRequestColumns = (
 
       return (
         <div className="flex flex-col items-center gap-1">
-          <StatusBadge {...ADMIN_ESTIMATE_REQUEST_STATUS_BADGE[row.status]} />
+          <StatusBadge
+            variant={ADMIN_ESTIMATE_REQUEST_STATUS_BADGE[row.status].variant}
+            label={t(`estimates.status.${row.status}`)}
+          />
           {hasMissingFields ? (
-            <span title={`누락: ${missingLabels.join(', ')}`}>
-              <StatusBadge variant="danger" label="정보 누락" />
+            <span
+              title={t('estimates.missing.title', {
+                fields: missingLabels.join(', '),
+              })}
+            >
+              <StatusBadge
+                variant="danger"
+                label={t('estimates.missing.badge')}
+              />
               <span className="sr-only">
-                누락 필드: {missingLabels.join(', ')}
+                {t('estimates.missing.fields', {
+                  fields: missingLabels.join(', '),
+                })}
               </span>
             </span>
           ) : null}
@@ -131,13 +150,13 @@ const getEstimateRequestColumns = (
   },
   {
     key: 'estimateCount',
-    header: '견적 수',
+    header: t('estimates.fields.estimateCount'),
     accessor: 'estimateCount',
     align: 'center',
   },
   {
     key: 'mover',
-    header: '매칭 기사',
+    header: t('estimates.fields.mover'),
     render: (row) => {
       const mover = row.mover ?? '-';
 
@@ -146,7 +165,7 @@ const getEstimateRequestColumns = (
   },
   {
     key: 'action',
-    header: '작업',
+    header: t('estimates.fields.actions'),
     align: 'center',
     render: (row) => (
       <Button
@@ -154,7 +173,7 @@ const getEstimateRequestColumns = (
         className="px-3 py-1.5 text-sm-medium"
         onClick={() => onDetailClick(row.id)}
       >
-        상세 보기
+        {t('estimates.viewDetail')}
       </Button>
     ),
   },
@@ -173,61 +192,64 @@ export const EstimateTable = ({
   onRetry,
   sort,
   onSortToggle,
-}: EstimateTableProps) => (
-  <section className="mt-4" aria-label="견적 요청 목록">
-    <div className="overflow-hidden rounded-lg border border-line-200 bg-white">
-      {isError ? (
-        <EmptyState
-          title="견적 요청 목록을 불러오지 못했습니다."
-          description="잠시 후 다시 시도해 주세요."
-          action={
-            <Button variant="secondary" onClick={onRetry}>
-              다시 시도
-            </Button>
-          }
-        />
-      ) : !isLoading && items.length === 0 ? (
-        <EmptyState
-          title={
-            hasActiveFilters
-              ? '검색 결과가 없습니다.'
-              : '등록된 견적 요청이 없습니다.'
-          }
-          description={
-            hasActiveFilters
-              ? '검색 조건을 변경한 후 다시 시도해 주세요.'
-              : undefined
-          }
-          action={
-            hasActiveFilters ? (
-              <Button variant="secondary" onClick={onResetFilters}>
-                필터 초기화
+}: EstimateTableProps) => {
+  const { t, i18n } = useTranslation();
+  return (
+    <section className="mt-4" aria-label={t('estimates.list.label')}>
+      <div className="overflow-hidden rounded-lg border border-line-200 bg-white">
+        {isError ? (
+          <EmptyState
+            title={t('estimates.list.error')}
+            description={t('estimates.common.retry')}
+            action={
+              <Button variant="secondary" onClick={onRetry}>
+                {t('estimates.list.retry')}
               </Button>
-            ) : undefined
-          }
-        />
-      ) : (
-        <DataTable
-          columns={getEstimateRequestColumns(
-            onDetailClick,
-            sort,
-            onSortToggle
-          )}
-          data={items}
-          rowKey="id"
-          loading={isLoading}
-          caption="견적 요청 목록"
-        />
-      )}
-    </div>
-    {totalPages > 0 ? (
-      <div className="mt-6 flex justify-center">
-        <Pagination
-          page={page}
-          totalPages={totalPages}
-          onPageChange={onPageChange}
-        />
+            }
+          />
+        ) : !isLoading && items.length === 0 ? (
+          <EmptyState
+            title={
+              hasActiveFilters
+                ? t('estimates.list.noResults')
+                : t('estimates.list.empty')
+            }
+            description={
+              hasActiveFilters ? t('estimates.list.changeFilters') : undefined
+            }
+            action={
+              hasActiveFilters ? (
+                <Button variant="secondary" onClick={onResetFilters}>
+                  {t('estimates.list.resetFilters')}
+                </Button>
+              ) : undefined
+            }
+          />
+        ) : (
+          <DataTable
+            columns={getEstimateRequestColumns(
+              onDetailClick,
+              sort,
+              onSortToggle,
+              t,
+              i18n.resolvedLanguage ?? 'ko'
+            )}
+            data={items}
+            rowKey="id"
+            loading={isLoading}
+            caption={t('estimates.list.label')}
+          />
+        )}
       </div>
-    ) : null}
-  </section>
-);
+      {totalPages > 0 ? (
+        <div className="mt-6 flex justify-center">
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+          />
+        </div>
+      ) : null}
+    </section>
+  );
+};

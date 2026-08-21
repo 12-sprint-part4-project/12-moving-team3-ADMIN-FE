@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { useAdminMe } from '@/hooks/useAdminMe';
@@ -16,6 +17,7 @@ interface AdminAuthGuardProps {
  * 새로고침 후 토큰 복구는 axiosInstance interceptor에 맡긴다.
  */
 export const AdminAuthGuard = ({ children }: AdminAuthGuardProps) => {
+  const { t } = useTranslation();
   const router = useRouter();
   const { isPending, isSuccess, isError } = useAdminMe();
 
@@ -30,10 +32,7 @@ export const AdminAuthGuard = ({ children }: AdminAuthGuardProps) => {
 
   if (isPending) {
     return (
-      <LoadingState
-        message="인증 확인 중..."
-        className="h-full py-0"
-      />
+      <LoadingState message={t('auth.checking')} className="h-full py-0" />
     );
   }
 

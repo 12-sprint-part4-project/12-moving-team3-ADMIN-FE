@@ -7,22 +7,25 @@ import {
 
 import type { Column } from '@/components/DataTable/DataTable';
 import type { AdminReviewListItem } from '@/types/adminReview';
+import type { TFunction } from 'i18next';
 
 /**
  * 관리자 리뷰 목록 DataTable 컬럼.
  * 상세 열기 핸들러만 외부에서 주입한다.
  */
 export const getReviewListColumns = (
-  onOpenDetail: (review: AdminReviewListItem) => void
+  onOpenDetail: (review: AdminReviewListItem) => void,
+  t: TFunction,
+  locale: string
 ): Column<AdminReviewListItem>[] => [
   {
     key: 'id',
-    header: '리뷰 ID',
+    header: t('reviews.fields.reviewId'),
     accessor: 'id',
   },
   {
     key: 'author',
-    header: '작성자',
+    header: t('reviews.fields.author'),
     className: 'max-w-56',
     render: (row) => (
       <div className="flex min-w-0 flex-col gap-0.5">
@@ -43,7 +46,7 @@ export const getReviewListColumns = (
   },
   {
     key: 'mover',
-    header: '기사',
+    header: t('reviews.fields.mover'),
     className: 'max-w-56',
     // 회원 목록 phoneNumber와 동일하게 null은 '-'로 표시한다.
     render: (row) => {
@@ -71,13 +74,13 @@ export const getReviewListColumns = (
   },
   {
     key: 'rating',
-    header: '별점',
+    header: t('reviews.fields.rating'),
     align: 'center',
     render: (row) => row.rating,
   },
   {
     key: 'content',
-    header: '리뷰 내용',
+    header: t('reviews.fields.content'),
     className: 'max-w-72',
     // 신고/채팅 목록과 동일하게 truncate + title로 전체 문구를 제공한다.
     render: (row) => (
@@ -88,33 +91,33 @@ export const getReviewListColumns = (
   },
   {
     key: 'createdAt',
-    header: '작성일',
-    render: (row) => formatAdminReviewCreatedAt(row.createdAt),
+    header: t('reviews.fields.createdAt'),
+    render: (row) => formatAdminReviewCreatedAt(row.createdAt, locale),
   },
   {
     key: 'status',
-    header: '상태',
+    header: t('reviews.fields.status'),
     align: 'center',
     // deletedAt으로 활성/삭제됨을 한눈에 구분한다.
     render: (row) =>
       row.deletedAt == null ? (
-        <StatusBadge variant="success" label="활성" />
+        <StatusBadge variant="success" label={t('reviews.status.active')} />
       ) : (
-        <StatusBadge variant="danger" label="삭제됨" />
+        <StatusBadge variant="danger" label={t('reviews.status.deleted')} />
       ),
   },
   {
     key: 'actions',
-    header: '관리',
+    header: t('reviews.fields.actions'),
     align: 'center',
     render: (row) => (
       <Button
         variant="secondary"
         className="px-3 py-1.5 text-sm-medium"
-        aria-label={`리뷰 ${row.id} 상세 보기`}
+        aria-label={t('reviews.viewDetailLabel', { id: row.id })}
         onClick={() => onOpenDetail(row)}
       >
-        상세 보기
+        {t('reviews.viewDetail')}
       </Button>
     ),
   },

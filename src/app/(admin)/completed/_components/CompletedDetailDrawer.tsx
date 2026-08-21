@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
+
 import { AdminDetailQueryBody } from '@/components/AdminDetailQueryBody/AdminDetailQueryBody';
 import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
@@ -29,53 +31,85 @@ interface CompletedDetailContentProps {
 }
 
 const CompletedDetailContent = ({ detail }: CompletedDetailContentProps) => {
-  const missingLabels = formatAdminCompletedMissingFields(detail.missingFields);
+  const { t, i18n } = useTranslation();
+  const missingLabels = formatAdminCompletedMissingFields(
+    detail.missingFields,
+    t
+  );
   const hasMissingFields = hasAdminCompletedMissingFields(detail.missingFields);
   const confirmedQuote = detail.confirmedQuote;
 
   const basicInformation: [string, string][] = [
-    ['견적 번호', String(detail.id)],
-    ['요청자 이름', detail.userName],
+    [t('estimates.fields.id'), String(detail.id)],
+    [t('estimates.fields.userName'), detail.userName],
     [
-      '요청자 닉네임',
+      t('estimates.fields.userNickname'),
       formatAdminEstimateRequestNullableText(detail.userNickname),
     ],
-    ['이사 유형', formatAdminEstimateRequestMoveType(detail.moveType)],
     [
-      '출발지 우편번호',
+      t('estimates.fields.moveType'),
+      formatAdminEstimateRequestMoveType(detail.moveType, t),
+    ],
+    [
+      t('estimates.fields.departureZipCode'),
       formatAdminEstimateRequestNullableText(detail.departureZipCode),
     ],
-    ['출발지', formatAdminEstimateRequestNullableText(detail.departureAddress)],
     [
-      '출발지 상세',
+      t('estimates.fields.departureAddress'),
+      formatAdminEstimateRequestNullableText(detail.departureAddress),
+    ],
+    [
+      t('estimates.fields.departureDetailAddress'),
       formatAdminEstimateRequestNullableText(detail.departureDetailAddress),
     ],
     [
-      '도착지 우편번호',
+      t('estimates.fields.arrivalZipCode'),
       formatAdminEstimateRequestNullableText(detail.arrivalZipCode),
     ],
-    ['도착지', formatAdminEstimateRequestNullableText(detail.arrivalAddress)],
     [
-      '도착지 상세',
+      t('estimates.fields.arrivalAddress'),
+      formatAdminEstimateRequestNullableText(detail.arrivalAddress),
+    ],
+    [
+      t('estimates.fields.arrivalDetailAddress'),
       formatAdminEstimateRequestNullableText(detail.arrivalDetailAddress),
     ],
-    ['이사일', formatAdminCompletedMoveDate(detail.moveDate)],
+    [
+      t('completed.fields.moveDate'),
+      formatAdminCompletedMoveDate(
+        detail.moveDate,
+        i18n.resolvedLanguage ?? 'ko'
+      ),
+    ],
   ];
 
   const confirmedQuoteInformation: [string, string][] = [
     [
-      '기사명',
+      t('completed.fields.moverName'),
       formatAdminEstimateRequestNullableText(confirmedQuote?.moverName),
     ],
     [
-      '기사 닉네임',
+      t('completed.fields.moverNickname'),
       formatAdminEstimateRequestNullableText(confirmedQuote?.moverNickname),
     ],
-    ['견적 금액', formatAdminCompletedPrice(confirmedQuote?.price ?? null)],
-    ['코멘트', formatAdminEstimateRequestNullableText(confirmedQuote?.comment)],
     [
-      '견적 생성일',
-      formatAdminEstimateRequestSubmittedAt(confirmedQuote?.createdAt ?? null),
+      t('completed.fields.price'),
+      formatAdminCompletedPrice(
+        confirmedQuote?.price ?? null,
+        t,
+        i18n.language
+      ),
+    ],
+    [
+      t('completed.fields.comment'),
+      formatAdminEstimateRequestNullableText(confirmedQuote?.comment),
+    ],
+    [
+      t('completed.fields.quoteCreatedAt'),
+      formatAdminEstimateRequestSubmittedAt(
+        confirmedQuote?.createdAt ?? null,
+        i18n.resolvedLanguage ?? 'ko'
+      ),
     ],
   ];
 
@@ -86,11 +120,13 @@ const CompletedDetailContent = ({ detail }: CompletedDetailContentProps) => {
           className="rounded-lg bg-red-100 px-3 py-2 text-xs-medium text-red-200"
           role="status"
         >
-          필수 정보가 누락된 데이터입니다. 누락 필드: {missingLabels.join(', ')}
+          {t('estimates.missing.description', {
+            fields: missingLabels.join(', '),
+          })}
         </p>
       ) : null}
 
-      <DetailSection title="기본 정보">
+      <DetailSection title={t('estimates.detail.basicInfo')}>
         <dl className="flex flex-col gap-3 text-xs-medium">
           {basicInformation.map(([label, value]) => (
             <div key={label} className="flex items-start justify-between gap-4">
@@ -101,10 +137,10 @@ const CompletedDetailContent = ({ detail }: CompletedDetailContentProps) => {
         </dl>
       </DetailSection>
 
-      <DetailSection title="확정 견적">
+      <DetailSection title={t('completed.detail.confirmedQuote')}>
         {confirmedQuote == null ? (
           <p className="text-xs-medium text-gray-500">
-            확정 견적 정보가 없습니다.
+            {t('completed.detail.noConfirmedQuote')}
           </p>
         ) : (
           <dl className="flex flex-col gap-3 text-xs-medium">
@@ -131,24 +167,29 @@ const CompletedDetailContent = ({ detail }: CompletedDetailContentProps) => {
 export const CompletedDetailDrawer = ({
   estimateRequestId,
   onClose,
-}: CompletedDetailDrawerProps) => (
-  <DetailDrawer
-    open={estimateRequestId != null}
-    title="완료 건 상세 정보"
-    onClose={onClose}
-    size="md"
-  >
-    {estimateRequestId != null ? (
-      // id가 있을 때만 본문을 마운트해서 estimateRequestId를 number로 좁힌다.
-      <AdminDetailQueryBody
-        id={estimateRequestId}
-        useDetail={useAdminCompletedDetail}
-        notFoundTitle="완료 건 정보를 찾을 수 없습니다."
-        errorTitle="완료 건 상세를 불러오지 못했습니다."
-        emptyTitle="완료 건 정보가 없습니다."
-        emptyDescription="선택한 완료 건을 찾을 수 없습니다."
-        renderContent={(detail) => <CompletedDetailContent detail={detail} />}
-      />
-    ) : null}
-  </DetailDrawer>
-);
+}: CompletedDetailDrawerProps) => {
+  const { t } = useTranslation();
+  return (
+    <DetailDrawer
+      open={estimateRequestId != null}
+      title={t('completed.detail.title')}
+      onClose={onClose}
+      size="md"
+    >
+      {estimateRequestId != null ? (
+        // id가 있을 때만 본문을 마운트해서 estimateRequestId를 number로 좁힌다.
+        <AdminDetailQueryBody
+          id={estimateRequestId}
+          useDetail={useAdminCompletedDetail}
+          notFoundTitle={t('completed.detail.notFound')}
+          errorTitle={t('completed.detail.error')}
+          errorDescription={t('completed.common.retry')}
+          retryLabel={t('completed.list.retry')}
+          emptyTitle={t('completed.detail.empty')}
+          emptyDescription={t('completed.detail.emptyDescription')}
+          renderContent={(detail) => <CompletedDetailContent detail={detail} />}
+        />
+      ) : null}
+    </DetailDrawer>
+  );
+};

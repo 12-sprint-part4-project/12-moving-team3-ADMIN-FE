@@ -8,6 +8,7 @@ import {
   type ChangeEvent,
   type ReactNode,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
 import { Button } from '@/components/Button/Button';
@@ -43,17 +44,6 @@ import type { AdminMemberListFilters } from '@/utils/adminMemberListSearchParams
 export type { AdminMemberListFilters } from '@/utils/adminMemberListSearchParams';
 
 /** 상태 필터: 빈 문자열은 status 미전달(전체) */
-const STATUS_FILTER_OPTIONS = [
-  { label: '상태 전체', value: '' },
-  { label: '활성', value: 'ACTIVE' },
-  { label: '정지', value: 'SUSPENDED' },
-] as const;
-
-const SORT_ORDER_OPTIONS = [
-  { label: '가입일 최신순', value: 'DESC' },
-  { label: '가입일 오래된순', value: 'ASC' },
-] as const;
-
 /** select value → MemberStatus | undefined. 알 수 없는 값은 무시한다. */
 const parseMemberStatusFilter = (value: string): MemberStatus | undefined => {
   if (value === 'ACTIVE' || value === 'SUSPENDED') {
@@ -115,6 +105,7 @@ export const AdminMemberListView = ({
   errorTitle,
   getColumns,
 }: AdminMemberListViewProps) => {
+  const { t } = useTranslation();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const filters = useMemo(
@@ -277,7 +268,7 @@ export const AdminMemberListView = ({
       return (
         <EmptyState
           title={errorTitle}
-          description="잠시 후 다시 시도해 주세요."
+          description={t('members.common.retry')}
         />
       );
     }
@@ -285,16 +276,16 @@ export const AdminMemberListView = ({
     if (items.length === 0) {
       return (
         <EmptyState
-          title={hasActiveFilters ? '검색 결과가 없습니다.' : emptyNoDataTitle}
+          title={
+            hasActiveFilters ? t('members.list.noResults') : emptyNoDataTitle
+          }
           description={
-            hasActiveFilters
-              ? '검색 조건을 변경한 후 다시 시도해 주세요.'
-              : undefined
+            hasActiveFilters ? t('members.list.changeFilters') : undefined
           }
           action={
             hasActiveFilters ? (
               <Button variant="secondary" onClick={handleResetFilters}>
-                필터 초기화
+                {t('members.list.resetFilters')}
               </Button>
             ) : undefined
           }
@@ -320,29 +311,39 @@ export const AdminMemberListView = ({
             value={searchInput}
             onChange={handleSearchChange}
             onSearch={handleSearch}
-            placeholder="이름, 이메일, 휴대폰 검색"
+            placeholder={t('members.list.searchPlaceholder')}
             searchAction="button"
             className="min-w-64 flex-1"
             aria-label={searchAriaLabel}
           />
           <FilterSelect
-            aria-label="상태"
+            aria-label={t('members.list.statusLabel')}
             value={filters.status ?? ''}
             onChange={handleStatusChange}
-            options={[...STATUS_FILTER_OPTIONS]}
+            options={[
+              { label: t('members.status.all'), value: '' },
+              { label: t('members.status.active'), value: 'ACTIVE' },
+              { label: t('members.status.suspended'), value: 'SUSPENDED' },
+            ]}
           />
           <DateRangePopover
             value={dateRangeValue}
             onConfirm={handleDateRangeConfirm}
-            placeholder="가입일 전체"
+            placeholder={t('members.list.allJoinDates')}
           />
           <FilterSelect
-            aria-label="가입일 정렬"
+            aria-label={t('members.list.joinDateSort')}
             value={filters.sortOrder}
             onChange={handleSortOrderChange}
-            options={[...SORT_ORDER_OPTIONS]}
+            options={[
+              { label: t('members.list.newest'), value: 'DESC' },
+              { label: t('members.list.oldest'), value: 'ASC' },
+            ]}
           />
-          <SearchResetButton onClick={handleResetFilters} />
+          <SearchResetButton
+            label={t('common.searchReset')}
+            onClick={handleResetFilters}
+          />
         </>
       }
     >

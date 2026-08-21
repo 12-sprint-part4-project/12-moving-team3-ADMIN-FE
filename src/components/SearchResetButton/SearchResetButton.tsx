@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 
 interface SearchResetButtonProps {
   onClick: () => void;
+  label: string;
   className?: string;
 }
 
@@ -12,6 +13,7 @@ interface SearchResetButtonProps {
  */
 export const SearchResetButton = ({
   onClick,
+  label,
   className,
 }: SearchResetButtonProps) => (
   <Button
@@ -19,6 +21,6 @@ export const SearchResetButton = ({
     onClick={onClick}
     className={cn('h-9 shrink-0 px-5 py-1.5', className)}
   >
-    검색 초기화
+    {label}
   </Button>
 );

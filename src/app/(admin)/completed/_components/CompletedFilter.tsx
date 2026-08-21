@@ -1,16 +1,11 @@
+import { useTranslation } from 'react-i18next';
+
 import { DateRangePopover } from '@/components/DateRangePopover/DateRangePopover';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
 import { SearchResetButton } from '@/components/SearchResetButton/SearchResetButton';
 
 import type { ComponentProps } from 'react';
-
-const MOVE_TYPE_OPTIONS = [
-  { label: '이사 유형 전체', value: '' },
-  { label: '소형이사', value: 'SMALL' },
-  { label: '가정이사', value: 'HOME' },
-  { label: '사무실이사', value: 'OFFICE' },
-];
 
 interface CompletedFilterProps {
   searchValue: string;
@@ -33,31 +28,39 @@ export const CompletedFilter = ({
   onMoveTypeChange,
   onDateRangeConfirm,
   onReset,
-}: CompletedFilterProps) => (
-  <section
-    className="mt-4 flex flex-wrap items-center gap-2"
-    aria-label="완료 건 필터"
-  >
-    <SearchInput
-      value={searchValue}
-      onChange={onSearchChange}
-      onSearch={onSearch}
-      placeholder="견적 번호, 요청자 이름, 전화번호 검색"
-      searchAction="button"
-      aria-label="완료 건 검색"
-      className="min-w-64 flex-1"
-    />
-    <FilterSelect
-      aria-label="이사 유형"
-      value={moveTypeValue}
-      onChange={onMoveTypeChange}
-      options={MOVE_TYPE_OPTIONS}
-    />
-    <DateRangePopover
-      value={dateRangeValue}
-      placeholder="이사일 기간 전체"
-      onConfirm={onDateRangeConfirm}
-    />
-    <SearchResetButton onClick={onReset} />
-  </section>
-);
+}: CompletedFilterProps) => {
+  const { t } = useTranslation();
+  return (
+    <section
+      className="mt-4 flex flex-wrap items-center gap-2"
+      aria-label={t('completed.filter.label')}
+    >
+      <SearchInput
+        value={searchValue}
+        onChange={onSearchChange}
+        onSearch={onSearch}
+        placeholder={t('completed.filter.searchPlaceholder')}
+        searchAction="button"
+        aria-label={t('completed.filter.searchLabel')}
+        className="min-w-64 flex-1"
+      />
+      <FilterSelect
+        aria-label={t('completed.filter.moveTypeLabel')}
+        value={moveTypeValue}
+        onChange={onMoveTypeChange}
+        options={[
+          { label: t('completed.moveType.all'), value: '' },
+          { label: t('estimates.moveType.SMALL'), value: 'SMALL' },
+          { label: t('estimates.moveType.HOME'), value: 'HOME' },
+          { label: t('estimates.moveType.OFFICE'), value: 'OFFICE' },
+        ]}
+      />
+      <DateRangePopover
+        value={dateRangeValue}
+        placeholder={t('completed.filter.allMoveDates')}
+        onConfirm={onDateRangeConfirm}
+      />
+      <SearchResetButton label={t('common.searchReset')} onClick={onReset} />
+    </section>
+  );
+};

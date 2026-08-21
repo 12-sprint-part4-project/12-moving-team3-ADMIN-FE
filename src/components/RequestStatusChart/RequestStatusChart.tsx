@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 import { cn } from '@/lib/utils';
@@ -13,7 +14,7 @@ export interface RequestStatusChartProps {
 
 interface StatusSegment {
   key: keyof Omit<AdminDashboardRequestStatus, 'total'>;
-  label: string;
+  labelKey: string;
   code: string;
   color: string;
 }
@@ -22,37 +23,35 @@ interface StatusSegment {
 const STATUS_SEGMENTS: StatusSegment[] = [
   {
     key: 'submitted',
-    label: '요청',
+    labelKey: 'dashboard.requestStatus.submitted',
     code: 'SUBMITTED',
     color: 'var(--color-blue-300)',
   },
   {
     key: 'confirmed',
-    label: '매칭 완료',
+    labelKey: 'dashboard.requestStatus.confirmed',
     code: 'CONFIRMED',
     color: 'var(--color-green-200)',
   },
   {
     key: 'completed',
-    label: '이사 완료',
+    labelKey: 'dashboard.requestStatus.completed',
     code: 'COMPLETED',
     color: 'var(--color-yellow-100)',
   },
   {
     key: 'expired',
-    label: '만료',
+    labelKey: 'dashboard.requestStatus.expired',
     code: 'EXPIRED',
     color: 'var(--color-blue-400)',
   },
   {
     key: 'canceled',
-    label: '취소',
+    labelKey: 'dashboard.requestStatus.canceled',
     code: 'CANCELED',
     color: 'var(--color-red-200)',
   },
 ];
-
-const formatCount = (value: number) => value.toLocaleString('ko-KR');
 
 const formatPercentage = (value: number, total: number) => {
   if (total === 0) {
@@ -70,8 +69,10 @@ export const RequestStatusChart = ({
   data,
   className,
 }: RequestStatusChartProps) => {
-  const chartData = STATUS_SEGMENTS.map(({ key, label, color }) => ({
-    name: label,
+  const { t, i18n } = useTranslation();
+  const formatCount = (value: number) => value.toLocaleString(i18n.language);
+  const chartData = STATUS_SEGMENTS.map(({ key, labelKey, color }) => ({
+    name: t(labelKey),
     value: data[key],
     color,
   }));
@@ -99,7 +100,12 @@ export const RequestStatusChart = ({
               <Tooltip
                 formatter={(value) =>
                   typeof value === 'number'
-                    ? [`${formatCount(value)}건`, undefined]
+                    ? [
+                        t('dashboard.units.count', {
+                          count: formatCount(value),
+                        }),
+                        undefined,
+                      ]
                     : [value, undefined]
                 }
               />
@@ -107,15 +113,17 @@ export const RequestStatusChart = ({
           </ResponsiveContainer>
 
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-sm-medium text-gray-500">총 요청</span>
+            <span className="text-sm-medium text-gray-500">
+              {t('dashboard.requestStatus.total')}
+            </span>
             <strong className="text-xl-bold text-black-400">
-              {formatCount(data.total)} 건
+              {t('dashboard.units.count', { count: formatCount(data.total) })}
             </strong>
           </div>
         </div>
 
         <ul className="flex w-full flex-1 flex-col gap-3">
-          {STATUS_SEGMENTS.map(({ key, label, code, color }) => {
+          {STATUS_SEGMENTS.map(({ key, labelKey, code, color }) => {
             const count = data[key];
 
             return (
@@ -130,11 +138,12 @@ export const RequestStatusChart = ({
                     aria-hidden
                   />
                   <span className="truncate">
-                    {label} <span className="text-gray-400">({code})</span>
+                    {t(labelKey)}{' '}
+                    <span className="text-gray-400">({code})</span>
                   </span>
                 </span>
                 <span className="shrink-0 text-black-400">
-                  {formatCount(count)}건{' '}
+                  {t('dashboard.units.count', { count: formatCount(count) })}{' '}
                   <span className="text-gray-400">
                     ({formatPercentage(count, data.total)}%)
                   </span>

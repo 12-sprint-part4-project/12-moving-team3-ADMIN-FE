@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/Button/Button';
 import { ConfirmModal } from '@/components/ConfirmModal/ConfirmModal';
@@ -26,6 +27,7 @@ import type {
   MemberRegion,
   MemberStatus,
 } from '@/types/adminMember';
+import type { TFunction } from 'i18next';
 
 /** 상세 Drawer 상태 변경 액션. ConfirmModal·mutation 연결에 사용한다. */
 export type AdminMemberStatusChangeAction = 'suspend' | 'activate';
@@ -38,24 +40,14 @@ interface StatusActionModalCopy {
 }
 
 /** ConfirmModal 문구. 액션별로 title/description/confirmText를 분리한다. */
-const STATUS_ACTION_MODAL_COPY: Record<
-  AdminMemberStatusChangeAction,
-  StatusActionModalCopy
-> = {
-  suspend: {
-    title: '회원을 7일 정지하시겠습니까?',
-    description: '정지 기간 동안 해당 회원은 서비스 이용이 제한됩니다.',
-    confirmText: '7일 정지',
-  },
-  activate: {
-    title: '회원 계정을 활성화하시겠습니까?',
-    description: '활성화 후 해당 회원은 다시 서비스를 이용할 수 있습니다.',
-    confirmText: '계정 활성화',
-  },
-};
-
-const STATUS_CHANGE_ERROR_MESSAGE =
-  '상태 변경에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+const getStatusActionModalCopy = (
+  action: AdminMemberStatusChangeAction,
+  t: TFunction
+): StatusActionModalCopy => ({
+  title: t(`members.action.${action}.title`),
+  description: t(`members.action.${action}.description`),
+  confirmText: t(`members.action.${action}.confirm`),
+});
 
 export const REGION_LABEL: Record<MemberRegion, string> = {
   SEOUL: '서울',
@@ -82,29 +74,33 @@ export const MOVE_TYPE_LABEL: Record<MemberMoveType, string> = {
   OFFICE: '사무실 이사',
 };
 
-export const formatNullableDateTime = (iso: string | null) => {
+export const formatNullableDateTime = (iso: string | null, locale: string) => {
   if (!iso) {
     return '-';
   }
 
-  return formatAdminMemberJoinedAt(iso);
+  return formatAdminMemberJoinedAt(iso, locale);
 };
 
-export const formatRegion = (region: MemberRegion | null) => {
+export const formatRegion = (region: MemberRegion | null, t?: TFunction) => {
   if (!region) {
     return '-';
   }
 
-  return REGION_LABEL[region] ?? region;
+  return t ? t(`members.region.${region}`) : (REGION_LABEL[region] ?? region);
 };
 
-export const formatServices = (services: MemberMoveType[]) => {
+export const formatServices = (services: MemberMoveType[], t?: TFunction) => {
   if (services.length === 0) {
     return '-';
   }
 
   return services
-    .map((service) => MOVE_TYPE_LABEL[service] ?? service)
+    .map((service) =>
+      t
+        ? t(`members.moveType.${service}`)
+        : (MOVE_TYPE_LABEL[service] ?? service)
+    )
     .join(', ');
 };
 
@@ -133,23 +129,32 @@ export interface AdminMemberBasicInfoSectionProps {
 export const AdminMemberBasicInfoSection = ({
   detail,
   className,
-}: AdminMemberBasicInfoSectionProps) => (
-  <DetailSection title="기본 정보" className={className}>
-    <dl className="flex flex-col gap-2 text-md-medium">
-      <DetailField label="이름" value={detail.name} />
-      <DetailField label="닉네임" value={detail.nickname} />
-      <DetailField label="이메일" value={detail.email} />
-      <DetailField
-        label="전화번호"
-        value={formatAdminMemberPhoneNumber(detail.phoneNumber)}
-      />
-      <DetailField
-        label="가입일"
-        value={formatAdminMemberJoinedAt(detail.createdAt)}
-      />
-    </dl>
-  </DetailSection>
-);
+}: AdminMemberBasicInfoSectionProps) => {
+  const { t, i18n } = useTranslation();
+  return (
+    <DetailSection title={t('members.detail.basicInfo')} className={className}>
+      <dl className="flex flex-col gap-2 text-md-medium">
+        <DetailField label={t('members.fields.name')} value={detail.name} />
+        <DetailField
+          label={t('members.fields.nickname')}
+          value={detail.nickname}
+        />
+        <DetailField label={t('members.fields.email')} value={detail.email} />
+        <DetailField
+          label={t('members.fields.phone')}
+          value={formatAdminMemberPhoneNumber(detail.phoneNumber)}
+        />
+        <DetailField
+          label={t('members.fields.joinedAt')}
+          value={formatAdminMemberJoinedAt(
+            detail.createdAt,
+            i18n.resolvedLanguage ?? 'ko'
+          )}
+        />
+      </dl>
+    </DetailSection>
+  );
+};
 
 export interface AdminMemberAccountStatusSectionProps {
   detail: AdminMemberDetail;
@@ -161,32 +166,51 @@ export const AdminMemberAccountStatusSection = ({
   detail,
   className,
 }: AdminMemberAccountStatusSectionProps) => {
+  const { t, i18n } = useTranslation();
   // UserStatusInfo가 없으면 목록과 같이 ACTIVE로 표시한다.
   const status = detail.userStatus?.status ?? 'ACTIVE';
   const suspendedAt = detail.userStatus?.suspendedAt ?? null;
   const suspendedUntil = detail.userStatus?.suspendedUntil ?? null;
 
   return (
-    <DetailSection title="계정 상태" className={className}>
+    <DetailSection
+      title={t('members.detail.accountStatus')}
+      className={className}
+    >
       <dl className="flex flex-col gap-2 text-md-medium">
         <div className="flex items-center justify-between gap-4">
-          <dt className="shrink-0 text-gray-500">계정 상태</dt>
+          <dt className="shrink-0 text-gray-500">
+            {t('members.detail.accountStatus')}
+          </dt>
           <dd>
             <StatusBadge
               variant={status === 'ACTIVE' ? 'success' : 'danger'}
-              label={status === 'ACTIVE' ? '활성' : '정지'}
+              label={t(
+                status === 'ACTIVE'
+                  ? 'members.status.active'
+                  : 'members.status.suspended'
+              )}
             />
           </dd>
         </div>
         <DetailField
-          label="정지 시작일"
-          value={formatNullableDateTime(suspendedAt)}
+          label={t('members.fields.suspendedAt')}
+          value={formatNullableDateTime(
+            suspendedAt,
+            i18n.resolvedLanguage ?? 'ko'
+          )}
         />
         <DetailField
-          label="정지 종료일"
-          value={formatNullableDateTime(suspendedUntil)}
+          label={t('members.fields.suspendedUntil')}
+          value={formatNullableDateTime(
+            suspendedUntil,
+            i18n.resolvedLanguage ?? 'ko'
+          )}
         />
-        <DetailField label="신고 횟수" value={detail.reportCount} />
+        <DetailField
+          label={t('members.fields.reportCount')}
+          value={detail.reportCount}
+        />
       </dl>
     </DetailSection>
   );
@@ -206,6 +230,7 @@ export const AdminMemberStatusActionFooter = ({
   status,
   onRequestStatusChange,
 }: AdminMemberStatusActionFooterProps) => {
+  const { t } = useTranslation();
   if (status === 'ACTIVE') {
     return (
       <Button
@@ -213,7 +238,7 @@ export const AdminMemberStatusActionFooter = ({
         className="w-full"
         onClick={() => onRequestStatusChange('suspend')}
       >
-        7일 정지
+        {t('members.action.suspend.confirm')}
       </Button>
     );
   }
@@ -224,7 +249,7 @@ export const AdminMemberStatusActionFooter = ({
       className="w-full"
       onClick={() => onRequestStatusChange('activate')}
     >
-      계정 활성화
+      {t('members.action.activate.confirm')}
     </Button>
   );
 };
@@ -253,6 +278,7 @@ export const AdminMemberDetailDrawerShell = ({
   emptyTitle,
   renderContent,
 }: AdminMemberDetailDrawerShellProps) => {
+  const { t } = useTranslation();
   const [pendingAction, setPendingAction] =
     useState<AdminMemberStatusChangeAction | null>(null);
   const [statusChangeError, setStatusChangeError] = useState<string | null>(
@@ -272,7 +298,7 @@ export const AdminMemberDetailDrawerShell = ({
   const isStatusChangePending =
     suspendMutation.isPending || activateMutation.isPending;
   const modalCopy = pendingAction
-    ? STATUS_ACTION_MODAL_COPY[pendingAction]
+    ? getStatusActionModalCopy(pendingAction, t)
     : null;
 
   const handleCloseDrawer = () => {
@@ -281,9 +307,7 @@ export const AdminMemberDetailDrawerShell = ({
     onClose();
   };
 
-  const handleRequestStatusChange = (
-    action: AdminMemberStatusChangeAction
-  ) => {
+  const handleRequestStatusChange = (action: AdminMemberStatusChangeAction) => {
     setStatusChangeError(null);
     setPendingAction(action);
   };
@@ -317,7 +341,7 @@ export const AdminMemberDetailDrawerShell = ({
       setPendingAction(null);
     } catch {
       // 실패 시 모달을 유지해 재시도·취소를 가능하게 한다.
-      setStatusChangeError(STATUS_CHANGE_ERROR_MESSAGE);
+      setStatusChangeError(t('members.action.error'));
     }
   };
 
@@ -330,7 +354,7 @@ export const AdminMemberDetailDrawerShell = ({
       return (
         <EmptyState
           title={errorTitle}
-          description="잠시 후 다시 시도해 주세요."
+          description={t('members.common.retry')}
         />
       );
     }
@@ -339,7 +363,7 @@ export const AdminMemberDetailDrawerShell = ({
       return (
         <EmptyState
           title={emptyTitle}
-          description="선택한 회원을 찾을 수 없습니다."
+          description={t('members.detail.notFoundDescription')}
         />
       );
     }

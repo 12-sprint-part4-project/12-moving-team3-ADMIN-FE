@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
+
 import {
   DetailField,
   formatNullableDateTime,
@@ -33,6 +35,8 @@ export const AdminReviewDetailDrawer = ({
   onRequestDelete,
   onClose,
 }: AdminReviewDetailDrawerProps) => {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage ?? 'ko';
   const footer =
     review && review.deletedAt == null ? (
       <Button
@@ -41,71 +45,91 @@ export const AdminReviewDetailDrawer = ({
         loading={isDeletePending}
         onClick={() => onRequestDelete(review.id)}
       >
-        리뷰 삭제
+        {t('reviews.delete.action')}
       </Button>
     ) : undefined;
 
   return (
     <DetailDrawer
       open={open}
-      title="리뷰 상세"
+      title={t('reviews.detail.title')}
       footer={footer}
       disableKeyboardEvents={isDeleteConfirmOpen}
       onClose={onClose}
     >
       {review ? (
         <div className="flex flex-col gap-4">
-          <DetailSection title="리뷰 정보">
+          <DetailSection title={t('reviews.detail.reviewInfo')}>
             <dl className="flex flex-col gap-2 text-md-medium">
-              <DetailField label="리뷰 ID" value={review.id} />
-              <DetailField label="견적 ID" value={review.quoteId} />
-              <DetailField label="별점" value={review.rating} />
               <DetailField
-                label="작성일"
-                value={formatAdminReviewCreatedAt(review.createdAt)}
+                label={t('reviews.fields.reviewId')}
+                value={review.id}
               />
               <DetailField
-                label="수정일"
-                value={formatNullableDateTime(review.updatedAt)}
+                label={t('reviews.fields.quoteId')}
+                value={review.quoteId}
               />
               <DetailField
-                label="삭제일"
-                value={formatNullableDateTime(review.deletedAt)}
+                label={t('reviews.fields.rating')}
+                value={review.rating}
+              />
+              <DetailField
+                label={t('reviews.fields.createdAt')}
+                value={formatAdminReviewCreatedAt(review.createdAt, locale)}
+              />
+              <DetailField
+                label={t('reviews.fields.updatedAt')}
+                value={formatNullableDateTime(review.updatedAt, locale)}
+              />
+              <DetailField
+                label={t('reviews.fields.deletedAt')}
+                value={formatNullableDateTime(review.deletedAt, locale)}
               />
               <div className="flex items-center justify-between gap-4">
-                <dt className="shrink-0 text-gray-500">상태</dt>
+                <dt className="shrink-0 text-gray-500">
+                  {t('reviews.fields.status')}
+                </dt>
                 <dd>
                   {review.deletedAt == null ? (
-                    <StatusBadge variant="success" label="활성" />
+                    <StatusBadge
+                      variant="success"
+                      label={t('reviews.status.active')}
+                    />
                   ) : (
-                    <StatusBadge variant="danger" label="삭제됨" />
+                    <StatusBadge
+                      variant="danger"
+                      label={t('reviews.status.deleted')}
+                    />
                   )}
                 </dd>
               </div>
             </dl>
           </DetailSection>
 
-          <DetailSection title="작성자·기사 정보">
+          <DetailSection title={t('reviews.detail.peopleInfo')}>
             <dl className="flex flex-col gap-2 text-md-medium">
               <DetailField
-                label="작성자"
+                label={t('reviews.fields.author')}
                 value={formatAdminReviewUserLabel(review.author)}
               />
-              <DetailField label="작성자 이메일" value={review.author.email} />
               <DetailField
-                label="기사"
+                label={t('reviews.fields.authorEmail')}
+                value={review.author.email}
+              />
+              <DetailField
+                label={t('reviews.fields.mover')}
                 value={
                   review.mover ? formatAdminReviewUserLabel(review.mover) : '-'
                 }
               />
               <DetailField
-                label="기사 이메일"
+                label={t('reviews.fields.moverEmail')}
                 value={review.mover?.email ?? '-'}
               />
             </dl>
           </DetailSection>
 
-          <DetailSection title="리뷰 원문">
+          <DetailSection title={t('reviews.detail.originalContent')}>
             <p className="text-md-regular break-words whitespace-pre-wrap text-black-400">
               {review.content}
             </p>
