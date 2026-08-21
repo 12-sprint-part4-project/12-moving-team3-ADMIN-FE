@@ -1,5 +1,7 @@
 import { format } from 'date-fns';
 
+import { formatLocalizedDateTime } from './formatLocalizedDate.ts';
+
 import type { StatusBadgeProps } from '@/components/StatusBadge/StatusBadge';
 import type {
   AdminEstimateQuoteStatus,
@@ -85,19 +87,14 @@ export const formatAdminEstimateRequestNameWithNickname = (
 };
 
 export const formatAdminEstimateRequestSubmittedAt = (
-  submittedAt: string | null
+  submittedAt: string | null,
+  locale: string
 ) => {
   if (submittedAt == null) {
     return '-';
   }
 
-  const date = new Date(submittedAt);
-
-  if (Number.isNaN(date.getTime())) {
-    return submittedAt;
-  }
-
-  return format(date, 'yyyy-MM-dd HH:mm');
+  return formatLocalizedDateTime(submittedAt, locale);
 };
 
 export const formatAdminEstimateRequestPhoneNumber = (

@@ -15,7 +15,7 @@ import { getChatListColumns } from './getChatListColumns';
  * 선택한 채팅방 ID를 한곳에서 관리해 목록 컬럼과 Drawer의 책임을 분리한다.
  */
 export const ChatManagementContent = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { detailId, setDetailId } = useDetailSearchParam('roomId');
   const selectedRoomId = parseNumericDetailId(detailId);
   const handleOpenDetail = useCallback(
@@ -23,8 +23,9 @@ export const ChatManagementContent = () => {
     [setDetailId]
   );
   const getColumns = useCallback(
-    () => getChatListColumns(handleOpenDetail, t),
-    [handleOpenDetail, t]
+    () =>
+      getChatListColumns(handleOpenDetail, t, i18n.resolvedLanguage ?? 'ko'),
+    [handleOpenDetail, i18n.resolvedLanguage, t]
   );
 
   return (

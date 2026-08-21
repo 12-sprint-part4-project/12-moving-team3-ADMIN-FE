@@ -25,7 +25,8 @@ const supportsContentDeletion = (row: AdminReportListItem) =>
 /** 신고 목록 표시 규칙과 상세 열기 액션을 컬럼 정의로 묶는다. */
 export const getReportListColumns = (
   onOpenDetail: (reportId: number) => void,
-  t: TFunction
+  t: TFunction,
+  locale: string
 ): Column<AdminReportListItem>[] => [
   { key: 'id', header: t('reports.fields.reportId'), accessor: 'id' },
   {
@@ -82,7 +83,7 @@ export const getReportListColumns = (
   {
     key: 'createdAt',
     header: t('reports.fields.createdAt'),
-    render: (row) => formatAdminReportCreatedAt(row.createdAt),
+    render: (row) => formatAdminReportCreatedAt(row.createdAt, locale),
   },
   {
     key: 'actions',

@@ -35,7 +35,8 @@ export const AdminReviewDetailDrawer = ({
   onRequestDelete,
   onClose,
 }: AdminReviewDetailDrawerProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage ?? 'ko';
   const footer =
     review && review.deletedAt == null ? (
       <Button
@@ -74,15 +75,15 @@ export const AdminReviewDetailDrawer = ({
               />
               <DetailField
                 label={t('reviews.fields.createdAt')}
-                value={formatAdminReviewCreatedAt(review.createdAt)}
+                value={formatAdminReviewCreatedAt(review.createdAt, locale)}
               />
               <DetailField
                 label={t('reviews.fields.updatedAt')}
-                value={formatNullableDateTime(review.updatedAt)}
+                value={formatNullableDateTime(review.updatedAt, locale)}
               />
               <DetailField
                 label={t('reviews.fields.deletedAt')}
-                value={formatNullableDateTime(review.deletedAt)}
+                value={formatNullableDateTime(review.deletedAt, locale)}
               />
               <div className="flex items-center justify-between gap-4">
                 <dt className="shrink-0 text-gray-500">

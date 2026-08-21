@@ -105,7 +105,7 @@ const getCompletedColumns = (
       />
     ),
     ariaSort: sort === 'ASC' ? 'ascending' : 'descending',
-    render: (row) => formatAdminCompletedMoveDate(row.moveDate),
+    render: (row) => formatAdminCompletedMoveDate(row.moveDate, locale),
   },
   {
     key: 'mover',
@@ -220,7 +220,7 @@ export const CompletedTable = ({
               sort,
               onSortToggle,
               t,
-              i18n.language
+              i18n.resolvedLanguage ?? 'ko'
             )}
             data={items}
             rowKey="id"

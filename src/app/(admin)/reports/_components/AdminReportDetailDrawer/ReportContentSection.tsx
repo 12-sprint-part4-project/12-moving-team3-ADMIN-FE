@@ -26,7 +26,7 @@ const ReportContentMetadataFields = ({
   /** 요약 줄에 이미 쓴 키는 중복 노출하지 않는다. */
   excludeKeys?: string[];
 }): ReactNode => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const excluded = new Set(excludeKeys ?? []);
   const entries = Object.entries(metadata).filter(
     ([key]) => !excluded.has(key)
@@ -42,7 +42,12 @@ const ReportContentMetadataFields = ({
       label={t(`reports.metadata.${key}`, {
         defaultValue: ADMIN_REPORT_CONTENT_METADATA_LABEL[key] ?? key,
       })}
-      value={formatAdminReportContentMetadataValue(key, value, t)}
+      value={formatAdminReportContentMetadataValue(
+        key,
+        value,
+        t,
+        i18n.resolvedLanguage ?? 'ko'
+      )}
     />
   ));
 };
@@ -68,7 +73,8 @@ export const ReportContentSection = ({
   isDeleteContentSelected,
   onToggleDeleteContent,
 }: ReportContentSectionProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage ?? 'ko';
   const {
     content,
     category,
@@ -162,11 +168,11 @@ export const ReportContentSection = ({
           {/* soft-delete 원본 조회 — 생성일·삭제일은 값 없어도 필드를 항상 노출한다. */}
           <DetailField
             label={t('reports.fields.contentCreatedAt')}
-            value={formatNullableDateTime(content.createdAt)}
+            value={formatNullableDateTime(content.createdAt, locale)}
           />
           <DetailField
             label={t('reports.fields.deletedAt')}
-            value={formatNullableDateTime(content.deletedAt)}
+            value={formatNullableDateTime(content.deletedAt, locale)}
           />
           {content.metadata ? (
             <ReportContentMetadataFields

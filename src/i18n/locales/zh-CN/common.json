@@ -6,7 +6,8 @@
     "confirm": "确认",
     "cancel": "取消",
     "loading": "加载中...",
-    "noData": "暂无数据。"
+    "noData": "暂无数据。",
+    "searchReset": "重置搜索"
   },
   "auth": {
     "brand": "Moving",

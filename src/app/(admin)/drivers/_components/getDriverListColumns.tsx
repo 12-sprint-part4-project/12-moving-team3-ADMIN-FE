@@ -25,7 +25,8 @@ const formatAverageRating = (averageRating: number | null) => {
 export const getDriverListColumns = (
   { page, pageSize, totalCount }: AdminMemberListColumnsContext,
   onOpenDetail: (memberId: string) => void,
-  t: TFunction
+  t: TFunction,
+  locale: string
 ): Column<AdminMemberListItem>[] => [
   {
     key: 'index',
@@ -69,7 +70,7 @@ export const getDriverListColumns = (
   {
     key: 'createdAt',
     header: t('members.fields.joinedAt'),
-    render: (row) => formatAdminMemberJoinedAt(row.createdAt),
+    render: (row) => formatAdminMemberJoinedAt(row.createdAt, locale),
   },
   {
     key: 'status',

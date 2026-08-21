@@ -1,5 +1,7 @@
 import { format } from 'date-fns';
 
+import { formatLocalizedDate } from './formatLocalizedDate.ts';
+
 import type { DateRange } from '@/components/DateRangePicker/DateRangePicker';
 import type { AdminDashboardStatisticsQuery } from '@/types/adminDashboard';
 
@@ -8,8 +10,10 @@ export const toAdminDashboardApiDate = (date: Date) =>
   format(date, 'yyyy-MM-dd');
 
 /** 이사일 표시용 YYYY-MM-DD */
-export const formatAdminDashboardMoveDate = (moveDate: string) =>
-  moveDate.split('T')[0];
+export const formatAdminDashboardMoveDate = (
+  moveDate: string,
+  locale: string
+) => formatLocalizedDate(moveDate, locale);
 
 /**
  * DateRange → statistics 쿼리 파라미터.

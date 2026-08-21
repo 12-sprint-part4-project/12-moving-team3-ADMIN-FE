@@ -15,7 +15,8 @@ import type { TFunction } from 'i18next';
  */
 export const getReviewListColumns = (
   onOpenDetail: (review: AdminReviewListItem) => void,
-  t: TFunction
+  t: TFunction,
+  locale: string
 ): Column<AdminReviewListItem>[] => [
   {
     key: 'id',
@@ -91,7 +92,7 @@ export const getReviewListColumns = (
   {
     key: 'createdAt',
     header: t('reviews.fields.createdAt'),
-    render: (row) => formatAdminReviewCreatedAt(row.createdAt),
+    render: (row) => formatAdminReviewCreatedAt(row.createdAt, locale),
   },
   {
     key: 'status',

@@ -6,7 +6,8 @@
     "confirm": "Confirm",
     "cancel": "Cancel",
     "loading": "Loading...",
-    "noData": "No data available."
+    "noData": "No data available.",
+    "searchReset": "Reset search"
   },
   "auth": {
     "brand": "Moving",

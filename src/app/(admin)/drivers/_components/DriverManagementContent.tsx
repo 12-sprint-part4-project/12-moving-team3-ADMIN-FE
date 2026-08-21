@@ -15,14 +15,19 @@ import { getDriverListColumns } from './getDriverListColumns';
  * 고객 목록과 공유하는 필터 로직은 AdminMemberListView에 그대로 위임한다.
  */
 export const DriverManagementContent = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { detailId, setDetailId: updateSelectedMember } =
     useDetailSearchParam('memberId');
   const selectedMemberId = parseUuidDetailId(detailId);
   const getColumns = useCallback(
     (context: Parameters<typeof getDriverListColumns>[0]) =>
-      getDriverListColumns(context, updateSelectedMember, t),
-    [updateSelectedMember, t]
+      getDriverListColumns(
+        context,
+        updateSelectedMember,
+        t,
+        i18n.resolvedLanguage ?? 'ko'
+      ),
+    [i18n.resolvedLanguage, updateSelectedMember, t]
   );
 
   return (

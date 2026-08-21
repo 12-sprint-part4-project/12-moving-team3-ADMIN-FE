@@ -32,12 +32,12 @@ export const formatNullableText = (value: string | null | undefined) => {
 };
 
 /** 날짜 필드용. null이면 '-' */
-export const formatNullableDateTime = (iso: string | null) => {
+export const formatNullableDateTime = (iso: string | null, locale: string) => {
   if (!iso) {
     return '-';
   }
 
-  return formatAdminReportCreatedAt(iso);
+  return formatAdminReportCreatedAt(iso, locale);
 };
 
 export const formatAdminLabel = (detail: AdminReportDetail, t?: TFunction) => {

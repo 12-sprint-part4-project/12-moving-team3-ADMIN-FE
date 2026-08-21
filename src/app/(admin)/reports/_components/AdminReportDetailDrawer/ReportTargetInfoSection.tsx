@@ -54,7 +54,7 @@ const PresenceStatusFields = ({
   presenceStatus,
   deletedAt,
 }: PresenceStatusFieldsProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   return (
     <>
       <div className="flex items-center justify-between gap-4">
@@ -71,7 +71,7 @@ const PresenceStatusFields = ({
       {/* soft-delete 원본 조회 — 삭제 여부와 무관하게 필드를 항상 노출한다. */}
       <DetailField
         label={t('reports.fields.deletedAt')}
-        value={formatNullableDateTime(deletedAt)}
+        value={formatNullableDateTime(deletedAt, i18n.resolvedLanguage ?? 'ko')}
       />
     </>
   );
@@ -82,13 +82,15 @@ interface AccountInfoFieldsProps {
 }
 
 const AccountInfoFields = ({ targetUser }: AccountInfoFieldsProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   return (
     <>
       <AccountStatusBadge targetUser={targetUser} />
       <DetailField
         label={t('reports.fields.reportCount')}
-        value={String(targetUser.reportCount)}
+        value={targetUser.reportCount.toLocaleString(
+          i18n.resolvedLanguage ?? 'ko'
+        )}
       />
     </>
   );

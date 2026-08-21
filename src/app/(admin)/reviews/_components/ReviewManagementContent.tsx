@@ -30,7 +30,7 @@ import type { AdminReviewListItem } from '@/types/adminReview';
  * 필터·목록·통계·삭제 Confirm 흐름을 조합한다.
  */
 export const ReviewManagementContent = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedReview, setSelectedReview] =
     useState<AdminReviewListItem | null>(null);
   const {
@@ -81,8 +81,9 @@ export const ReviewManagementContent = () => {
     setSelectedReview(review);
   }, []);
   const columns = useMemo(
-    () => getReviewListColumns(handleOpenDetail, t),
-    [handleOpenDetail, t]
+    () =>
+      getReviewListColumns(handleOpenDetail, t, i18n.resolvedLanguage ?? 'ko'),
+    [handleOpenDetail, i18n.resolvedLanguage, t]
   );
 
   const ratingFilterOptions = [
@@ -195,7 +196,10 @@ export const ReviewManagementContent = () => {
               onConfirm={handleDateRangeConfirm}
               placeholder={t('reviews.filter.allCreatedDates')}
             />
-            <SearchResetButton onClick={handleResetFilters} />
+            <SearchResetButton
+              label={t('common.searchReset')}
+              onClick={handleResetFilters}
+            />
           </>
         }
       >

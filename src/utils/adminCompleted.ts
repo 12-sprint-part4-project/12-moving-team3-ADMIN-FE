@@ -2,6 +2,8 @@ import { format } from 'date-fns';
 
 import { formatAdminEstimateQuotePrice } from '@/utils/adminEstimateRequest';
 
+import { formatLocalizedDate } from './formatLocalizedDate.ts';
+
 import type {
   AdminCompletedDetailMissingField,
   AdminCompletedListMissingField,
@@ -31,12 +33,15 @@ export const toAdminCompletedApiDate = (date: Date) =>
   format(date, 'yyyy-MM-dd');
 
 /** 이사일 표시용 YYYY-MM-DD. null이면 '-' */
-export const formatAdminCompletedMoveDate = (moveDate: string | null) => {
+export const formatAdminCompletedMoveDate = (
+  moveDate: string | null,
+  locale: string
+) => {
   if (moveDate == null) {
     return '-';
   }
 
-  return moveDate.split('T')[0] ?? moveDate;
+  return formatLocalizedDate(moveDate, locale);
 };
 
 export const formatAdminCompletedPrice = (

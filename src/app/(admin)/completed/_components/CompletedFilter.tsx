@@ -60,7 +60,7 @@ export const CompletedFilter = ({
         placeholder={t('completed.filter.allMoveDates')}
         onConfirm={onDateRangeConfirm}
       />
-      <SearchResetButton onClick={onReset} />
+      <SearchResetButton label={t('common.searchReset')} onClick={onReset} />
     </section>
   );
 };

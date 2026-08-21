@@ -83,7 +83,10 @@ const EstimateQuoteList = ({
               {statusLabel}
             </span>
             <time className="text-gray-500">
-              {formatAdminEstimateRequestSubmittedAt(quote.createdAt)}
+              {formatAdminEstimateRequestSubmittedAt(
+                quote.createdAt,
+                i18n.resolvedLanguage ?? 'ko'
+              )}
             </time>
           </li>
         );
@@ -97,7 +100,7 @@ interface EstimateDetailContentProps {
 }
 
 const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const missingLabels = formatAdminEstimateRequestMissingFields(
     detail.missingFields,
     t
@@ -143,7 +146,10 @@ const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
     ],
     [
       t('estimates.fields.submittedAt'),
-      formatAdminEstimateRequestSubmittedAt(detail.submittedAt),
+      formatAdminEstimateRequestSubmittedAt(
+        detail.submittedAt,
+        i18n.resolvedLanguage ?? 'ko'
+      ),
     ],
   ];
 
@@ -234,6 +240,8 @@ export const EstimateDetailDrawer = ({
           useDetail={useAdminEstimateRequestDetail}
           notFoundTitle={t('estimates.detail.notFound')}
           errorTitle={t('estimates.detail.error')}
+          errorDescription={t('estimates.common.retry')}
+          retryLabel={t('estimates.list.retry')}
           emptyTitle={t('estimates.detail.empty')}
           emptyDescription={t('estimates.detail.emptyDescription')}
           renderContent={(detail) => <EstimateDetailContent detail={detail} />}

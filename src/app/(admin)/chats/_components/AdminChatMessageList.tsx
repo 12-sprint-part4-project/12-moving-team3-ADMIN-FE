@@ -52,7 +52,7 @@ interface AdminChatMessageItemProps {
 }
 
 const AdminChatMessageItem = ({ message }: AdminChatMessageItemProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const senderLabel = formatAdminChatUserLabel(message.sender, t);
   // 필터링된 메시지는 관리자가 원문을 보도록 rawContent를 우선 표시한다.
   // content/rawContent API 계약은 유지하고, 표시만 UI에서 선택한다.
@@ -78,7 +78,10 @@ const AdminChatMessageItem = ({ message }: AdminChatMessageItemProps) => {
           className="ml-auto text-xs-medium text-gray-400"
           dateTime={message.createdAt}
         >
-          {formatAdminMemberJoinedAt(message.createdAt)}
+          {formatAdminMemberJoinedAt(
+            message.createdAt,
+            i18n.resolvedLanguage ?? 'ko'
+          )}
         </time>
       </div>
 

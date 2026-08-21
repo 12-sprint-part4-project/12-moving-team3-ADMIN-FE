@@ -6,7 +6,8 @@
     "confirm": "확인",
     "cancel": "취소",
     "loading": "불러오는 중...",
-    "noData": "데이터가 없습니다."
+    "noData": "데이터가 없습니다.",
+    "searchReset": "검색 초기화"
   },
   "auth": {
     "brand": "무빙",

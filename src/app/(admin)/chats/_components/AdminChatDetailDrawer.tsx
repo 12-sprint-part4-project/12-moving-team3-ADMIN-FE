@@ -31,7 +31,8 @@ interface ChatBasicInfoSectionProps {
 
 /** 채팅방 ID·유형·생성/마지막 메시지 시각 */
 const ChatBasicInfoSection = ({ detail }: ChatBasicInfoSectionProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage ?? 'ko';
   return (
     <DetailSection title={t('chats.detail.basicInfo')}>
       <dl className="flex flex-col gap-2 text-md-medium">
@@ -42,11 +43,11 @@ const ChatBasicInfoSection = ({ detail }: ChatBasicInfoSectionProps) => {
         />
         <DetailField
           label={t('chats.fields.createdAt')}
-          value={formatAdminMemberJoinedAt(detail.createdAt)}
+          value={formatAdminMemberJoinedAt(detail.createdAt, locale)}
         />
         <DetailField
           label={t('chats.fields.lastMessageAt')}
-          value={formatNullableDateTime(detail.lastMessageAt)}
+          value={formatNullableDateTime(detail.lastMessageAt, locale)}
         />
       </dl>
     </DetailSection>
@@ -120,7 +121,8 @@ interface ChatParticipantBlockProps {
 
 /** 참여자 1명 블록. 여러 명을 DetailField 한 줄에 몰지 않기 위해 분리한다. */
 const ChatParticipantBlock = ({ participant }: ChatParticipantBlockProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage ?? 'ko';
   const isLeft = participant.leftAt != null;
 
   return (
@@ -141,7 +143,7 @@ const ChatParticipantBlock = ({ participant }: ChatParticipantBlockProps) => {
         />
         <DetailField
           label={t('chats.fields.joinedAt')}
-          value={formatAdminMemberJoinedAt(participant.joinedAt)}
+          value={formatAdminMemberJoinedAt(participant.joinedAt, locale)}
         />
         <div className="flex items-center justify-between gap-4">
           <dt className="shrink-0 text-gray-500">
@@ -159,7 +161,7 @@ const ChatParticipantBlock = ({ participant }: ChatParticipantBlockProps) => {
         {isLeft ? (
           <DetailField
             label={t('chats.fields.leftAt')}
-            value={formatNullableDateTime(participant.leftAt)}
+            value={formatNullableDateTime(participant.leftAt, locale)}
           />
         ) : null}
         {participant.isDeleted ? (

@@ -76,7 +76,10 @@ const CompletedDetailContent = ({ detail }: CompletedDetailContentProps) => {
     ],
     [
       t('completed.fields.moveDate'),
-      formatAdminCompletedMoveDate(detail.moveDate),
+      formatAdminCompletedMoveDate(
+        detail.moveDate,
+        i18n.resolvedLanguage ?? 'ko'
+      ),
     ],
   ];
 
@@ -103,7 +106,10 @@ const CompletedDetailContent = ({ detail }: CompletedDetailContentProps) => {
     ],
     [
       t('completed.fields.quoteCreatedAt'),
-      formatAdminEstimateRequestSubmittedAt(confirmedQuote?.createdAt ?? null),
+      formatAdminEstimateRequestSubmittedAt(
+        confirmedQuote?.createdAt ?? null,
+        i18n.resolvedLanguage ?? 'ko'
+      ),
     ],
   ];
 
@@ -177,6 +183,8 @@ export const CompletedDetailDrawer = ({
           useDetail={useAdminCompletedDetail}
           notFoundTitle={t('completed.detail.notFound')}
           errorTitle={t('completed.detail.error')}
+          errorDescription={t('completed.common.retry')}
+          retryLabel={t('completed.list.retry')}
           emptyTitle={t('completed.detail.empty')}
           emptyDescription={t('completed.detail.emptyDescription')}
           renderContent={(detail) => <CompletedDetailContent detail={detail} />}

@@ -14,7 +14,7 @@ export const ReportReporterSection = ({
 }: {
   detail: AdminReportDetail;
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { reporter } = detail;
 
   return (
@@ -56,7 +56,10 @@ export const ReportReporterSection = ({
           {/* soft-delete 원본 조회 — 미탈퇴여도 필드는 항상 두고 null은 '-'로 본다. */}
           <DetailField
             label={t('reports.fields.withdrawnAt')}
-            value={formatNullableDateTime(reporter.deletedAt)}
+            value={formatNullableDateTime(
+              reporter.deletedAt,
+              i18n.resolvedLanguage ?? 'ko'
+            )}
           />
         </dl>
       </div>

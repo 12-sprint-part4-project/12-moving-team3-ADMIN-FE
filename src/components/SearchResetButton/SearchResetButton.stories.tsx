@@ -13,6 +13,7 @@ type Story = StoryObj<typeof SearchResetButton>;
 
 export const Default: Story = {
   args: {
+    label: '검색 초기화',
     onClick: () => undefined,
   },
 };

@@ -244,7 +244,10 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
             onChange={handleRoomTypeChange}
             options={roomTypeOptions}
           />
-          <SearchResetButton onClick={handleResetFilters} />
+          <SearchResetButton
+            label={t('common.searchReset')}
+            onClick={handleResetFilters}
+          />
         </>
       }
     >

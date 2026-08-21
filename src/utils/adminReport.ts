@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { formatLocalizedDateTime } from './formatLocalizedDate.ts';
 
 import type { StatusBadgeProps } from '@/components/StatusBadge/StatusBadge';
 import type {
@@ -123,7 +123,9 @@ export const getMetadataLabel = (
 ): string | null => {
   if (t && typeof value === 'string') {
     if (key === 'userType' || key === 'messageType' || key === 'category') {
-      return t(`reports.metadataValue.${key}.${value}`);
+      return t(`reports.metadataValue.${key}.${value}`, {
+        defaultValue: value,
+      });
     }
   }
   switch (key) {
@@ -242,14 +244,15 @@ export const getAdminReportContentSummary = (
 export const formatAdminReportContentMetadataValue = (
   key: string,
   value: unknown,
-  t?: TFunction
+  t?: TFunction,
+  locale?: string
 ): string => {
   if (value === null || value === undefined) {
     return '-';
   }
 
   if (key === 'rating' && typeof value === 'number') {
-    return `★${value}`;
+    return `★${new Intl.NumberFormat(locale).format(value)}`;
   }
 
   const mappedLabel = getMetadataLabel(key, value, t);
@@ -261,14 +264,18 @@ export const formatAdminReportContentMetadataValue = (
     (key === 'lastMessageAt' || key === 'postDeletedAt') &&
     typeof value === 'string'
   ) {
-    return formatAdminReportCreatedAt(value);
+    return formatAdminReportCreatedAt(value, locale ?? 'ko');
   }
 
   if (typeof value === 'string') {
     return value.trim() === '' ? '-' : value;
   }
 
-  if (typeof value === 'number' || typeof value === 'boolean') {
+  if (typeof value === 'number') {
+    return new Intl.NumberFormat(locale).format(value);
+  }
+
+  if (typeof value === 'boolean') {
     return String(value);
   }
 
@@ -280,15 +287,8 @@ export const formatAdminReportContentMetadataValue = (
 };
 
 /** 목록·상세 신고일 표시 (회원 목록과 동일 포맷) */
-export const formatAdminReportCreatedAt = (iso: string) => {
-  const date = new Date(iso);
-
-  if (Number.isNaN(date.getTime())) {
-    return iso;
-  }
-
-  return format(date, 'yyyy-MM-dd HH:mm');
-};
+export const formatAdminReportCreatedAt = (iso: string, locale: string) =>
+  formatLocalizedDateTime(iso, locale);
 
 /** 신고자 셀 표시명. 닉네임이 있으면 이름 옆에 보조로 붙인다. */
 export const formatAdminReportReporter = (reporter: {

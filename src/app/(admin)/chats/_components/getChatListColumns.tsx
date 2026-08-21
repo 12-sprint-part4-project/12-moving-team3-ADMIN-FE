@@ -15,7 +15,8 @@ import type { TFunction } from 'i18next';
  */
 export const getChatListColumns = (
   onOpenDetail: (roomId: number) => void,
-  t: TFunction
+  t: TFunction,
+  locale: string
 ): Column<AdminChatListItem>[] => [
   {
     key: 'id',
@@ -61,7 +62,9 @@ export const getChatListColumns = (
     key: 'lastMessageAt',
     header: t('chats.fields.lastMessageAt'),
     render: (row) =>
-      row.lastMessageAt ? formatAdminMemberJoinedAt(row.lastMessageAt) : '-',
+      row.lastMessageAt
+        ? formatAdminMemberJoinedAt(row.lastMessageAt, locale)
+        : '-',
   },
   {
     key: 'actions',

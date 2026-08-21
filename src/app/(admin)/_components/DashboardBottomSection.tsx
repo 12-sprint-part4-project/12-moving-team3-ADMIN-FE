@@ -63,7 +63,8 @@ const DashboardPanel = ({
 };
 
 export const DashboardBottomSection = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage ?? 'ko';
   const { data, isPending, isError } = useDashboardRecentActivities();
   const activities = data?.data;
 
@@ -71,7 +72,7 @@ export const DashboardBottomSection = () => {
     {
       key: 'createdAt',
       header: t('dashboard.columns.reportedAt'),
-      render: (row) => formatAdminReportCreatedAt(row.createdAt),
+      render: (row) => formatAdminReportCreatedAt(row.createdAt, locale),
     },
     {
       key: 'target',
@@ -111,7 +112,7 @@ export const DashboardBottomSection = () => {
     {
       key: 'joinedAt',
       header: t('dashboard.columns.joinedAt'),
-      render: (row) => formatAdminMemberJoinedAt(row.createdAt),
+      render: (row) => formatAdminMemberJoinedAt(row.createdAt, locale),
     },
   ];
   const recentCompletedColumns: Column<AdminDashboardRecentCompletedRequest>[] =
@@ -131,7 +132,7 @@ export const DashboardBottomSection = () => {
       {
         key: 'moveDate',
         header: t('dashboard.columns.moveDate'),
-        render: (row) => formatAdminDashboardMoveDate(row.moveDate),
+        render: (row) => formatAdminDashboardMoveDate(row.moveDate, locale),
       },
       {
         key: 'driverName',

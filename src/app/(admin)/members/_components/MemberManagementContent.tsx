@@ -15,15 +15,20 @@ import { getMemberListColumns } from './getMemberListColumns';
  * 공통 목록의 검색·필터 동작은 유지하고 선택 회원 상태만 라우트에서 소유한다.
  */
 export const MemberManagementContent = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { detailId, setDetailId: updateSelectedMember } =
     useDetailSearchParam('memberId');
   const selectedMemberId = parseUuidDetailId(detailId);
 
   const getColumns = useCallback(
     (context: Parameters<typeof getMemberListColumns>[0]) =>
-      getMemberListColumns(context, updateSelectedMember, t),
-    [updateSelectedMember, t]
+      getMemberListColumns(
+        context,
+        updateSelectedMember,
+        t,
+        i18n.resolvedLanguage ?? 'ko'
+      ),
+    [i18n.resolvedLanguage, updateSelectedMember, t]
   );
 
   return (

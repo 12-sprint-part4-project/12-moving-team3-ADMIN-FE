@@ -1,6 +1,6 @@
 'use client';
 
-import { format, isSameDay } from 'date-fns';
+import { isSameDay } from 'date-fns';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Calendar } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
@@ -12,6 +12,7 @@ import {
   type DateRange,
 } from '@/components/DateRangePicker/DateRangePicker';
 import { cn } from '@/lib/utils';
+import { formatLocalizedDate } from '@/utils/formatLocalizedDate';
 
 const POPOVER_MOTION_OFFSET_PX = 4;
 const POPOVER_MOTION_DURATION_SEC = 0.2;
@@ -26,14 +27,14 @@ export interface DateRangePopoverProps {
 }
 
 // 날짜 범위를 포맷팅하여 문자열로 반환하는 함수
-const formatDateRange = (value?: DateRange) => {
+const formatDateRange = (value: DateRange | undefined, locale: string) => {
   if (!value) {
     // 값이 없으면 undefined 반환
     return undefined;
   }
 
   // 시작일 포맷팅
-  const from = format(value.from, 'yyyy.MM.dd');
+  const from = formatLocalizedDate(value.from, locale);
 
   // 종료일이 없거나 시작일과 종료일이 같으면 시작일만 반환
   if (!value.to || isSameDay(value.from, value.to)) {
@@ -41,7 +42,7 @@ const formatDateRange = (value?: DateRange) => {
   }
 
   // 시작일 ~ 종료일 형태로 반환
-  return `${from} ~ ${format(value.to, 'yyyy.MM.dd')}`;
+  return `${from} ~ ${formatLocalizedDate(value.to, locale)}`;
 };
 
 // 날짜 범위 선택 팝오버 컴포넌트
@@ -52,7 +53,7 @@ export const DateRangePopover = ({
   className,
   triggerClassName,
 }: DateRangePopoverProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   // popover를 위한 고유 ID
   const popoverId = useId();
   const shouldReduceMotion = useReducedMotion();
@@ -65,7 +66,9 @@ export const DateRangePopover = ({
   const isOpenRef = useRef(isOpen);
   // 버튼에 표시될 날짜 문자열
   const dateRangeLabel =
-    formatDateRange(value) ?? placeholder ?? t('dateRange.allPeriod');
+    formatDateRange(value, i18n.resolvedLanguage ?? 'ko') ??
+    placeholder ??
+    t('dateRange.allPeriod');
   const popoverTransition = {
     duration: shouldReduceMotion ? 0 : POPOVER_MOTION_DURATION_SEC,
     ease: 'easeOut',

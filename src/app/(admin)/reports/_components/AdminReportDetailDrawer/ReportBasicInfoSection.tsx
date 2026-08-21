@@ -17,7 +17,7 @@ export const ReportBasicInfoSection = ({
 }: {
   detail: AdminReportDetail;
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   return (
     <DetailSection title={t('reports.detail.basicInfo')}>
       <dl className="flex flex-col gap-2 text-md-medium">
@@ -47,7 +47,10 @@ export const ReportBasicInfoSection = ({
         </div>
         <DetailField
           label={t('reports.fields.createdAt')}
-          value={formatAdminReportCreatedAt(detail.createdAt)}
+          value={formatAdminReportCreatedAt(
+            detail.createdAt,
+            i18n.resolvedLanguage ?? 'ko'
+          )}
         />
         <DetailField
           label={t('reports.fields.admin')}

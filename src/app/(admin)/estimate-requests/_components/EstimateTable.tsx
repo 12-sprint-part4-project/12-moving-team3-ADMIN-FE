@@ -44,7 +44,8 @@ const getEstimateRequestColumns = (
   onDetailClick: EstimateTableProps['onDetailClick'],
   sort: AdminListSortDirection,
   onSortToggle: EstimateTableProps['onSortToggle'],
-  t: TFunction
+  t: TFunction,
+  locale: string
 ): Column<AdminEstimateRequestListItem>[] => [
   { key: 'id', header: t('estimates.fields.id'), accessor: 'id' },
   {
@@ -104,7 +105,8 @@ const getEstimateRequestColumns = (
       />
     ),
     ariaSort: sort === 'ASC' ? 'ascending' : 'descending',
-    render: (row) => formatAdminEstimateRequestSubmittedAt(row.submittedAt),
+    render: (row) =>
+      formatAdminEstimateRequestSubmittedAt(row.submittedAt, locale),
   },
   {
     key: 'status',
@@ -191,7 +193,7 @@ export const EstimateTable = ({
   sort,
   onSortToggle,
 }: EstimateTableProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   return (
     <section className="mt-4" aria-label={t('estimates.list.label')}>
       <div className="overflow-hidden rounded-lg border border-line-200 bg-white">
@@ -229,7 +231,8 @@ export const EstimateTable = ({
               onDetailClick,
               sort,
               onSortToggle,
-              t
+              t,
+              i18n.resolvedLanguage ?? 'ko'
             )}
             data={items}
             rowKey="id"

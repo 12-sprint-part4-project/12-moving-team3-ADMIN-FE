@@ -16,7 +16,8 @@ import type { TFunction } from 'i18next';
 export const getMemberListColumns = (
   { page, pageSize, totalCount }: AdminMemberListColumnsContext,
   onOpenDetail: (memberId: string) => void,
-  t: TFunction
+  t: TFunction,
+  locale: string
 ): Column<AdminMemberListItem>[] => [
   {
     key: 'index',
@@ -47,7 +48,7 @@ export const getMemberListColumns = (
   {
     key: 'createdAt',
     header: t('members.fields.joinedAt'),
-    render: (row) => formatAdminMemberJoinedAt(row.createdAt),
+    render: (row) => formatAdminMemberJoinedAt(row.createdAt, locale),
   },
   {
     key: 'status',

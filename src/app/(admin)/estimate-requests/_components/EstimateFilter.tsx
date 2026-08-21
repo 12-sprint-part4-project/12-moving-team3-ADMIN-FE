@@ -73,7 +73,7 @@ export const EstimateFilter = ({
         placeholder={t('estimates.filter.allDates')}
         onConfirm={onDateRangeConfirm}
       />
-      <SearchResetButton onClick={onReset} />
+      <SearchResetButton label={t('common.searchReset')} onClick={onReset} />
     </section>
   );
 };

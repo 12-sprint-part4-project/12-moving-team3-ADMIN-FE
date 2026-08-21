@@ -84,7 +84,7 @@ export const ReportFilter = ({
         onConfirm={onDateRangeConfirm}
         placeholder={t('reports.filter.allDates')}
       />
-      <SearchResetButton onClick={onReset} />
+      <SearchResetButton label={t('common.searchReset')} onClick={onReset} />
     </>
   );
 };

@@ -340,7 +340,10 @@ export const AdminMemberListView = ({
               { label: t('members.list.oldest'), value: 'ASC' },
             ]}
           />
-          <SearchResetButton onClick={handleResetFilters} />
+          <SearchResetButton
+            label={t('common.searchReset')}
+            onClick={handleResetFilters}
+          />
         </>
       }
     >

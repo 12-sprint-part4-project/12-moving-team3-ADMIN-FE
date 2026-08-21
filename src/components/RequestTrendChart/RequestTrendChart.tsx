@@ -37,6 +37,7 @@ export const RequestTrendChart = ({
   className,
 }: RequestTrendChartProps) => {
   const { t, i18n } = useTranslation();
+  const numberFormatter = new Intl.NumberFormat(i18n.resolvedLanguage ?? 'ko');
 
   return (
     <div className={cn('h-72 w-full', className)}>
@@ -61,8 +62,11 @@ export const RequestTrendChart = ({
               tickLine={false}
               axisLine={false}
               width={40}
+              tickFormatter={(value: number) => numberFormatter.format(value)}
             />
-            <Tooltip />
+            <Tooltip
+              formatter={(value) => numberFormatter.format(Number(value))}
+            />
             <Line
               type="monotone"
               dataKey="count"
@@ -81,7 +85,7 @@ export const RequestTrendChart = ({
           <li key={label}>
             {t('dashboard.trend.count', {
               label,
-              count: count.toLocaleString(i18n.language),
+              count: numberFormatter.format(count),
             })}
           </li>
         ))}

@@ -74,12 +74,12 @@ export const MOVE_TYPE_LABEL: Record<MemberMoveType, string> = {
   OFFICE: '사무실 이사',
 };
 
-export const formatNullableDateTime = (iso: string | null) => {
+export const formatNullableDateTime = (iso: string | null, locale: string) => {
   if (!iso) {
     return '-';
   }
 
-  return formatAdminMemberJoinedAt(iso);
+  return formatAdminMemberJoinedAt(iso, locale);
 };
 
 export const formatRegion = (region: MemberRegion | null, t?: TFunction) => {
@@ -130,7 +130,7 @@ export const AdminMemberBasicInfoSection = ({
   detail,
   className,
 }: AdminMemberBasicInfoSectionProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   return (
     <DetailSection title={t('members.detail.basicInfo')} className={className}>
       <dl className="flex flex-col gap-2 text-md-medium">
@@ -146,7 +146,10 @@ export const AdminMemberBasicInfoSection = ({
         />
         <DetailField
           label={t('members.fields.joinedAt')}
-          value={formatAdminMemberJoinedAt(detail.createdAt)}
+          value={formatAdminMemberJoinedAt(
+            detail.createdAt,
+            i18n.resolvedLanguage ?? 'ko'
+          )}
         />
       </dl>
     </DetailSection>
@@ -163,7 +166,7 @@ export const AdminMemberAccountStatusSection = ({
   detail,
   className,
 }: AdminMemberAccountStatusSectionProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   // UserStatusInfo가 없으면 목록과 같이 ACTIVE로 표시한다.
   const status = detail.userStatus?.status ?? 'ACTIVE';
   const suspendedAt = detail.userStatus?.suspendedAt ?? null;
@@ -192,11 +195,17 @@ export const AdminMemberAccountStatusSection = ({
         </div>
         <DetailField
           label={t('members.fields.suspendedAt')}
-          value={formatNullableDateTime(suspendedAt)}
+          value={formatNullableDateTime(
+            suspendedAt,
+            i18n.resolvedLanguage ?? 'ko'
+          )}
         />
         <DetailField
           label={t('members.fields.suspendedUntil')}
-          value={formatNullableDateTime(suspendedUntil)}
+          value={formatNullableDateTime(
+            suspendedUntil,
+            i18n.resolvedLanguage ?? 'ko'
+          )}
         />
         <DetailField
           label={t('members.fields.reportCount')}

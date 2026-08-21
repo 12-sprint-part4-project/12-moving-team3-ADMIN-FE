@@ -22,7 +22,7 @@ import { ReportTable } from './ReportTable';
  * 필터 상태와 표시 컴포넌트 사이의 데이터 연결만 담당한다.
  */
 export const ReportManagementContent = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { detailId, setDetailId } = useDetailSearchParam('reportId');
   const selectedReportId = parseNumericDetailId(detailId);
   const {
@@ -65,8 +65,9 @@ export const ReportManagementContent = () => {
     [setDetailId]
   );
   const columns = useMemo(
-    () => getReportListColumns(handleOpenDetail, t),
-    [handleOpenDetail, t]
+    () =>
+      getReportListColumns(handleOpenDetail, t, i18n.resolvedLanguage ?? 'ko'),
+    [handleOpenDetail, i18n.resolvedLanguage, t]
   );
 
   return (
