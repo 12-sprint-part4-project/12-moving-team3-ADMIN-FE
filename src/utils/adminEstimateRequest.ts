@@ -9,6 +9,7 @@ import type {
   AdminEstimateRequestStatisticsQuery,
   AdminEstimateRequestStatus,
 } from '@/types/adminEstimateRequest';
+import type { TFunction } from 'i18next';
 
 const MOVE_TYPE_LABEL: Record<AdminEstimateRequestMoveType, string> = {
   SMALL: '소형이사',
@@ -116,25 +117,34 @@ export const formatAdminEstimateRequestPhoneNumber = (
 };
 
 export const formatAdminEstimateRequestMoveType = (
-  moveType: AdminEstimateRequestMoveType | null
+  moveType: AdminEstimateRequestMoveType | null,
+  t?: TFunction
 ) => {
   if (moveType == null) {
     return '-';
   }
 
-  return MOVE_TYPE_LABEL[moveType];
+  return t ? t(`estimates.moveType.${moveType}`) : MOVE_TYPE_LABEL[moveType];
 };
 
 export const formatAdminEstimateQuoteStatus = (
-  status: AdminEstimateQuoteStatus
-) => QUOTE_STATUS_LABEL[status];
+  status: AdminEstimateQuoteStatus,
+  t?: TFunction
+) => (t ? t(`estimates.quoteStatus.${status}`) : QUOTE_STATUS_LABEL[status]);
 
-export const formatAdminEstimateQuotePrice = (price: number | null) => {
+export const formatAdminEstimateQuotePrice = (
+  price: number | null,
+  t?: TFunction,
+  locale = 'ko-KR'
+) => {
   if (price == null) {
     return '-';
   }
 
-  return `${new Intl.NumberFormat('ko-KR').format(price)}원`;
+  const formattedPrice = new Intl.NumberFormat(locale).format(price);
+  return t
+    ? t('estimates.price', { price: formattedPrice })
+    : `${formattedPrice}원`;
 };
 
 export const hasAdminEstimateRequestMissingFields = (
@@ -150,13 +160,14 @@ export const formatAdminEstimateRequestMissingFields = (
     | AdminEstimateRequestListMissingField
     | AdminEstimateRequestDetailMissingField
     | string
-  )[]
+  )[],
+  t?: TFunction
 ) =>
   missingFields.map((field) => {
     if (Object.hasOwn(MISSING_FIELD_LABEL, field)) {
-      return MISSING_FIELD_LABEL[
-        field as AdminEstimateRequestDetailMissingField
-      ];
+      return t
+        ? t(`estimates.fields.${field}`)
+        : MISSING_FIELD_LABEL[field as AdminEstimateRequestDetailMissingField];
     }
 
     return field;

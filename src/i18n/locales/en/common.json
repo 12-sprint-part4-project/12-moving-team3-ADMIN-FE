@@ -244,6 +244,89 @@
       "JEJU": "Jeju"
     }
   },
+  "estimates": {
+    "title": "Estimate Request Management",
+    "description": "View submitted estimate requests.",
+    "unit": "items",
+    "price": "KRW {{price}}",
+    "common": { "retry": "Please try again later." },
+    "filter": {
+      "label": "Estimate request filters",
+      "searchPlaceholder": "Search request ID, requester, or phone",
+      "searchLabel": "Search estimate requests",
+      "statusLabel": "Estimate request status",
+      "allDates": "All dates"
+    },
+    "status": {
+      "all": "All statuses",
+      "SUBMITTED": "Pending",
+      "CONFIRMED": "Matched",
+      "EXPIRED": "Expired",
+      "CANCELED": "Canceled"
+    },
+    "quoteStatus": {
+      "PENDING": "Pending",
+      "CONFIRMED": "Confirmed",
+      "REJECTED": "Rejected",
+      "DELETED": "Deleted"
+    },
+    "moveType": {
+      "SMALL": "Small Move",
+      "HOME": "Home Move",
+      "OFFICE": "Office Move"
+    },
+    "fields": {
+      "id": "Request ID",
+      "userName": "Requester",
+      "userNickname": "Requester Nickname",
+      "phoneNumber": "Phone",
+      "moveType": "Move Type",
+      "departureAddress": "Departure",
+      "departureDetailAddress": "Departure Details",
+      "departureZipCode": "Departure Postal Code",
+      "arrivalAddress": "Arrival",
+      "arrivalDetailAddress": "Arrival Details",
+      "arrivalZipCode": "Arrival Postal Code",
+      "submittedAt": "Submitted At",
+      "status": "Status",
+      "estimateCount": "Quotes",
+      "mover": "Matched Mover",
+      "actions": "Actions"
+    },
+    "statistics": {
+      "label": "Estimate request statistics",
+      "error": "Failed to load estimate request statistics.",
+      "description": "Based on submission date; only the date filter is applied."
+    },
+    "list": {
+      "label": "Estimate request list",
+      "error": "Failed to load estimate requests.",
+      "retry": "Try again",
+      "noResults": "No search results.",
+      "empty": "There are no estimate requests.",
+      "changeFilters": "Change the search filters and try again.",
+      "resetFilters": "Reset filters"
+    },
+    "missing": {
+      "title": "Missing: {{fields}}",
+      "badge": "Missing Information",
+      "fields": "Missing fields: {{fields}}",
+      "description": "Required information is missing. Missing fields: {{fields}}"
+    },
+    "detail": {
+      "title": "Estimate Request Details",
+      "basicInfo": "Basic Information",
+      "activeQuotes": "Active Quotes ({{count}})",
+      "deletedQuotes": "Deleted Quotes ({{count}})",
+      "noActiveQuotes": "There are no active quotes.",
+      "noDeletedQuotes": "There are no deleted quotes.",
+      "notFound": "The estimate request could not be found.",
+      "error": "Failed to load estimate request details.",
+      "empty": "Estimate request information is unavailable.",
+      "emptyDescription": "The selected estimate request could not be found."
+    },
+    "viewDetail": "View details"
+  },
   "language": {
     "selectorLabel": "Select language"
   },

@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
+
 import { AdminDetailQueryBody } from '@/components/AdminDetailQueryBody/AdminDetailQueryBody';
 import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
@@ -41,6 +43,7 @@ const EstimateQuoteList = ({
   emptyMessage,
   forceDeletedStatus = false,
 }: EstimateQuoteListProps) => {
+  const { t, i18n } = useTranslation();
   if (quotes.length === 0) {
     return <p className="text-xs-medium text-gray-500">{emptyMessage}</p>;
   }
@@ -49,8 +52,8 @@ const EstimateQuoteList = ({
     <ul className="flex flex-col gap-3">
       {quotes.map((quote) => {
         const statusLabel = forceDeletedStatus
-          ? '삭제'
-          : formatAdminEstimateQuoteStatus(quote.status);
+          ? t('estimates.quoteStatus.DELETED')
+          : formatAdminEstimateQuoteStatus(quote.status, t);
         const moverLabel = formatAdminEstimateRequestNameWithNickname(
           quote.moverName,
           quote.moverNickname
@@ -68,7 +71,7 @@ const EstimateQuoteList = ({
               {moverLabel}
             </span>
             <span className="ml-auto text-black-400">
-              {formatAdminEstimateQuotePrice(quote.price)}
+              {formatAdminEstimateQuotePrice(quote.price, t, i18n.language)}
             </span>
             <span
               className={cn(
@@ -94,40 +97,54 @@ interface EstimateDetailContentProps {
 }
 
 const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
+  const { t } = useTranslation();
   const missingLabels = formatAdminEstimateRequestMissingFields(
-    detail.missingFields
+    detail.missingFields,
+    t
   );
   const hasMissingFields = hasAdminEstimateRequestMissingFields(
     detail.missingFields
   );
 
   const basicInformation: [string, string][] = [
-    ['견적 번호', String(detail.id)],
-    ['요청자 이름', detail.userName],
+    [t('estimates.fields.id'), String(detail.id)],
+    [t('estimates.fields.userName'), detail.userName],
     [
-      '요청자 닉네임',
+      t('estimates.fields.userNickname'),
       formatAdminEstimateRequestNullableText(detail.userNickname),
     ],
-    ['이사 유형', formatAdminEstimateRequestMoveType(detail.moveType)],
     [
-      '출발지 우편번호',
+      t('estimates.fields.moveType'),
+      formatAdminEstimateRequestMoveType(detail.moveType, t),
+    ],
+    [
+      t('estimates.fields.departureZipCode'),
       formatAdminEstimateRequestNullableText(detail.departureZipCode),
     ],
-    ['출발지', formatAdminEstimateRequestNullableText(detail.departureAddress)],
     [
-      '출발지 상세',
+      t('estimates.fields.departureAddress'),
+      formatAdminEstimateRequestNullableText(detail.departureAddress),
+    ],
+    [
+      t('estimates.fields.departureDetailAddress'),
       formatAdminEstimateRequestNullableText(detail.departureDetailAddress),
     ],
     [
-      '도착지 우편번호',
+      t('estimates.fields.arrivalZipCode'),
       formatAdminEstimateRequestNullableText(detail.arrivalZipCode),
     ],
-    ['도착지', formatAdminEstimateRequestNullableText(detail.arrivalAddress)],
     [
-      '도착지 상세',
+      t('estimates.fields.arrivalAddress'),
+      formatAdminEstimateRequestNullableText(detail.arrivalAddress),
+    ],
+    [
+      t('estimates.fields.arrivalDetailAddress'),
       formatAdminEstimateRequestNullableText(detail.arrivalDetailAddress),
     ],
-    ['제출일', formatAdminEstimateRequestSubmittedAt(detail.submittedAt)],
+    [
+      t('estimates.fields.submittedAt'),
+      formatAdminEstimateRequestSubmittedAt(detail.submittedAt),
+    ],
   ];
 
   return (
@@ -137,11 +154,13 @@ const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
           className="rounded-lg bg-red-100 px-3 py-2 text-xs-medium text-red-200"
           role="status"
         >
-          필수 정보가 누락된 데이터입니다. 누락 필드: {missingLabels.join(', ')}
+          {t('estimates.missing.description', {
+            fields: missingLabels.join(', '),
+          })}
         </p>
       ) : null}
 
-      <DetailSection title="기본 정보">
+      <DetailSection title={t('estimates.detail.basicInfo')}>
         <dl className="flex flex-col gap-3 text-xs-medium">
           {basicInformation.map(([label, value]) => (
             <div key={label} className="flex items-start justify-between gap-4">
@@ -150,27 +169,40 @@ const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
             </div>
           ))}
           <div className="flex items-center justify-between gap-4">
-            <dt className="shrink-0 text-gray-500">상태</dt>
+            <dt className="shrink-0 text-gray-500">
+              {t('estimates.fields.status')}
+            </dt>
             <dd>
               <StatusBadge
-                {...ADMIN_ESTIMATE_REQUEST_STATUS_BADGE[detail.status]}
+                variant={
+                  ADMIN_ESTIMATE_REQUEST_STATUS_BADGE[detail.status].variant
+                }
+                label={t(`estimates.status.${detail.status}`)}
               />
             </dd>
           </div>
         </dl>
       </DetailSection>
 
-      <DetailSection title={`활성 견적 (${detail.activeQuotesCount}건)`}>
+      <DetailSection
+        title={t('estimates.detail.activeQuotes', {
+          count: detail.activeQuotesCount,
+        })}
+      >
         <EstimateQuoteList
           quotes={detail.activeQuotes}
-          emptyMessage="활성 견적이 없습니다."
+          emptyMessage={t('estimates.detail.noActiveQuotes')}
         />
       </DetailSection>
 
-      <DetailSection title={`삭제된 견적 (${detail.deletedQuotesCount}건)`}>
+      <DetailSection
+        title={t('estimates.detail.deletedQuotes', {
+          count: detail.deletedQuotesCount,
+        })}
+      >
         <EstimateQuoteList
           quotes={detail.deletedQuotes}
-          emptyMessage="삭제된 견적이 없습니다."
+          emptyMessage={t('estimates.detail.noDeletedQuotes')}
           forceDeletedStatus
         />
       </DetailSection>
@@ -186,24 +218,27 @@ const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
 export const EstimateDetailDrawer = ({
   estimateRequestId,
   onClose,
-}: EstimateDetailDrawerProps) => (
-  <DetailDrawer
-    open={estimateRequestId != null}
-    title="견적 요청 상세 정보"
-    onClose={onClose}
-    size="md"
-  >
-    {estimateRequestId != null ? (
-      // id가 있을 때만 본문을 마운트해서 estimateRequestId를 number로 좁힌다.
-      <AdminDetailQueryBody
-        id={estimateRequestId}
-        useDetail={useAdminEstimateRequestDetail}
-        notFoundTitle="견적 요청 정보를 찾을 수 없습니다."
-        errorTitle="견적 요청 상세를 불러오지 못했습니다."
-        emptyTitle="견적 요청 정보가 없습니다."
-        emptyDescription="선택한 견적 요청을 찾을 수 없습니다."
-        renderContent={(detail) => <EstimateDetailContent detail={detail} />}
-      />
-    ) : null}
-  </DetailDrawer>
-);
+}: EstimateDetailDrawerProps) => {
+  const { t } = useTranslation();
+  return (
+    <DetailDrawer
+      open={estimateRequestId != null}
+      title={t('estimates.detail.title')}
+      onClose={onClose}
+      size="md"
+    >
+      {estimateRequestId != null ? (
+        // id가 있을 때만 본문을 마운트해서 estimateRequestId를 number로 좁힌다.
+        <AdminDetailQueryBody
+          id={estimateRequestId}
+          useDetail={useAdminEstimateRequestDetail}
+          notFoundTitle={t('estimates.detail.notFound')}
+          errorTitle={t('estimates.detail.error')}
+          emptyTitle={t('estimates.detail.empty')}
+          emptyDescription={t('estimates.detail.emptyDescription')}
+          renderContent={(detail) => <EstimateDetailContent detail={detail} />}
+        />
+      ) : null}
+    </DetailDrawer>
+  );
+};

@@ -232,6 +232,89 @@
       "JEJU": "제주"
     }
   },
+  "estimates": {
+    "title": "견적 요청 관리",
+    "description": "견적 요청 내역을 조회할 수 있습니다.",
+    "unit": "건",
+    "price": "{{price}}원",
+    "common": { "retry": "잠시 후 다시 시도해 주세요." },
+    "filter": {
+      "label": "견적 요청 필터",
+      "searchPlaceholder": "견적 번호, 요청자 이름, 전화번호 검색",
+      "searchLabel": "견적 요청 검색",
+      "statusLabel": "견적 요청 상태",
+      "allDates": "기간 전체"
+    },
+    "status": {
+      "all": "상태 전체",
+      "SUBMITTED": "대기 중",
+      "CONFIRMED": "매칭 완료",
+      "EXPIRED": "만료",
+      "CANCELED": "취소"
+    },
+    "quoteStatus": {
+      "PENDING": "대기",
+      "CONFIRMED": "확정",
+      "REJECTED": "반려",
+      "DELETED": "삭제"
+    },
+    "moveType": {
+      "SMALL": "소형이사",
+      "HOME": "가정이사",
+      "OFFICE": "사무실이사"
+    },
+    "fields": {
+      "id": "견적 번호",
+      "userName": "요청자 이름",
+      "userNickname": "요청자 닉네임",
+      "phoneNumber": "전화번호",
+      "moveType": "이사 유형",
+      "departureAddress": "출발지",
+      "departureDetailAddress": "출발지 상세",
+      "departureZipCode": "출발지 우편번호",
+      "arrivalAddress": "도착지",
+      "arrivalDetailAddress": "도착지 상세",
+      "arrivalZipCode": "도착지 우편번호",
+      "submittedAt": "제출일",
+      "status": "상태",
+      "estimateCount": "견적 수",
+      "mover": "매칭 기사",
+      "actions": "작업"
+    },
+    "statistics": {
+      "label": "견적 요청 통계",
+      "error": "견적 요청 통계를 불러오지 못했습니다.",
+      "description": "※ 제출일 기준으로 집계되며, 기간 필터만 적용됩니다."
+    },
+    "list": {
+      "label": "견적 요청 목록",
+      "error": "견적 요청 목록을 불러오지 못했습니다.",
+      "retry": "다시 시도",
+      "noResults": "검색 결과가 없습니다.",
+      "empty": "등록된 견적 요청이 없습니다.",
+      "changeFilters": "검색 조건을 변경한 후 다시 시도해 주세요.",
+      "resetFilters": "필터 초기화"
+    },
+    "missing": {
+      "title": "누락: {{fields}}",
+      "badge": "정보 누락",
+      "fields": "누락 필드: {{fields}}",
+      "description": "필수 정보가 누락된 데이터입니다. 누락 필드: {{fields}}"
+    },
+    "detail": {
+      "title": "견적 요청 상세 정보",
+      "basicInfo": "기본 정보",
+      "activeQuotes": "활성 견적 ({{count}}건)",
+      "deletedQuotes": "삭제된 견적 ({{count}}건)",
+      "noActiveQuotes": "활성 견적이 없습니다.",
+      "noDeletedQuotes": "삭제된 견적이 없습니다.",
+      "notFound": "견적 요청 정보를 찾을 수 없습니다.",
+      "error": "견적 요청 상세를 불러오지 못했습니다.",
+      "empty": "견적 요청 정보가 없습니다.",
+      "emptyDescription": "선택한 견적 요청을 찾을 수 없습니다."
+    },
+    "viewDetail": "상세 보기"
+  },
   "language": {
     "selectorLabel": "언어 선택"
   },

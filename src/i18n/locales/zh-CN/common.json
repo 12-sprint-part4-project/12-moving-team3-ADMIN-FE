@@ -232,6 +232,89 @@
       "JEJU": "济州"
     }
   },
+  "estimates": {
+    "title": "报价请求管理",
+    "description": "查看已提交的报价请求。",
+    "unit": "项",
+    "price": "{{price}}韩元",
+    "common": { "retry": "请稍后重试。" },
+    "filter": {
+      "label": "报价请求筛选",
+      "searchPlaceholder": "搜索请求编号、申请人或手机号",
+      "searchLabel": "搜索报价请求",
+      "statusLabel": "报价请求状态",
+      "allDates": "全部日期"
+    },
+    "status": {
+      "all": "全部状态",
+      "SUBMITTED": "待处理",
+      "CONFIRMED": "已匹配",
+      "EXPIRED": "已过期",
+      "CANCELED": "已取消"
+    },
+    "quoteStatus": {
+      "PENDING": "待处理",
+      "CONFIRMED": "已确认",
+      "REJECTED": "已拒绝",
+      "DELETED": "已删除"
+    },
+    "moveType": {
+      "SMALL": "小型搬家",
+      "HOME": "家庭搬家",
+      "OFFICE": "办公室搬家"
+    },
+    "fields": {
+      "id": "请求编号",
+      "userName": "申请人姓名",
+      "userNickname": "申请人昵称",
+      "phoneNumber": "手机号",
+      "moveType": "搬家类型",
+      "departureAddress": "出发地",
+      "departureDetailAddress": "出发地详细地址",
+      "departureZipCode": "出发地邮编",
+      "arrivalAddress": "目的地",
+      "arrivalDetailAddress": "目的地详细地址",
+      "arrivalZipCode": "目的地邮编",
+      "submittedAt": "提交日期",
+      "status": "状态",
+      "estimateCount": "报价数",
+      "mover": "已匹配师傅",
+      "actions": "操作"
+    },
+    "statistics": {
+      "label": "报价请求统计",
+      "error": "无法加载报价请求统计。",
+      "description": "以提交日期为基准，仅应用日期筛选。"
+    },
+    "list": {
+      "label": "报价请求列表",
+      "error": "无法加载报价请求列表。",
+      "retry": "重试",
+      "noResults": "没有搜索结果。",
+      "empty": "暂无报价请求。",
+      "changeFilters": "请更改搜索条件后重试。",
+      "resetFilters": "重置筛选"
+    },
+    "missing": {
+      "title": "缺失：{{fields}}",
+      "badge": "信息缺失",
+      "fields": "缺失字段：{{fields}}",
+      "description": "缺少必填信息。缺失字段：{{fields}}"
+    },
+    "detail": {
+      "title": "报价请求详情",
+      "basicInfo": "基本信息",
+      "activeQuotes": "有效报价（{{count}}项）",
+      "deletedQuotes": "已删除报价（{{count}}项）",
+      "noActiveQuotes": "暂无有效报价。",
+      "noDeletedQuotes": "暂无已删除报价。",
+      "notFound": "找不到报价请求。",
+      "error": "无法加载报价请求详情。",
+      "empty": "暂无报价请求信息。",
+      "emptyDescription": "找不到所选报价请求。"
+    },
+    "viewDetail": "查看详情"
+  },
   "language": {
     "selectorLabel": "选择语言"
   },
