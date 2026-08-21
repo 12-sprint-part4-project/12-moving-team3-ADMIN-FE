@@ -3,8 +3,30 @@
     "login": "登录",
     "logout": "退出登录"
   },
+  "language": {
+    "selectorLabel": "选择语言"
+  },
+  "header": {
+    "title": "管理后台",
+    "logoAlt": "Moving",
+    "goToDashboard": "前往仪表盘",
+    "adminMenu": "管理员菜单",
+    "userMenu": "{{userName}}的菜单",
+    "loggingOut": "正在退出..."
+  },
+  "sidebar": {
+    "navigationLabel": "管理员菜单",
+    "expand": "展开侧边栏",
+    "collapse": "收起侧边栏"
+  },
   "navigation": {
     "dashboard": "仪表盘",
-    "members": "会员管理"
+    "members": "会员管理",
+    "drivers": "搬家师傅管理",
+    "estimateRequests": "报价请求管理",
+    "completed": "已完成订单",
+    "chats": "聊天管理",
+    "reports": "举报管理",
+    "reviews": "评价管理"
   }
 }

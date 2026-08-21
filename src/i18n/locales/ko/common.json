@@ -3,8 +3,30 @@
     "login": "로그인",
     "logout": "로그아웃"
   },
+  "language": {
+    "selectorLabel": "언어 선택"
+  },
+  "header": {
+    "title": "관리자 페이지",
+    "logoAlt": "무빙",
+    "goToDashboard": "대시보드로 이동",
+    "adminMenu": "관리자 메뉴",
+    "userMenu": "{{userName}} 메뉴",
+    "loggingOut": "로그아웃 중..."
+  },
+  "sidebar": {
+    "navigationLabel": "관리자 메뉴",
+    "expand": "사이드바 펼치기",
+    "collapse": "사이드바 접기"
+  },
   "navigation": {
     "dashboard": "대시보드",
-    "members": "회원 관리"
+    "members": "회원 관리",
+    "drivers": "기사 관리",
+    "estimateRequests": "견적 요청 관리",
+    "completed": "완료 건 관리",
+    "chats": "채팅 관리",
+    "reports": "신고 관리",
+    "reviews": "리뷰 관리"
   }
 }
