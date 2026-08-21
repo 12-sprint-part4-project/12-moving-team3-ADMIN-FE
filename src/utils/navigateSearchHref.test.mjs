@@ -6,6 +6,7 @@ import { navigateSearchHref } from './navigateSearchHref.ts';
 /**
  * Next.js 16이 동기화하는 native History API 동작을 흉내 낸다.
  * pushState는 스택을 늘리고, replaceState는 현재 항목만 교체한다.
+ * router.replace는 호출하지 않는다(초기 쿼리 복원 회귀 방지).
  */
 const createBrowserWindowMock = (initialHref = '/drivers') => {
   const entries = [{ url: initialHref, state: { initial: true } }];
@@ -56,24 +57,6 @@ const createBrowserWindowMock = (initialHref = '/drivers') => {
   return {
     window: { location, history },
     getHistoryUrls: () => entries.map((entry) => entry.url),
-    getHistoryIndex: () => index,
-  };
-};
-
-const createRouterSpy = () => {
-  /** @type {{ method: 'push' | 'replace'; href: string; options?: { scroll?: boolean } }[]} */
-  const calls = [];
-
-  return {
-    calls,
-    router: {
-      push: (href, options) => {
-        calls.push({ method: 'push', href, options });
-      },
-      replace: (href, options) => {
-        calls.push({ method: 'replace', href, options });
-      },
-    },
   };
 };
 
@@ -93,25 +76,25 @@ const withBrowserWindow = (initialHref, run) => {
   }
 };
 
-test('같은 href면 History API와 router를 호출하지 않는다', () => {
+test('같은 href면 History API를 호출하지 않는다', () => {
   withBrowserWindow('/drivers?sortOrder=ASC', () => {
-    const { router, calls } = createRouterSpy();
     const lengthBefore = window.history.length;
 
-    navigateSearchHref(router, '/drivers?sortOrder=ASC');
+    navigateSearchHref('/drivers?sortOrder=ASC');
 
     assert.equal(window.history.length, lengthBefore);
-    assert.deepEqual(calls, []);
+    assert.equal(
+      `${window.location.pathname}${window.location.search}`,
+      '/drivers?sortOrder=ASC'
+    );
   });
 });
 
-test('push 경로: pushState로 히스토리를 쌓고 router.replace로 useSearchParams 구독만 갱신한다', () => {
+test('push 경로: pushState로 히스토리를 쌓고 주소창 쿼리를 갱신한다', () => {
   withBrowserWindow('/drivers?sortOrder=ASC', (browser) => {
-    const { router, calls } = createRouterSpy();
     const lengthBefore = window.history.length;
 
     navigateSearchHref(
-      router,
       '/drivers?sortOrder=ASC&memberId=b2222222-2222-4222-8222-222222222201'
     );
 
@@ -124,14 +107,6 @@ test('push 경로: pushState로 히스토리를 쌓고 router.replace로 useSear
       '/drivers?sortOrder=ASC',
       '/drivers?sortOrder=ASC&memberId=b2222222-2222-4222-8222-222222222201',
     ]);
-    // router.push를 쓰면 히스토리가 이중으로 쌓이므로 replace만 호출해야 한다.
-    assert.deepEqual(calls, [
-      {
-        method: 'replace',
-        href: '/drivers?sortOrder=ASC&memberId=b2222222-2222-4222-8222-222222222201',
-        options: { scroll: false },
-      },
-    ]);
   });
 });
 
@@ -139,10 +114,9 @@ test('replace 경로: replaceState로 현재 항목만 바꾸고 히스토리 �
   withBrowserWindow(
     '/drivers?sortOrder=ASC&memberId=b2222222-2222-4222-8222-222222222201',
     (browser) => {
-      const { router, calls } = createRouterSpy();
       const lengthBefore = window.history.length;
 
-      navigateSearchHref(router, '/drivers?sortOrder=ASC', { replace: true });
+      navigateSearchHref('/drivers?sortOrder=ASC', { replace: true });
 
       assert.equal(window.history.length, lengthBefore);
       assert.equal(
@@ -150,27 +124,32 @@ test('replace 경로: replaceState로 현재 항목만 바꾸고 히스토리 �
         '/drivers?sortOrder=ASC'
       );
       assert.deepEqual(browser.getHistoryUrls(), ['/drivers?sortOrder=ASC']);
-      assert.deepEqual(calls, [
-        {
-          method: 'replace',
-          href: '/drivers?sortOrder=ASC',
-          options: { scroll: false },
-        },
-      ]);
     }
   );
 });
 
-test('필터 변경·상세 열기·닫기 시퀀스에서 pushState/replaceState와 router.replace가 맞게 동작한다', () => {
-  withBrowserWindow('/drivers?page=2&sortOrder=ASC', (browser) => {
-    const { router, calls } = createRouterSpy();
+test('하드 리로드 직후 상세 닫기는 replaceState만으로 초기 memberId 쿼리를 제거한다', () => {
+  withBrowserWindow(
+    '/drivers?sortOrder=ASC&memberId=b2222222-2222-4222-8222-222222222201',
+    () => {
+      navigateSearchHref('/drivers?sortOrder=ASC', { replace: true });
 
-    navigateSearchHref(router, '/drivers?page=2&sortOrder=ASC&status=ACTIVE');
+      assert.equal(
+        `${window.location.pathname}${window.location.search}`,
+        '/drivers?sortOrder=ASC'
+      );
+      assert.equal(window.location.search.includes('memberId'), false);
+    }
+  );
+});
+
+test('필터 변경·상세 열기·닫기 시퀀스에서 pushState/replaceState가 맞게 동작한다', () => {
+  withBrowserWindow('/drivers?page=2&sortOrder=ASC', (browser) => {
+    navigateSearchHref('/drivers?page=2&sortOrder=ASC&status=ACTIVE');
     navigateSearchHref(
-      router,
       '/drivers?page=2&sortOrder=ASC&status=ACTIVE&memberId=1'
     );
-    navigateSearchHref(router, '/drivers?page=2&sortOrder=ASC&status=ACTIVE', {
+    navigateSearchHref('/drivers?page=2&sortOrder=ASC&status=ACTIVE', {
       replace: true,
     });
 
@@ -184,13 +163,5 @@ test('필터 변경·상세 열기·닫기 시퀀스에서 pushState/replaceStat
       '/drivers?page=2&sortOrder=ASC&status=ACTIVE',
       '/drivers?page=2&sortOrder=ASC&status=ACTIVE',
     ]);
-    assert.deepEqual(
-      calls.map((call) => call.method),
-      ['replace', 'replace', 'replace']
-    );
-    assert.equal(
-      calls.at(-1)?.href,
-      '/drivers?page=2&sortOrder=ASC&status=ACTIVE'
-    );
   });
 });

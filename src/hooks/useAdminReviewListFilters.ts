@@ -1,4 +1,4 @@
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
 
 import {
@@ -68,7 +68,6 @@ const toListQuery = (
  * page 보정(setFilters)은 목록 응답을 아는 호출부에서 처리한다.
  */
 export const useAdminReviewListFilters = () => {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const filters = useMemo(
@@ -134,9 +133,9 @@ export const useAdminReviewListFilters = () => {
         nextFilters
       );
 
-      navigateSearchHref(router, href, { replace: options?.replace });
+      navigateSearchHref(href, { replace: options?.replace });
     },
-    [filters, pathname, router]
+    [filters, pathname]
   );
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {

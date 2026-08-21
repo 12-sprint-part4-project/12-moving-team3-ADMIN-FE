@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import {
   useCallback,
   useMemo,
@@ -78,7 +78,6 @@ export interface AdminChatListViewProps {
  * 검색·유형 필터·페이지네이션과 Loading/Empty/Table 구조를 담당한다.
  */
 export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const filters = useMemo(
@@ -120,9 +119,9 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
         nextFilters
       );
 
-      navigateSearchHref(router, href, { replace: options?.replace });
+      navigateSearchHref(href, { replace: options?.replace });
     },
-    [filters, pathname, router]
+    [filters, pathname]
   );
 
   const handlePageClamp = useCallback(

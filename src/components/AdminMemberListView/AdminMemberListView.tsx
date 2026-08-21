@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import {
   useCallback,
   useMemo,
@@ -114,7 +114,6 @@ export const AdminMemberListView = ({
   errorTitle,
   getColumns,
 }: AdminMemberListViewProps) => {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const filters = useMemo(
@@ -187,9 +186,9 @@ export const AdminMemberListView = ({
         nextFilters
       );
 
-      navigateSearchHref(router, href, { replace: options?.replace });
+      navigateSearchHref(href, { replace: options?.replace });
     },
-    [filters, pathname, router]
+    [filters, pathname]
   );
 
   const handlePageClamp = useCallback(

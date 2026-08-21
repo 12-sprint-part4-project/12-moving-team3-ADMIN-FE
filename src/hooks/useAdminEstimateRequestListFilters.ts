@@ -1,4 +1,4 @@
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
 
 import {
@@ -40,7 +40,6 @@ const toListQuery = (
  * 검색·상태·제출일·정렬·페이지와 통계 기간 query를 URL에서 복원한다.
  */
 export const useAdminEstimateRequestListFilters = () => {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const filters = useMemo(
@@ -102,9 +101,9 @@ export const useAdminEstimateRequestListFilters = () => {
         nextFilters
       );
 
-      navigateSearchHref(router, href, { replace: options?.replace });
+      navigateSearchHref(href, { replace: options?.replace });
     },
-    [filters, pathname, router]
+    [filters, pathname]
   );
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {

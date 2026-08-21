@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
 
 import {
@@ -42,7 +42,6 @@ const toListQuery = (
  * 검색어는 버튼 또는 Enter로 확정될 때만 Query에 반영한다.
  */
 export const useAdminReportListFilters = () => {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const filters = useMemo(
@@ -99,9 +98,9 @@ export const useAdminReportListFilters = () => {
         nextFilters
       );
 
-      navigateSearchHref(router, href, { replace: options?.replace });
+      navigateSearchHref(href, { replace: options?.replace });
     },
-    [filters, pathname, router]
+    [filters, pathname]
   );
 
   const handleTargetUserSearchChange = (event: ChangeEvent<HTMLInputElement>) =>
