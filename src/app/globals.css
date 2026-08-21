@@ -160,21 +160,6 @@
   --text-xs-regular: 0.75rem;
   --text-xs-regular--line-height: 1.5;
   --text-xs-regular--font-weight: 400;
-
-  /**
-   * Motion Tokens
-   * DetailDrawer 우측 슬라이드 인 애니메이션
-   */
-  --animate-drawer-in: drawer-in 0.2s ease-out;
-}
-
-@keyframes drawer-in {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
 }
 
 @media (prefers-color-scheme: dark) {

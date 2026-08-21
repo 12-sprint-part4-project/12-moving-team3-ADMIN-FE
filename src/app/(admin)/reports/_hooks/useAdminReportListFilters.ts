@@ -7,6 +7,7 @@ import {
   parseAdminReportSearchParams,
 } from '@/utils/adminListSearchParams';
 import { toAdminReportStatisticsQuery } from '@/utils/adminReport';
+import { navigateSearchHref } from '@/utils/navigateSearchHref';
 
 import {
   parseReportStatusFilter,
@@ -94,18 +95,13 @@ export const useAdminReportListFilters = () => {
       };
       const href = createAdminReportListHref(
         pathname,
-        new URLSearchParams(searchParams.toString()),
+        new URLSearchParams(window.location.search),
         nextFilters
       );
 
-      if (options?.replace) {
-        router.replace(href, { scroll: false });
-        return;
-      }
-
-      router.push(href, { scroll: false });
+      navigateSearchHref(router, href, { replace: options?.replace });
     },
-    [filters, pathname, router, searchParams]
+    [filters, pathname, router]
   );
 
   const handleTargetUserSearchChange = (event: ChangeEvent<HTMLInputElement>) =>
