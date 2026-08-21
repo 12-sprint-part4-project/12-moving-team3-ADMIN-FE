@@ -3,7 +3,6 @@
 import { defineConfig, globalIgnores } from 'eslint/config';
 import nextVitals from 'eslint-config-next/core-web-vitals';
 import nextTs from 'eslint-config-next/typescript';
-import importPlugin from 'eslint-plugin-import';
 import storybook from 'eslint-plugin-storybook';
 
 const eslintConfig = defineConfig([
@@ -19,12 +18,7 @@ const eslintConfig = defineConfig([
   ]),
 
   ...storybook.configs['flat/recommended'],
-
   {
-    plugins: {
-      import: importPlugin,
-    },
-
     settings: {
       // @/ alias를 internal로 해석하기 위한 TypeScript resolver
       'import/resolver': {

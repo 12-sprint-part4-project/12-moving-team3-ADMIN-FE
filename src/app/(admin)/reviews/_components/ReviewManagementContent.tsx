@@ -10,6 +10,7 @@ import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
+import { SearchResetButton } from '@/components/SearchResetButton/SearchResetButton';
 import { useAdminReviewDeleteConfirm } from '@/hooks/useAdminReviewDeleteConfirm';
 import { useAdminReviewList } from '@/hooks/useAdminReviewList';
 import { useAdminReviewListFilters } from '@/hooks/useAdminReviewListFilters';
@@ -198,6 +199,7 @@ export const ReviewManagementContent = () => {
               onConfirm={handleDateRangeConfirm}
               placeholder="작성일 전체"
             />
+            <SearchResetButton onClick={handleResetFilters} />
           </>
         }
       >

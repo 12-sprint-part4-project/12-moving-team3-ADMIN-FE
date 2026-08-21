@@ -1,6 +1,7 @@
 import { DateRangePopover } from '@/components/DateRangePopover/DateRangePopover';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
+import { SearchResetButton } from '@/components/SearchResetButton/SearchResetButton';
 
 import {
   REPORT_STATUS_FILTER_OPTIONS,
@@ -19,6 +20,7 @@ interface ReportFilterProps {
   onStatusChange: ComponentProps<typeof FilterSelect>['onChange'];
   onTargetChange: ComponentProps<typeof FilterSelect>['onChange'];
   onDateRangeConfirm: ComponentProps<typeof DateRangePopover>['onConfirm'];
+  onReset: () => void;
 }
 
 /** 검색·상태·대상·신고일 필터 UI만 담당하는 표현 컴포넌트. */
@@ -32,6 +34,7 @@ export const ReportFilter = ({
   onStatusChange,
   onTargetChange,
   onDateRangeConfirm,
+  onReset,
 }: ReportFilterProps) => (
   <>
     <SearchInput
@@ -60,5 +63,6 @@ export const ReportFilter = ({
       onConfirm={onDateRangeConfirm}
       placeholder="신고일 전체"
     />
+    <SearchResetButton onClick={onReset} />
   </>
 );
