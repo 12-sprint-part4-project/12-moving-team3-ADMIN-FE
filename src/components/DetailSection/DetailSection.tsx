@@ -28,6 +28,7 @@ export interface DetailSectionProps extends VariantProps<
 > {
   title: string;
   children: ReactNode;
+  headerAction?: ReactNode;
   className?: string;
 }
 
@@ -38,13 +39,15 @@ export interface DetailSectionProps extends VariantProps<
 export const DetailSection = ({
   title,
   children,
+  headerAction,
   padding,
   className,
 }: DetailSectionProps) => (
   <section className={cn(detailSectionVariants({ padding }), className)}>
     {/* Header: 섹션 제목 + 하단 Divider */}
-    <header className="border-b border-line-200 pb-3">
+    <header className="flex items-center justify-between gap-3 border-b border-line-200 pb-3">
       <h3 className="text-lg-bold text-black-400">{title}</h3>
+      {headerAction}
     </header>
     {/* Body: 섹션 본문 */}
     <div className="pt-3">{children}</div>

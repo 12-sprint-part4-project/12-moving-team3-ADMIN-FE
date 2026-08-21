@@ -12,7 +12,17 @@ import {
 } from '@/utils/adminReport';
 
 import type { Column } from '@/components/DataTable/DataTable';
-import type { AdminReportListItem } from '@/types/adminReport';
+import type {
+  AdminReportListItem,
+  AdminReportTarget,
+} from '@/types/adminReport';
+
+const CONTENT_DELETION_SUPPORTED_TARGETS: ReadonlySet<AdminReportTarget> =
+  new Set(['ARTICLE', 'COMMENT', 'REVIEW']);
+
+const supportsContentDeletion = (row: AdminReportListItem) =>
+  row.category === 'ABUSIVE_LANGUAGE' &&
+  CONTENT_DELETION_SUPPORTED_TARGETS.has(row.target);
 
 /** 신고 목록 표시 규칙과 상세 열기 액션을 컬럼 정의로 묶는다. */
 export const getReportListColumns = (
@@ -33,7 +43,14 @@ export const getReportListColumns = (
   {
     key: 'target',
     header: '대상 유형',
-    render: (row) => ADMIN_REPORT_TARGET_LABEL[row.target],
+    render: (row) => (
+      <div className="flex items-center gap-2">
+        <span>{ADMIN_REPORT_TARGET_LABEL[row.target]}</span>
+        {supportsContentDeletion(row) ? (
+          <StatusBadge variant="neutral" label="삭제 지원" />
+        ) : null}
+      </div>
+    ),
   },
   {
     key: 'category',

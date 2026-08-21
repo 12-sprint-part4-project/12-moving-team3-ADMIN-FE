@@ -13,7 +13,6 @@ const REPORT_STATUS_FILTERS = [
 const REPORT_TARGET_FILTERS = [
   { label: '사용자', value: 'USER' },
   { label: '리뷰', value: 'REVIEW' },
-  { label: '채팅방', value: 'CHAT_ROOM' },
   { label: '메시지', value: 'MESSAGE' },
   { label: '게시글', value: 'ARTICLE' },
   { label: '댓글', value: 'COMMENT' },

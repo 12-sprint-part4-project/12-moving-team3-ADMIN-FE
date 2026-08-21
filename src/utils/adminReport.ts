@@ -3,7 +3,6 @@ import { format } from 'date-fns';
 import type { StatusBadgeProps } from '@/components/StatusBadge/StatusBadge';
 import type {
   AdminReportCategory,
-  AdminReportChatRoomType,
   AdminReportDetailContent,
   AdminReportMessageType,
   AdminReportPostsCategory,
@@ -36,7 +35,6 @@ export const ADMIN_REPORT_STATUS_BADGE_VARIANT: Record<
 export const ADMIN_REPORT_TARGET_LABEL: Record<AdminReportTarget, string> = {
   USER: '회원',
   REVIEW: '리뷰',
-  CHAT_ROOM: '채팅방',
   MESSAGE: '메시지',
   ARTICLE: '게시글',
   COMMENT: '댓글',
@@ -68,7 +66,6 @@ export const ADMIN_REPORT_PROCESS_ACTION_LABEL: Record<
 /** content.metadata 키 → 관리자용 한글 라벨 */
 export const ADMIN_REPORT_CONTENT_METADATA_LABEL: Record<string, string> = {
   rating: '별점',
-  roomType: '채팅방 유형',
   estimateRequestId: '견적 요청 ID',
   quoteId: '견적 ID',
   lastMessageAt: '마지막 메시지',
@@ -79,15 +76,6 @@ export const ADMIN_REPORT_CONTENT_METADATA_LABEL: Record<string, string> = {
   postTitle: '원글 제목',
   postDeletedAt: '원글 삭제일',
   userType: '유저 타입',
-};
-
-const ADMIN_REPORT_CHAT_ROOM_TYPE_LABEL: Record<
-  AdminReportChatRoomType,
-  string
-> = {
-  GENERAL: '일반',
-  DESIGNATED: '지정 견적',
-  COMMUNITY: '커뮤니티',
 };
 
 const ADMIN_REPORT_MESSAGE_TYPE_LABEL: Record<AdminReportMessageType, string> =
@@ -134,8 +122,6 @@ export const getMetadataLabel = (
   switch (key) {
     case 'userType':
       return getMetadataEnumLabel(ADMIN_REPORT_USER_TYPE_LABEL, value);
-    case 'roomType':
-      return getMetadataEnumLabel(ADMIN_REPORT_CHAT_ROOM_TYPE_LABEL, value);
     case 'messageType':
       return getMetadataEnumLabel(ADMIN_REPORT_MESSAGE_TYPE_LABEL, value);
     case 'category':
@@ -149,12 +135,7 @@ export const getMetadataLabel = (
  * BE가 type 라벨을 title에 넣는 경우(리뷰/댓글/메시지 등).
  * 실제 게시글 제목과 구분해 필드 노출 여부를 판단한다.
  */
-const CONTENT_PLACEHOLDER_TITLES = new Set([
-  '리뷰',
-  '댓글',
-  '채팅 메시지',
-  '채팅방',
-]);
+const CONTENT_PLACEHOLDER_TITLES = new Set(['리뷰', '댓글', '채팅 메시지']);
 
 /** 의미 있는 제목만 노출한다. placeholder·빈 값은 숨긴다. */
 export const hasMeaningfulContentTitle = (
@@ -188,8 +169,7 @@ export const getAdminReportContentSummary = (
 
   switch (content.type) {
     case 'REVIEW': {
-      const rating =
-        typeof meta.rating === 'number' ? meta.rating : null;
+      const rating = typeof meta.rating === 'number' ? meta.rating : null;
       return {
         text: rating != null ? `리뷰 · ★${rating}` : '리뷰',
         usedMetadataKeys: rating != null ? ['rating'] : [],
@@ -210,13 +190,6 @@ export const getAdminReportContentSummary = (
       return {
         text: typeLabel ? `메시지 · ${typeLabel}` : '메시지',
         usedMetadataKeys: typeLabel ? ['messageType'] : [],
-      };
-    }
-    case 'CHAT_ROOM': {
-      const typeLabel = getMetadataLabel('roomType', meta.roomType);
-      return {
-        text: typeLabel ? `채팅방 · ${typeLabel}` : '채팅방',
-        usedMetadataKeys: typeLabel ? ['roomType'] : [],
       };
     }
     case 'ARTICLE': {
@@ -316,8 +289,6 @@ export const formatAdminReportTarget = (
     case 'COMMENT':
       // 콘텐츠 유형은 목록에서 타입 라벨만으로 충분하다. 본문/제목은 상세에서 본다.
       return ADMIN_REPORT_TARGET_LABEL[targetInfo.type];
-    case 'CHAT_ROOM':
-      return `채팅방 #${targetInfo.id}`;
     case 'MESSAGE':
       // 메시지는 작성자만 표시해 대상 사용자를 바로 식별한다.
       return targetInfo.sender

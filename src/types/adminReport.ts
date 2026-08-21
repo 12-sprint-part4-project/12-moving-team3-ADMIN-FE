@@ -22,36 +22,21 @@ export type AdminReportMoveType = MemberMoveType;
  * Prisma enum이 아니라 요청 계약 전용 — 여러 파일에 문자열을 중복 선언하지 않는다.
  */
 export type AdminReportProcessAction =
-  | 'SUSPEND_TARGET_USER'
-  | 'DELETE_REPORTED_CONTENT';
+  'SUSPEND_TARGET_USER' | 'DELETE_REPORTED_CONTENT';
 
 export type AdminReportTarget =
-  | 'USER'
-  | 'REVIEW'
-  | 'CHAT_ROOM'
-  | 'MESSAGE'
-  | 'ARTICLE'
-  | 'COMMENT';
+  'USER' | 'REVIEW' | 'MESSAGE' | 'ARTICLE' | 'COMMENT';
 
-export type AdminReportCategory =
-  | 'INAPPROPRIATE_PROFILE'
-  | 'ABUSIVE_LANGUAGE';
+export type AdminReportCategory = 'INAPPROPRIATE_PROFILE' | 'ABUSIVE_LANGUAGE';
 
 export type AdminReportUserType = 'CUSTOMER' | 'MOVER';
-
-/** Prisma ChatRoomType */
-export type AdminReportChatRoomType = 'GENERAL' | 'DESIGNATED' | 'COMMUNITY';
 
 /** Prisma MessageType */
 export type AdminReportMessageType = 'TEXT' | 'IMAGE';
 
 /** Prisma PostsCategory */
 export type AdminReportPostsCategory =
-  | 'MOVING_TIP'
-  | 'QUESTION'
-  | 'REVIEW'
-  | 'ETC'
-  | 'FURNITURE_SHARE';
+  'MOVING_TIP' | 'QUESTION' | 'REVIEW' | 'ETC' | 'FURNITURE_SHARE';
 
 export interface AdminReportReporter {
   id: string;
@@ -84,13 +69,6 @@ export interface AdminReportReviewTargetInfo {
   author: AdminReportTargetAuthor | null;
 }
 
-export interface AdminReportChatRoomTargetInfo {
-  type: 'CHAT_ROOM';
-  id: number;
-  roomType: AdminReportChatRoomType;
-  createdAt: string;
-}
-
 export interface AdminReportMessageTargetInfo {
   type: 'MESSAGE';
   id: number;
@@ -118,7 +96,6 @@ export interface AdminReportCommentTargetInfo {
 export type AdminReportTargetInfo =
   | AdminReportUserTargetInfo
   | AdminReportReviewTargetInfo
-  | AdminReportChatRoomTargetInfo
   | AdminReportMessageTargetInfo
   | AdminReportArticleTargetInfo
   | AdminReportCommentTargetInfo;

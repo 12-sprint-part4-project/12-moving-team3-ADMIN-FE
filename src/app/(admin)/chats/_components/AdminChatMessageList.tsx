@@ -1,5 +1,7 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
+import { RefreshCw } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { Button } from '@/components/Button/Button';
@@ -7,13 +9,14 @@ import { DetailSection } from '@/components/DetailSection/DetailSection';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
+import { ADMIN_CHAT_QUERY_KEYS } from '@/constants/adminChatQueryKeys';
 import { useAdminChatMessages } from '@/hooks/useAdminChatMessages';
 import { formatAdminChatUserLabel } from '@/utils/adminChat';
+import { sortAdminChatMessagesByCreatedAtDesc } from '@/utils/adminChatMessages';
 import { formatAdminMemberJoinedAt } from '@/utils/adminMember';
 
 import type {
   AdminChatMessage,
-  AdminChatMessagesMeta,
   AdminChatMessagesQuery,
 } from '@/types/adminChat';
 
@@ -25,11 +28,7 @@ export interface AdminChatMessageListProps {
   enabled: boolean;
 }
 
-/** id ASC(과거 → 최신)로 정렬한다. BE는 id DESC로 내려준다. */
-const sortMessagesByIdAsc = (items: AdminChatMessage[]) =>
-  [...items].sort((a, b) => a.id - b.id);
-
-/** id 기준 병합 후 시간순 정렬. 추가 페이지 누적·중복 방어에 쓴다. */
+/** id 기준 병합 후 생성 시각 최신순 정렬. 추가 페이지 누적·중복 방어에 쓴다. */
 const mergeMessagesById = (
   existing: AdminChatMessage[],
   incoming: AdminChatMessage[]
@@ -44,7 +43,7 @@ const mergeMessagesById = (
     byId.set(message.id, message);
   }
 
-  return sortMessagesByIdAsc([...byId.values()]);
+  return sortAdminChatMessagesByCreatedAtDesc([...byId.values()]);
 };
 
 interface AdminChatMessageItemProps {
@@ -120,15 +119,10 @@ export const AdminChatMessageList = ({
   roomId,
   enabled,
 }: AdminChatMessageListProps) => {
+  const queryClient = useQueryClient();
   /** 더 보기 전에 화면에 있던 메시지 스냅샷. 첫 페이지만 볼 때는 비어 있다. */
   const [frozenMessages, setFrozenMessages] = useState<AdminChatMessage[]>([]);
   const [before, setBefore] = useState<number | undefined>(undefined);
-  /** 마지막 성공 응답의 meta. 다음 페이지 fetch 중에도 버튼을 유지하기 위해 보관한다. */
-  const [meta, setMeta] = useState<AdminChatMessagesMeta>({
-    hasNext: false,
-    nextCursor: null,
-  });
-  const [appliedDataUpdatedAt, setAppliedDataUpdatedAt] = useState(0);
 
   const params = useMemo((): AdminChatMessagesQuery => {
     return {
@@ -137,33 +131,15 @@ export const AdminChatMessageList = ({
     };
   }, [before]);
 
-  const {
-    data,
-    dataUpdatedAt,
-    isPending,
-    isError,
-    isFetching,
-    isSuccess,
-    refetch,
-  } = useAdminChatMessages(roomId, params, { enabled });
-
-  // 성공 응답 meta만 렌더 중 반영한다(effect setState 금지 규칙 회피).
-  if (
-    isSuccess &&
-    data?.data &&
-    dataUpdatedAt !== appliedDataUpdatedAt
-  ) {
-    setAppliedDataUpdatedAt(dataUpdatedAt);
-    setMeta(data.data.meta);
-  }
+  const { data, isPending, isError, isFetching, isSuccess, refetch } =
+    useAdminChatMessages(roomId, params, { enabled });
 
   const messages = useMemo(() => {
-    const livePageMessages =
-      isSuccess && data?.data ? data.data.messages : [];
+    const livePageMessages = isSuccess && data?.data ? data.data.messages : [];
 
-    // 첫 페이지: query 결과를 시간순으로만 정렬해 보여준다.
+    // 첫 페이지: 원본 생성 시각 기준 최신순으로 정렬해 보여준다.
     if (before === undefined) {
-      return sortMessagesByIdAsc(livePageMessages);
+      return sortAdminChatMessagesByCreatedAtDesc(livePageMessages);
     }
 
     // 추가 페이지: 클릭 시 얼린 목록 + 현재 페이지를 id 기준으로 병합한다.
@@ -172,22 +148,50 @@ export const AdminChatMessageList = ({
 
   const isInitialLoading = isPending && before === undefined;
   const isLoadMoreLoading = isFetching && before !== undefined;
-  const showLoadMore = meta.hasNext && meta.nextCursor != null;
+  const isRefreshing = isFetching && before === undefined;
+  const nextCursor = data?.data.meta.nextCursor ?? null;
+  const canLoadOlder = data?.data.meta.hasNext === true && nextCursor != null;
+  const canRetryLoadOlder = isError && before !== undefined;
 
   const handleLoadOlder = () => {
-    if (meta.nextCursor == null || isLoadMoreLoading) {
+    if (isFetching) {
       return;
     }
 
-    // 같은 cursor 조회가 이미 실패한 경우 before를 바꾸지 않고 재시도한다.
-    if (before === meta.nextCursor) {
+    if (canRetryLoadOlder) {
       void refetch();
+      return;
+    }
+
+    if (!canLoadOlder) {
       return;
     }
 
     // 다음 요청 전에 현재 화면 메시지를 고정해, fetch 중에도 목록이 비지 않게 한다.
     setFrozenMessages(messages);
-    setBefore(meta.nextCursor);
+    setBefore(nextCursor);
+  };
+
+  const handleRefresh = () => {
+    if (isFetching) {
+      return;
+    }
+
+    if (before === undefined) {
+      void refetch();
+      return;
+    }
+
+    // 과거 페이지가 활성 query인 경우 최신 첫 페이지 캐시를 stale 처리한 뒤 돌아간다.
+    void queryClient.invalidateQueries({
+      queryKey: ADMIN_CHAT_QUERY_KEYS.messageList(roomId, {
+        limit: MESSAGE_PAGE_LIMIT,
+      }),
+      exact: true,
+      refetchType: 'none',
+    });
+    setFrozenMessages([]);
+    setBefore(undefined);
   };
 
   const renderBody = () => {
@@ -219,34 +223,50 @@ export const AdminChatMessageList = ({
 
     return (
       <div className="flex flex-col gap-3">
-        {showLoadMore ? (
-          <div className="flex flex-col items-center gap-2">
-            <Button
-              variant="secondary"
-              className="px-3 py-1.5 text-sm-medium"
-              loading={isLoadMoreLoading}
-              onClick={handleLoadOlder}
-            >
-              이전 메시지 더 보기
-            </Button>
-            {isError && before !== undefined ? (
-              <p className="text-xs-medium text-red-200">
-                이전 메시지를 불러오지 못했습니다.
-              </p>
-            ) : null}
-          </div>
-        ) : null}
-
         <ul className="flex flex-col gap-3">
           {messages.map((message) => (
             <AdminChatMessageItem key={message.id} message={message} />
           ))}
         </ul>
+
+        <div className="flex flex-col items-center gap-2">
+          <Button
+            variant="secondary"
+            className="px-3 py-1.5 text-sm-medium"
+            loading={isLoadMoreLoading}
+            disabled={isFetching || (!canLoadOlder && !canRetryLoadOlder)}
+            onClick={handleLoadOlder}
+          >
+            이전 메시지 더 보기
+          </Button>
+          {canRetryLoadOlder ? (
+            <p className="text-xs-medium text-red-200">
+              이전 메시지를 불러오지 못했습니다.
+            </p>
+          ) : null}
+        </div>
       </div>
     );
   };
 
   return (
-    <DetailSection title="메시지 히스토리">{renderBody()}</DetailSection>
+    <DetailSection
+      title="메시지 히스토리"
+      headerAction={
+        <Button
+          variant="secondary"
+          className="size-7 p-0"
+          loading={isRefreshing}
+          disabled={!enabled || isFetching}
+          onClick={handleRefresh}
+          aria-label="메시지 새로고침"
+          title="메시지 새로고침"
+        >
+          <RefreshCw className="size-4" aria-hidden />
+        </Button>
+      }
+    >
+      {renderBody()}
+    </DetailSection>
   );
 };
