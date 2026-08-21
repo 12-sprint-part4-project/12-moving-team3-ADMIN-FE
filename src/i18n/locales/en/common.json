@@ -390,6 +390,85 @@
       "emptyDescription": "The selected completed move could not be found."
     }
   },
+  "chats": {
+    "title": "Chat Management",
+    "description": "View, search, and filter chat rooms.",
+    "common": {
+      "retry": "Please try again later.",
+      "retryAction": "Try again"
+    },
+    "roomType": {
+      "GENERAL": "General",
+      "DESIGNATED": "Designated Quote",
+      "COMMUNITY": "Community"
+    },
+    "userType": { "CUSTOMER": "Customer", "MOVER": "Mover" },
+    "participant": {
+      "active": "Participating",
+      "left": "Left",
+      "withdrawn": "Withdrawn"
+    },
+    "filter": {
+      "allTypes": "All",
+      "searchPlaceholder": "Search name, nickname, email, or phone",
+      "searchLabel": "Search chat participants"
+    },
+    "fields": {
+      "roomId": "Chat Room ID",
+      "participants": "Participants",
+      "roomType": "Room Type",
+      "lastMessage": "Last Message",
+      "lastMessageAt": "Last Message At",
+      "createdAt": "Created At",
+      "actions": "Actions",
+      "estimateRequestId": "Estimate Request ID",
+      "quoteId": "Quote ID",
+      "designatedMoverId": "Designated Mover ID",
+      "communityPostId": "Community Post ID",
+      "name": "Name",
+      "nickname": "Nickname",
+      "email": "Email",
+      "userType": "User Type",
+      "joinedAt": "Joined At",
+      "leftStatus": "Participation Status",
+      "leftAt": "Left At",
+      "withdrawnStatus": "Withdrawal Status"
+    },
+    "list": {
+      "label": "Chat room list",
+      "error": "Failed to load chat rooms.",
+      "noResults": "No search results found.",
+      "empty": "There are no chat rooms.",
+      "changeFilters": "Change the filters and try again.",
+      "resetFilters": "Reset filters"
+    },
+    "detail": {
+      "title": "Chat Room Details",
+      "basicInfo": "Basic Chat Room Information",
+      "linkedInfo": "Linked Information",
+      "participantInfo": "Participant Information",
+      "noParticipants": "There are no participants.",
+      "noSelection": "No chat room is selected.",
+      "error": "Failed to load chat room details.",
+      "empty": "Chat room information is unavailable.",
+      "notFound": "The selected chat room could not be found."
+    },
+    "messages": {
+      "title": "Message History",
+      "none": "No messages",
+      "imageMessage": "Image message",
+      "filtered": "Filtered",
+      "imageAlt": "Chat image",
+      "imageError": "Failed to load the image.",
+      "loading": "Loading messages...",
+      "error": "Failed to load messages.",
+      "empty": "There are no messages.",
+      "loadOlder": "Load older messages",
+      "loadOlderError": "Failed to load older messages.",
+      "refresh": "Refresh messages"
+    },
+    "viewDetail": "View details"
+  },
   "reports": {
     "title": "Report Management",
     "description": "View reports and check their status.",

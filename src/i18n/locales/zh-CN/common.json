@@ -378,6 +378,82 @@
       "emptyDescription": "找不到所选已完成订单。"
     }
   },
+  "chats": {
+    "title": "聊天管理",
+    "description": "查看、搜索和筛选聊天室。",
+    "common": { "retry": "请稍后重试。", "retryAction": "重试" },
+    "roomType": {
+      "GENERAL": "普通",
+      "DESIGNATED": "指定报价",
+      "COMMUNITY": "社区"
+    },
+    "userType": { "CUSTOMER": "客户", "MOVER": "搬家师傅" },
+    "participant": {
+      "active": "参与中",
+      "left": "已离开",
+      "withdrawn": "已注销"
+    },
+    "filter": {
+      "allTypes": "全部",
+      "searchPlaceholder": "搜索姓名、昵称、邮箱或手机号",
+      "searchLabel": "搜索聊天参与者"
+    },
+    "fields": {
+      "roomId": "聊天室 ID",
+      "participants": "参与者",
+      "roomType": "聊天室类型",
+      "lastMessage": "最后消息",
+      "lastMessageAt": "最后消息时间",
+      "createdAt": "创建日期",
+      "actions": "操作",
+      "estimateRequestId": "报价请求 ID",
+      "quoteId": "报价 ID",
+      "designatedMoverId": "指定搬家师傅 ID",
+      "communityPostId": "社区帖子 ID",
+      "name": "姓名",
+      "nickname": "昵称",
+      "email": "邮箱",
+      "userType": "用户类型",
+      "joinedAt": "加入时间",
+      "leftStatus": "参与状态",
+      "leftAt": "离开时间",
+      "withdrawnStatus": "注销状态"
+    },
+    "list": {
+      "label": "聊天室列表",
+      "error": "无法加载聊天室列表。",
+      "noResults": "没有搜索结果。",
+      "empty": "暂无聊天室。",
+      "changeFilters": "请修改筛选条件后重试。",
+      "resetFilters": "重置筛选"
+    },
+    "detail": {
+      "title": "聊天室详情",
+      "basicInfo": "聊天室基本信息",
+      "linkedInfo": "关联信息",
+      "participantInfo": "参与者信息",
+      "noParticipants": "暂无参与者。",
+      "noSelection": "未选择聊天室。",
+      "error": "无法加载聊天室详情。",
+      "empty": "没有聊天室信息。",
+      "notFound": "找不到所选聊天室。"
+    },
+    "messages": {
+      "title": "消息记录",
+      "none": "暂无消息",
+      "imageMessage": "图片消息",
+      "filtered": "已过滤",
+      "imageAlt": "聊天图片",
+      "imageError": "无法加载图片。",
+      "loading": "正在加载消息...",
+      "error": "无法加载消息。",
+      "empty": "暂无消息记录。",
+      "loadOlder": "加载更早消息",
+      "loadOlderError": "无法加载更早消息。",
+      "refresh": "刷新消息"
+    },
+    "viewDetail": "查看详情"
+  },
   "reports": {
     "title": "举报管理",
     "description": "查看举报列表和处理状态。",

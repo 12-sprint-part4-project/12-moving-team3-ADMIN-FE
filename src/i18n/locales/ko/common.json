@@ -378,6 +378,81 @@
       "emptyDescription": "선택한 완료 건을 찾을 수 없습니다."
     }
   },
+  "chats": {
+    "title": "채팅 관리",
+    "description": "채팅방 목록을 조회하고 검색·필터할 수 있습니다.",
+    "common": {
+      "retry": "잠시 후 다시 시도해 주세요.",
+      "retryAction": "다시 시도"
+    },
+    "roomType": {
+      "GENERAL": "일반",
+      "DESIGNATED": "지정 견적",
+      "COMMUNITY": "커뮤니티"
+    },
+    "userType": { "CUSTOMER": "고객", "MOVER": "기사" },
+    "participant": { "active": "참여 중", "left": "이탈", "withdrawn": "탈퇴" },
+    "filter": {
+      "allTypes": "전체",
+      "searchPlaceholder": "이름, 닉네임, 이메일, 휴대폰 검색",
+      "searchLabel": "채팅방 참여자 검색"
+    },
+    "fields": {
+      "roomId": "채팅방 ID",
+      "participants": "참여자",
+      "roomType": "채팅방 유형",
+      "lastMessage": "마지막 메시지",
+      "lastMessageAt": "마지막 메시지 시각",
+      "createdAt": "생성일",
+      "actions": "관리",
+      "estimateRequestId": "견적 요청 ID",
+      "quoteId": "견적 ID",
+      "designatedMoverId": "지정 기사 ID",
+      "communityPostId": "커뮤니티 게시글 ID",
+      "name": "이름",
+      "nickname": "닉네임",
+      "email": "이메일",
+      "userType": "회원 유형",
+      "joinedAt": "참여 시각",
+      "leftStatus": "이탈 여부",
+      "leftAt": "이탈 시각",
+      "withdrawnStatus": "탈퇴 여부"
+    },
+    "list": {
+      "label": "채팅방 목록",
+      "error": "채팅방 목록을 불러오지 못했습니다.",
+      "noResults": "검색 결과가 없습니다.",
+      "empty": "등록된 채팅방이 없습니다.",
+      "changeFilters": "검색 조건을 변경한 후 다시 시도해 주세요.",
+      "resetFilters": "필터 초기화"
+    },
+    "detail": {
+      "title": "채팅방 상세",
+      "basicInfo": "채팅방 기본 정보",
+      "linkedInfo": "연결 정보",
+      "participantInfo": "참여자 정보",
+      "noParticipants": "참여자가 없습니다.",
+      "noSelection": "선택한 채팅방 정보가 없습니다.",
+      "error": "채팅방 상세를 불러오지 못했습니다.",
+      "empty": "채팅방 정보가 없습니다.",
+      "notFound": "선택한 채팅방을 찾을 수 없습니다."
+    },
+    "messages": {
+      "title": "메시지 히스토리",
+      "none": "메시지 없음",
+      "imageMessage": "이미지 메시지",
+      "filtered": "필터링됨",
+      "imageAlt": "채팅 이미지",
+      "imageError": "이미지를 불러올 수 없습니다.",
+      "loading": "메시지를 불러오는 중...",
+      "error": "메시지를 불러오지 못했습니다.",
+      "empty": "메시지 내역이 없습니다.",
+      "loadOlder": "이전 메시지 더 보기",
+      "loadOlderError": "이전 메시지를 불러오지 못했습니다.",
+      "refresh": "메시지 새로고침"
+    },
+    "viewDetail": "상세 보기"
+  },
   "reports": {
     "title": "신고 관리",
     "description": "신고 목록을 조회하고 상태를 확인할 수 있습니다.",

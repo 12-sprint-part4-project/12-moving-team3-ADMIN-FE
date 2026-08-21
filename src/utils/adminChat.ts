@@ -4,6 +4,7 @@ import type {
   AdminChatRoomType,
   AdminChatUserType,
 } from '@/types/adminChat';
+import type { TFunction } from 'i18next';
 
 /** 발신자·참여자 공통 표시명에 필요한 최소 필드 */
 interface AdminChatNamedUser {
@@ -32,9 +33,14 @@ export const ADMIN_CHAT_USER_TYPE_LABEL: Record<AdminChatUserType, string> = {
  * `닉네임(회원 유형)` 표기.
  * 닉네임이 비어 있으면 name으로 fallback한다.
  */
-export const formatAdminChatUserLabel = (user: AdminChatNamedUser) => {
+export const formatAdminChatUserLabel = (
+  user: AdminChatNamedUser,
+  t?: TFunction
+) => {
   const displayName = user.nickname.trim() || user.name.trim() || '-';
-  const userTypeLabel = ADMIN_CHAT_USER_TYPE_LABEL[user.userType];
+  const userTypeLabel = t
+    ? t(`chats.userType.${user.userType}`)
+    : ADMIN_CHAT_USER_TYPE_LABEL[user.userType];
 
   return `${displayName}(${userTypeLabel})`;
 };
@@ -44,13 +50,16 @@ export const formatAdminChatUserLabel = (user: AdminChatNamedUser) => {
  * 예: `길동이(고객), 빠른이사맨(기사)`
  */
 export const formatAdminChatParticipants = (
-  participants: AdminChatParticipant[]
+  participants: AdminChatParticipant[],
+  t?: TFunction
 ) => {
   if (participants.length === 0) {
     return '-';
   }
 
-  return participants.map((participant) => formatAdminChatUserLabel(participant)).join(', ');
+  return participants
+    .map((participant) => formatAdminChatUserLabel(participant, t))
+    .join(', ');
 };
 
 /**
@@ -58,14 +67,15 @@ export const formatAdminChatParticipants = (
  * TEXT는 content, IMAGE는 고정 문구, 없으면 안내 문구를 쓴다.
  */
 export const formatAdminChatLastMessagePreview = (
-  lastMessage: AdminChatLastMessage | null
+  lastMessage: AdminChatLastMessage | null,
+  t?: TFunction
 ) => {
   if (!lastMessage) {
-    return '메시지 없음';
+    return t ? t('chats.messages.none') : '메시지 없음';
   }
 
   if (lastMessage.messageType === 'IMAGE') {
-    return '이미지 메시지';
+    return t ? t('chats.messages.imageMessage') : '이미지 메시지';
   }
 
   const content = lastMessage.content.trim();

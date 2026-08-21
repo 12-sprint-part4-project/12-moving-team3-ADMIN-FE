@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useDetailSearchParam } from '@/hooks/useDetailSearchParam';
 import { parseNumericDetailId } from '@/utils/detailSearchParams';
@@ -14,6 +15,7 @@ import { getChatListColumns } from './getChatListColumns';
  * 선택한 채팅방 ID를 한곳에서 관리해 목록 컬럼과 Drawer의 책임을 분리한다.
  */
 export const ChatManagementContent = () => {
+  const { t } = useTranslation();
   const { detailId, setDetailId } = useDetailSearchParam('roomId');
   const selectedRoomId = parseNumericDetailId(detailId);
   const handleOpenDetail = useCallback(
@@ -21,8 +23,8 @@ export const ChatManagementContent = () => {
     [setDetailId]
   );
   const getColumns = useCallback(
-    () => getChatListColumns(handleOpenDetail),
-    [handleOpenDetail]
+    () => getChatListColumns(handleOpenDetail, t),
+    [handleOpenDetail, t]
   );
 
   return (
