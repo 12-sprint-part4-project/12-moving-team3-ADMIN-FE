@@ -1,7 +1,11 @@
 /**
  * 관리자 목록·상세 쿼리 전용 클라이언트 이동.
- * 하드 리로드 직후 App Router의 query-only push/replace가 no-op인 경우가 있어
- * History API로 주소를 맞춘 뒤 router로 useSearchParams 구독을 갱신한다.
+ *
+ * Next.js 16은 native History API(pushState/replaceState)를
+ * usePathname·useSearchParams와 동기화한다. 하드 리로드 직후
+ * query-only router.push가 no-op인 경우가 있어 History API로 주소를
+ * 맞춘 뒤 router.replace로 구독을 갱신한다. replace는 새 히스토리
+ * 항목을 추가하지 않는다.
  */
 export interface NavigateSearchHrefRouter {
   push: (href: string, options?: { scroll?: boolean }) => void;
