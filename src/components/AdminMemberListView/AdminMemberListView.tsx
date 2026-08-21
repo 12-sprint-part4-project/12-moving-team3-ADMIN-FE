@@ -20,6 +20,7 @@ import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
+import { SearchResetButton } from '@/components/SearchResetButton/SearchResetButton';
 import { useAdminMemberList } from '@/hooks/useAdminMemberList';
 import { useClampListPage } from '@/hooks/useClampListPage';
 import { toAdminMemberApiDate } from '@/utils/adminMember';
@@ -341,6 +342,7 @@ export const AdminMemberListView = ({
             onChange={handleSortOrderChange}
             options={[...SORT_ORDER_OPTIONS]}
           />
+          <SearchResetButton onClick={handleResetFilters} />
         </>
       }
     >

@@ -16,6 +16,7 @@ import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
+import { SearchResetButton } from '@/components/SearchResetButton/SearchResetButton';
 import { useAdminChatList } from '@/hooks/useAdminChatList';
 import { useClampListPage } from '@/hooks/useClampListPage';
 import { ADMIN_CHAT_ROOM_TYPE_LABEL } from '@/utils/adminChat';
@@ -248,6 +249,7 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
             onChange={handleRoomTypeChange}
             options={[...ROOM_TYPE_FILTER_OPTIONS]}
           />
+          <SearchResetButton onClick={handleResetFilters} />
         </>
       }
     >

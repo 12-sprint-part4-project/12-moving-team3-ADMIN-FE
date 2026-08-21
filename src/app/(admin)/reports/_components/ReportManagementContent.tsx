@@ -93,6 +93,7 @@ export const ReportManagementContent = () => {
             onStatusChange={handleStatusChange}
             onTargetChange={handleTargetChange}
             onDateRangeConfirm={handleDateRangeConfirm}
+            onReset={handleResetFilters}
           />
         }
       >
