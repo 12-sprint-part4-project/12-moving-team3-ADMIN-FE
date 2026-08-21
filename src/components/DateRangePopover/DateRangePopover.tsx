@@ -1,6 +1,6 @@
 'use client';
 
-import { format, isSameDay } from 'date-fns';
+import { isSameDay } from 'date-fns';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Calendar } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
@@ -10,7 +10,10 @@ import {
   DateRangePicker,
   type DateRange,
 } from '@/components/DateRangePicker/DateRangePicker';
+import { useI18n } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
+
+import type { Language } from '@/i18n/config';
 
 const POPOVER_MOTION_OFFSET_PX = 4;
 const POPOVER_MOTION_DURATION_SEC = 0.2;
@@ -22,17 +25,30 @@ export interface DateRangePopoverProps {
   placeholder?: string;
   className?: string;
   triggerClassName?: string;
+  locale?: Language;
+  labels?: {
+    placeholder: string;
+    dialog: string;
+    allPeriod: string;
+    cancel: string;
+    confirm: string;
+  };
 }
 
 // 날짜 범위를 포맷팅하여 문자열로 반환하는 함수
-const formatDateRange = (value?: DateRange) => {
+const formatDateRange = (value?: DateRange, locale: Language = 'ko') => {
   if (!value) {
     // 값이 없으면 undefined 반환
     return undefined;
   }
 
   // 시작일 포맷팅
-  const from = format(value.from, 'yyyy.MM.dd');
+  const formatter = new Intl.DateTimeFormat(locale, {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+  const from = formatter.format(value.from);
 
   // 종료일이 없거나 시작일과 종료일이 같으면 시작일만 반환
   if (!value.to || isSameDay(value.from, value.to)) {
@@ -40,7 +56,7 @@ const formatDateRange = (value?: DateRange) => {
   }
 
   // 시작일 ~ 종료일 형태로 반환
-  return `${from} ~ ${format(value.to, 'yyyy.MM.dd')}`;
+  return `${from} ~ ${formatter.format(value.to)}`;
 };
 
 // 날짜 범위 선택 팝오버 컴포넌트
@@ -50,7 +66,11 @@ export const DateRangePopover = ({
   placeholder = '전체 기간',
   className,
   triggerClassName,
+  locale,
+  labels,
 }: DateRangePopoverProps) => {
+  const { language } = useI18n();
+  const resolvedLocale = locale ?? language;
   // popover를 위한 고유 ID
   const popoverId = useId();
   const shouldReduceMotion = useReducedMotion();
@@ -61,13 +81,19 @@ export const DateRangePopover = ({
   // wrapper ref (outside click 감지·Escape 후 트리거 포커스 복귀에 사용)
   const wrapperRef = useRef<HTMLDivElement>(null);
   const isOpenRef = useRef(isOpen);
-  isOpenRef.current = isOpen;
   // 버튼에 표시될 날짜 문자열
-  const dateRangeLabel = formatDateRange(value) ?? placeholder;
+  const dateRangeLabel =
+    formatDateRange(value, resolvedLocale) ??
+    labels?.placeholder ??
+    placeholder;
   const popoverTransition = {
     duration: shouldReduceMotion ? 0 : POPOVER_MOTION_DURATION_SEC,
     ease: 'easeOut',
   } as const;
+
+  useEffect(() => {
+    isOpenRef.current = isOpen;
+  }, [isOpen]);
 
   // 버튼 클릭시 팝오버 열고 닫기
   const handleTriggerClick = () => {
@@ -167,7 +193,7 @@ export const DateRangePopover = ({
             key="date-range-popover"
             id={popoverId}
             role="dialog"
-            aria-label="날짜 범위 선택"
+            aria-label={labels?.dialog ?? '날짜 범위 선택'}
             initial={{ opacity: 0, y: -POPOVER_MOTION_OFFSET_PX }}
             animate={{ opacity: 1, y: 0 }}
             exit={{
@@ -182,18 +208,20 @@ export const DateRangePopover = ({
             <DateRangePicker
               value={draftRange}
               onChange={setDraftRange}
+              locale={resolvedLocale}
+              ariaLabel={labels?.dialog}
               className="rounded-none border-0"
             />
             {/* 취소/확인 버튼 영역 */}
             <div className="flex justify-end gap-2 border-t border-line-200 p-4">
               <Button variant="outlined" onClick={handleSelectAllPeriod}>
-                전체 기간
+                {labels?.allPeriod ?? '전체 기간'}
               </Button>
               <Button variant="secondary" onClick={handleCancel}>
-                취소
+                {labels?.cancel ?? '취소'}
               </Button>
               <Button variant="solid" onClick={handleConfirm}>
-                확인
+                {labels?.confirm ?? '확인'}
               </Button>
             </div>
           </motion.div>

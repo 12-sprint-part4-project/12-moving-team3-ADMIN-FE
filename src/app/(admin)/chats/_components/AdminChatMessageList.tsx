@@ -62,7 +62,9 @@ const AdminChatMessageItem = ({ message }: AdminChatMessageItemProps) => {
   return (
     <li className="rounded-lg border border-line-100 bg-background-100 p-3">
       <div className="flex flex-wrap items-center gap-2">
-        <p className="text-md-semibold text-black-400">{senderLabel}</p>
+        <p data-i18n-ignore className="text-md-semibold text-black-400">
+          {senderLabel}
+        </p>
         {message.sender.isDeleted ? (
           <StatusBadge variant="danger" label="탈퇴" />
         ) : null}
@@ -101,7 +103,10 @@ const AdminChatMessageItem = ({ message }: AdminChatMessageItemProps) => {
             </p>
           )
         ) : (
-          <p className="text-md-regular break-words whitespace-pre-wrap text-black-400">
+          <p
+            data-i18n-ignore
+            className="text-md-regular break-words whitespace-pre-wrap text-black-400"
+          >
             {displayContent}
           </p>
         )}

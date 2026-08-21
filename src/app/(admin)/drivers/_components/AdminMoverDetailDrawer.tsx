@@ -9,6 +9,7 @@ import {
   REGION_LABEL,
 } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
+import { translateCurrent } from '@/i18n/format';
 
 import type {
   AdminMemberDetail,
@@ -27,7 +28,7 @@ const formatCareer = (career: number | null) => {
     return '-';
   }
 
-  return `${career}년`;
+  return translateCurrent('ui.years', { value: career });
 };
 
 const formatAverageRating = (averageRating: number | null) => {

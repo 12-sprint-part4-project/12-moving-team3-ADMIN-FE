@@ -7,7 +7,11 @@ interface TruncatedTextProps {
 
 /** 한 줄로 말줄임 처리하고 hover 시 전체 문자열을 제공한다. */
 export const TruncatedText = ({ value, className }: TruncatedTextProps) => (
-  <span className={cn('block truncate', className)} title={value}>
+  <span
+    data-i18n-ignore
+    className={cn('block truncate', className)}
+    title={value}
+  >
     {value}
   </span>
 );

@@ -3,6 +3,7 @@ import { CircleCheck, CircleDollarSign, Wallet } from 'lucide-react';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { StatisticsCardList } from '@/components/StatCard/StatisticsCardList';
+import { formatLocalizedNumber } from '@/i18n/format';
 
 import type { AdminCompletedStatistics } from '@/types/adminCompleted';
 import type { ReactNode } from 'react';
@@ -57,7 +58,7 @@ const formatStatisticValue = (
     return value;
   }
 
-  return new Intl.NumberFormat('ko-KR').format(value);
+  return formatLocalizedNumber(value);
 };
 
 /**

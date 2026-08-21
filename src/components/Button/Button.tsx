@@ -1,6 +1,10 @@
+'use client';
+
 import { cva, type VariantProps } from 'class-variance-authority';
 import { type ButtonHTMLAttributes, type ReactNode } from 'react';
 
+import { translateCurrentUiValue } from '@/i18n/format';
+import { useI18n } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
@@ -52,7 +56,12 @@ export const Button = ({
   type = 'button',
   children,
   ...props
-}: ButtonProps) => (
+}: ButtonProps) => {
+  useI18n();
+  const localizedChildren =
+    typeof children === 'string' ? translateCurrentUiValue(children) : children;
+
+  return (
   <button
     {...props}
     type={type}
@@ -68,7 +77,7 @@ export const Button = ({
       )}
     >
       {leftIcon}
-      {children}
+      {localizedChildren}
       {rightIcon}
     </span>
     {loading ? (
@@ -78,4 +87,5 @@ export const Button = ({
       />
     ) : null}
   </button>
-);
+  );
+};

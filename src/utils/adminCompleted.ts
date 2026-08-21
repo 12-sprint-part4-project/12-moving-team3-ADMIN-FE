@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 
+import { formatLocalizedDate, translateCurrentUiValue } from '@/i18n/format';
 import { formatAdminEstimateQuotePrice } from '@/utils/adminEstimateRequest';
 
 import type {
@@ -35,7 +36,7 @@ export const formatAdminCompletedMoveDate = (moveDate: string | null) => {
     return '-';
   }
 
-  return moveDate.split('T')[0] ?? moveDate;
+  return formatLocalizedDate(moveDate);
 };
 
 export const formatAdminCompletedPrice = (price: number | null) =>
@@ -56,7 +57,9 @@ export const formatAdminCompletedMissingFields = (
 ) =>
   missingFields.map((field) => {
     if (Object.hasOwn(MISSING_FIELD_LABEL, field)) {
-      return MISSING_FIELD_LABEL[field as AdminCompletedDetailMissingField];
+      return translateCurrentUiValue(
+        MISSING_FIELD_LABEL[field as AdminCompletedDetailMissingField]
+      );
     }
 
     return field;

@@ -2,8 +2,10 @@
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
+import { useI18n } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 
+import type { TranslationKey } from '@/i18n/translator';
 import type { AdminDashboardRequestStatus } from '@/types/adminDashboard';
 
 export interface RequestStatusChartProps {
@@ -13,7 +15,7 @@ export interface RequestStatusChartProps {
 
 interface StatusSegment {
   key: keyof Omit<AdminDashboardRequestStatus, 'total'>;
-  label: string;
+  labelKey: TranslationKey;
   code: string;
   color: string;
 }
@@ -22,44 +24,42 @@ interface StatusSegment {
 const STATUS_SEGMENTS: StatusSegment[] = [
   {
     key: 'submitted',
-    label: '요청',
+    labelKey: 'dashboard.request',
     code: 'SUBMITTED',
     color: 'var(--color-blue-300)',
   },
   {
     key: 'confirmed',
-    label: '매칭 완료',
+    labelKey: 'dashboard.matched',
     code: 'CONFIRMED',
     color: 'var(--color-green-200)',
   },
   {
     key: 'completed',
-    label: '이사 완료',
+    labelKey: 'dashboard.moveCompleted',
     code: 'COMPLETED',
     color: 'var(--color-yellow-100)',
   },
   {
     key: 'expired',
-    label: '만료',
+    labelKey: 'dashboard.expired',
     code: 'EXPIRED',
     color: 'var(--color-blue-400)',
   },
   {
     key: 'canceled',
-    label: '취소',
+    labelKey: 'dashboard.canceled',
     code: 'CANCELED',
     color: 'var(--color-red-200)',
   },
 ];
 
-const formatCount = (value: number) => value.toLocaleString('ko-KR');
-
-const formatPercentage = (value: number, total: number) => {
+const getPercentage = (value: number, total: number) => {
   if (total === 0) {
-    return '0.0';
+    return 0;
   }
 
-  return ((value / total) * 100).toFixed(1);
+  return (value / total) * 100;
 };
 
 /**
@@ -70,8 +70,15 @@ export const RequestStatusChart = ({
   data,
   className,
 }: RequestStatusChartProps) => {
-  const chartData = STATUS_SEGMENTS.map(({ key, label, color }) => ({
-    name: label,
+  const { language, t } = useI18n();
+  const formatCount = (value: number) => value.toLocaleString(language);
+  const formatPercentage = (value: number, total: number) =>
+    new Intl.NumberFormat(language, {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    }).format(getPercentage(value, total));
+  const chartData = STATUS_SEGMENTS.map(({ key, labelKey, color }) => ({
+    name: t(labelKey),
     value: data[key],
     color,
   }));
@@ -99,7 +106,10 @@ export const RequestStatusChart = ({
               <Tooltip
                 formatter={(value) =>
                   typeof value === 'number'
-                    ? [`${formatCount(value)}건`, undefined]
+                    ? [
+                        `${formatCount(value)} ${t('dashboard.requestUnit')}`,
+                        undefined,
+                      ]
                     : [value, undefined]
                 }
               />
@@ -107,15 +117,17 @@ export const RequestStatusChart = ({
           </ResponsiveContainer>
 
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-sm-medium text-gray-500">총 요청</span>
+            <span className="text-sm-medium text-gray-500">
+              {t('dashboard.totalRequests')}
+            </span>
             <strong className="text-xl-bold text-black-400">
-              {formatCount(data.total)} 건
+              {formatCount(data.total)} {t('dashboard.requestUnit')}
             </strong>
           </div>
         </div>
 
         <ul className="flex w-full flex-1 flex-col gap-3">
-          {STATUS_SEGMENTS.map(({ key, label, code, color }) => {
+          {STATUS_SEGMENTS.map(({ key, labelKey, code, color }) => {
             const count = data[key];
 
             return (
@@ -130,11 +142,12 @@ export const RequestStatusChart = ({
                     aria-hidden
                   />
                   <span className="truncate">
-                    {label} <span className="text-gray-400">({code})</span>
+                    {t(labelKey)}{' '}
+                    <span className="text-gray-400">({code})</span>
                   </span>
                 </span>
                 <span className="shrink-0 text-black-400">
-                  {formatCount(count)}건{' '}
+                  {formatCount(count)} {t('dashboard.requestUnit')}{' '}
                   <span className="text-gray-400">
                     ({formatPercentage(count, data.total)}%)
                   </span>

@@ -1,5 +1,11 @@
 import { format } from 'date-fns';
 
+import {
+  formatLocalizedDateTime,
+  formatLocalizedKrw,
+  translateCurrentUiValue,
+} from '@/i18n/format';
+
 import type { StatusBadgeProps } from '@/components/StatusBadge/StatusBadge';
 import type {
   AdminEstimateQuoteStatus,
@@ -90,13 +96,7 @@ export const formatAdminEstimateRequestSubmittedAt = (
     return '-';
   }
 
-  const date = new Date(submittedAt);
-
-  if (Number.isNaN(date.getTime())) {
-    return submittedAt;
-  }
-
-  return format(date, 'yyyy-MM-dd HH:mm');
+  return formatLocalizedDateTime(submittedAt);
 };
 
 export const formatAdminEstimateRequestPhoneNumber = (
@@ -122,19 +122,19 @@ export const formatAdminEstimateRequestMoveType = (
     return '-';
   }
 
-  return MOVE_TYPE_LABEL[moveType];
+  return translateCurrentUiValue(MOVE_TYPE_LABEL[moveType]);
 };
 
 export const formatAdminEstimateQuoteStatus = (
   status: AdminEstimateQuoteStatus
-) => QUOTE_STATUS_LABEL[status];
+) => translateCurrentUiValue(QUOTE_STATUS_LABEL[status]);
 
 export const formatAdminEstimateQuotePrice = (price: number | null) => {
   if (price == null) {
     return '-';
   }
 
-  return `${new Intl.NumberFormat('ko-KR').format(price)}원`;
+  return formatLocalizedKrw(price);
 };
 
 export const hasAdminEstimateRequestMissingFields = (
@@ -154,9 +154,9 @@ export const formatAdminEstimateRequestMissingFields = (
 ) =>
   missingFields.map((field) => {
     if (Object.hasOwn(MISSING_FIELD_LABEL, field)) {
-      return MISSING_FIELD_LABEL[
-        field as AdminEstimateRequestDetailMissingField
-      ];
+      return translateCurrentUiValue(
+        MISSING_FIELD_LABEL[field as AdminEstimateRequestDetailMissingField]
+      );
     }
 
     return field;

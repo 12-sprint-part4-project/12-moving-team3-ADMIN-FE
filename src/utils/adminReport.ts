@@ -1,4 +1,8 @@
-import { format } from 'date-fns';
+import {
+  formatLocalizedDateTime,
+  translateCurrent,
+  translateCurrentUiValue,
+} from '@/i18n/format';
 
 import type { StatusBadgeProps } from '@/components/StatusBadge/StatusBadge';
 import type {
@@ -171,7 +175,10 @@ export const getAdminReportContentSummary = (
     case 'REVIEW': {
       const rating = typeof meta.rating === 'number' ? meta.rating : null;
       return {
-        text: rating != null ? `리뷰 · ★${rating}` : '리뷰',
+        text:
+          rating != null
+            ? translateCurrent('ui.reviewRatingSummary', { rating })
+            : translateCurrent('ui.reviewPost'),
         usedMetadataKeys: rating != null ? ['rating'] : [],
       };
     }
@@ -181,21 +188,31 @@ export const getAdminReportContentSummary = (
           ? meta.postTitle.trim()
           : null;
       return {
-        text: postTitle ? `댓글 · 원글: ${postTitle}` : '댓글',
+        text: postTitle
+          ? translateCurrent('ui.commentPostSummary', { title: postTitle })
+          : translateCurrent('dashboard.reportTargetComment'),
         usedMetadataKeys: postTitle ? ['postTitle'] : [],
       };
     }
     case 'MESSAGE': {
       const typeLabel = getMetadataLabel('messageType', meta.messageType);
       return {
-        text: typeLabel ? `메시지 · ${typeLabel}` : '메시지',
+        text: typeLabel
+          ? translateCurrent('ui.messageSummary', {
+              type: translateCurrentUiValue(typeLabel),
+            })
+          : translateCurrent('dashboard.reportTargetMessage'),
         usedMetadataKeys: typeLabel ? ['messageType'] : [],
       };
     }
     case 'ARTICLE': {
       const categoryLabel = getMetadataLabel('category', meta.category);
       return {
-        text: categoryLabel ? `게시글 · ${categoryLabel}` : '게시글',
+        text: categoryLabel
+          ? translateCurrent('ui.postSummary', {
+              category: translateCurrentUiValue(categoryLabel),
+            })
+          : translateCurrent('dashboard.reportTargetArticle'),
         usedMetadataKeys: categoryLabel ? ['category'] : [],
       };
     }
@@ -219,7 +236,7 @@ export const formatAdminReportContentMetadataValue = (
 
   const mappedLabel = getMetadataLabel(key, value);
   if (mappedLabel != null) {
-    return mappedLabel;
+    return translateCurrentUiValue(mappedLabel);
   }
 
   if (
@@ -246,13 +263,7 @@ export const formatAdminReportContentMetadataValue = (
 
 /** 목록·상세 신고일 표시 (회원 목록과 동일 포맷) */
 export const formatAdminReportCreatedAt = (iso: string) => {
-  const date = new Date(iso);
-
-  if (Number.isNaN(date.getTime())) {
-    return iso;
-  }
-
-  return format(date, 'yyyy-MM-dd HH:mm');
+  return formatLocalizedDateTime(iso);
 };
 
 /** 신고자 셀 표시명. 닉네임이 있으면 이름 옆에 보조로 붙인다. */
@@ -277,7 +288,9 @@ export const formatAdminReportTarget = (
   targetInfo: AdminReportTargetInfo | null
 ) => {
   if (!targetInfo) {
-    return `${ADMIN_REPORT_TARGET_LABEL[target]} (삭제됨)`;
+    return translateCurrent('ui.deletedSuffix', {
+      type: translateCurrentUiValue(ADMIN_REPORT_TARGET_LABEL[target]),
+    });
   }
 
   switch (targetInfo.type) {

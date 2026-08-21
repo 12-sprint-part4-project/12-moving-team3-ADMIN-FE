@@ -1,5 +1,6 @@
 import { Button } from '@/components/Button/Button';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
+import { translateCurrent } from '@/i18n/format';
 import {
   formatAdminReviewCreatedAt,
   formatAdminReviewUserLabel,
@@ -111,7 +112,7 @@ export const getReviewListColumns = (
       <Button
         variant="secondary"
         className="px-3 py-1.5 text-sm-medium"
-        aria-label={`리뷰 ${row.id} 상세 보기`}
+        aria-label={translateCurrent('ui.reviewDetailLabel', { id: row.id })}
         onClick={() => onOpenDetail(row)}
       >
         상세 보기

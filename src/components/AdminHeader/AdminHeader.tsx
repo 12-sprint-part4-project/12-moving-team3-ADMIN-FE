@@ -152,7 +152,7 @@ export const AdminHeader = ({
               className="flex items-center gap-2 text-md-medium text-black-300"
             >
               <User className="size-5" aria-hidden />
-              {userName ? <span>{userName}</span> : null}
+              {userName ? <span data-i18n-ignore>{userName}</span> : null}
               <ChevronDown className="size-4" aria-hidden />
             </button>
 
@@ -164,12 +164,18 @@ export const AdminHeader = ({
                 {userName || userEmail ? (
                   <div className="border-b border-line-200 px-4 py-3">
                     {userName ? (
-                      <p className="text-md-medium text-black-300">
+                      <p
+                        data-i18n-ignore
+                        className="text-md-medium text-black-300"
+                      >
                         {userName}
                       </p>
                     ) : null}
                     {userEmail ? (
-                      <p className="text-xs-medium text-gray-500">
+                      <p
+                        data-i18n-ignore
+                        className="text-xs-medium text-gray-500"
+                      >
                         {userEmail}
                       </p>
                     ) : null}

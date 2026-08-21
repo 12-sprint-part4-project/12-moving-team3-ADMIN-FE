@@ -90,9 +90,9 @@ const SidebarPortalTooltip = ({ labelKey, top, left }: SidebarTooltipState) => {
 /** 접힌 너비(w-14)에서 px-2를 뺀 아이콘 열. 펼쳐도 아이콘이 가운데 자리에 남는다. */
 const ICON_COLUMN_CLASS_NAME = 'flex w-10 shrink-0 justify-center';
 
-/** Tailwind w-14 / w-45와 동일한 rem 값 */
+/** 접힌 너비는 Tailwind w-14와 동일하고, 펼친 너비는 긴 번역 문구를 수용한다. */
 const SIDEBAR_COLLAPSED_WIDTH = '3.5rem';
-const SIDEBAR_EXPANDED_WIDTH = '11.25rem';
+const SIDEBAR_EXPANDED_WIDTH = '18rem';
 /** DetailDrawer와 동일한 0.2s ease-out */
 const SIDEBAR_MOTION_DURATION_SEC = 0.2;
 

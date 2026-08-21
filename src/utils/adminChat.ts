@@ -1,3 +1,5 @@
+import { translateCurrentUiValue } from '@/i18n/format';
+
 import type {
   AdminChatLastMessage,
   AdminChatParticipant,
@@ -34,7 +36,9 @@ export const ADMIN_CHAT_USER_TYPE_LABEL: Record<AdminChatUserType, string> = {
  */
 export const formatAdminChatUserLabel = (user: AdminChatNamedUser) => {
   const displayName = user.nickname.trim() || user.name.trim() || '-';
-  const userTypeLabel = ADMIN_CHAT_USER_TYPE_LABEL[user.userType];
+  const userTypeLabel = translateCurrentUiValue(
+    ADMIN_CHAT_USER_TYPE_LABEL[user.userType]
+  );
 
   return `${displayName}(${userTypeLabel})`;
 };
@@ -50,7 +54,9 @@ export const formatAdminChatParticipants = (
     return '-';
   }
 
-  return participants.map((participant) => formatAdminChatUserLabel(participant)).join(', ');
+  return participants
+    .map((participant) => formatAdminChatUserLabel(participant))
+    .join(', ');
 };
 
 /**
@@ -61,11 +67,11 @@ export const formatAdminChatLastMessagePreview = (
   lastMessage: AdminChatLastMessage | null
 ) => {
   if (!lastMessage) {
-    return '메시지 없음';
+    return translateCurrentUiValue('메시지 없음');
   }
 
   if (lastMessage.messageType === 'IMAGE') {
-    return '이미지 메시지';
+    return translateCurrentUiValue('이미지 메시지');
   }
 
   const content = lastMessage.content.trim();

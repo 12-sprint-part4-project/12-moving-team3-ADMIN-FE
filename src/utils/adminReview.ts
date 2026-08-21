@@ -1,5 +1,7 @@
 import { format } from 'date-fns';
 
+import { formatLocalizedDateTime } from '@/i18n/format';
+
 import type {
   AdminReviewStatisticsQuery,
   AdminReviewUserSummary,
@@ -10,13 +12,7 @@ export const toAdminReviewApiDate = (date: Date) => format(date, 'yyyy-MM-dd');
 
 /** 목록·상세 작성일 표시 — 회원/신고 목록과 동일한 포맷 */
 export const formatAdminReviewCreatedAt = (iso: string) => {
-  const date = new Date(iso);
-
-  if (Number.isNaN(date.getTime())) {
-    return iso;
-  }
-
-  return format(date, 'yyyy-MM-dd HH:mm');
+  return formatLocalizedDateTime(iso);
 };
 
 /**

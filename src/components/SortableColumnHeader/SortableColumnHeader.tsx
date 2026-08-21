@@ -1,5 +1,6 @@
 import { ArrowDown, ArrowUp } from 'lucide-react';
 
+import { useI18n } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 
 import type { AdminListSortDirection } from '@/types/adminEstimateRequest';
@@ -21,15 +22,16 @@ export const SortableColumnHeader = ({
   onToggle,
   className,
 }: SortableColumnHeaderProps) => {
+  const { t } = useI18n();
   const isDescending = sort === 'DESC';
   const SortIcon = isDescending ? ArrowDown : ArrowUp;
-  const sortLabel = isDescending ? '내림차순' : '오름차순';
+  const sortLabel = t(isDescending ? 'ui.descending' : 'ui.ascending');
 
   return (
     <button
       type="button"
       onClick={onToggle}
-      aria-label={`${label} ${sortLabel}으로 정렬됨`}
+      aria-label={t('ui.sortedLabel', { label, direction: sortLabel })}
       className={cn(
         'inline-flex cursor-pointer items-center gap-1 rounded-sm text-inherit outline-none focus-visible:text-blue-300',
         className

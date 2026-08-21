@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+import { translateCurrent } from '@/i18n/format';
 import { formatAdminReportCreatedAt } from '@/utils/adminReport';
 
 import type { StatusBadgeProps } from '@/components/StatusBadge/StatusBadge';
@@ -131,5 +132,5 @@ export const formatCareer = (career: number | null) => {
     return '-';
   }
 
-  return `${career}년`;
+  return translateCurrent('ui.years', { value: career });
 };

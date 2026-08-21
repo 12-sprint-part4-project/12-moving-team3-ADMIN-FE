@@ -36,6 +36,18 @@ test('관리자 이름을 번역하지 않고 헤더 문구에 삽입한다', ()
   assert.equal(t('header.userMenu', { name: '관리자 Kim' }), '관리자 Kim menu');
 });
 
+test('대시보드 문구와 건수 단위를 언어별로 번역한다', () => {
+  const ko = createTranslator('ko');
+  const en = createTranslator('en');
+  const zhCN = createTranslator('zh-CN');
+
+  assert.equal(ko('dashboard.requestStatus'), '견적 요청 상태 현황');
+  assert.equal(en('dashboard.requestStatus'), 'Estimate Request Status');
+  assert.equal(en('dashboard.requestUnit'), 'requests');
+  assert.equal(zhCN('dashboard.requestStatus'), '估价请求状态');
+  assert.equal(zhCN('dashboard.requestUnit'), '件');
+});
+
 test('번역이 없으면 한국어 리소스와 번역 키 순서로 fallback한다', () => {
   const resources = {
     ko: { common: { greeting: '안녕하세요' } },

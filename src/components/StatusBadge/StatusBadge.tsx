@@ -1,5 +1,9 @@
+'use client';
+
 import { cva, type VariantProps } from 'class-variance-authority';
 
+import { translateCurrentUiValue } from '@/i18n/format';
+import { useI18n } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 
 export const statusBadgeVariants = cva(
@@ -30,8 +34,12 @@ export const StatusBadge = ({
   variant,
   label,
   className,
-}: StatusBadgeProps) => (
-  <span className={cn(statusBadgeVariants({ variant }), className)}>
-    {label}
-  </span>
-);
+}: StatusBadgeProps) => {
+  useI18n();
+
+  return (
+    <span className={cn(statusBadgeVariants({ variant }), className)}>
+      {translateCurrentUiValue(label)}
+    </span>
+  );
+};
