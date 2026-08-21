@@ -123,6 +123,115 @@
       "REJECTED": "已驳回"
     }
   },
+  "members": {
+    "common": { "retry": "请稍后重试。" },
+    "status": { "all": "全部状态", "active": "正常", "suspended": "已停用" },
+    "list": {
+      "noResults": "没有搜索结果。",
+      "changeFilters": "请更改搜索条件后重试。",
+      "resetFilters": "重置筛选",
+      "searchPlaceholder": "搜索姓名、邮箱或手机号",
+      "statusLabel": "状态",
+      "allJoinDates": "全部注册日期",
+      "joinDateSort": "按注册日期排序",
+      "newest": "最新注册优先",
+      "oldest": "最早注册优先"
+    },
+    "columns": {
+      "number": "编号",
+      "status": "状态",
+      "actions": "管理",
+      "viewDetail": "查看详情"
+    },
+    "fields": {
+      "name": "姓名",
+      "nickname": "昵称",
+      "email": "邮箱",
+      "phone": "手机号",
+      "joinedAt": "注册日期",
+      "rating": "评分",
+      "suspendedAt": "停用开始日期",
+      "suspendedUntil": "停用结束日期",
+      "reportCount": "被举报次数",
+      "preferredRegion": "期望地区",
+      "services": "使用服务",
+      "serviceTypes": "服务类型",
+      "serviceRegions": "服务地区",
+      "career": "从业经验",
+      "shortDescription": "一句话介绍",
+      "description": "详细介绍",
+      "averageRating": "平均评分",
+      "reviewCount": "评价数",
+      "confirmedQuotes": "已确认报价数"
+    },
+    "detail": {
+      "basicInfo": "基本信息",
+      "accountStatus": "账号状态",
+      "notFoundDescription": "找不到所选会员。"
+    },
+    "action": {
+      "suspend": {
+        "title": "将该会员停用7天？",
+        "description": "停用期间该会员的服务使用将受到限制。",
+        "confirm": "停用7天"
+      },
+      "activate": {
+        "title": "启用该会员账号？",
+        "description": "启用后该会员可重新使用服务。",
+        "confirm": "启用账号"
+      },
+      "error": "状态更改失败，请稍后重试。"
+    },
+    "customer": {
+      "title": "会员管理",
+      "description": "查看、搜索和筛选普通会员。",
+      "caption": "普通会员列表",
+      "searchLabel": "搜索会员",
+      "empty": "暂无已注册会员。",
+      "error": "无法加载会员列表。",
+      "profile": "会员资料",
+      "detailTitle": "会员详情",
+      "detailError": "无法加载会员详情。",
+      "detailEmpty": "暂无会员信息。"
+    },
+    "mover": {
+      "title": "搬家师傅管理",
+      "description": "查看、搜索和筛选搬家师傅。",
+      "caption": "搬家师傅列表",
+      "searchLabel": "搜索搬家师傅",
+      "empty": "暂无已注册搬家师傅。",
+      "error": "无法加载搬家师傅列表。",
+      "profile": "搬家师傅资料",
+      "statistics": "搬家师傅统计",
+      "careerValue": "{{career}}年",
+      "detailTitle": "搬家师傅详情",
+      "detailError": "无法加载搬家师傅详情。",
+      "detailEmpty": "暂无搬家师傅信息。"
+    },
+    "moveType": {
+      "SMALL": "小型搬家",
+      "HOME": "家庭搬家",
+      "OFFICE": "办公室搬家"
+    },
+    "region": {
+      "SEOUL": "首尔",
+      "GYEONGGI": "京畿道",
+      "INCHEON": "仁川",
+      "GANGWON": "江原道",
+      "CHUNGBUK": "忠清北道",
+      "CHUNGNAM": "忠清南道",
+      "SEJONG": "世宗",
+      "DAEJEON": "大田",
+      "JEONBUK": "全罗北道",
+      "GWANGJU_JEONNAM": "光州·全罗南道",
+      "GYEONGBUK": "庆尚北道",
+      "DAEGU": "大邱",
+      "ULSAN": "蔚山",
+      "GYEONGNAM": "庆尚南道",
+      "BUSAN": "釜山",
+      "JEJU": "济州"
+    }
+  },
   "language": {
     "selectorLabel": "选择语言"
   },

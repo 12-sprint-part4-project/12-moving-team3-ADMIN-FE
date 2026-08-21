@@ -131,6 +131,119 @@
       "REJECTED": "Rejected"
     }
   },
+  "members": {
+    "common": { "retry": "Please try again later." },
+    "status": {
+      "all": "All statuses",
+      "active": "Active",
+      "suspended": "Suspended"
+    },
+    "list": {
+      "noResults": "No search results.",
+      "changeFilters": "Change the search filters and try again.",
+      "resetFilters": "Reset filters",
+      "searchPlaceholder": "Search name, email, or phone",
+      "statusLabel": "Status",
+      "allJoinDates": "All join dates",
+      "joinDateSort": "Sort by join date",
+      "newest": "Newest first",
+      "oldest": "Oldest first"
+    },
+    "columns": {
+      "number": "No.",
+      "status": "Status",
+      "actions": "Actions",
+      "viewDetail": "View details"
+    },
+    "fields": {
+      "name": "Name",
+      "nickname": "Nickname",
+      "email": "Email",
+      "phone": "Phone",
+      "joinedAt": "Joined At",
+      "rating": "Rating",
+      "suspendedAt": "Suspended At",
+      "suspendedUntil": "Suspended Until",
+      "reportCount": "Reports",
+      "preferredRegion": "Preferred Region",
+      "services": "Services Used",
+      "serviceTypes": "Service Types",
+      "serviceRegions": "Service Regions",
+      "career": "Experience",
+      "shortDescription": "Short Introduction",
+      "description": "Description",
+      "averageRating": "Average Rating",
+      "reviewCount": "Reviews",
+      "confirmedQuotes": "Confirmed Quotes"
+    },
+    "detail": {
+      "basicInfo": "Basic Information",
+      "accountStatus": "Account Status",
+      "notFoundDescription": "The selected member could not be found."
+    },
+    "action": {
+      "suspend": {
+        "title": "Suspend this member for 7 days?",
+        "description": "The member will have limited access during the suspension.",
+        "confirm": "Suspend for 7 days"
+      },
+      "activate": {
+        "title": "Activate this member account?",
+        "description": "The member will regain access after activation.",
+        "confirm": "Activate account"
+      },
+      "error": "Failed to change the status. Please try again later."
+    },
+    "customer": {
+      "title": "Member Management",
+      "description": "View, search, and filter customer accounts.",
+      "caption": "Customer list",
+      "searchLabel": "Search members",
+      "empty": "There are no registered members.",
+      "error": "Failed to load the member list.",
+      "profile": "Member Profile",
+      "detailTitle": "Member Details",
+      "detailError": "Failed to load member details.",
+      "detailEmpty": "Member information is unavailable."
+    },
+    "mover": {
+      "title": "Mover Management",
+      "description": "View, search, and filter mover accounts.",
+      "caption": "Mover list",
+      "searchLabel": "Search movers",
+      "empty": "There are no registered movers.",
+      "error": "Failed to load the mover list.",
+      "profile": "Mover Profile",
+      "statistics": "Mover Statistics",
+      "careerValue": "{{career}} years",
+      "detailTitle": "Mover Details",
+      "detailError": "Failed to load mover details.",
+      "detailEmpty": "Mover information is unavailable."
+    },
+    "moveType": {
+      "SMALL": "Small Move",
+      "HOME": "Home Move",
+      "OFFICE": "Office Move"
+    },
+    "region": {
+      "SEOUL": "Seoul",
+      "GYEONGGI": "Gyeonggi",
+      "INCHEON": "Incheon",
+      "GANGWON": "Gangwon",
+      "CHUNGBUK": "North Chungcheong",
+      "CHUNGNAM": "South Chungcheong",
+      "SEJONG": "Sejong",
+      "DAEJEON": "Daejeon",
+      "JEONBUK": "North Jeolla",
+      "GWANGJU_JEONNAM": "Gwangju · South Jeolla",
+      "GYEONGBUK": "North Gyeongsang",
+      "DAEGU": "Daegu",
+      "ULSAN": "Ulsan",
+      "GYEONGNAM": "South Gyeongsang",
+      "BUSAN": "Busan",
+      "JEJU": "Jeju"
+    }
+  },
   "language": {
     "selectorLabel": "Select language"
   },
