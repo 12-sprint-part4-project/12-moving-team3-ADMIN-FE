@@ -162,7 +162,10 @@ export const ConfirmModal = ({
 
   return createPortal(
     <div
-      className={cn(confirmModalOverlayVariants())}
+      className={cn(
+        confirmModalOverlayVariants(),
+        confirmLoading ? 'cursor-not-allowed' : 'cursor-pointer'
+      )}
       onClick={handleOverlayClick}
       role="presentation"
     >
@@ -173,7 +176,7 @@ export const ConfirmModal = ({
         aria-labelledby={titleId}
         aria-describedby={describedBy || undefined}
         tabIndex={-1}
-        className={cn(confirmModalPanelVariants(), className)}
+        className={cn(confirmModalPanelVariants(), 'cursor-default', className)}
         onClick={handlePanelClick}
       >
         <h2 id={titleId} className="text-xl-bold text-black-400">
