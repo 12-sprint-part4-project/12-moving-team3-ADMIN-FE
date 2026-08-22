@@ -132,15 +132,17 @@ test('목록 query를 갱신해도 상세 ID와 다른 query를 보존한다', (
   );
 });
 
-test('견적 요청 query의 상태, 날짜, 정렬을 검증한다', () => {
+test('견적 요청 query의 검색 필드, 상태, 날짜, 정렬을 검증한다', () => {
   assert.deepEqual(
     parseAdminEstimateRequestSearchParams(
       new URLSearchParams(
-        'search=%20%EA%B2%AC%EC%A0%81%20&status=CONFIRMED&startDate=2026-08-01&endDate=2026-08-20&sort=ASC&page=3'
+        'id=42&userName=%20%EA%B2%AC%EC%A0%81%20&phoneNumber=010-1234-5678&status=CONFIRMED&startDate=2026-08-01&endDate=2026-08-20&sort=ASC&page=3'
       )
     ),
     {
-      search: '견적',
+      id: '42',
+      userName: '견적',
+      phoneNumber: '010-1234-5678',
       status: 'CONFIRMED',
       startDate: '2026-08-01',
       endDate: '2026-08-20',
@@ -152,22 +154,24 @@ test('견적 요청 query의 상태, 날짜, 정렬을 검증한다', () => {
   assert.deepEqual(
     parseAdminEstimateRequestSearchParams(
       new URLSearchParams(
-        'search=%20&status=INVALID&startDate=2026-02-30&endDate=2026-01-01&sort=INVALID&page=0'
+        'id=abc&userName=%20&phoneNumber=---&status=INVALID&startDate=2026-02-30&endDate=2026-01-01&sort=INVALID&page=0'
       )
     ),
     { sort: 'DESC', page: 1, pageSize: 10 }
   );
 });
 
-test('완료 건 query의 이사 유형, 날짜, 정렬을 검증한다', () => {
+test('완료 건 query의 검색 필드, 이사 유형, 날짜, 정렬을 검증한다', () => {
   assert.deepEqual(
     parseAdminCompletedSearchParams(
       new URLSearchParams(
-        'search=%20user%20&moveType=OFFICE&startDate=2026-08-01&endDate=2026-08-20&sort=ASC&page=2'
+        'id=9&userName=%20user%20&phoneNumber=01012345678&moveType=OFFICE&startDate=2026-08-01&endDate=2026-08-20&sort=ASC&page=2'
       )
     ),
     {
-      search: 'user',
+      id: '9',
+      userName: 'user',
+      phoneNumber: '01012345678',
       moveType: 'OFFICE',
       startDate: '2026-08-01',
       endDate: '2026-08-20',
@@ -179,7 +183,7 @@ test('완료 건 query의 이사 유형, 날짜, 정렬을 검증한다', () => 
   assert.deepEqual(
     parseAdminCompletedSearchParams(
       new URLSearchParams(
-        'moveType=INVALID&startDate=2026-13-01&endDate=2026-01-01&sort=DOWN&page=x'
+        'id=x&phoneNumber=---&moveType=INVALID&startDate=2026-13-01&endDate=2026-01-01&sort=DOWN&page=x'
       )
     ),
     { sort: 'DESC', page: 1, pageSize: 10 }

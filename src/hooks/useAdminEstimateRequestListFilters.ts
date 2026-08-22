@@ -1,6 +1,7 @@
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
 
+import { useDraftSearchFields } from '@/hooks/useDraftSearchFields';
 import {
   toAdminEstimateRequestApiDate,
   toAdminEstimateRequestStatisticsQuery,
@@ -11,6 +12,11 @@ import {
   parseAdminEstimateRequestSearchParams,
   parseAdminListEnum,
 } from '@/utils/adminListSearchParams';
+import {
+  getEstimateRequestSearchFieldErrors,
+  hasEstimateRequestSearchFieldErrors,
+  type EstimateRequestSearchFieldErrors,
+} from '@/utils/adminSearchFieldValidation';
 import { navigateSearchHref } from '@/utils/navigateSearchHref';
 
 import type { DateRangePopoverProps } from '@/components/DateRangePopover/DateRangePopover';
@@ -29,7 +35,9 @@ const toListQuery = (
   page: filters.page,
   pageSize: filters.pageSize,
   sort: filters.sort,
-  ...(filters.search ? { search: filters.search } : {}),
+  ...(filters.id ? { id: filters.id } : {}),
+  ...(filters.userName ? { userName: filters.userName } : {}),
+  ...(filters.phoneNumber ? { phoneNumber: filters.phoneNumber } : {}),
   ...(filters.status ? { status: filters.status } : {}),
   ...(filters.startDate ? { startDate: filters.startDate } : {}),
   ...(filters.startDate && filters.endDate ? { endDate: filters.endDate } : {}),
@@ -49,15 +57,19 @@ export const useAdminEstimateRequestListFilters = () => {
       ),
     [searchParams]
   );
-  // 입력창 초안. 검색 버튼/Enter 시에만 filters.search로 반영한다.
-  const urlSearch = filters.search ?? '';
-  const [syncedSearch, setSyncedSearch] = useState(urlSearch);
-  const [searchInput, setSearchInput] = useState(urlSearch);
-
-  if (syncedSearch !== urlSearch) {
-    setSyncedSearch(urlSearch);
-    setSearchInput(urlSearch);
-  }
+  // 입력창 초안. 검색 버튼/Enter 시에만 URL 검색 필드로 반영한다.
+  const urlSearchValues = useMemo(
+    () => ({
+      id: filters.id ?? '',
+      userName: filters.userName ?? '',
+      phoneNumber: filters.phoneNumber ?? '',
+    }),
+    [filters.id, filters.userName, filters.phoneNumber]
+  );
+  const { drafts, handleFieldChange, commitDrafts, clearDrafts } =
+    useDraftSearchFields(urlSearchValues);
+  const [searchFieldErrors, setSearchFieldErrors] =
+    useState<EstimateRequestSearchFieldErrors>({});
 
   const listQuery = useMemo(() => toListQuery(filters), [filters]);
   const statisticsQuery = useMemo(
@@ -67,7 +79,12 @@ export const useAdminEstimateRequestListFilters = () => {
   );
 
   const hasActiveFilters = Boolean(
-    filters.search || filters.status || filters.startDate || filters.endDate
+    filters.id ||
+      filters.userName ||
+      filters.phoneNumber ||
+      filters.status ||
+      filters.startDate ||
+      filters.endDate
   );
 
   const dateRangeValue = useMemo<DateRangePopoverProps['value']>(() => {
@@ -106,17 +123,38 @@ export const useAdminEstimateRequestListFilters = () => {
     [filters, pathname]
   );
 
-  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(event.target.value);
-  };
+  const handleSearchFieldChange =
+    (key: 'id' | 'userName' | 'phoneNumber') =>
+    (event: ChangeEvent<HTMLInputElement>) => {
+      if (key === 'id' || key === 'phoneNumber') {
+        setSearchFieldErrors((previous) => {
+          if (!previous[key]) {
+            return previous;
+          }
 
-  const handleSearch = (value: string) => {
-    const trimmed = value.trim();
-    setSearchInput(trimmed);
-    updateFilters(
-      { search: trimmed.length > 0 ? trimmed : undefined },
-      { resetPage: true }
-    );
+          const next = { ...previous };
+          delete next[key];
+          return next;
+        });
+      }
+
+      handleFieldChange(key)(event);
+    };
+
+  const handleSearch = () => {
+    const patch = commitDrafts();
+    const errors = getEstimateRequestSearchFieldErrors({
+      id: patch.id ?? '',
+      phoneNumber: patch.phoneNumber ?? '',
+    });
+    setSearchFieldErrors(errors);
+
+    // 무효 필드가 있으면 URL·API에 반영하지 않는다.
+    if (hasEstimateRequestSearchFieldErrors(errors)) {
+      return;
+    }
+
+    updateFilters(patch, { resetPage: true });
   };
 
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -169,9 +207,12 @@ export const useAdminEstimateRequestListFilters = () => {
   );
 
   const handleResetFilters = () => {
-    setSearchInput('');
+    clearDrafts();
+    setSearchFieldErrors({});
     updateFilters({
-      search: undefined,
+      id: undefined,
+      userName: undefined,
+      phoneNumber: undefined,
       status: undefined,
       startDate: undefined,
       endDate: undefined,
@@ -182,12 +223,13 @@ export const useAdminEstimateRequestListFilters = () => {
 
   return {
     filters,
-    searchInput,
+    searchDrafts: drafts,
+    searchFieldErrors,
     listQuery,
     statisticsQuery,
     hasActiveFilters,
     dateRangeValue,
-    handleSearchChange,
+    handleSearchFieldChange,
     handleSearch,
     handleStatusChange,
     handleDateRangeConfirm,

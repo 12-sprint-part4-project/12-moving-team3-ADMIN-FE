@@ -26,12 +26,13 @@ export const EstimateManagementContent = () => {
   const selectedEstimateRequestId = parseNumericDetailId(detailId);
   const {
     filters,
-    searchInput,
+    searchDrafts,
+    searchFieldErrors,
     listQuery,
     statisticsQuery,
     hasActiveFilters,
     dateRangeValue,
-    handleSearchChange,
+    handleSearchFieldChange,
     handleSearch,
     handleStatusChange,
     handleDateRangeConfirm,
@@ -77,10 +78,11 @@ export const EstimateManagementContent = () => {
         isError={isStatisticsError}
       />
       <EstimateFilter
-        searchValue={searchInput}
+        searchDrafts={searchDrafts}
+        searchFieldErrors={searchFieldErrors}
         statusValue={filters.status ?? ''}
         dateRangeValue={dateRangeValue}
-        onSearchChange={handleSearchChange}
+        onSearchFieldChange={handleSearchFieldChange}
         onSearch={handleSearch}
         onStatusChange={handleStatusChange}
         onDateRangeConfirm={handleDateRangeConfirm}
