@@ -20,6 +20,7 @@ import {
   formatAdminEstimateRequestSubmittedAt,
   hasAdminEstimateRequestMissingFields,
 } from '@/utils/adminEstimateRequest';
+import { isDetailNeighborId } from '@/utils/detailNavigation';
 
 import type {
   AdminEstimateQuote,
@@ -245,6 +246,13 @@ export const EstimateDetailDrawer = ({
     detailQueryResult.data?.data.id === estimateRequestId
       ? detailQueryResult.data.data
       : null;
+  const handleNavigate = (id: number) => {
+    if (!isDetailNeighborId(id, currentDetail)) {
+      return;
+    }
+
+    onNavigate(id);
+  };
   // 같은 조회 결과를 본문과 footer가 공유하도록, 훅은 여기서 한 번만 호출한다.
   const useDetail = () => detailQueryResult;
 
@@ -262,7 +270,7 @@ export const EstimateDetailDrawer = ({
             previousLabel={t('estimates.detail.previous')}
             nextLabel={t('estimates.detail.next')}
             disabled={currentDetail == null}
-            onNavigate={onNavigate}
+            onNavigate={handleNavigate}
           />
         ) : undefined
       }

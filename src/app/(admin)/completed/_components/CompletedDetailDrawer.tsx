@@ -18,6 +18,7 @@ import {
   formatAdminEstimateRequestNullableText,
   formatAdminEstimateRequestSubmittedAt,
 } from '@/utils/adminEstimateRequest';
+import { isDetailNeighborId } from '@/utils/detailNavigation';
 
 import type {
   AdminCompletedDetail,
@@ -187,6 +188,13 @@ export const CompletedDetailDrawer = ({
     detailQueryResult.data?.data.id === estimateRequestId
       ? detailQueryResult.data.data
       : null;
+  const handleNavigate = (id: number) => {
+    if (!isDetailNeighborId(id, currentDetail)) {
+      return;
+    }
+
+    onNavigate(id);
+  };
   // 같은 조회 결과를 본문과 footer가 공유하도록, 훅은 여기서 한 번만 호출한다.
   const useDetail = () => detailQueryResult;
 
@@ -204,7 +212,7 @@ export const CompletedDetailDrawer = ({
             previousLabel={t('completed.detail.previous')}
             nextLabel={t('completed.detail.next')}
             disabled={currentDetail == null}
-            onNavigate={onNavigate}
+            onNavigate={handleNavigate}
           />
         ) : undefined
       }

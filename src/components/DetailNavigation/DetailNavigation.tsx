@@ -2,6 +2,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { Button } from '@/components/Button/Button';
 import { cn } from '@/lib/utils';
+import { resolveDetailNavigationId } from '@/utils/detailNavigation';
 
 export interface DetailNavigationProps<TId extends string | number = number> {
   prevId: TId | null;
@@ -17,6 +18,7 @@ export interface DetailNavigationProps<TId extends string | number = number> {
 /**
  * 관리자 상세 Drawer용 이전·다음 이동 버튼.
  * prevId/nextId가 없으면 해당 방향만 비활성화한다.
+ * disabled 속성은 DevTools로 풀 수 있으므로 클릭 시에도 같은 조건을 검사한다.
  */
 export const DetailNavigation = <TId extends string | number = number>({
   prevId,
@@ -26,37 +28,36 @@ export const DetailNavigation = <TId extends string | number = number>({
   onNavigate,
   disabled = false,
   className,
-}: DetailNavigationProps<TId>) => (
-  <div className={cn('flex gap-2', className)}>
-    <Button
-      variant="secondary"
-      className="w-full"
-      disabled={disabled || prevId == null}
-      leftIcon={<ChevronLeft className="size-4" aria-hidden />}
-      onClick={() => {
-        if (prevId == null) {
-          return;
-        }
+}: DetailNavigationProps<TId>) => {
+  const handleNavigate = (targetId: TId | null) => {
+    const id = resolveDetailNavigationId(targetId, disabled);
+    if (id == null) {
+      return;
+    }
 
-        onNavigate(prevId);
-      }}
-    >
-      {previousLabel}
-    </Button>
-    <Button
-      variant="secondary"
-      className="w-full"
-      disabled={disabled || nextId == null}
-      rightIcon={<ChevronRight className="size-4" aria-hidden />}
-      onClick={() => {
-        if (nextId == null) {
-          return;
-        }
+    onNavigate(id);
+  };
 
-        onNavigate(nextId);
-      }}
-    >
-      {nextLabel}
-    </Button>
-  </div>
-);
+  return (
+    <div className={cn('flex gap-2', className)}>
+      <Button
+        variant="secondary"
+        className="w-full"
+        disabled={disabled || prevId == null}
+        leftIcon={<ChevronLeft className="size-4" aria-hidden />}
+        onClick={() => handleNavigate(prevId)}
+      >
+        {previousLabel}
+      </Button>
+      <Button
+        variant="secondary"
+        className="w-full"
+        disabled={disabled || nextId == null}
+        rightIcon={<ChevronRight className="size-4" aria-hidden />}
+        onClick={() => handleNavigate(nextId)}
+      >
+        {nextLabel}
+      </Button>
+    </div>
+  );
+};
