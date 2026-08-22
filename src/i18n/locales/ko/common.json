@@ -138,6 +138,7 @@
       "allJoinDates": "가입일 전체"
     },
     "filter": {
+      "userName": "이름 및 닉네임",
       "phoneNumberInvalid": "전화번호는 숫자를 포함해 입력해 주세요."
     },
     "columns": {

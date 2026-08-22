@@ -138,6 +138,7 @@
       "allJoinDates": "全部注册日期"
     },
     "filter": {
+      "userName": "姓名及昵称",
       "phoneNumberInvalid": "手机号需包含数字。"
     },
     "columns": {

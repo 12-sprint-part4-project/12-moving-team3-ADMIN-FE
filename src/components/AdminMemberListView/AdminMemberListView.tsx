@@ -357,8 +357,8 @@ export const AdminMemberListView = ({
               {
                 name: 'userName',
                 value: drafts.userName,
-                placeholder: t('members.fields.name'),
-                'aria-label': t('members.fields.name'),
+                placeholder: t('members.filter.userName'),
+                'aria-label': t('members.filter.userName'),
                 onChange: handleSearchFieldChange('userName'),
               },
               {

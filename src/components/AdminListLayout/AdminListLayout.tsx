@@ -46,7 +46,7 @@ export const AdminListLayout = ({
 
       <div className={cn('mt-6 flex flex-col gap-4', className)}>
         {filters ? (
-          <div className="flex flex-wrap items-center gap-2">{filters}</div>
+          <div className="flex flex-wrap items-start gap-2">{filters}</div>
         ) : null}
 
         <section className="rounded-lg border border-line-200 bg-white">

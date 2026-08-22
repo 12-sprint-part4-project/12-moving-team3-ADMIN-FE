@@ -38,6 +38,7 @@ export type MemberMoveType = 'SMALL' | 'HOME' | 'OFFICE';
 export interface AdminMemberListQuery {
   userType?: MemberUserType;
   status?: MemberStatus;
+  /** 이름 또는 닉네임 부분 검색 */
   userName?: string;
   email?: string;
   phoneNumber?: string;

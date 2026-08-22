@@ -150,6 +150,7 @@
       "allJoinDates": "All join dates"
     },
     "filter": {
+      "userName": "Name and nickname",
       "phoneNumberInvalid": "Phone number must include digits."
     },
     "columns": {
