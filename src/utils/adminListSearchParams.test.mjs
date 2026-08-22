@@ -29,6 +29,10 @@ test('채팅 query를 복원하고 잘못된 값은 기본값으로 처리한다
     ),
     { page: 1, pageSize: 10 }
   );
+  assert.deepEqual(
+    parseAdminChatSearchParams(new URLSearchParams('id=0')),
+    { page: 1, pageSize: 10 }
+  );
 });
 
 test('리뷰 query의 별점, 상태, 날짜, 정렬을 검증한다', () => {

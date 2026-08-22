@@ -1,7 +1,13 @@
 import { z } from 'zod';
 
-/** 견적 번호 검색 값. 비어 있지 않으면 숫자만 허용한다. */
-export const searchIdSchema = z.string().trim().regex(/^\d+$/);
+/**
+ * 백엔드 목록 검색 id는 min(1)이다.
+ * 0·000은 숫자이지만 API가 400을 내므로 양의 정수만 허용한다.
+ */
+const SEARCH_ID_PATTERN = /^[1-9]\d*$/;
+
+/** 검색 id. 비어 있지 않으면 1 이상의 정수만 허용한다. */
+export const searchIdSchema = z.string().trim().regex(SEARCH_ID_PATTERN);
 
 /**
  * 전화번호 검색 값.
@@ -20,7 +26,7 @@ export const estimateRequestSearchFieldsSchema = z.object({
   id: z
     .string()
     .trim()
-    .refine((value) => value.length === 0 || /^\d+$/.test(value)),
+    .refine((value) => value.length === 0 || SEARCH_ID_PATTERN.test(value)),
   phoneNumber: z
     .string()
     .trim()
