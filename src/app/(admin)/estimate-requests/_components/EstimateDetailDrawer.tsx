@@ -14,8 +14,8 @@ import {
   formatAdminEstimateQuoteStatus,
   formatAdminEstimateRequestMissingFields,
   formatAdminEstimateRequestMoveType,
-  formatAdminEstimateRequestNameWithNickname,
   formatAdminEstimateRequestNullableText,
+  getAdminEstimateRequestNameWithNickname,
   formatAdminEstimateRequestSubmittedAt,
   hasAdminEstimateRequestMissingFields,
 } from '@/utils/adminEstimateRequest';
@@ -54,21 +54,24 @@ const EstimateQuoteList = ({
         const statusLabel = forceDeletedStatus
           ? t('estimates.quoteStatus.DELETED')
           : formatAdminEstimateQuoteStatus(quote.status, t);
-        const moverLabel = formatAdminEstimateRequestNameWithNickname(
+        const moverLabel = getAdminEstimateRequestNameWithNickname(
           quote.moverName,
           quote.moverNickname
         );
+        const moverTitle = moverLabel.nickname
+          ? `${moverLabel.name} (${moverLabel.nickname})`
+          : moverLabel.name;
 
         return (
           <li
             key={quote.id}
             className="flex items-center justify-between gap-3 text-xs-medium"
           >
-            <span
-              className="min-w-0 truncate text-black-400"
-              title={moverLabel}
-            >
-              {moverLabel}
+            <span className="min-w-0 text-black-400" title={moverTitle}>
+              <span className="block truncate">{moverLabel.name}</span>
+              {moverLabel.nickname ? (
+                <span className="block truncate">({moverLabel.nickname})</span>
+              ) : null}
             </span>
             <span className="ml-auto text-black-400">
               {formatAdminEstimateQuotePrice(quote.price, t, i18n.language)}
