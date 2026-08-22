@@ -1,3 +1,5 @@
+import type { AdminListSortDirection } from '@/types/adminEstimateRequest';
+
 /** GET /api/admin/reviews/statistics 쿼리 파라미터 */
 export interface AdminReviewStatisticsQuery {
   startDate?: string;
@@ -52,6 +54,8 @@ export interface AdminReviewListQuery {
   startDate?: string;
   /** 작성일 종료 (YYYY-MM-DD). startDate 없이 단독 전달 불가 */
   endDate?: string;
+  /** 작성일 정렬. 미전달 시 BE 기본값 DESC */
+  sort?: AdminListSortDirection;
   page?: number;
   pageSize?: number;
 }

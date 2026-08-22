@@ -43,7 +43,8 @@ export interface AdminMemberListQuery {
   startDate?: string;
   /** 가입 기간 종료일 (YYYY-MM-DD). startDate 없이 단독 전달 불가 */
   endDate?: string;
-  sortOrder?: AdminMemberSortOrder;
+  /** 가입일 정렬. 미전달 시 BE 기본값 DESC */
+  sort?: AdminMemberSortOrder;
   page?: number;
   pageSize?: number;
 }

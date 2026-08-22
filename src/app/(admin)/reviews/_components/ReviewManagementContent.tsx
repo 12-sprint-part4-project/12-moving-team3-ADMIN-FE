@@ -45,6 +45,7 @@ export const ReviewManagementContent = () => {
     handleRatingChange,
     handleDeletionStatusChange,
     handleDateRangeConfirm,
+    handleSortToggle,
     handlePageChange,
     replacePage,
     handleResetFilters,
@@ -82,8 +83,14 @@ export const ReviewManagementContent = () => {
   }, []);
   const columns = useMemo(
     () =>
-      getReviewListColumns(handleOpenDetail, t, i18n.resolvedLanguage ?? 'ko'),
-    [handleOpenDetail, i18n.resolvedLanguage, t]
+      getReviewListColumns(
+        handleOpenDetail,
+        filters.sort,
+        handleSortToggle,
+        t,
+        i18n.resolvedLanguage ?? 'ko'
+      ),
+    [filters.sort, handleOpenDetail, handleSortToggle, i18n.resolvedLanguage, t]
   );
 
   const ratingFilterOptions = [

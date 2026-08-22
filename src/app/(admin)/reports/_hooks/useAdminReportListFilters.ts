@@ -26,6 +26,7 @@ const toListQuery = (
 ): AdminReportListQuery => ({
   page: filters.page,
   pageSize: filters.pageSize,
+  sort: filters.sort,
   ...(filters.status ? { status: filters.status } : {}),
   ...(filters.target ? { target: filters.target } : {}),
   ...(filters.targetUserKeyword
@@ -148,6 +149,14 @@ export const useAdminReportListFilters = () => {
     );
   };
 
+  // 정렬이 바뀌면 1페이지부터 다시 봐야 이전 페이지의 오래된 결과가 남지 않는다.
+  const handleSortToggle = () => {
+    updateFilters(
+      { sort: filters.sort === 'DESC' ? 'ASC' : 'DESC' },
+      { resetPage: true }
+    );
+  };
+
   const handleResetFilters = () => {
     setTargetUserSearch('');
     updateFilters({
@@ -156,6 +165,7 @@ export const useAdminReportListFilters = () => {
       targetUserKeyword: undefined,
       reportedFrom: undefined,
       reportedTo: undefined,
+      sort: 'DESC',
       page: 1,
     });
   };
@@ -183,6 +193,7 @@ export const useAdminReportListFilters = () => {
     handleStatusChange,
     handleTargetChange,
     handleDateRangeConfirm,
+    handleSortToggle,
     handlePageChange: (page: number) => updateFilters({ page }),
     replacePage,
     handleResetFilters,

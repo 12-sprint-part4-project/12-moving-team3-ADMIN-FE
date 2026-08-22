@@ -32,11 +32,11 @@ test('지정한 상세 ID만 제거하고 나머지 query는 유지한다', () =
   assert.equal(
     createDetailHref(
       '/members',
-      new URLSearchParams('page=3&memberId=member-a&sortOrder=DESC'),
+      new URLSearchParams('page=3&memberId=member-a&sort=ASC'),
       'memberId',
       null
     ),
-    '/members?page=3&sortOrder=DESC'
+    '/members?page=3&sort=ASC'
   );
   assert.equal(
     createDetailHref('/chats', new URLSearchParams('roomId=1'), 'roomId', null),

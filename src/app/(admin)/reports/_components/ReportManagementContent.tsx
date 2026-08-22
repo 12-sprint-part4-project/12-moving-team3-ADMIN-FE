@@ -37,6 +37,7 @@ export const ReportManagementContent = () => {
     handleStatusChange,
     handleTargetChange,
     handleDateRangeConfirm,
+    handleSortToggle,
     handlePageChange,
     replacePage,
     handleResetFilters,
@@ -66,8 +67,14 @@ export const ReportManagementContent = () => {
   );
   const columns = useMemo(
     () =>
-      getReportListColumns(handleOpenDetail, t, i18n.resolvedLanguage ?? 'ko'),
-    [handleOpenDetail, i18n.resolvedLanguage, t]
+      getReportListColumns(
+        handleOpenDetail,
+        filters.sort,
+        handleSortToggle,
+        t,
+        i18n.resolvedLanguage ?? 'ko'
+      ),
+    [filters.sort, handleOpenDetail, handleSortToggle, i18n.resolvedLanguage, t]
   );
 
   return (

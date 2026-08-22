@@ -77,66 +77,66 @@ const withBrowserWindow = (initialHref, run) => {
 };
 
 test('같은 href면 History API를 호출하지 않는다', () => {
-  withBrowserWindow('/drivers?sortOrder=ASC', () => {
+  withBrowserWindow('/drivers?sort=ASC', () => {
     const lengthBefore = window.history.length;
 
-    navigateSearchHref('/drivers?sortOrder=ASC');
+    navigateSearchHref('/drivers?sort=ASC');
 
     assert.equal(window.history.length, lengthBefore);
     assert.equal(
       `${window.location.pathname}${window.location.search}`,
-      '/drivers?sortOrder=ASC'
+      '/drivers?sort=ASC'
     );
   });
 });
 
 test('push 경로: pushState로 히스토리를 쌓고 주소창 쿼리를 갱신한다', () => {
-  withBrowserWindow('/drivers?sortOrder=ASC', (browser) => {
+  withBrowserWindow('/drivers?sort=ASC', (browser) => {
     const lengthBefore = window.history.length;
 
     navigateSearchHref(
-      '/drivers?sortOrder=ASC&memberId=b2222222-2222-4222-8222-222222222201'
+      '/drivers?sort=ASC&memberId=b2222222-2222-4222-8222-222222222201'
     );
 
     assert.equal(window.history.length, lengthBefore + 1);
     assert.equal(
       `${window.location.pathname}${window.location.search}`,
-      '/drivers?sortOrder=ASC&memberId=b2222222-2222-4222-8222-222222222201'
+      '/drivers?sort=ASC&memberId=b2222222-2222-4222-8222-222222222201'
     );
     assert.deepEqual(browser.getHistoryUrls(), [
-      '/drivers?sortOrder=ASC',
-      '/drivers?sortOrder=ASC&memberId=b2222222-2222-4222-8222-222222222201',
+      '/drivers?sort=ASC',
+      '/drivers?sort=ASC&memberId=b2222222-2222-4222-8222-222222222201',
     ]);
   });
 });
 
 test('replace 경로: replaceState로 현재 항목만 바꾸고 히스토리 길이는 유지한다', () => {
   withBrowserWindow(
-    '/drivers?sortOrder=ASC&memberId=b2222222-2222-4222-8222-222222222201',
+    '/drivers?sort=ASC&memberId=b2222222-2222-4222-8222-222222222201',
     (browser) => {
       const lengthBefore = window.history.length;
 
-      navigateSearchHref('/drivers?sortOrder=ASC', { replace: true });
+      navigateSearchHref('/drivers?sort=ASC', { replace: true });
 
       assert.equal(window.history.length, lengthBefore);
       assert.equal(
         `${window.location.pathname}${window.location.search}`,
-        '/drivers?sortOrder=ASC'
+        '/drivers?sort=ASC'
       );
-      assert.deepEqual(browser.getHistoryUrls(), ['/drivers?sortOrder=ASC']);
+      assert.deepEqual(browser.getHistoryUrls(), ['/drivers?sort=ASC']);
     }
   );
 });
 
 test('하드 리로드 직후 상세 닫기는 replaceState만으로 초기 memberId 쿼리를 제거한다', () => {
   withBrowserWindow(
-    '/drivers?sortOrder=ASC&memberId=b2222222-2222-4222-8222-222222222201',
+    '/drivers?sort=ASC&memberId=b2222222-2222-4222-8222-222222222201',
     () => {
-      navigateSearchHref('/drivers?sortOrder=ASC', { replace: true });
+      navigateSearchHref('/drivers?sort=ASC', { replace: true });
 
       assert.equal(
         `${window.location.pathname}${window.location.search}`,
-        '/drivers?sortOrder=ASC'
+        '/drivers?sort=ASC'
       );
       assert.equal(window.location.search.includes('memberId'), false);
     }
@@ -144,24 +144,24 @@ test('하드 리로드 직후 상세 닫기는 replaceState만으로 초기 memb
 });
 
 test('필터 변경·상세 열기·닫기 시퀀스에서 pushState/replaceState가 맞게 동작한다', () => {
-  withBrowserWindow('/drivers?page=2&sortOrder=ASC', (browser) => {
-    navigateSearchHref('/drivers?page=2&sortOrder=ASC&status=ACTIVE');
+  withBrowserWindow('/drivers?page=2&sort=ASC', (browser) => {
+    navigateSearchHref('/drivers?page=2&sort=ASC&status=ACTIVE');
     navigateSearchHref(
-      '/drivers?page=2&sortOrder=ASC&status=ACTIVE&memberId=1'
+      '/drivers?page=2&sort=ASC&status=ACTIVE&memberId=1'
     );
-    navigateSearchHref('/drivers?page=2&sortOrder=ASC&status=ACTIVE', {
+    navigateSearchHref('/drivers?page=2&sort=ASC&status=ACTIVE', {
       replace: true,
     });
 
     assert.equal(
       `${window.location.pathname}${window.location.search}`,
-      '/drivers?page=2&sortOrder=ASC&status=ACTIVE'
+      '/drivers?page=2&sort=ASC&status=ACTIVE'
     );
     assert.equal(window.history.length, 3);
     assert.deepEqual(browser.getHistoryUrls(), [
-      '/drivers?page=2&sortOrder=ASC',
-      '/drivers?page=2&sortOrder=ASC&status=ACTIVE',
-      '/drivers?page=2&sortOrder=ASC&status=ACTIVE',
+      '/drivers?page=2&sort=ASC',
+      '/drivers?page=2&sort=ASC&status=ACTIVE',
+      '/drivers?page=2&sort=ASC&status=ACTIVE',
     ]);
   });
 });

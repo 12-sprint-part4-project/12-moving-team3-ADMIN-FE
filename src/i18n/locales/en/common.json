@@ -147,10 +147,7 @@
       "resetFilters": "Reset filters",
       "searchPlaceholder": "Search name, email, or phone",
       "statusLabel": "Status",
-      "allJoinDates": "All join dates",
-      "joinDateSort": "Sort by join date",
-      "newest": "Newest first",
-      "oldest": "Oldest first"
+      "allJoinDates": "All join dates"
     },
     "columns": {
       "number": "No.",

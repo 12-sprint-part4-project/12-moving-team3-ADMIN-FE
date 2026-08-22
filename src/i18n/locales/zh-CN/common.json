@@ -135,10 +135,7 @@
       "resetFilters": "重置筛选",
       "searchPlaceholder": "搜索姓名、邮箱或手机号",
       "statusLabel": "状态",
-      "allJoinDates": "全部注册日期",
-      "joinDateSort": "按注册日期排序",
-      "newest": "最新注册优先",
-      "oldest": "最早注册优先"
+      "allJoinDates": "全部注册日期"
     },
     "columns": {
       "number": "编号",

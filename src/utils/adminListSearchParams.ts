@@ -54,6 +54,10 @@ export const parseAdminListEnum = <T extends string>(
   allowedValues: readonly T[]
 ) => allowedValues.find((allowedValue) => allowedValue === value);
 
+/** 잘못된 정렬값은 기본값 DESC로 처리한다. */
+const parseAdminListSort = (value: string | null): AdminListSortDirection =>
+  value === 'ASC' ? 'ASC' : 'DESC';
+
 export const createAdminListHref = (
   pathname: string,
   searchParams: URLSearchParams,
@@ -118,6 +122,7 @@ export interface AdminReviewUrlFilters {
   deletionStatus?: AdminReviewDeletionStatus;
   startDate?: string;
   endDate?: string;
+  sort: AdminListSortDirection;
   page: number;
   pageSize: number;
 }
@@ -128,6 +133,7 @@ const REVIEW_QUERY_KEYS = [
   'deletionStatus',
   'startDate',
   'endDate',
+  'sort',
   'page',
 ] as const;
 const REVIEW_DELETION_STATUSES: readonly AdminReviewDeletionStatus[] = [
@@ -160,6 +166,7 @@ export const parseAdminReviewSearchParams = (
     ...(deletionStatus ? { deletionStatus } : {}),
     ...(startDate ? { startDate } : {}),
     ...(endDate ? { endDate } : {}),
+    sort: parseAdminListSort(searchParams.get('sort')),
     page: parseAdminListPage(searchParams.get('page')),
     pageSize: DEFAULT_ADMIN_LIST_PAGE_SIZE,
   };
@@ -176,6 +183,7 @@ export const createAdminReviewListHref = (
     deletionStatus: filters.deletionStatus,
     startDate: filters.startDate,
     endDate: filters.endDate,
+    sort: filters.sort === 'ASC' ? 'ASC' : undefined,
     page: filters.page > 1 ? String(filters.page) : undefined,
   });
 
@@ -185,6 +193,7 @@ export interface AdminReportUrlFilters {
   targetUserKeyword?: string;
   reportedFrom?: string;
   reportedTo?: string;
+  sort: AdminListSortDirection;
   page: number;
   pageSize: number;
 }
@@ -195,6 +204,7 @@ const REPORT_QUERY_KEYS = [
   'targetUserKeyword',
   'reportedFrom',
   'reportedTo',
+  'sort',
   'page',
 ] as const;
 
@@ -234,6 +244,7 @@ export const parseAdminReportSearchParams = (
     ...(targetUserKeyword ? { targetUserKeyword } : {}),
     ...(reportedFrom ? { reportedFrom } : {}),
     ...(reportedTo ? { reportedTo } : {}),
+    sort: parseAdminListSort(searchParams.get('sort')),
     page: parseAdminListPage(searchParams.get('page')),
     pageSize: DEFAULT_ADMIN_LIST_PAGE_SIZE,
   };
@@ -250,12 +261,9 @@ export const createAdminReportListHref = (
     targetUserKeyword: filters.targetUserKeyword,
     reportedFrom: filters.reportedFrom,
     reportedTo: filters.reportedTo,
+    sort: filters.sort === 'ASC' ? 'ASC' : undefined,
     page: filters.page > 1 ? String(filters.page) : undefined,
   });
-
-/** 잘못된 정렬값은 기본값 DESC로 처리한다. */
-const parseAdminListSort = (value: string | null): AdminListSortDirection =>
-  value === 'ASC' ? 'ASC' : 'DESC';
 
 export interface AdminEstimateRequestUrlFilters {
   search?: string;

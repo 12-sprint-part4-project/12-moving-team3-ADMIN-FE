@@ -29,11 +29,11 @@ test('채팅 query를 복원하고 잘못된 값은 기본값으로 처리한다
   );
 });
 
-test('리뷰 query의 별점, 상태, 날짜 범위를 검증한다', () => {
+test('리뷰 query의 별점, 상태, 날짜, 정렬을 검증한다', () => {
   assert.deepEqual(
     parseAdminReviewSearchParams(
       new URLSearchParams(
-        'search=review&rating=5&deletionStatus=DELETED&startDate=2026-08-01&endDate=2026-08-20&page=2'
+        'search=review&rating=5&deletionStatus=DELETED&startDate=2026-08-01&endDate=2026-08-20&sort=ASC&page=2'
       )
     ),
     {
@@ -42,6 +42,7 @@ test('리뷰 query의 별점, 상태, 날짜 범위를 검증한다', () => {
       deletionStatus: 'DELETED',
       startDate: '2026-08-01',
       endDate: '2026-08-20',
+      sort: 'ASC',
       page: 2,
       pageSize: 10,
     }
@@ -49,18 +50,18 @@ test('리뷰 query의 별점, 상태, 날짜 범위를 검증한다', () => {
   assert.deepEqual(
     parseAdminReviewSearchParams(
       new URLSearchParams(
-        'rating=6&deletionStatus=INVALID&startDate=2026-02-30&endDate=2026-01-01&page=x'
+        'rating=6&deletionStatus=INVALID&startDate=2026-02-30&endDate=2026-01-01&sort=INVALID&page=x'
       )
     ),
-    { page: 1, pageSize: 10 }
+    { sort: 'DESC', page: 1, pageSize: 10 }
   );
 });
 
-test('신고 query의 상태, 대상, 날짜 범위를 검증한다', () => {
+test('신고 query의 상태, 대상, 날짜, 정렬을 검증한다', () => {
   assert.deepEqual(
     parseAdminReportSearchParams(
       new URLSearchParams(
-        'status=PENDING&target=REVIEW&targetUserKeyword=%20user%20&reportedFrom=2026-08-01&reportedTo=2026-08-20&page=4'
+        'status=PENDING&target=REVIEW&targetUserKeyword=%20user%20&reportedFrom=2026-08-01&reportedTo=2026-08-20&sort=ASC&page=4'
       )
     ),
     {
@@ -69,15 +70,16 @@ test('신고 query의 상태, 대상, 날짜 범위를 검증한다', () => {
       targetUserKeyword: 'user',
       reportedFrom: '2026-08-01',
       reportedTo: '2026-08-20',
+      sort: 'ASC',
       page: 4,
       pageSize: 10,
     }
   );
   assert.deepEqual(
     parseAdminReportSearchParams(
-      new URLSearchParams('target=CHAT_ROOM&page=1')
+      new URLSearchParams('target=CHAT_ROOM&sort=DOWN&page=1')
     ),
-    { page: 1, pageSize: 10 }
+    { sort: 'DESC', page: 1, pageSize: 10 }
   );
 });
 
@@ -94,17 +96,18 @@ test('목록 query를 갱신해도 상세 ID와 다른 query를 보존한다', (
     createAdminReportListHref(
       '/reports',
       new URLSearchParams('reportId=7&page=3'),
-      { status: 'RESOLVED', page: 1, pageSize: 10 }
+      { status: 'RESOLVED', sort: 'DESC', page: 1, pageSize: 10 }
     ),
     '/reports?reportId=7&status=RESOLVED'
   );
   assert.equal(
     createAdminReviewListHref('/reviews', new URLSearchParams('view=compact'), {
       rating: 4,
+      sort: 'ASC',
       page: 2,
       pageSize: 10,
     }),
-    '/reviews?view=compact&rating=4&page=2'
+    '/reviews?view=compact&rating=4&sort=ASC&page=2'
   );
   assert.equal(
     createAdminEstimateRequestListHref(

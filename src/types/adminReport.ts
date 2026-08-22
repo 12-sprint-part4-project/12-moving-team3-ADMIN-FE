@@ -3,6 +3,7 @@
  * 백엔드 Swagger(admin-report)와 controller 응답(`{ data: ... }`) 구조에 맞춘다.
  */
 
+import type { AdminListSortDirection } from '@/types/adminEstimateRequest';
 import type {
   MemberMoveType,
   MemberRegion,
@@ -114,6 +115,8 @@ export interface AdminReportListQuery {
   reportedFrom?: string;
   /** 신고일 종료일 (YYYY-MM-DD). reportedFrom 없이 단독 전달 불가 */
   reportedTo?: string;
+  /** 신고일 정렬. 미전달 시 BE 기본값 DESC */
+  sort?: AdminListSortDirection;
   page?: number;
   pageSize?: number;
 }

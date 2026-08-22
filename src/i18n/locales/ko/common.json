@@ -135,10 +135,7 @@
       "resetFilters": "필터 초기화",
       "searchPlaceholder": "이름, 이메일, 휴대폰 검색",
       "statusLabel": "상태",
-      "allJoinDates": "가입일 전체",
-      "joinDateSort": "가입일 정렬",
-      "newest": "가입일 최신순",
-      "oldest": "가입일 오래된순"
+      "allJoinDates": "가입일 전체"
     },
     "columns": {
       "number": "번호",
