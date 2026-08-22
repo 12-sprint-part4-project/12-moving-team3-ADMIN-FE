@@ -11,7 +11,7 @@ test('회원 목록 query를 목록 상태로 복원한다', () => {
   assert.deepEqual(
     parseAdminMemberListSearchParams(
       new URLSearchParams(
-        'search=%20%ED%99%8D%EA%B8%B8%EB%8F%99%20&page=3&status=SUSPENDED&startDate=2026-08-01&endDate=2026-08-20&sortOrder=ASC'
+        'search=%20%ED%99%8D%EA%B8%B8%EB%8F%99%20&page=3&status=SUSPENDED&startDate=2026-08-01&endDate=2026-08-20&sort=ASC'
       )
     ),
     {
@@ -21,7 +21,7 @@ test('회원 목록 query를 목록 상태로 복원한다', () => {
       status: 'SUSPENDED',
       startDate: '2026-08-01',
       endDate: '2026-08-20',
-      sortOrder: 'ASC',
+      sort: 'ASC',
     }
   );
 });
@@ -30,7 +30,7 @@ test('잘못된 목록 query는 안전한 기본값으로 처리한다', () => {
   assert.deepEqual(
     parseAdminMemberListSearchParams(
       new URLSearchParams(
-        'search=%20&page=0&status=INVALID&startDate=2026-02-30&endDate=2026-01-01&sortOrder=INVALID'
+        'search=%20&page=0&status=INVALID&startDate=2026-02-30&endDate=2026-01-01&sort=INVALID'
       )
     ),
     INITIAL_ADMIN_MEMBER_LIST_FILTERS
@@ -42,7 +42,7 @@ test('기본값은 생략하고 memberId를 포함한 다른 query는 유지한�
     createAdminMemberListHref(
       '/members',
       new URLSearchParams(
-        'memberId=550e8400-e29b-41d4-a716-446655440000&page=3&sortOrder=ASC'
+        'memberId=550e8400-e29b-41d4-a716-446655440000&page=3&sort=ASC'
       ),
       INITIAL_ADMIN_MEMBER_LIST_FILTERS
     ),
@@ -62,9 +62,9 @@ test('목록 상태를 query에 반영하면서 다른 query를 보존한다', (
         status: 'ACTIVE',
         startDate: '2026-08-01',
         endDate: '2026-08-20',
-        sortOrder: 'ASC',
+        sort: 'ASC',
       }
     ),
-    '/drivers?memberId=mover-id&tab=profile&search=%EA%B8%B0%EC%82%AC&page=2&status=ACTIVE&startDate=2026-08-01&endDate=2026-08-20&sortOrder=ASC'
+    '/drivers?memberId=mover-id&tab=profile&search=%EA%B8%B0%EC%82%AC&page=2&status=ACTIVE&startDate=2026-08-01&endDate=2026-08-20&sort=ASC'
   );
 });

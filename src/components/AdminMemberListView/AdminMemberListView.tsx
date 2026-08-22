@@ -53,9 +53,6 @@ const parseMemberStatusFilter = (value: string): MemberStatus | undefined => {
   return undefined;
 };
 
-const parseSortOrder = (value: string): AdminMemberSortOrder =>
-  value === 'ASC' ? 'ASC' : 'DESC';
-
 const toListQuery = (
   userType: MemberUserType,
   filters: AdminMemberListFilters
@@ -63,7 +60,7 @@ const toListQuery = (
   userType,
   page: filters.page,
   pageSize: filters.pageSize,
-  sortOrder: filters.sortOrder,
+  sort: filters.sort,
   ...(filters.search ? { search: filters.search } : {}),
   ...(filters.status ? { status: filters.status } : {}),
   ...(filters.startDate ? { startDate: filters.startDate } : {}),
@@ -74,6 +71,8 @@ export interface AdminMemberListColumnsContext {
   page: number;
   pageSize: number;
   totalCount: number;
+  sort: AdminMemberSortOrder;
+  onSortToggle: () => void;
 }
 
 export interface AdminMemberListViewProps {
@@ -152,16 +151,6 @@ export const AdminMemberListView = ({
     return { from, to };
   }, [filters.startDate, filters.endDate]);
 
-  const columns = useMemo(
-    () =>
-      getColumns({
-        page: filters.page,
-        pageSize: filters.pageSize,
-        totalCount,
-      }),
-    [getColumns, filters.page, filters.pageSize, totalCount]
-  );
-
   const updateFilters = useCallback(
     (
       patch: Partial<AdminMemberListFilters>,
@@ -215,12 +204,32 @@ export const AdminMemberListView = ({
     );
   };
 
-  const handleSortOrderChange = (event: ChangeEvent<HTMLSelectElement>) => {
+  // 정렬이 바뀌면 1페이지부터 다시 봐야 이전 페이지의 오래된 결과가 남지 않는다.
+  const handleSortToggle = useCallback(() => {
     updateFilters(
-      { sortOrder: parseSortOrder(event.target.value) },
+      { sort: filters.sort === 'DESC' ? 'ASC' : 'DESC' },
       { resetPage: true }
     );
-  };
+  }, [filters.sort, updateFilters]);
+
+  const columns = useMemo(
+    () =>
+      getColumns({
+        page: filters.page,
+        pageSize: filters.pageSize,
+        totalCount,
+        sort: filters.sort,
+        onSortToggle: handleSortToggle,
+      }),
+    [
+      getColumns,
+      filters.page,
+      filters.pageSize,
+      filters.sort,
+      handleSortToggle,
+      totalCount,
+    ]
+  );
 
   const handleDateRangeConfirm: DateRangePopoverProps['onConfirm'] = (
     range
@@ -330,15 +339,6 @@ export const AdminMemberListView = ({
             value={dateRangeValue}
             onConfirm={handleDateRangeConfirm}
             placeholder={t('members.list.allJoinDates')}
-          />
-          <FilterSelect
-            aria-label={t('members.list.joinDateSort')}
-            value={filters.sortOrder}
-            onChange={handleSortOrderChange}
-            options={[
-              { label: t('members.list.newest'), value: 'DESC' },
-              { label: t('members.list.oldest'), value: 'ASC' },
-            ]}
           />
           <SearchResetButton
             label={t('common.searchReset')}

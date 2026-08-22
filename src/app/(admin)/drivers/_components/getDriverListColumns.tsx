@@ -1,4 +1,5 @@
 import { Button } from '@/components/Button/Button';
+import { SortableColumnHeader } from '@/components/SortableColumnHeader/SortableColumnHeader';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { TruncatedText } from '@/components/TruncatedText/TruncatedText';
 import {
@@ -23,7 +24,13 @@ const formatAverageRating = (averageRating: number | null) => {
 
 /** 기사 전용 필드인 닉네임과 평균 평점을 포함한 목록 컬럼을 생성한다. */
 export const getDriverListColumns = (
-  { page, pageSize, totalCount }: AdminMemberListColumnsContext,
+  {
+    page,
+    pageSize,
+    totalCount,
+    sort,
+    onSortToggle,
+  }: AdminMemberListColumnsContext,
   onOpenDetail: (memberId: string) => void,
   t: TFunction,
   locale: string
@@ -69,7 +76,14 @@ export const getDriverListColumns = (
   },
   {
     key: 'createdAt',
-    header: t('members.fields.joinedAt'),
+    header: (
+      <SortableColumnHeader
+        label={t('members.fields.joinedAt')}
+        sort={sort}
+        onToggle={onSortToggle}
+      />
+    ),
+    ariaSort: sort === 'ASC' ? 'ascending' : 'descending',
     render: (row) => formatAdminMemberJoinedAt(row.createdAt, locale),
   },
   {

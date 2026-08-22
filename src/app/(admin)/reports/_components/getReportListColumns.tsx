@@ -1,4 +1,5 @@
 import { Button } from '@/components/Button/Button';
+import { SortableColumnHeader } from '@/components/SortableColumnHeader/SortableColumnHeader';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { TruncatedText } from '@/components/TruncatedText/TruncatedText';
 import {
@@ -9,6 +10,7 @@ import {
 } from '@/utils/adminReport';
 
 import type { Column } from '@/components/DataTable/DataTable';
+import type { AdminListSortDirection } from '@/types/adminEstimateRequest';
 import type {
   AdminReportListItem,
   AdminReportTarget,
@@ -25,6 +27,8 @@ const supportsContentDeletion = (row: AdminReportListItem) =>
 /** 신고 목록 표시 규칙과 상세 열기 액션을 컬럼 정의로 묶는다. */
 export const getReportListColumns = (
   onOpenDetail: (reportId: number) => void,
+  sort: AdminListSortDirection,
+  onSortToggle: () => void,
   t: TFunction,
   locale: string
 ): Column<AdminReportListItem>[] => [
@@ -82,7 +86,14 @@ export const getReportListColumns = (
   },
   {
     key: 'createdAt',
-    header: t('reports.fields.createdAt'),
+    header: (
+      <SortableColumnHeader
+        label={t('reports.fields.createdAt')}
+        sort={sort}
+        onToggle={onSortToggle}
+      />
+    ),
+    ariaSort: sort === 'ASC' ? 'ascending' : 'descending',
     render: (row) => formatAdminReportCreatedAt(row.createdAt, locale),
   },
   {

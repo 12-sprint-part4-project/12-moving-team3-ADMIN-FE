@@ -1,6 +1,7 @@
 'use client';
 
 import { cva, type VariantProps } from 'class-variance-authority';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { X } from 'lucide-react';
 import {
   useEffect,
@@ -24,6 +25,8 @@ const FOCUSABLE_SELECTOR =
 const DEFAULT_ARIA_LABEL = '상세 정보';
 /** Overlay 버튼의 접근성 이름 */
 const OVERLAY_ARIA_LABEL = '상세 패널 닫기';
+/** AdminSidebar와 동일한 열고 닫기 시간 */
+const DRAWER_MOTION_DURATION_SEC = 0.2;
 
 /**
  * Portal은 브라우저 DOM이 준비된 뒤에만 생성할 수 있어 hydration 완료 여부를 확인한다.
@@ -88,14 +91,12 @@ const getFocusableChildren = (panel: HTMLElement) => {
   return sequential.map(({ element }) => element);
 };
 
-export const detailDrawerRootVariants = cva('fixed inset-0 z-50');
-
 export const detailDrawerOverlayVariants = cva(
-  'absolute inset-0 z-0 cursor-pointer border-0 bg-black-500/50 p-0'
+  'fixed inset-0 z-50 cursor-pointer border-0 bg-black-500/50 p-0'
 );
 
 export const detailDrawerPanelVariants = cva(
-  'absolute inset-y-0 right-0 z-10 flex h-full w-full flex-col border-l border-line-200 bg-white outline-none animate-drawer-in motion-reduce:animate-none',
+  'fixed inset-y-0 right-0 z-50 flex h-full w-full flex-col border-l border-line-200 bg-white outline-none',
   {
     variants: {
       size: {
@@ -157,7 +158,16 @@ export const DetailDrawer = ({
   disableKeyboardEvents = false,
 }: DetailDrawerProps) => {
   const titleId = useId();
+  const shouldReduceMotion = useReducedMotion();
   const panelRef = useRef<HTMLDivElement>(null);
+  const drawerTransition = {
+    duration: shouldReduceMotion ? 0 : DRAWER_MOTION_DURATION_SEC,
+    ease: 'easeOut',
+  } as const;
+  // prefers-reduced-motion이면 슬라이드/페이드 없이 즉시 전환한다.
+  // duration 0만 쓰면 한 프레임이라도 화면 밖에서 시작해 보일 수 있다.
+  const overlayHiddenOpacity = shouldReduceMotion ? 1 : 0;
+  const panelHiddenX = shouldReduceMotion ? 0 : '100%';
   /** Drawer가 열리기 전 포커스 요소. 닫힐 때 복원에 사용한다. */
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
   /** ESC 핸들러가 항상 최신 onClose를 쓰도록 보관한다. */
@@ -272,8 +282,9 @@ export const DetailDrawer = ({
     };
   }, [open, mounted]);
 
-  // 서버 렌더이거나 닫힌 상태면 Portal을 만들지 않는다.
-  if (!mounted || !open) {
+  // 서버에서는 Portal을 만들지 않는다. 닫힌 뒤에는 Portal을 유지해야
+  // AnimatePresence가 overlay·panel의 exit 애니메이션을 재생할 수 있다.
+  if (!mounted) {
     return null;
   }
 
@@ -283,56 +294,71 @@ export const DetailDrawer = ({
   };
 
   // 레이아웃 overflow와 무관하게 최상단에 보이도록 document.body에 Portal로 붙인다.
+  // initial={false}: 새로고침·URL 복원으로 이미 열린 채 마운트되면 enter를 생략한다.
+  // 이후 사용자가 열고 닫을 때의 fade/slide는 그대로 재생된다.
   return createPortal(
-    <div className={cn(detailDrawerRootVariants())}>
-      {/* Overlay: 배경 dim + 클릭 시 닫기. Tab 순서에는 넣지 않는다. */}
-      <button
-        type="button"
-        tabIndex={-1}
-        className={cn(detailDrawerOverlayVariants())}
-        onClick={handleOverlayClick}
-        aria-label={OVERLAY_ARIA_LABEL}
-      />
+    <AnimatePresence initial={false}>
+      {open ? (
+        <motion.button
+          key="detail-drawer-overlay"
+          type="button"
+          tabIndex={-1}
+          initial={{ opacity: overlayHiddenOpacity }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: overlayHiddenOpacity, pointerEvents: 'none' }}
+          transition={drawerTransition}
+          className={cn(detailDrawerOverlayVariants())}
+          onClick={handleOverlayClick}
+          aria-label={OVERLAY_ARIA_LABEL}
+        />
+      ) : null}
+      {open ? (
+        <motion.div
+          key="detail-drawer-panel"
+          ref={panelRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={title ? titleId : undefined}
+          aria-label={title ? undefined : DEFAULT_ARIA_LABEL}
+          tabIndex={-1}
+          initial={{ x: panelHiddenX }}
+          animate={{ x: 0 }}
+          exit={{ x: panelHiddenX, pointerEvents: 'none' }}
+          transition={drawerTransition}
+          className={cn(detailDrawerPanelVariants({ size }), className)}
+        >
+          {/* Header: 제목 + 닫기 버튼 */}
+          <header className={cn(detailDrawerHeaderVariants())}>
+            {title ? (
+              <h2 id={titleId} className="text-xl-bold text-black-400">
+                {title}
+              </h2>
+            ) : (
+              <span className="sr-only">{DEFAULT_ARIA_LABEL}</span>
+            )}
 
-      {/* Panel: 우측에서 슬라이드되는 상세 영역 */}
-      <div
-        ref={panelRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={title ? titleId : undefined}
-        aria-label={title ? undefined : DEFAULT_ARIA_LABEL}
-        tabIndex={-1}
-        className={cn(detailDrawerPanelVariants({ size }), className)}
-      >
-        {/* Header: 제목 + 닫기 버튼 */}
-        <header className={cn(detailDrawerHeaderVariants())}>
-          {title ? (
-            <h2 id={titleId} className="text-xl-bold text-black-400">
-              {title}
-            </h2>
-          ) : (
-            <span className="sr-only">{DEFAULT_ARIA_LABEL}</span>
-          )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-black-100 hover:bg-background-200"
+              aria-label="닫기"
+            >
+              <X className="size-5" aria-hidden />
+            </button>
+          </header>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-black-100 hover:bg-background-200"
-            aria-label="닫기"
-          >
-            <X className="size-5" aria-hidden />
-          </button>
-        </header>
+          {/* Body: 스크롤 가능한 상세 콘텐츠 */}
+          <div className={cn(detailDrawerBodyVariants())}>{children}</div>
 
-        {/* Body: 스크롤 가능한 상세 콘텐츠 */}
-        <div className={cn(detailDrawerBodyVariants())}>{children}</div>
-
-        {/* Footer: null/undefined가 아니면 0·빈 문자열 등도 유효한 ReactNode로 렌더한다. */}
-        {footer != null ? (
-          <footer className={cn(detailDrawerFooterVariants())}>{footer}</footer>
-        ) : null}
-      </div>
-    </div>,
+          {/* Footer: null/undefined가 아니면 0·빈 문자열 등도 유효한 ReactNode로 렌더한다. */}
+          {footer != null ? (
+            <footer className={cn(detailDrawerFooterVariants())}>
+              {footer}
+            </footer>
+          ) : null}
+        </motion.div>
+      ) : null}
+    </AnimatePresence>,
     document.body
   );
 };

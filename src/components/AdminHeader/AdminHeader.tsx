@@ -1,5 +1,6 @@
 'use client';
 
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ChevronDown, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,6 +9,10 @@ import { useTranslation } from 'react-i18next';
 
 import { LanguageSelector } from '@/components/LanguageSelector/LanguageSelector';
 import { cn } from '@/lib/utils';
+
+/** DateRangePopover와 동일한 드롭다운 열림/닫힘 모션 */
+const MENU_MOTION_OFFSET_PX = 4;
+const MENU_MOTION_DURATION_SEC = 0.2;
 
 export interface AdminHeaderProps {
   /** 로고 우측 타이틀. 기본값: '관리자 페이지' */
@@ -62,11 +67,18 @@ export const AdminHeader = ({
   className,
 }: AdminHeaderProps) => {
   const { t } = useTranslation();
+  const shouldReduceMotion = useReducedMotion();
   const menuId = useId();
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const resolvedTitle = title ?? t('header.title');
+  const menuTransition = {
+    duration: shouldReduceMotion ? 0 : MENU_MOTION_DURATION_SEC,
+    ease: 'easeOut',
+  } as const;
+  // prefers-reduced-motion이면 위치 이동 없이 opacity만 즉시 전환한다.
+  const menuHiddenY = shouldReduceMotion ? 0 : -MENU_MOTION_OFFSET_PX;
 
   useEffect(() => {
     if (!isMenuOpen) {
@@ -159,35 +171,46 @@ export const AdminHeader = ({
               <ChevronDown className="size-4" aria-hidden />
             </button>
 
-            {isMenuOpen ? (
-              <div
-                id={menuId}
-                className="absolute top-full right-0 z-10 mt-2 min-w-52 overflow-hidden rounded-lg border border-line-200 bg-white py-1"
-              >
-                {userName || userEmail ? (
-                  <div className="border-b border-line-200 px-4 py-3">
-                    {userName ? (
-                      <p className="text-md-medium text-black-300">
-                        {userName}
-                      </p>
-                    ) : null}
-                    {userEmail ? (
-                      <p className="text-xs-medium text-gray-500">
-                        {userEmail}
-                      </p>
-                    ) : null}
-                  </div>
-                ) : null}
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  disabled={isLoggingOut || !onLogout}
-                  className="flex w-full px-4 py-2.5 text-left text-md-medium text-black-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+            <AnimatePresence>
+              {isMenuOpen ? (
+                <motion.div
+                  key="admin-header-profile-menu"
+                  id={menuId}
+                  initial={{ opacity: 0, y: menuHiddenY }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{
+                    opacity: 0,
+                    y: menuHiddenY,
+                    pointerEvents: 'none',
+                  }}
+                  transition={menuTransition}
+                  className="absolute top-full right-0 z-10 mt-2 min-w-52 overflow-hidden rounded-lg border border-line-200 bg-white py-1"
                 >
-                  {isLoggingOut ? t('header.loggingOut') : t('common.logout')}
-                </button>
-              </div>
-            ) : null}
+                  {userName || userEmail ? (
+                    <div className="border-b border-line-200 px-4 py-3">
+                      {userName ? (
+                        <p className="text-md-medium text-black-300">
+                          {userName}
+                        </p>
+                      ) : null}
+                      {userEmail ? (
+                        <p className="text-xs-medium text-gray-500">
+                          {userEmail}
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    disabled={isLoggingOut || !onLogout}
+                    className="flex w-full px-4 py-2.5 text-left text-md-medium text-black-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isLoggingOut ? t('header.loggingOut') : t('common.logout')}
+                  </button>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
           </div>
         ) : null}
       </div>

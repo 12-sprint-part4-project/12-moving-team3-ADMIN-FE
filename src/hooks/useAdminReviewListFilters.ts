@@ -55,6 +55,7 @@ const toListQuery = (
 ): AdminReviewListQuery => ({
   page: filters.page,
   pageSize: filters.pageSize,
+  sort: filters.sort,
   ...(filters.search ? { search: filters.search } : {}),
   ...(filters.rating !== undefined ? { rating: filters.rating } : {}),
   ...(filters.deletionStatus ? { deletionStatus: filters.deletionStatus } : {}),
@@ -188,6 +189,14 @@ export const useAdminReviewListFilters = () => {
     );
   };
 
+  // 정렬이 바뀌면 1페이지부터 다시 봐야 이전 페이지의 오래된 결과가 남지 않는다.
+  const handleSortToggle = () => {
+    updateFilters(
+      { sort: filters.sort === 'DESC' ? 'ASC' : 'DESC' },
+      { resetPage: true }
+    );
+  };
+
   const handlePageChange = (page: number) => {
     updateFilters({ page });
   };
@@ -205,6 +214,7 @@ export const useAdminReviewListFilters = () => {
       deletionStatus: undefined,
       startDate: undefined,
       endDate: undefined,
+      sort: 'DESC',
       page: 1,
     });
   };
@@ -221,6 +231,7 @@ export const useAdminReviewListFilters = () => {
     handleRatingChange,
     handleDeletionStatusChange,
     handleDateRangeConfirm,
+    handleSortToggle,
     handlePageChange,
     replacePage,
     handleResetFilters,

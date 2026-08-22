@@ -13,13 +13,13 @@ export interface AdminMemberListFilters {
   status?: MemberStatus;
   startDate?: string;
   endDate?: string;
-  sortOrder: AdminMemberSortOrder;
+  sort: AdminMemberSortOrder;
   page: number;
   pageSize: number;
 }
 
 export const INITIAL_ADMIN_MEMBER_LIST_FILTERS: AdminMemberListFilters = {
-  sortOrder: 'DESC',
+  sort: 'DESC',
   page: 1,
   pageSize: DEFAULT_ADMIN_LIST_PAGE_SIZE,
 };
@@ -30,7 +30,7 @@ const MANAGED_QUERY_KEYS = [
   'status',
   'startDate',
   'endDate',
-  'sortOrder',
+  'sort',
 ] as const;
 
 const MEMBER_STATUSES: readonly MemberStatus[] = ['ACTIVE', 'SUSPENDED'];
@@ -50,14 +50,14 @@ export const parseAdminMemberListSearchParams = (
     startDate && parsedEndDate && parsedEndDate >= startDate
       ? parsedEndDate
       : undefined;
-  const sortOrder = searchParams.get('sortOrder') === 'ASC' ? 'ASC' : 'DESC';
+  const sort = searchParams.get('sort') === 'ASC' ? 'ASC' : 'DESC';
 
   return {
     ...(search ? { search } : {}),
     ...(status ? { status } : {}),
     ...(startDate ? { startDate } : {}),
     ...(endDate ? { endDate } : {}),
-    sortOrder,
+    sort,
     page: parseAdminListPage(searchParams.get('page')),
     pageSize: DEFAULT_ADMIN_LIST_PAGE_SIZE,
   };
@@ -75,5 +75,5 @@ export const createAdminMemberListHref = (
     status: filters.status,
     startDate: filters.startDate,
     endDate: filters.endDate,
-    sortOrder: filters.sortOrder === 'ASC' ? 'ASC' : undefined,
+    sort: filters.sort === 'ASC' ? 'ASC' : undefined,
   });

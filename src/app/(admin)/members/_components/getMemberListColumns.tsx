@@ -1,4 +1,5 @@
 import { Button } from '@/components/Button/Button';
+import { SortableColumnHeader } from '@/components/SortableColumnHeader/SortableColumnHeader';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { TruncatedText } from '@/components/TruncatedText/TruncatedText';
 import {
@@ -14,7 +15,13 @@ import type { TFunction } from 'i18next';
 
 /** 일반 회원 목록에만 필요한 컬럼을 생성한다. */
 export const getMemberListColumns = (
-  { page, pageSize, totalCount }: AdminMemberListColumnsContext,
+  {
+    page,
+    pageSize,
+    totalCount,
+    sort,
+    onSortToggle,
+  }: AdminMemberListColumnsContext,
   onOpenDetail: (memberId: string) => void,
   t: TFunction,
   locale: string
@@ -47,7 +54,14 @@ export const getMemberListColumns = (
   },
   {
     key: 'createdAt',
-    header: t('members.fields.joinedAt'),
+    header: (
+      <SortableColumnHeader
+        label={t('members.fields.joinedAt')}
+        sort={sort}
+        onToggle={onSortToggle}
+      />
+    ),
+    ariaSort: sort === 'ASC' ? 'ascending' : 'descending',
     render: (row) => formatAdminMemberJoinedAt(row.createdAt, locale),
   },
   {

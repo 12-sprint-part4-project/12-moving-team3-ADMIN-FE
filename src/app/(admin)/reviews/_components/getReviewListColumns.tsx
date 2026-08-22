@@ -1,4 +1,5 @@
 import { Button } from '@/components/Button/Button';
+import { SortableColumnHeader } from '@/components/SortableColumnHeader/SortableColumnHeader';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import {
   formatAdminReviewCreatedAt,
@@ -6,6 +7,7 @@ import {
 } from '@/utils/adminReview';
 
 import type { Column } from '@/components/DataTable/DataTable';
+import type { AdminListSortDirection } from '@/types/adminEstimateRequest';
 import type { AdminReviewListItem } from '@/types/adminReview';
 import type { TFunction } from 'i18next';
 
@@ -15,6 +17,8 @@ import type { TFunction } from 'i18next';
  */
 export const getReviewListColumns = (
   onOpenDetail: (review: AdminReviewListItem) => void,
+  sort: AdminListSortDirection,
+  onSortToggle: () => void,
   t: TFunction,
   locale: string
 ): Column<AdminReviewListItem>[] => [
@@ -91,7 +95,14 @@ export const getReviewListColumns = (
   },
   {
     key: 'createdAt',
-    header: t('reviews.fields.createdAt'),
+    header: (
+      <SortableColumnHeader
+        label={t('reviews.fields.createdAt')}
+        sort={sort}
+        onToggle={onSortToggle}
+      />
+    ),
+    ariaSort: sort === 'ASC' ? 'ascending' : 'descending',
     render: (row) => formatAdminReviewCreatedAt(row.createdAt, locale),
   },
   {
