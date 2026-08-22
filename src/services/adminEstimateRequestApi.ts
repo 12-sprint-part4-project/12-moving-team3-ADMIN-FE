@@ -6,6 +6,7 @@ import {
 import { axiosInstance } from '@/api/axiosInstance';
 
 import type {
+  AdminEstimateRequestDetailQuery,
   AdminEstimateRequestDetailResponse,
   AdminEstimateRequestListQuery,
   AdminEstimateRequestListResponse,
@@ -38,13 +39,16 @@ export const getAdminEstimateRequestStatistics = async (
 
 /**
  * 관리자 견적 요청 상세 조회.
+ * params는 목록과 동일한 필터·정렬이며 page/pageSize는 보내지 않는다.
  * Access Token은 axiosInstance Request Interceptor가 Authorization에 첨부한다.
  */
 export const getAdminEstimateRequestDetail = async (
-  estimateRequestId: number
+  estimateRequestId: number,
+  params?: AdminEstimateRequestDetailQuery
 ): Promise<AdminEstimateRequestDetailResponse> => {
   const response = await axiosInstance.get<AdminEstimateRequestDetailResponse>(
-    getAdminEstimateRequestDetailPath(estimateRequestId)
+    getAdminEstimateRequestDetailPath(estimateRequestId),
+    params ? { params } : undefined
   );
 
   return response.data;

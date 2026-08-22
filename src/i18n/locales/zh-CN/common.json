@@ -317,7 +317,9 @@
       "notFound": "找不到报价请求。",
       "error": "无法加载报价请求详情。",
       "empty": "暂无报价请求信息。",
-      "emptyDescription": "找不到所选报价请求。"
+      "emptyDescription": "找不到所选报价请求。",
+      "previous": "上一项",
+      "next": "下一项"
     },
     "viewDetail": "查看详情"
   },
@@ -383,7 +385,9 @@
       "notFound": "找不到已完成订单。",
       "error": "无法加载已完成订单详情。",
       "empty": "暂无已完成订单信息。",
-      "emptyDescription": "找不到所选已完成订单。"
+      "emptyDescription": "找不到所选已完成订单。",
+      "previous": "上一项",
+      "next": "下一项"
     }
   },
   "chats": {

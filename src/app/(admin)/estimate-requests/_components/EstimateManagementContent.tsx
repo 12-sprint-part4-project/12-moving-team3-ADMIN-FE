@@ -29,6 +29,7 @@ export const EstimateManagementContent = () => {
     searchDrafts,
     searchFieldErrors,
     listQuery,
+    detailQuery,
     statisticsQuery,
     hasActiveFilters,
     dateRangeValue,
@@ -44,6 +45,11 @@ export const EstimateManagementContent = () => {
 
   const handleOpenDetail = useCallback(
     (estimateRequestId: number) => setDetailId(String(estimateRequestId)),
+    [setDetailId]
+  );
+  const handleNavigateDetail = useCallback(
+    (estimateRequestId: number) =>
+      setDetailId(String(estimateRequestId), { replace: true }),
     [setDetailId]
   );
 
@@ -104,6 +110,8 @@ export const EstimateManagementContent = () => {
       />
       <EstimateDetailDrawer
         estimateRequestId={selectedEstimateRequestId}
+        detailQuery={detailQuery}
+        onNavigate={handleNavigateDetail}
         onClose={() => setDetailId(null)}
       />
     </>

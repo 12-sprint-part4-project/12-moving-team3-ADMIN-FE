@@ -17,7 +17,7 @@ export const useDetailSearchParam = (parameterName: string) => {
   const detailId = searchParams.get(parameterName)?.trim() || null;
 
   const setDetailId = useCallback(
-    (nextDetailId: string | null) => {
+    (nextDetailId: string | null, options?: { replace?: boolean }) => {
       const href = createDetailHref(
         pathname,
         new URLSearchParams(window.location.search),
@@ -26,7 +26,10 @@ export const useDetailSearchParam = (parameterName: string) => {
       );
 
       // 닫기는 히스토리를 쌓지 않고, 열기는 뒤로 가기로 닫을 수 있게 push한다.
-      navigateSearchHref(href, { replace: nextDetailId === null });
+      // 드로어 안 이전/다음은 열린 상태를 유지하므로 replace로 히스토리를 덮는다.
+      navigateSearchHref(href, {
+        replace: options?.replace ?? nextDetailId === null,
+      });
     },
     [parameterName, pathname]
   );

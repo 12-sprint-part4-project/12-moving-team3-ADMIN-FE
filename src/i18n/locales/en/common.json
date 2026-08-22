@@ -329,7 +329,9 @@
       "notFound": "The estimate request could not be found.",
       "error": "Failed to load estimate request details.",
       "empty": "Estimate request information is unavailable.",
-      "emptyDescription": "The selected estimate request could not be found."
+      "emptyDescription": "The selected estimate request could not be found.",
+      "previous": "Previous",
+      "next": "Next"
     },
     "viewDetail": "View details"
   },
@@ -395,7 +397,9 @@
       "notFound": "The completed move could not be found.",
       "error": "Failed to load completed move details.",
       "empty": "Completed move information is unavailable.",
-      "emptyDescription": "The selected completed move could not be found."
+      "emptyDescription": "The selected completed move could not be found.",
+      "previous": "Previous",
+      "next": "Next"
     }
   },
   "chats": {

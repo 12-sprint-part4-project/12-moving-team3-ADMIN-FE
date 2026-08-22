@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
 import { useDraftSearchFields } from '@/hooks/useDraftSearchFields';
 import {
   toAdminCompletedApiDate,
+  toAdminCompletedDetailQuery,
   toAdminCompletedStatisticsQuery,
 } from '@/utils/adminCompleted';
 import {
@@ -26,7 +27,7 @@ import type { AdminCompletedUrlFilters } from '@/utils/adminListSearchParams';
 export type AdminCompletedListFilters = AdminCompletedUrlFilters;
 
 /**
- * UI 필터 → API query.
+ * UI 필터 → 목록 API query.
  * undefined·빈 값은 객체에 넣지 않아 axios query string에서 빠진다.
  */
 const toListQuery = (
@@ -34,13 +35,7 @@ const toListQuery = (
 ): AdminCompletedListQuery => ({
   page: filters.page,
   pageSize: filters.pageSize,
-  sort: filters.sort,
-  ...(filters.id ? { id: filters.id } : {}),
-  ...(filters.userName ? { userName: filters.userName } : {}),
-  ...(filters.phoneNumber ? { phoneNumber: filters.phoneNumber } : {}),
-  ...(filters.moveType ? { moveType: filters.moveType } : {}),
-  ...(filters.startDate ? { startDate: filters.startDate } : {}),
-  ...(filters.startDate && filters.endDate ? { endDate: filters.endDate } : {}),
+  ...toAdminCompletedDetailQuery(filters),
 });
 
 /**
@@ -72,6 +67,10 @@ export const useAdminCompletedListFilters = () => {
     useState<EstimateRequestSearchFieldErrors>({});
 
   const listQuery = useMemo(() => toListQuery(filters), [filters]);
+  const detailQuery = useMemo(
+    () => toAdminCompletedDetailQuery(filters),
+    [filters]
+  );
   const statisticsQuery = useMemo(
     () => toAdminCompletedStatisticsQuery(filters.startDate, filters.endDate),
     [filters.startDate, filters.endDate]
@@ -79,11 +78,11 @@ export const useAdminCompletedListFilters = () => {
 
   const hasActiveFilters = Boolean(
     filters.id ||
-      filters.userName ||
-      filters.phoneNumber ||
-      filters.moveType ||
-      filters.startDate ||
-      filters.endDate
+    filters.userName ||
+    filters.phoneNumber ||
+    filters.moveType ||
+    filters.startDate ||
+    filters.endDate
   );
 
   const dateRangeValue = useMemo<DateRangePopoverProps['value']>(() => {
@@ -222,6 +221,7 @@ export const useAdminCompletedListFilters = () => {
     searchDrafts: drafts,
     searchFieldErrors,
     listQuery,
+    detailQuery,
     statisticsQuery,
     hasActiveFilters,
     dateRangeValue,
