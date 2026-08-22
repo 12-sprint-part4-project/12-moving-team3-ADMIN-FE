@@ -16,14 +16,20 @@ import { DataTable, type Column } from '@/components/DataTable/DataTable';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
-import { SearchInput } from '@/components/SearchInput/SearchInput';
+import { MultiFieldSearch } from '@/components/MultiFieldSearch/MultiFieldSearch';
 import { SearchResetButton } from '@/components/SearchResetButton/SearchResetButton';
 import { useAdminChatList } from '@/hooks/useAdminChatList';
 import { useClampListPage } from '@/hooks/useClampListPage';
+import { useDraftSearchFields } from '@/hooks/useDraftSearchFields';
 import {
   createAdminChatListHref,
   parseAdminChatSearchParams,
 } from '@/utils/adminListSearchParams';
+import {
+  getSearchIdFieldErrors,
+  hasSearchIdFieldErrors,
+  type EstimateRequestSearchFieldErrors,
+} from '@/utils/adminSearchFieldValidation';
 import { navigateSearchHref } from '@/utils/navigateSearchHref';
 
 import type {
@@ -51,7 +57,8 @@ const parseRoomTypeFilter = (value: string): AdminChatRoomType | undefined => {
 const toListQuery = (filters: AdminChatListFilters): AdminChatListQuery => ({
   page: filters.page,
   pageSize: filters.pageSize,
-  ...(filters.search ? { search: filters.search } : {}),
+  ...(filters.id ? { id: filters.id } : {}),
+  ...(filters.userName ? { userName: filters.userName } : {}),
   ...(filters.roomType ? { roomType: filters.roomType } : {}),
 });
 
@@ -79,15 +86,18 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
       parseAdminChatSearchParams(new URLSearchParams(searchParams.toString())),
     [searchParams]
   );
-  // 입력창 초안. 검색 버튼/Enter 시에만 실제 조회 Query에 반영한다.
-  const urlSearch = filters.search ?? '';
-  const [syncedSearch, setSyncedSearch] = useState(urlSearch);
-  const [searchInput, setSearchInput] = useState(urlSearch);
-
-  if (syncedSearch !== urlSearch) {
-    setSyncedSearch(urlSearch);
-    setSearchInput(urlSearch);
-  }
+  // 검색 버튼/Enter 시에만 URL 검색 필드로 반영한다.
+  const urlSearchValues = useMemo(
+    () => ({
+      id: filters.id ?? '',
+      userName: filters.userName ?? '',
+    }),
+    [filters.id, filters.userName]
+  );
+  const { drafts, handleFieldChange, commitDrafts, clearDrafts } =
+    useDraftSearchFields(urlSearchValues);
+  const [searchFieldErrors, setSearchFieldErrors] =
+    useState<EstimateRequestSearchFieldErrors>({});
 
   const listQuery = useMemo(() => toListQuery(filters), [filters]);
   const { data, isPending, isError } = useAdminChatList(listQuery);
@@ -139,17 +149,34 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
     [getColumns, filters.page, filters.pageSize]
   );
 
-  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(event.target.value);
-  };
+  const handleSearchFieldChange =
+    (key: 'id' | 'userName') => (event: ChangeEvent<HTMLInputElement>) => {
+      if (key === 'id') {
+        setSearchFieldErrors((previous) => {
+          if (!previous.id) {
+            return previous;
+          }
 
-  const handleSearch = (value: string) => {
-    const trimmed = value.trim();
-    setSearchInput(trimmed);
-    updateFilters(
-      { search: trimmed.length > 0 ? trimmed : undefined },
-      { resetPage: true }
-    );
+          const next = { ...previous };
+          delete next.id;
+          return next;
+        });
+      }
+
+      handleFieldChange(key)(event);
+    };
+
+  const handleSearch = () => {
+    const patch = commitDrafts();
+    const errors = getSearchIdFieldErrors(patch.id ?? '');
+    setSearchFieldErrors(errors);
+
+    // 무효 필드가 있으면 URL·API에 반영하지 않는다.
+    if (hasSearchIdFieldErrors(errors)) {
+      return;
+    }
+
+    updateFilters(patch, { resetPage: true });
   };
 
   const handleRoomTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -164,11 +191,19 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
   };
 
   const handleResetFilters = () => {
-    setSearchInput('');
-    updateFilters({ search: undefined, roomType: undefined, page: 1 });
+    clearDrafts();
+    setSearchFieldErrors({});
+    updateFilters({
+      id: undefined,
+      userName: undefined,
+      roomType: undefined,
+      page: 1,
+    });
   };
 
-  const hasActiveFilters = Boolean(filters.search || filters.roomType);
+  const hasActiveFilters = Boolean(
+    filters.id || filters.userName || filters.roomType
+  );
   const roomTypeOptions = ['', 'GENERAL', 'DESIGNATED', 'COMMUNITY'].map(
     (value) => ({
       value,
@@ -229,14 +264,27 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
       onPageChange={handlePageChange}
       filters={
         <>
-          <SearchInput
-            value={searchInput}
-            onChange={handleSearchChange}
+          <MultiFieldSearch
+            fields={[
+              {
+                name: 'id',
+                value: drafts.id,
+                placeholder: t('chats.fields.roomId'),
+                'aria-label': t('chats.fields.roomId'),
+                errorMessage: searchFieldErrors.id
+                  ? t('chats.filter.idInvalid')
+                  : undefined,
+                onChange: handleSearchFieldChange('id'),
+              },
+              {
+                name: 'userName',
+                value: drafts.userName,
+                placeholder: t('chats.filter.userName'),
+                'aria-label': t('chats.filter.userName'),
+                onChange: handleSearchFieldChange('userName'),
+              },
+            ]}
             onSearch={handleSearch}
-            placeholder={t('chats.filter.searchPlaceholder')}
-            searchAction="button"
-            className="min-w-64 flex-1"
-            aria-label={t('chats.filter.searchLabel')}
           />
           <FilterSelect
             aria-label={t('chats.fields.roomType')}

@@ -38,7 +38,6 @@ export const MemberManagementContent = () => {
         title={t('members.customer.title')}
         description={t('members.customer.description')}
         caption={t('members.customer.caption')}
-        searchAriaLabel={t('members.customer.searchLabel')}
         emptyNoDataTitle={t('members.customer.empty')}
         errorTitle={t('members.customer.error')}
         getColumns={getColumns}

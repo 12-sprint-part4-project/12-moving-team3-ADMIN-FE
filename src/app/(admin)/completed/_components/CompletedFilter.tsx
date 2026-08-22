@@ -41,7 +41,7 @@ export const CompletedFilter = ({
   const { t } = useTranslation();
   return (
     <section
-      className="mt-4 flex flex-wrap items-center gap-2"
+      className="mt-4 flex flex-wrap items-start gap-2"
       aria-label={t('completed.filter.label')}
     >
       <MultiFieldSearch

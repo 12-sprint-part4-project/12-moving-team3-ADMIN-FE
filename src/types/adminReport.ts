@@ -109,8 +109,9 @@ export type AdminReportTargetInfo =
 export interface AdminReportListQuery {
   status?: AdminReportStatus;
   target?: AdminReportTarget;
-  /** 신고 대상 사용자 검색어 (이름·닉네임·이메일) */
-  targetUserKeyword?: string;
+  id?: string;
+  /** 신고 대상 사용자 이름 또는 닉네임 */
+  userName?: string;
   /** 신고일 시작일 (YYYY-MM-DD, UserReport.createdAt) */
   reportedFrom?: string;
   /** 신고일 종료일 (YYYY-MM-DD). reportedFrom 없이 단독 전달 불가 */

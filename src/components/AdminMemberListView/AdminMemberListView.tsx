@@ -20,16 +20,22 @@ import {
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
-import { SearchInput } from '@/components/SearchInput/SearchInput';
+import { MultiFieldSearch } from '@/components/MultiFieldSearch/MultiFieldSearch';
 import { SearchResetButton } from '@/components/SearchResetButton/SearchResetButton';
 import { useAdminMemberList } from '@/hooks/useAdminMemberList';
 import { useClampListPage } from '@/hooks/useClampListPage';
+import { useDraftSearchFields } from '@/hooks/useDraftSearchFields';
 import { toAdminMemberApiDate } from '@/utils/adminMember';
 import {
   createAdminMemberListHref,
   INITIAL_ADMIN_MEMBER_LIST_FILTERS,
   parseAdminMemberListSearchParams,
 } from '@/utils/adminMemberListSearchParams';
+import {
+  getPhoneNumberSearchFieldErrors,
+  hasEstimateRequestSearchFieldErrors,
+  type EstimateRequestSearchFieldErrors,
+} from '@/utils/adminSearchFieldValidation';
 import { navigateSearchHref } from '@/utils/navigateSearchHref';
 
 import type {
@@ -61,7 +67,9 @@ const toListQuery = (
   page: filters.page,
   pageSize: filters.pageSize,
   sort: filters.sort,
-  ...(filters.search ? { search: filters.search } : {}),
+  ...(filters.userName ? { userName: filters.userName } : {}),
+  ...(filters.email ? { email: filters.email } : {}),
+  ...(filters.phoneNumber ? { phoneNumber: filters.phoneNumber } : {}),
   ...(filters.status ? { status: filters.status } : {}),
   ...(filters.startDate ? { startDate: filters.startDate } : {}),
   ...(filters.endDate ? { endDate: filters.endDate } : {}),
@@ -80,7 +88,6 @@ export interface AdminMemberListViewProps {
   title: string;
   description: string;
   caption: string;
-  searchAriaLabel: string;
   /** 필터 없을 때 빈 목록 제목 */
   emptyNoDataTitle: string;
   /** 조회 실패 시 제목 */
@@ -99,7 +106,6 @@ export const AdminMemberListView = ({
   title,
   description,
   caption,
-  searchAriaLabel,
   emptyNoDataTitle,
   errorTitle,
   getColumns,
@@ -114,15 +120,19 @@ export const AdminMemberListView = ({
       ),
     [searchParams]
   );
-  // 입력 중인 초안은 URL과 분리하고, 실제 검색 또는 history 이동 때만 동기화한다.
-  const urlSearch = filters.search ?? '';
-  const [syncedSearch, setSyncedSearch] = useState(urlSearch);
-  const [searchInput, setSearchInput] = useState(urlSearch);
-
-  if (syncedSearch !== urlSearch) {
-    setSyncedSearch(urlSearch);
-    setSearchInput(urlSearch);
-  }
+  // 입력창 초안. 검색 버튼/Enter 시에만 URL 검색 필드로 반영한다.
+  const urlSearchValues = useMemo(
+    () => ({
+      userName: filters.userName ?? '',
+      email: filters.email ?? '',
+      phoneNumber: filters.phoneNumber ?? '',
+    }),
+    [filters.userName, filters.email, filters.phoneNumber]
+  );
+  const { drafts, handleFieldChange, commitDrafts, clearDrafts } =
+    useDraftSearchFields(urlSearchValues);
+  const [searchFieldErrors, setSearchFieldErrors] =
+    useState<EstimateRequestSearchFieldErrors>({});
 
   const listQuery = useMemo(
     () => toListQuery(userType, filters),
@@ -184,17 +194,35 @@ export const AdminMemberListView = ({
     onPageClamp: handlePageClamp,
   });
 
-  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(event.target.value);
-  };
+  const handleSearchFieldChange =
+    (key: 'userName' | 'email' | 'phoneNumber') =>
+    (event: ChangeEvent<HTMLInputElement>) => {
+      if (key === 'phoneNumber') {
+        setSearchFieldErrors((previous) => {
+          if (!previous.phoneNumber) {
+            return previous;
+          }
 
-  const handleSearch = (value: string) => {
-    const trimmed = value.trim();
-    setSearchInput(trimmed);
-    updateFilters(
-      { search: trimmed.length > 0 ? trimmed : undefined },
-      { resetPage: true }
-    );
+          const next = { ...previous };
+          delete next.phoneNumber;
+          return next;
+        });
+      }
+
+      handleFieldChange(key)(event);
+    };
+
+  const handleSearch = () => {
+    const patch = commitDrafts();
+    const errors = getPhoneNumberSearchFieldErrors(patch.phoneNumber ?? '');
+    setSearchFieldErrors(errors);
+
+    // 무효 필드가 있으면 URL·API에 반영하지 않는다.
+    if (hasEstimateRequestSearchFieldErrors(errors)) {
+      return;
+    }
+
+    updateFilters(patch, { resetPage: true });
   };
 
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -254,10 +282,13 @@ export const AdminMemberListView = ({
   };
 
   const handleResetFilters = () => {
-    setSearchInput('');
+    clearDrafts();
+    setSearchFieldErrors({});
     updateFilters({
       ...INITIAL_ADMIN_MEMBER_LIST_FILTERS,
-      search: undefined,
+      userName: undefined,
+      email: undefined,
+      phoneNumber: undefined,
       status: undefined,
       startDate: undefined,
       endDate: undefined,
@@ -265,7 +296,12 @@ export const AdminMemberListView = ({
   };
 
   const hasActiveFilters = Boolean(
-    filters.search || filters.status || filters.startDate || filters.endDate
+    filters.userName ||
+    filters.email ||
+    filters.phoneNumber ||
+    filters.status ||
+    filters.startDate ||
+    filters.endDate
   );
 
   const renderListBody = (): ReactNode => {
@@ -316,14 +352,34 @@ export const AdminMemberListView = ({
       onPageChange={handlePageChange}
       filters={
         <>
-          <SearchInput
-            value={searchInput}
-            onChange={handleSearchChange}
+          <MultiFieldSearch
+            fields={[
+              {
+                name: 'userName',
+                value: drafts.userName,
+                placeholder: t('members.filter.userName'),
+                'aria-label': t('members.filter.userName'),
+                onChange: handleSearchFieldChange('userName'),
+              },
+              {
+                name: 'email',
+                value: drafts.email,
+                placeholder: t('members.fields.email'),
+                'aria-label': t('members.fields.email'),
+                onChange: handleSearchFieldChange('email'),
+              },
+              {
+                name: 'phoneNumber',
+                value: drafts.phoneNumber,
+                placeholder: t('members.fields.phone'),
+                'aria-label': t('members.fields.phone'),
+                errorMessage: searchFieldErrors.phoneNumber
+                  ? t('members.filter.phoneNumberInvalid')
+                  : undefined,
+                onChange: handleSearchFieldChange('phoneNumber'),
+              },
+            ]}
             onSearch={handleSearch}
-            placeholder={t('members.list.searchPlaceholder')}
-            searchAction="button"
-            className="min-w-64 flex-1"
-            aria-label={searchAriaLabel}
           />
           <FilterSelect
             aria-label={t('members.list.statusLabel')}

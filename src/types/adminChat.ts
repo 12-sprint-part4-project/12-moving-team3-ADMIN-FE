@@ -16,7 +16,8 @@ export type AdminChatUserType = MemberUserType;
 
 /** GET /api/admin/chats 쿼리 파라미터 */
 export interface AdminChatListQuery {
-  search?: string;
+  id?: string;
+  userName?: string;
   roomType?: AdminChatRoomType;
   page?: number;
   pageSize?: number;

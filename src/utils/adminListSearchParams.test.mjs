@@ -17,14 +17,20 @@ import {
 test('채팅 query를 복원하고 잘못된 값은 기본값으로 처리한다', () => {
   assert.deepEqual(
     parseAdminChatSearchParams(
-      new URLSearchParams('search=%20%ED%99%8D%20&roomType=GENERAL&page=3')
+      new URLSearchParams(
+        'id=12&userName=%20%ED%99%8D%20&roomType=GENERAL&page=3'
+      )
     ),
-    { search: '홍', roomType: 'GENERAL', page: 3, pageSize: 10 }
+    { id: '12', userName: '홍', roomType: 'GENERAL', page: 3, pageSize: 10 }
   );
   assert.deepEqual(
     parseAdminChatSearchParams(
-      new URLSearchParams('search=%20&roomType=INVALID&page=0')
+      new URLSearchParams('id=abc&userName=%20&roomType=INVALID&page=0')
     ),
+    { page: 1, pageSize: 10 }
+  );
+  assert.deepEqual(
+    parseAdminChatSearchParams(new URLSearchParams('id=0')),
     { page: 1, pageSize: 10 }
   );
 });
@@ -33,11 +39,13 @@ test('리뷰 query의 별점, 상태, 날짜, 정렬을 검증한다', () => {
   assert.deepEqual(
     parseAdminReviewSearchParams(
       new URLSearchParams(
-        'search=review&rating=5&deletionStatus=DELETED&startDate=2026-08-01&endDate=2026-08-20&sort=ASC&page=2'
+        'id=9&userName=review&moverName=mover&rating=5&deletionStatus=DELETED&startDate=2026-08-01&endDate=2026-08-20&sort=ASC&page=2'
       )
     ),
     {
-      search: 'review',
+      id: '9',
+      userName: 'review',
+      moverName: 'mover',
       rating: 5,
       deletionStatus: 'DELETED',
       startDate: '2026-08-01',
@@ -61,13 +69,14 @@ test('신고 query의 상태, 대상, 날짜, 정렬을 검증한다', () => {
   assert.deepEqual(
     parseAdminReportSearchParams(
       new URLSearchParams(
-        'status=PENDING&target=REVIEW&targetUserKeyword=%20user%20&reportedFrom=2026-08-01&reportedTo=2026-08-20&sort=ASC&page=4'
+        'id=7&status=PENDING&target=REVIEW&userName=%20user%20&reportedFrom=2026-08-01&reportedTo=2026-08-20&sort=ASC&page=4'
       )
     ),
     {
+      id: '7',
       status: 'PENDING',
       target: 'REVIEW',
-      targetUserKeyword: 'user',
+      userName: 'user',
       reportedFrom: '2026-08-01',
       reportedTo: '2026-08-20',
       sort: 'ASC',
@@ -88,9 +97,9 @@ test('목록 query를 갱신해도 상세 ID와 다른 query를 보존한다', (
     createAdminChatListHref(
       '/chats',
       new URLSearchParams('roomId=12&tab=participants&page=4'),
-      { search: '홍길동', roomType: 'DESIGNATED', page: 1, pageSize: 10 }
+      { userName: '홍길동', roomType: 'DESIGNATED', page: 1, pageSize: 10 }
     ),
-    '/chats?roomId=12&tab=participants&search=%ED%99%8D%EA%B8%B8%EB%8F%99&roomType=DESIGNATED'
+    '/chats?roomId=12&tab=participants&userName=%ED%99%8D%EA%B8%B8%EB%8F%99&roomType=DESIGNATED'
   );
   assert.equal(
     createAdminReportListHref(

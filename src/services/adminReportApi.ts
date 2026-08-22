@@ -21,7 +21,7 @@ import type {
 /**
  * 관리자 신고 목록 조회.
  * Access Token은 axiosInstance Request Interceptor가 Authorization에 첨부한다.
- * status·target·targetUserKeyword·reportedFrom·reportedTo는
+ * status·target·id·userName·reportedFrom·reportedTo는
  * 값이 있을 때만 params에 포함한다(axios가 undefined를 제외한다).
  */
 export const getAdminReportList = async (

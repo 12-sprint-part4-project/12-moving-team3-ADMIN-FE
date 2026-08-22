@@ -1,6 +1,7 @@
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
 
+import { useDraftSearchFields } from '@/hooks/useDraftSearchFields';
 import {
   createAdminReviewListHref,
   parseAdminReviewSearchParams,
@@ -9,6 +10,11 @@ import {
   toAdminReviewApiDate,
   toAdminReviewStatisticsQuery,
 } from '@/utils/adminReview';
+import {
+  getSearchIdFieldErrors,
+  hasSearchIdFieldErrors,
+  type EstimateRequestSearchFieldErrors,
+} from '@/utils/adminSearchFieldValidation';
 import { navigateSearchHref } from '@/utils/navigateSearchHref';
 
 import type { DateRangePopoverProps } from '@/components/DateRangePopover/DateRangePopover';
@@ -56,7 +62,9 @@ const toListQuery = (
   page: filters.page,
   pageSize: filters.pageSize,
   sort: filters.sort,
-  ...(filters.search ? { search: filters.search } : {}),
+  ...(filters.id ? { id: filters.id } : {}),
+  ...(filters.userName ? { userName: filters.userName } : {}),
+  ...(filters.moverName ? { moverName: filters.moverName } : {}),
   ...(filters.rating !== undefined ? { rating: filters.rating } : {}),
   ...(filters.deletionStatus ? { deletionStatus: filters.deletionStatus } : {}),
   ...(filters.startDate ? { startDate: filters.startDate } : {}),
@@ -78,15 +86,18 @@ export const useAdminReviewListFilters = () => {
       ),
     [searchParams]
   );
-  // 입력창 초안. 검색 버튼/Enter 시에만 filters.search로 반영한다.
-  const urlSearch = filters.search ?? '';
-  const [syncedSearch, setSyncedSearch] = useState(urlSearch);
-  const [searchInput, setSearchInput] = useState(urlSearch);
-
-  if (syncedSearch !== urlSearch) {
-    setSyncedSearch(urlSearch);
-    setSearchInput(urlSearch);
-  }
+  const urlSearchValues = useMemo(
+    () => ({
+      id: filters.id ?? '',
+      userName: filters.userName ?? '',
+      moverName: filters.moverName ?? '',
+    }),
+    [filters.id, filters.userName, filters.moverName]
+  );
+  const { drafts, handleFieldChange, commitDrafts, clearDrafts } =
+    useDraftSearchFields(urlSearchValues);
+  const [searchFieldErrors, setSearchFieldErrors] =
+    useState<EstimateRequestSearchFieldErrors>({});
 
   const listQuery = useMemo(() => toListQuery(filters), [filters]);
   const statisticsQuery = useMemo(
@@ -94,9 +105,10 @@ export const useAdminReviewListFilters = () => {
     [filters.startDate, filters.endDate]
   );
 
-  // 삭제 상태가 선택된 경우에만 활성 필터로 본다.
   const hasActiveFilters = Boolean(
-    filters.search ||
+    filters.id ||
+    filters.userName ||
+    filters.moverName ||
     filters.rating !== undefined ||
     filters.startDate ||
     filters.endDate ||
@@ -139,17 +151,35 @@ export const useAdminReviewListFilters = () => {
     [filters, pathname]
   );
 
-  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(event.target.value);
-  };
+  const handleSearchFieldChange =
+    (key: 'id' | 'userName' | 'moverName') =>
+    (event: ChangeEvent<HTMLInputElement>) => {
+      if (key === 'id') {
+        setSearchFieldErrors((previous) => {
+          if (!previous.id) {
+            return previous;
+          }
 
-  const handleSearch = (value: string) => {
-    const trimmed = value.trim();
-    setSearchInput(trimmed);
-    updateFilters(
-      { search: trimmed.length > 0 ? trimmed : undefined },
-      { resetPage: true }
-    );
+          const next = { ...previous };
+          delete next.id;
+          return next;
+        });
+      }
+
+      handleFieldChange(key)(event);
+    };
+
+  const handleSearch = () => {
+    const patch = commitDrafts();
+    const errors = getSearchIdFieldErrors(patch.id ?? '');
+    setSearchFieldErrors(errors);
+
+    // 무효 필드가 있으면 URL·API에 반영하지 않는다.
+    if (hasSearchIdFieldErrors(errors)) {
+      return;
+    }
+
+    updateFilters(patch, { resetPage: true });
   };
 
   const handleRatingChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -207,9 +237,12 @@ export const useAdminReviewListFilters = () => {
   );
 
   const handleResetFilters = () => {
-    setSearchInput('');
+    clearDrafts();
+    setSearchFieldErrors({});
     updateFilters({
-      search: undefined,
+      id: undefined,
+      userName: undefined,
+      moverName: undefined,
       rating: undefined,
       deletionStatus: undefined,
       startDate: undefined,
@@ -221,12 +254,13 @@ export const useAdminReviewListFilters = () => {
 
   return {
     filters,
-    searchInput,
+    searchDrafts: drafts,
+    searchFieldErrors,
     listQuery,
     statisticsQuery,
     hasActiveFilters,
     dateRangeValue,
-    handleSearchChange,
+    handleSearchFieldChange,
     handleSearch,
     handleRatingChange,
     handleDeletionStatusChange,

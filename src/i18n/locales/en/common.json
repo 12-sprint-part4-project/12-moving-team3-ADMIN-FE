@@ -149,6 +149,10 @@
       "statusLabel": "Status",
       "allJoinDates": "All join dates"
     },
+    "filter": {
+      "userName": "Name and nickname",
+      "phoneNumberInvalid": "Phone number must include digits."
+    },
     "columns": {
       "number": "No.",
       "status": "Status",
@@ -415,7 +419,9 @@
     "filter": {
       "allTypes": "All",
       "searchPlaceholder": "Search name, nickname, email, or phone",
-      "searchLabel": "Search chat participants"
+      "searchLabel": "Search chat participants",
+      "idInvalid": "Chat room ID must contain digits only.",
+      "userName": "Participant name and nickname"
     },
     "fields": {
       "roomId": "Chat Room ID",
@@ -517,7 +523,9 @@
       "searchLabel": "Search reported users",
       "allStatuses": "All",
       "allTargets": "All",
-      "allDates": "All report dates"
+      "allDates": "All report dates",
+      "idInvalid": "Report ID must contain digits only.",
+      "userName": "Target name and nickname"
     },
     "fields": {
       "reportId": "Report ID",
@@ -646,7 +654,10 @@
       "ratingOption": "{{rating}} stars",
       "allStatuses": "All",
       "deletionStatus": "Deletion status",
-      "allCreatedDates": "All creation dates"
+      "allCreatedDates": "All creation dates",
+      "idInvalid": "Review ID must contain digits only.",
+      "userName": "Author name and nickname",
+      "moverName": "Mover name and nickname"
     },
     "fields": {
       "reviewId": "Review ID",

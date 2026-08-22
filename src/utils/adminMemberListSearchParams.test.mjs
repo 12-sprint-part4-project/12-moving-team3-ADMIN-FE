@@ -11,11 +11,13 @@ test('회원 목록 query를 목록 상태로 복원한다', () => {
   assert.deepEqual(
     parseAdminMemberListSearchParams(
       new URLSearchParams(
-        'search=%20%ED%99%8D%EA%B8%B8%EB%8F%99%20&page=3&status=SUSPENDED&startDate=2026-08-01&endDate=2026-08-20&sort=ASC'
+        'userName=%20%ED%99%8D%EA%B8%B8%EB%8F%99%20&email=user%40test.com&phoneNumber=010-1234-5678&page=3&status=SUSPENDED&startDate=2026-08-01&endDate=2026-08-20&sort=ASC'
       )
     ),
     {
-      search: '홍길동',
+      userName: '홍길동',
+      email: 'user@test.com',
+      phoneNumber: '010-1234-5678',
       page: 3,
       pageSize: 10,
       status: 'SUSPENDED',
@@ -30,7 +32,7 @@ test('잘못된 목록 query는 안전한 기본값으로 처리한다', () => {
   assert.deepEqual(
     parseAdminMemberListSearchParams(
       new URLSearchParams(
-        'search=%20&page=0&status=INVALID&startDate=2026-02-30&endDate=2026-01-01&sort=INVALID'
+        'userName=%20&email=%20&phoneNumber=---&page=0&status=INVALID&startDate=2026-02-30&endDate=2026-01-01&sort=INVALID'
       )
     ),
     INITIAL_ADMIN_MEMBER_LIST_FILTERS
@@ -56,7 +58,7 @@ test('목록 상태를 query에 반영하면서 다른 query를 보존한다', (
       '/drivers',
       new URLSearchParams('memberId=mover-id&tab=profile'),
       {
-        search: '기사',
+        userName: '기사',
         page: 2,
         pageSize: 10,
         status: 'ACTIVE',
@@ -65,6 +67,6 @@ test('목록 상태를 query에 반영하면서 다른 query를 보존한다', (
         sort: 'ASC',
       }
     ),
-    '/drivers?memberId=mover-id&tab=profile&search=%EA%B8%B0%EC%82%AC&page=2&status=ACTIVE&startDate=2026-08-01&endDate=2026-08-20&sort=ASC'
+    '/drivers?memberId=mover-id&tab=profile&userName=%EA%B8%B0%EC%82%AC&page=2&status=ACTIVE&startDate=2026-08-01&endDate=2026-08-20&sort=ASC'
   );
 });
