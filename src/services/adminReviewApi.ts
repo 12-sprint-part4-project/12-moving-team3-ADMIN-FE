@@ -15,7 +15,7 @@ import type {
 /**
  * 관리자 리뷰 목록 조회.
  * Access Token은 axiosInstance Request Interceptor가 Authorization에 첨부한다.
- * search·rating은 값이 있을 때만 params에 포함한다(axios가 undefined를 제외한다).
+ * id·userName·moverName·rating은 값이 있을 때만 params에 포함한다(axios가 undefined를 제외한다).
  */
 export const getAdminReviewList = async (
   params?: AdminReviewListQuery

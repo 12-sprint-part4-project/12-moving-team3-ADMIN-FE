@@ -27,13 +27,14 @@ export const ReportManagementContent = () => {
   const selectedReportId = parseNumericDetailId(detailId);
   const {
     filters,
-    targetUserSearch,
+    searchDrafts,
+    searchFieldErrors,
     listQuery,
     statisticsQuery,
     dateRangeValue,
     hasActiveFilters,
-    handleTargetUserSearchChange,
-    handleTargetUserSearch,
+    handleSearchFieldChange,
+    handleSearch,
     handleStatusChange,
     handleTargetChange,
     handleDateRangeConfirm,
@@ -94,12 +95,13 @@ export const ReportManagementContent = () => {
         }
         filters={
           <ReportFilter
-            searchValue={targetUserSearch}
+            searchDrafts={searchDrafts}
+            searchFieldErrors={searchFieldErrors}
             statusValue={filters.status ?? ''}
             targetValue={filters.target ?? ''}
             dateRangeValue={dateRangeValue}
-            onSearchChange={handleTargetUserSearchChange}
-            onSearch={handleTargetUserSearch}
+            onSearchFieldChange={handleSearchFieldChange}
+            onSearch={handleSearch}
             onStatusChange={handleStatusChange}
             onTargetChange={handleTargetChange}
             onDateRangeConfirm={handleDateRangeConfirm}

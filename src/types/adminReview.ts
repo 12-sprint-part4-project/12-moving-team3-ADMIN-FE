@@ -45,7 +45,11 @@ export type AdminReviewDeletionStatus = 'ACTIVE' | 'DELETED';
 
 /** GET /api/admin/reviews 쿼리 파라미터 */
 export interface AdminReviewListQuery {
-  search?: string;
+  id?: string;
+  /** 작성자 이름 또는 닉네임 */
+  userName?: string;
+  /** 기사 이름 또는 닉네임 */
+  moverName?: string;
   /** 1~5. 미전달 시 전체 별점 */
   rating?: number;
   /** 미전달 시 전체. ACTIVE=미삭제, DELETED=삭제됨 */

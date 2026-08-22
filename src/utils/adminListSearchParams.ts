@@ -80,13 +80,14 @@ export const createAdminListHref = (
 };
 
 export interface AdminChatUrlFilters {
-  search?: string;
+  id?: string;
+  userName?: string;
   roomType?: AdminChatRoomType;
   page: number;
   pageSize: number;
 }
 
-const CHAT_QUERY_KEYS = ['search', 'roomType', 'page'] as const;
+const CHAT_QUERY_KEYS = ['id', 'userName', 'roomType', 'page'] as const;
 const CHAT_ROOM_TYPES: readonly AdminChatRoomType[] = [
   'GENERAL',
   'DESIGNATED',
@@ -96,14 +97,18 @@ const CHAT_ROOM_TYPES: readonly AdminChatRoomType[] = [
 export const parseAdminChatSearchParams = (
   searchParams: URLSearchParams
 ): AdminChatUrlFilters => {
+  const rawId = searchParams.get('id')?.trim() || undefined;
+  const userName = searchParams.get('userName')?.trim() || undefined;
   const roomType = parseAdminListEnum(
     searchParams.get('roomType'),
     CHAT_ROOM_TYPES
   );
-  const search = searchParams.get('search')?.trim() || undefined;
+  // URL 직접 입력 시 무효 값은 필터에서 제외해 API로 보내지 않는다.
+  const id = rawId && isValidSearchId(rawId) ? rawId : undefined;
 
   return {
-    ...(search ? { search } : {}),
+    ...(id ? { id } : {}),
+    ...(userName ? { userName } : {}),
     ...(roomType ? { roomType } : {}),
     page: parseAdminListPage(searchParams.get('page')),
     pageSize: DEFAULT_ADMIN_LIST_PAGE_SIZE,
@@ -116,13 +121,16 @@ export const createAdminChatListHref = (
   filters: AdminChatUrlFilters
 ) =>
   createAdminListHref(pathname, searchParams, CHAT_QUERY_KEYS, {
-    search: filters.search,
+    id: filters.id,
+    userName: filters.userName,
     roomType: filters.roomType,
     page: filters.page > 1 ? String(filters.page) : undefined,
   });
 
 export interface AdminReviewUrlFilters {
-  search?: string;
+  id?: string;
+  userName?: string;
+  moverName?: string;
   rating?: number;
   deletionStatus?: AdminReviewDeletionStatus;
   startDate?: string;
@@ -133,7 +141,9 @@ export interface AdminReviewUrlFilters {
 }
 
 const REVIEW_QUERY_KEYS = [
-  'search',
+  'id',
+  'userName',
+  'moverName',
   'rating',
   'deletionStatus',
   'startDate',
@@ -149,7 +159,10 @@ const REVIEW_DELETION_STATUSES: readonly AdminReviewDeletionStatus[] = [
 export const parseAdminReviewSearchParams = (
   searchParams: URLSearchParams
 ): AdminReviewUrlFilters => {
-  const search = searchParams.get('search')?.trim() || undefined;
+  const rawId = searchParams.get('id')?.trim() || undefined;
+  const userName = searchParams.get('userName')?.trim() || undefined;
+  const moverName = searchParams.get('moverName')?.trim() || undefined;
+  const id = rawId && isValidSearchId(rawId) ? rawId : undefined;
   const ratingValue = searchParams.get('rating');
   const rating = /^[1-5]$/.test(ratingValue ?? '')
     ? Number(ratingValue)
@@ -166,7 +179,9 @@ export const parseAdminReviewSearchParams = (
       : undefined;
 
   return {
-    ...(search ? { search } : {}),
+    ...(id ? { id } : {}),
+    ...(userName ? { userName } : {}),
+    ...(moverName ? { moverName } : {}),
     ...(rating ? { rating } : {}),
     ...(deletionStatus ? { deletionStatus } : {}),
     ...(startDate ? { startDate } : {}),
@@ -183,7 +198,9 @@ export const createAdminReviewListHref = (
   filters: AdminReviewUrlFilters
 ) =>
   createAdminListHref(pathname, searchParams, REVIEW_QUERY_KEYS, {
-    search: filters.search,
+    id: filters.id,
+    userName: filters.userName,
+    moverName: filters.moverName,
     rating: filters.rating ? String(filters.rating) : undefined,
     deletionStatus: filters.deletionStatus,
     startDate: filters.startDate,
@@ -195,7 +212,8 @@ export const createAdminReviewListHref = (
 export interface AdminReportUrlFilters {
   status?: AdminReportStatus;
   target?: AdminReportTarget;
-  targetUserKeyword?: string;
+  id?: string;
+  userName?: string;
   reportedFrom?: string;
   reportedTo?: string;
   sort: AdminListSortDirection;
@@ -206,7 +224,8 @@ export interface AdminReportUrlFilters {
 const REPORT_QUERY_KEYS = [
   'status',
   'target',
-  'targetUserKeyword',
+  'id',
+  'userName',
   'reportedFrom',
   'reportedTo',
   'sort',
@@ -234,8 +253,9 @@ export const parseAdminReportSearchParams = (
     REPORT_STATUSES
   );
   const target = parseAdminListEnum(searchParams.get('target'), REPORT_TARGETS);
-  const targetUserKeyword =
-    searchParams.get('targetUserKeyword')?.trim() || undefined;
+  const rawId = searchParams.get('id')?.trim() || undefined;
+  const userName = searchParams.get('userName')?.trim() || undefined;
+  const id = rawId && isValidSearchId(rawId) ? rawId : undefined;
   const reportedFrom = parseAdminListDate(searchParams.get('reportedFrom'));
   const parsedReportedTo = parseAdminListDate(searchParams.get('reportedTo'));
   const reportedTo =
@@ -246,7 +266,8 @@ export const parseAdminReportSearchParams = (
   return {
     ...(status ? { status } : {}),
     ...(target ? { target } : {}),
-    ...(targetUserKeyword ? { targetUserKeyword } : {}),
+    ...(id ? { id } : {}),
+    ...(userName ? { userName } : {}),
     ...(reportedFrom ? { reportedFrom } : {}),
     ...(reportedTo ? { reportedTo } : {}),
     sort: parseAdminListSort(searchParams.get('sort')),
@@ -263,7 +284,8 @@ export const createAdminReportListHref = (
   createAdminListHref(pathname, searchParams, REPORT_QUERY_KEYS, {
     status: filters.status,
     target: filters.target,
-    targetUserKeyword: filters.targetUserKeyword,
+    id: filters.id,
+    userName: filters.userName,
     reportedFrom: filters.reportedFrom,
     reportedTo: filters.reportedTo,
     sort: filters.sort === 'ASC' ? 'ASC' : undefined,

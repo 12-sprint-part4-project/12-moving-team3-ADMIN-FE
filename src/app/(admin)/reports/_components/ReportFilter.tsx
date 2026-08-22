@@ -2,18 +2,25 @@ import { useTranslation } from 'react-i18next';
 
 import { DateRangePopover } from '@/components/DateRangePopover/DateRangePopover';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
-import { SearchInput } from '@/components/SearchInput/SearchInput';
+import { MultiFieldSearch } from '@/components/MultiFieldSearch/MultiFieldSearch';
 import { SearchResetButton } from '@/components/SearchResetButton/SearchResetButton';
 
-import type { ComponentProps } from 'react';
+import type { EstimateRequestSearchFieldErrors } from '@/utils/adminSearchFieldValidation';
+import type { ChangeEvent, ComponentProps } from 'react';
 
 interface ReportFilterProps {
-  searchValue: string;
+  searchDrafts: {
+    id: string;
+    userName: string;
+  };
+  searchFieldErrors: EstimateRequestSearchFieldErrors;
   statusValue: string;
   targetValue: string;
   dateRangeValue: ComponentProps<typeof DateRangePopover>['value'];
-  onSearchChange: ComponentProps<typeof SearchInput>['onChange'];
-  onSearch: ComponentProps<typeof SearchInput>['onSearch'];
+  onSearchFieldChange: (
+    key: 'id' | 'userName'
+  ) => (event: ChangeEvent<HTMLInputElement>) => void;
+  onSearch: () => void;
   onStatusChange: ComponentProps<typeof FilterSelect>['onChange'];
   onTargetChange: ComponentProps<typeof FilterSelect>['onChange'];
   onDateRangeConfirm: ComponentProps<typeof DateRangePopover>['onConfirm'];
@@ -22,11 +29,12 @@ interface ReportFilterProps {
 
 /** 검색·상태·대상·신고일 필터 UI만 담당하는 표현 컴포넌트. */
 export const ReportFilter = ({
-  searchValue,
+  searchDrafts,
+  searchFieldErrors,
   statusValue,
   targetValue,
   dateRangeValue,
-  onSearchChange,
+  onSearchFieldChange,
   onSearch,
   onStatusChange,
   onTargetChange,
@@ -58,14 +66,27 @@ export const ReportFilter = ({
 
   return (
     <>
-      <SearchInput
-        value={searchValue}
-        onChange={onSearchChange}
+      <MultiFieldSearch
+        fields={[
+          {
+            name: 'id',
+            value: searchDrafts.id,
+            placeholder: t('reports.fields.reportId'),
+            'aria-label': t('reports.fields.reportId'),
+            errorMessage: searchFieldErrors.id
+              ? t('reports.filter.idInvalid')
+              : undefined,
+            onChange: onSearchFieldChange('id'),
+          },
+          {
+            name: 'userName',
+            value: searchDrafts.userName,
+            placeholder: t('reports.filter.userName'),
+            'aria-label': t('reports.filter.userName'),
+            onChange: onSearchFieldChange('userName'),
+          },
+        ]}
         onSearch={onSearch}
-        placeholder={t('reports.filter.searchPlaceholder')}
-        searchAction="button"
-        className="min-w-64 flex-1"
-        aria-label={t('reports.filter.searchLabel')}
       />
       <FilterSelect
         aria-label={t('reports.fields.status')}

@@ -38,7 +38,9 @@ export type MemberMoveType = 'SMALL' | 'HOME' | 'OFFICE';
 export interface AdminMemberListQuery {
   userType?: MemberUserType;
   status?: MemberStatus;
-  search?: string;
+  userName?: string;
+  email?: string;
+  phoneNumber?: string;
   /** 가입 기간 시작일 (YYYY-MM-DD). 없으면 전체 기간 */
   startDate?: string;
   /** 가입 기간 종료일 (YYYY-MM-DD). startDate 없이 단독 전달 불가 */

@@ -137,6 +137,9 @@
       "statusLabel": "状态",
       "allJoinDates": "全部注册日期"
     },
+    "filter": {
+      "phoneNumberInvalid": "手机号需包含数字。"
+    },
     "columns": {
       "number": "编号",
       "status": "状态",
@@ -400,7 +403,9 @@
     "filter": {
       "allTypes": "全部",
       "searchPlaceholder": "搜索姓名、昵称、邮箱或手机号",
-      "searchLabel": "搜索聊天参与者"
+      "searchLabel": "搜索聊天参与者",
+      "idInvalid": "聊天室 ID 只能输入数字。",
+      "userName": "参与者姓名及昵称"
     },
     "fields": {
       "roomId": "聊天室 ID",
@@ -499,7 +504,9 @@
       "searchLabel": "搜索被举报用户",
       "allStatuses": "全部",
       "allTargets": "全部",
-      "allDates": "全部举报日期"
+      "allDates": "全部举报日期",
+      "idInvalid": "举报 ID 只能输入数字。",
+      "userName": "目标姓名及昵称"
     },
     "fields": {
       "reportId": "举报 ID",
@@ -628,7 +635,10 @@
       "ratingOption": "{{rating}}分",
       "allStatuses": "全部",
       "deletionStatus": "删除状态",
-      "allCreatedDates": "全部创建日期"
+      "allCreatedDates": "全部创建日期",
+      "idInvalid": "评价 ID 只能输入数字。",
+      "userName": "发布者姓名及昵称",
+      "moverName": "搬家师傅姓名及昵称"
     },
     "fields": {
       "reviewId": "评价 ID",

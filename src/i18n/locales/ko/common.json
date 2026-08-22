@@ -137,6 +137,9 @@
       "statusLabel": "상태",
       "allJoinDates": "가입일 전체"
     },
+    "filter": {
+      "phoneNumberInvalid": "전화번호는 숫자를 포함해 입력해 주세요."
+    },
     "columns": {
       "number": "번호",
       "status": "상태",
@@ -399,7 +402,9 @@
     "filter": {
       "allTypes": "전체",
       "searchPlaceholder": "이름, 닉네임, 이메일, 휴대폰 검색",
-      "searchLabel": "채팅방 참여자 검색"
+      "searchLabel": "채팅방 참여자 검색",
+      "idInvalid": "채팅방 ID는 숫자만 입력해 주세요.",
+      "userName": "참여자 이름 및 닉네임"
     },
     "fields": {
       "roomId": "채팅방 ID",
@@ -497,7 +502,9 @@
       "searchLabel": "신고 대상 사용자 검색",
       "allStatuses": "전체",
       "allTargets": "전체",
-      "allDates": "신고일 전체"
+      "allDates": "신고일 전체",
+      "idInvalid": "신고 ID는 숫자만 입력해 주세요.",
+      "userName": "대상 이름 및 닉네임"
     },
     "fields": {
       "reportId": "신고 ID",
@@ -626,7 +633,10 @@
       "ratingOption": "{{rating}}점",
       "allStatuses": "전체",
       "deletionStatus": "삭제 상태",
-      "allCreatedDates": "작성일 전체"
+      "allCreatedDates": "작성일 전체",
+      "idInvalid": "리뷰 ID는 숫자만 입력해 주세요.",
+      "userName": "작성자 이름 및 닉네임",
+      "moverName": "기사 이름 및 닉네임"
     },
     "fields": {
       "reviewId": "리뷰 ID",

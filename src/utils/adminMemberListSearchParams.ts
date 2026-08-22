@@ -5,11 +5,14 @@ import {
   parseAdminListEnum,
   parseAdminListPage,
 } from './adminListSearchParams.ts';
+import { isValidSearchPhoneNumber } from './adminSearchFieldValidation.ts';
 
 import type { AdminMemberSortOrder, MemberStatus } from '@/types/adminMember';
 
 export interface AdminMemberListFilters {
-  search?: string;
+  userName?: string;
+  email?: string;
+  phoneNumber?: string;
   status?: MemberStatus;
   startDate?: string;
   endDate?: string;
@@ -25,7 +28,9 @@ export const INITIAL_ADMIN_MEMBER_LIST_FILTERS: AdminMemberListFilters = {
 };
 
 const MANAGED_QUERY_KEYS = [
-  'search',
+  'userName',
+  'email',
+  'phoneNumber',
   'page',
   'status',
   'startDate',
@@ -39,7 +44,14 @@ const MEMBER_STATUSES: readonly MemberStatus[] = ['ACTIVE', 'SUSPENDED'];
 export const parseAdminMemberListSearchParams = (
   searchParams: URLSearchParams
 ): AdminMemberListFilters => {
-  const search = searchParams.get('search')?.trim() || undefined;
+  const userName = searchParams.get('userName')?.trim() || undefined;
+  const email = searchParams.get('email')?.trim() || undefined;
+  const rawPhoneNumber = searchParams.get('phoneNumber')?.trim() || undefined;
+  // URL 직접 입력 시 무효 값은 필터에서 제외해 API로 보내지 않는다.
+  const phoneNumber =
+    rawPhoneNumber && isValidSearchPhoneNumber(rawPhoneNumber)
+      ? rawPhoneNumber
+      : undefined;
   const status = parseAdminListEnum(
     searchParams.get('status'),
     MEMBER_STATUSES
@@ -53,7 +65,9 @@ export const parseAdminMemberListSearchParams = (
   const sort = searchParams.get('sort') === 'ASC' ? 'ASC' : 'DESC';
 
   return {
-    ...(search ? { search } : {}),
+    ...(userName ? { userName } : {}),
+    ...(email ? { email } : {}),
+    ...(phoneNumber ? { phoneNumber } : {}),
     ...(status ? { status } : {}),
     ...(startDate ? { startDate } : {}),
     ...(endDate ? { endDate } : {}),
@@ -70,7 +84,9 @@ export const createAdminMemberListHref = (
   filters: AdminMemberListFilters
 ) =>
   createAdminListHref(pathname, searchParams, MANAGED_QUERY_KEYS, {
-    search: filters.search,
+    userName: filters.userName,
+    email: filters.email,
+    phoneNumber: filters.phoneNumber,
     page: filters.page > 1 ? String(filters.page) : undefined,
     status: filters.status,
     startDate: filters.startDate,

@@ -10,7 +10,7 @@ import { DateRangePopover } from '@/components/DateRangePopover/DateRangePopover
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
-import { SearchInput } from '@/components/SearchInput/SearchInput';
+import { MultiFieldSearch } from '@/components/MultiFieldSearch/MultiFieldSearch';
 import { SearchResetButton } from '@/components/SearchResetButton/SearchResetButton';
 import { useAdminReviewDeleteConfirm } from '@/hooks/useAdminReviewDeleteConfirm';
 import { useAdminReviewList } from '@/hooks/useAdminReviewList';
@@ -35,12 +35,13 @@ export const ReviewManagementContent = () => {
     useState<AdminReviewListItem | null>(null);
   const {
     filters,
-    searchInput,
+    searchDrafts,
+    searchFieldErrors,
     listQuery,
     statisticsQuery,
     hasActiveFilters,
     dateRangeValue,
-    handleSearchChange,
+    handleSearchFieldChange,
     handleSearch,
     handleRatingChange,
     handleDeletionStatusChange,
@@ -177,14 +178,34 @@ export const ReviewManagementContent = () => {
         }
         filters={
           <>
-            <SearchInput
-              value={searchInput}
-              onChange={handleSearchChange}
+            <MultiFieldSearch
+              fields={[
+                {
+                  name: 'id',
+                  value: searchDrafts.id,
+                  placeholder: t('reviews.fields.reviewId'),
+                  'aria-label': t('reviews.fields.reviewId'),
+                  errorMessage: searchFieldErrors.id
+                    ? t('reviews.filter.idInvalid')
+                    : undefined,
+                  onChange: handleSearchFieldChange('id'),
+                },
+                {
+                  name: 'userName',
+                  value: searchDrafts.userName,
+                  placeholder: t('reviews.filter.userName'),
+                  'aria-label': t('reviews.filter.userName'),
+                  onChange: handleSearchFieldChange('userName'),
+                },
+                {
+                  name: 'moverName',
+                  value: searchDrafts.moverName,
+                  placeholder: t('reviews.filter.moverName'),
+                  'aria-label': t('reviews.filter.moverName'),
+                  onChange: handleSearchFieldChange('moverName'),
+                },
+              ]}
               onSearch={handleSearch}
-              placeholder={t('reviews.filter.searchPlaceholder')}
-              searchAction="button"
-              className="min-w-64 flex-1"
-              aria-label={t('reviews.filter.searchLabel')}
             />
             <FilterSelect
               aria-label={t('reviews.fields.rating')}

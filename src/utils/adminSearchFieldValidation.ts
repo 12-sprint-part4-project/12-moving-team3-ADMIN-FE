@@ -66,3 +66,21 @@ export const getEstimateRequestSearchFieldErrors = (drafts: {
 export const hasEstimateRequestSearchFieldErrors = (
   errors: EstimateRequestSearchFieldErrors
 ) => Boolean(errors.id || errors.phoneNumber);
+
+/**
+ * 숫자 id만 검증한다.
+ * 잘못된 번호가 API로 나가면 400이 나므로, 검색 확정 전에 막는다.
+ */
+export const getSearchIdFieldErrors = (id: string) =>
+  getEstimateRequestSearchFieldErrors({ id, phoneNumber: '' });
+
+export const hasSearchIdFieldErrors = (
+  errors: EstimateRequestSearchFieldErrors
+) => Boolean(errors.id);
+
+/**
+ * 전화번호만 검증한다.
+ * 숫자가 없으면 부분 일치 검색이 성립하지 않으므로 확정 전에 막는다.
+ */
+export const getPhoneNumberSearchFieldErrors = (phoneNumber: string) =>
+  getEstimateRequestSearchFieldErrors({ id: '', phoneNumber });

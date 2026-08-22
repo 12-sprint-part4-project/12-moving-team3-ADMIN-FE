@@ -2,11 +2,17 @@ import { format } from 'date-fns';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
 
+import { useDraftSearchFields } from '@/hooks/useDraftSearchFields';
 import {
   createAdminReportListHref,
   parseAdminReportSearchParams,
 } from '@/utils/adminListSearchParams';
 import { toAdminReportStatisticsQuery } from '@/utils/adminReport';
+import {
+  getSearchIdFieldErrors,
+  hasSearchIdFieldErrors,
+  type EstimateRequestSearchFieldErrors,
+} from '@/utils/adminSearchFieldValidation';
 import { navigateSearchHref } from '@/utils/navigateSearchHref';
 
 import {
@@ -29,9 +35,8 @@ const toListQuery = (
   sort: filters.sort,
   ...(filters.status ? { status: filters.status } : {}),
   ...(filters.target ? { target: filters.target } : {}),
-  ...(filters.targetUserKeyword
-    ? { targetUserKeyword: filters.targetUserKeyword }
-    : {}),
+  ...(filters.id ? { id: filters.id } : {}),
+  ...(filters.userName ? { userName: filters.userName } : {}),
   ...(filters.reportedFrom ? { reportedFrom: filters.reportedFrom } : {}),
   ...(filters.reportedFrom && filters.reportedTo
     ? { reportedTo: filters.reportedTo }
@@ -52,14 +57,17 @@ export const useAdminReportListFilters = () => {
       ),
     [searchParams]
   );
-  const urlSearch = filters.targetUserKeyword ?? '';
-  const [syncedSearch, setSyncedSearch] = useState(urlSearch);
-  const [targetUserSearch, setTargetUserSearch] = useState(urlSearch);
-
-  if (syncedSearch !== urlSearch) {
-    setSyncedSearch(urlSearch);
-    setTargetUserSearch(urlSearch);
-  }
+  const urlSearchValues = useMemo(
+    () => ({
+      id: filters.id ?? '',
+      userName: filters.userName ?? '',
+    }),
+    [filters.id, filters.userName]
+  );
+  const { drafts, handleFieldChange, commitDrafts, clearDrafts } =
+    useDraftSearchFields(urlSearchValues);
+  const [searchFieldErrors, setSearchFieldErrors] =
+    useState<EstimateRequestSearchFieldErrors>({});
 
   const listQuery = useMemo(() => toListQuery(filters), [filters]);
   const statisticsQuery = useMemo(
@@ -104,16 +112,34 @@ export const useAdminReportListFilters = () => {
     [filters, pathname]
   );
 
-  const handleTargetUserSearchChange = (event: ChangeEvent<HTMLInputElement>) =>
-    setTargetUserSearch(event.target.value);
+  const handleSearchFieldChange =
+    (key: 'id' | 'userName') => (event: ChangeEvent<HTMLInputElement>) => {
+      if (key === 'id') {
+        setSearchFieldErrors((previous) => {
+          if (!previous.id) {
+            return previous;
+          }
 
-  const handleTargetUserSearch = (value: string) => {
-    const trimmed = value.trim();
-    setTargetUserSearch(trimmed);
-    updateFilters(
-      { targetUserKeyword: trimmed.length > 0 ? trimmed : undefined },
-      { resetPage: true }
-    );
+          const next = { ...previous };
+          delete next.id;
+          return next;
+        });
+      }
+
+      handleFieldChange(key)(event);
+    };
+
+  const handleSearch = () => {
+    const patch = commitDrafts();
+    const errors = getSearchIdFieldErrors(patch.id ?? '');
+    setSearchFieldErrors(errors);
+
+    // 무효 필드가 있으면 URL·API에 반영하지 않는다.
+    if (hasSearchIdFieldErrors(errors)) {
+      return;
+    }
+
+    updateFilters(patch, { resetPage: true });
   };
 
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) =>
@@ -158,11 +184,13 @@ export const useAdminReportListFilters = () => {
   };
 
   const handleResetFilters = () => {
-    setTargetUserSearch('');
+    clearDrafts();
+    setSearchFieldErrors({});
     updateFilters({
       status: undefined,
       target: undefined,
-      targetUserKeyword: undefined,
+      id: undefined,
+      userName: undefined,
       reportedFrom: undefined,
       reportedTo: undefined,
       sort: 'DESC',
@@ -177,19 +205,21 @@ export const useAdminReportListFilters = () => {
 
   return {
     filters,
-    targetUserSearch,
+    searchDrafts: drafts,
+    searchFieldErrors,
     listQuery,
     statisticsQuery,
     dateRangeValue,
     hasActiveFilters: Boolean(
       filters.status ||
       filters.target ||
-      filters.targetUserKeyword ||
+      filters.id ||
+      filters.userName ||
       filters.reportedFrom ||
       filters.reportedTo
     ),
-    handleTargetUserSearchChange,
-    handleTargetUserSearch,
+    handleSearchFieldChange,
+    handleSearch,
     handleStatusChange,
     handleTargetChange,
     handleDateRangeConfirm,

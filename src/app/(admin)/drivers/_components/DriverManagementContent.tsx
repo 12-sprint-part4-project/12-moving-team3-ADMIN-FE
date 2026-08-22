@@ -37,7 +37,6 @@ export const DriverManagementContent = () => {
         title={t('members.mover.title')}
         description={t('members.mover.description')}
         caption={t('members.mover.caption')}
-        searchAriaLabel={t('members.mover.searchLabel')}
         emptyNoDataTitle={t('members.mover.empty')}
         errorTitle={t('members.mover.error')}
         getColumns={getColumns}
