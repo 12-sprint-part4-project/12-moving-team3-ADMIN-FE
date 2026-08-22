@@ -258,7 +258,9 @@
       "searchPlaceholder": "Search request ID, requester, or phone",
       "searchLabel": "Search estimate requests",
       "statusLabel": "Estimate request status",
-      "allDates": "All dates"
+      "allDates": "All dates",
+      "idInvalid": "Estimate ID must contain digits only.",
+      "phoneNumberInvalid": "Phone number must include at least one digit."
     },
     "status": {
       "all": "All statuses",
@@ -341,7 +343,9 @@
       "searchPlaceholder": "Search request ID, requester, or phone",
       "searchLabel": "Search completed moves",
       "moveTypeLabel": "Move type",
-      "allMoveDates": "All move dates"
+      "allMoveDates": "All move dates",
+      "idInvalid": "Estimate ID must contain digits only.",
+      "phoneNumberInvalid": "Phone number must include at least one digit."
     },
     "statistics": {
       "label": "Completed move statistics",

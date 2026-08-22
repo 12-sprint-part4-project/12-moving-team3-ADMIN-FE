@@ -26,12 +26,13 @@ export const CompletedManagementContent = () => {
   const selectedEstimateRequestId = parseNumericDetailId(detailId);
   const {
     filters,
-    searchInput,
+    searchDrafts,
+    searchFieldErrors,
     listQuery,
     statisticsQuery,
     hasActiveFilters,
     dateRangeValue,
-    handleSearchChange,
+    handleSearchFieldChange,
     handleSearch,
     handleMoveTypeChange,
     handleDateRangeConfirm,
@@ -77,10 +78,11 @@ export const CompletedManagementContent = () => {
         isError={isStatisticsError}
       />
       <CompletedFilter
-        searchValue={searchInput}
+        searchDrafts={searchDrafts}
+        searchFieldErrors={searchFieldErrors}
         moveTypeValue={filters.moveType ?? ''}
         dateRangeValue={dateRangeValue}
-        onSearchChange={handleSearchChange}
+        onSearchFieldChange={handleSearchFieldChange}
         onSearch={handleSearch}
         onMoveTypeChange={handleMoveTypeChange}
         onDateRangeConfirm={handleDateRangeConfirm}

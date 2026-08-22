@@ -28,7 +28,12 @@ export type AdminCompletedDetailMissingField =
 export interface AdminCompletedListQuery {
   page: number;
   pageSize: number;
-  search?: string;
+  /** 견적 요청 ID. BE adminCompletedListQuerySchema.id와 동일 */
+  id?: string;
+  /** 요청자 이름. BE adminCompletedListQuerySchema.userName과 동일 */
+  userName?: string;
+  /** 요청자 전화번호. BE adminCompletedListQuerySchema.phoneNumber와 동일 */
+  phoneNumber?: string;
   moveType?: AdminEstimateRequestMoveType;
   startDate?: string;
   endDate?: string;
