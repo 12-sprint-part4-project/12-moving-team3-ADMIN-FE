@@ -2,17 +2,25 @@ import { useTranslation } from 'react-i18next';
 
 import { DateRangePopover } from '@/components/DateRangePopover/DateRangePopover';
 import { FilterSelect } from '@/components/FilterSelect/FilterSelect';
-import { SearchInput } from '@/components/SearchInput/SearchInput';
+import { MultiFieldSearch } from '@/components/MultiFieldSearch/MultiFieldSearch';
 import { SearchResetButton } from '@/components/SearchResetButton/SearchResetButton';
 
-import type { ComponentProps } from 'react';
+import type { EstimateRequestSearchFieldErrors } from '@/utils/adminSearchFieldValidation';
+import type { ChangeEvent, ComponentProps } from 'react';
 
 interface EstimateFilterProps {
-  searchValue: string;
+  searchDrafts: {
+    id: string;
+    userName: string;
+    phoneNumber: string;
+  };
+  searchFieldErrors: EstimateRequestSearchFieldErrors;
   statusValue: string;
   dateRangeValue: ComponentProps<typeof DateRangePopover>['value'];
-  onSearchChange: ComponentProps<typeof SearchInput>['onChange'];
-  onSearch: ComponentProps<typeof SearchInput>['onSearch'];
+  onSearchFieldChange: (
+    key: 'id' | 'userName' | 'phoneNumber'
+  ) => (event: ChangeEvent<HTMLInputElement>) => void;
+  onSearch: () => void;
   onStatusChange: ComponentProps<typeof FilterSelect>['onChange'];
   onDateRangeConfirm: ComponentProps<typeof DateRangePopover>['onConfirm'];
   onReset: () => void;
@@ -20,10 +28,11 @@ interface EstimateFilterProps {
 
 /** 검색·상태·제출일 필터 UI만 담당하는 표현 컴포넌트. */
 export const EstimateFilter = ({
-  searchValue,
+  searchDrafts,
+  searchFieldErrors,
   statusValue,
   dateRangeValue,
-  onSearchChange,
+  onSearchFieldChange,
   onSearch,
   onStatusChange,
   onDateRangeConfirm,
@@ -35,14 +44,37 @@ export const EstimateFilter = ({
       className="mt-4 flex flex-wrap items-center gap-2"
       aria-label={t('estimates.filter.label')}
     >
-      <SearchInput
-        value={searchValue}
-        onChange={onSearchChange}
+      <MultiFieldSearch
+        fields={[
+          {
+            name: 'id',
+            value: searchDrafts.id,
+            placeholder: t('estimates.fields.id'),
+            'aria-label': t('estimates.fields.id'),
+            errorMessage: searchFieldErrors.id
+              ? t('estimates.filter.idInvalid')
+              : undefined,
+            onChange: onSearchFieldChange('id'),
+          },
+          {
+            name: 'userName',
+            value: searchDrafts.userName,
+            placeholder: t('estimates.fields.userName'),
+            'aria-label': t('estimates.fields.userName'),
+            onChange: onSearchFieldChange('userName'),
+          },
+          {
+            name: 'phoneNumber',
+            value: searchDrafts.phoneNumber,
+            placeholder: t('estimates.fields.phoneNumber'),
+            'aria-label': t('estimates.fields.phoneNumber'),
+            errorMessage: searchFieldErrors.phoneNumber
+              ? t('estimates.filter.phoneNumberInvalid')
+              : undefined,
+            onChange: onSearchFieldChange('phoneNumber'),
+          },
+        ]}
         onSearch={onSearch}
-        placeholder={t('estimates.filter.searchPlaceholder')}
-        searchAction="button"
-        aria-label={t('estimates.filter.searchLabel')}
-        className="min-w-64 flex-1"
       />
       <FilterSelect
         aria-label={t('estimates.filter.statusLabel')}

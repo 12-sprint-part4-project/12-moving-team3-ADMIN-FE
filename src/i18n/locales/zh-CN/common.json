@@ -243,7 +243,9 @@
       "searchPlaceholder": "搜索请求编号、申请人或手机号",
       "searchLabel": "搜索报价请求",
       "statusLabel": "报价请求状态",
-      "allDates": "全部日期"
+      "allDates": "全部日期",
+      "idInvalid": "请求编号只能输入数字。",
+      "phoneNumberInvalid": "手机号至少需要包含一个数字。"
     },
     "status": {
       "all": "全部状态",
@@ -326,7 +328,9 @@
       "searchPlaceholder": "搜索请求编号、申请人或手机号",
       "searchLabel": "搜索已完成订单",
       "moveTypeLabel": "搬家类型",
-      "allMoveDates": "全部搬家日期"
+      "allMoveDates": "全部搬家日期",
+      "idInvalid": "请求编号只能输入数字。",
+      "phoneNumberInvalid": "手机号至少需要包含一个数字。"
     },
     "statistics": {
       "label": "已完成订单统计",

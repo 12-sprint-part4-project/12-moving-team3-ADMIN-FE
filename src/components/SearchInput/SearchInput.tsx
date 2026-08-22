@@ -48,8 +48,13 @@ export interface SearchInputProps
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   /** 검색 버튼 클릭 또는 Enter 입력 시 호출. 현재 입력값을 인자로 전달한다. */
   onSearch?: (value: string) => void;
-  /** icon은 돋보기 클릭, button은 입력창 옆 텍스트 버튼으로 검색한다. */
-  searchAction?: 'icon' | 'button';
+  /**
+   * icon은 돋보기 클릭, button은 입력창 옆 텍스트 버튼으로 검색한다.
+   * none은 장식용 아이콘만 두고 Enter로만 검색한다(다중 필드 검색용).
+   */
+  searchAction?: 'icon' | 'button' | 'none';
+  /** true면 오류 테두리와 aria-invalid를 적용한다. */
+  invalid?: boolean;
   className?: string;
 }
 
@@ -61,6 +66,7 @@ export const SearchInput = ({
   onChange,
   onSearch,
   searchAction = 'icon',
+  invalid = false,
   onKeyDown,
   className,
   id,
@@ -75,6 +81,7 @@ export const SearchInput = ({
   const resolvedPlaceholder = placeholder ?? t('common.search');
   const resolvedAriaLabel =
     ariaLabel ?? (ariaLabelledBy ? undefined : resolvedPlaceholder);
+  const showInvalid = Boolean(invalid) && !disabled;
 
   const handleSearch = (searchValue?: string) => {
     if (disabled) {
@@ -101,7 +108,10 @@ export const SearchInput = ({
     <div
       className={cn(
         SEARCH_INPUT_VARIANTS({ disabled }),
-        searchAction === 'button' ? 'min-w-0 flex-1' : className
+        showInvalid && 'border-red-200 focus-within:border-red-200',
+        searchAction === 'button' || searchAction === 'none'
+          ? 'min-w-0 flex-1'
+          : className
       )}
       data-disabled={disabled || undefined}
     >
@@ -141,6 +151,7 @@ export const SearchInput = ({
         autoComplete={autoComplete ?? 'off'}
         aria-label={resolvedAriaLabel}
         aria-labelledby={ariaLabelledBy}
+        aria-invalid={showInvalid || undefined}
         onChange={onChange}
         onKeyDown={handleKeyDown}
         className={cn(
@@ -165,6 +176,10 @@ export const SearchInput = ({
         </Button>
       </div>
     );
+  }
+
+  if (searchAction === 'none') {
+    return <div className={cn('flex min-w-0', className)}>{input}</div>;
   }
 
   return input;

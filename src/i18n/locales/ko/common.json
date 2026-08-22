@@ -243,7 +243,9 @@
       "searchPlaceholder": "견적 번호, 요청자 이름, 전화번호 검색",
       "searchLabel": "견적 요청 검색",
       "statusLabel": "견적 요청 상태",
-      "allDates": "기간 전체"
+      "allDates": "기간 전체",
+      "idInvalid": "견적 번호는 숫자만 입력해 주세요.",
+      "phoneNumberInvalid": "전화번호는 숫자를 포함해 입력해 주세요."
     },
     "status": {
       "all": "상태 전체",
@@ -326,7 +328,9 @@
       "searchPlaceholder": "견적 번호, 요청자 이름, 전화번호 검색",
       "searchLabel": "완료 건 검색",
       "moveTypeLabel": "이사 유형",
-      "allMoveDates": "이사일 기간 전체"
+      "allMoveDates": "이사일 기간 전체",
+      "idInvalid": "견적 번호는 숫자만 입력해 주세요.",
+      "phoneNumberInvalid": "전화번호는 숫자를 포함해 입력해 주세요."
     },
     "statistics": {
       "label": "완료 건 통계",

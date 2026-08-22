@@ -21,7 +21,12 @@ export type AdminEstimateRequestDetailMissingField =
 export interface AdminEstimateRequestListQuery {
   page: number;
   pageSize: number;
-  search?: string;
+  /** 견적 요청 ID. BE adminEstimateRequestListQuerySchema.id와 동일 */
+  id?: string;
+  /** 요청자 이름. BE adminEstimateRequestListQuerySchema.userName과 동일 */
+  userName?: string;
+  /** 요청자 전화번호. BE adminEstimateRequestListQuerySchema.phoneNumber와 동일 */
+  phoneNumber?: string;
   status?: AdminEstimateRequestStatus;
   startDate?: string;
   endDate?: string;

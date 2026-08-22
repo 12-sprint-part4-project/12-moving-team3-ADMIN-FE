@@ -1,3 +1,8 @@
+import {
+  isValidSearchId,
+  isValidSearchPhoneNumber,
+} from './adminSearchFieldValidation.ts';
+
 import type { AdminChatRoomType } from '@/types/adminChat';
 import type {
   AdminEstimateRequestMoveType,
@@ -266,7 +271,9 @@ export const createAdminReportListHref = (
   });
 
 export interface AdminEstimateRequestUrlFilters {
-  search?: string;
+  id?: string;
+  userName?: string;
+  phoneNumber?: string;
   status?: AdminEstimateRequestStatus;
   startDate?: string;
   endDate?: string;
@@ -276,7 +283,9 @@ export interface AdminEstimateRequestUrlFilters {
 }
 
 const ESTIMATE_REQUEST_QUERY_KEYS = [
-  'search',
+  'id',
+  'userName',
+  'phoneNumber',
   'status',
   'startDate',
   'endDate',
@@ -289,7 +298,15 @@ export const ESTIMATE_REQUEST_STATUSES: readonly AdminEstimateRequestStatus[] =
 export const parseAdminEstimateRequestSearchParams = (
   searchParams: URLSearchParams
 ): AdminEstimateRequestUrlFilters => {
-  const search = searchParams.get('search')?.trim() || undefined;
+  const rawId = searchParams.get('id')?.trim() || undefined;
+  const userName = searchParams.get('userName')?.trim() || undefined;
+  const rawPhoneNumber = searchParams.get('phoneNumber')?.trim() || undefined;
+  // URL 직접 입력 시 무효 값은 필터에서 제외해 API로 보내지 않는다.
+  const id = rawId && isValidSearchId(rawId) ? rawId : undefined;
+  const phoneNumber =
+    rawPhoneNumber && isValidSearchPhoneNumber(rawPhoneNumber)
+      ? rawPhoneNumber
+      : undefined;
   const status = parseAdminListEnum(
     searchParams.get('status'),
     ESTIMATE_REQUEST_STATUSES
@@ -300,7 +317,9 @@ export const parseAdminEstimateRequestSearchParams = (
   );
 
   return {
-    ...(search ? { search } : {}),
+    ...(id ? { id } : {}),
+    ...(userName ? { userName } : {}),
+    ...(phoneNumber ? { phoneNumber } : {}),
     ...(status ? { status } : {}),
     ...(startDate ? { startDate } : {}),
     ...(endDate ? { endDate } : {}),
@@ -316,7 +335,9 @@ export const createAdminEstimateRequestListHref = (
   filters: AdminEstimateRequestUrlFilters
 ) =>
   createAdminListHref(pathname, searchParams, ESTIMATE_REQUEST_QUERY_KEYS, {
-    search: filters.search,
+    id: filters.id,
+    userName: filters.userName,
+    phoneNumber: filters.phoneNumber,
     status: filters.status,
     startDate: filters.startDate,
     endDate: filters.endDate,
@@ -325,7 +346,9 @@ export const createAdminEstimateRequestListHref = (
   });
 
 export interface AdminCompletedUrlFilters {
-  search?: string;
+  id?: string;
+  userName?: string;
+  phoneNumber?: string;
   moveType?: AdminEstimateRequestMoveType;
   startDate?: string;
   endDate?: string;
@@ -335,7 +358,9 @@ export interface AdminCompletedUrlFilters {
 }
 
 const COMPLETED_QUERY_KEYS = [
-  'search',
+  'id',
+  'userName',
+  'phoneNumber',
   'moveType',
   'startDate',
   'endDate',
@@ -351,7 +376,15 @@ export const COMPLETED_MOVE_TYPES: readonly AdminEstimateRequestMoveType[] = [
 export const parseAdminCompletedSearchParams = (
   searchParams: URLSearchParams
 ): AdminCompletedUrlFilters => {
-  const search = searchParams.get('search')?.trim() || undefined;
+  const rawId = searchParams.get('id')?.trim() || undefined;
+  const userName = searchParams.get('userName')?.trim() || undefined;
+  const rawPhoneNumber = searchParams.get('phoneNumber')?.trim() || undefined;
+  // URL 직접 입력 시 무효 값은 필터에서 제외해 API로 보내지 않는다.
+  const id = rawId && isValidSearchId(rawId) ? rawId : undefined;
+  const phoneNumber =
+    rawPhoneNumber && isValidSearchPhoneNumber(rawPhoneNumber)
+      ? rawPhoneNumber
+      : undefined;
   const moveType = parseAdminListEnum(
     searchParams.get('moveType'),
     COMPLETED_MOVE_TYPES
@@ -362,7 +395,9 @@ export const parseAdminCompletedSearchParams = (
   );
 
   return {
-    ...(search ? { search } : {}),
+    ...(id ? { id } : {}),
+    ...(userName ? { userName } : {}),
+    ...(phoneNumber ? { phoneNumber } : {}),
     ...(moveType ? { moveType } : {}),
     ...(startDate ? { startDate } : {}),
     ...(endDate ? { endDate } : {}),
@@ -378,7 +413,9 @@ export const createAdminCompletedListHref = (
   filters: AdminCompletedUrlFilters
 ) =>
   createAdminListHref(pathname, searchParams, COMPLETED_QUERY_KEYS, {
-    search: filters.search,
+    id: filters.id,
+    userName: filters.userName,
+    phoneNumber: filters.phoneNumber,
     moveType: filters.moveType,
     startDate: filters.startDate,
     endDate: filters.endDate,
