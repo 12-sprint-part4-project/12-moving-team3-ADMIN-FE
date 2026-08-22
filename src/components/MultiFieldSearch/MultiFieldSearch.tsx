@@ -1,12 +1,11 @@
 'use client';
 
+import { useId, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/Button/Button';
 import { SearchInput } from '@/components/SearchInput/SearchInput';
 import { cn } from '@/lib/utils';
-
-import type { ChangeEvent } from 'react';
 
 export interface MultiFieldSearchField {
   name: string;
@@ -36,6 +35,7 @@ export const MultiFieldSearch = ({
   className,
 }: MultiFieldSearchProps) => {
   const { t } = useTranslation();
+  const instanceId = useId();
 
   return (
     <div
@@ -46,7 +46,7 @@ export const MultiFieldSearch = ({
     >
       {fields.map((field) => {
         const hasError = Boolean(field.errorMessage);
-        const errorId = `${field.name}-search-error`;
+        const errorId = `${instanceId}-${field.name}-search-error`;
 
         return (
           <div key={field.name} className="flex min-w-40 flex-1 flex-col gap-1">
