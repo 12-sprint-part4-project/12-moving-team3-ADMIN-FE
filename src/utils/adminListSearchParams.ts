@@ -1,7 +1,7 @@
 import {
   isValidSearchId,
   isValidSearchPhoneNumber,
-} from '@/utils/adminSearchFieldValidation';
+} from './adminSearchFieldValidation.ts';
 
 import type { AdminChatRoomType } from '@/types/adminChat';
 import type {
