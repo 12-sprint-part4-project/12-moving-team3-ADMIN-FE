@@ -63,27 +63,39 @@ export const formatAdminEstimateRequestNullableText = (
   return value;
 };
 
+interface AdminEstimateRequestNameWithNickname {
+  name: string;
+  nickname: string | null;
+}
+
 /**
- * 이름 옆에 닉네임을 보조 표기한다.
+ * 견적 기사 표시명.
  * 닉네임이 없거나 이름과 같으면 이름만 반환한다.
+ * 이름이 없으면 닉네임을 본문으로 사용한다.
  */
-export const formatAdminEstimateRequestNameWithNickname = (
+export const getAdminEstimateRequestNameWithNickname = (
   name: string | null | undefined,
   nickname: string | null | undefined
-) => {
+): AdminEstimateRequestNameWithNickname => {
   const trimmedName = name?.trim();
   const displayName = formatAdminEstimateRequestNullableText(trimmedName);
   const trimmedNickname = nickname?.trim();
 
   if (displayName === '-') {
-    return formatAdminEstimateRequestNullableText(trimmedNickname);
+    return {
+      name: formatAdminEstimateRequestNullableText(trimmedNickname),
+      nickname: null,
+    };
   }
 
   if (trimmedNickname && trimmedNickname !== trimmedName) {
-    return `${displayName} (${trimmedNickname})`;
+    return {
+      name: displayName,
+      nickname: trimmedNickname,
+    };
   }
 
-  return displayName;
+  return { name: displayName, nickname: null };
 };
 
 export const formatAdminEstimateRequestSubmittedAt = (
