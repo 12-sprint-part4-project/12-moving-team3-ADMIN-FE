@@ -1,12 +1,13 @@
 import { format } from 'date-fns';
 
-import { formatAdminEstimateQuotePrice } from '@/utils/adminEstimateRequest';
-
+import { formatAdminEstimateQuotePrice } from './adminEstimateRequest.ts';
 import { formatLocalizedDate } from './formatLocalizedDate.ts';
 
 import type {
   AdminCompletedDetailMissingField,
+  AdminCompletedDetailQuery,
   AdminCompletedListMissingField,
+  AdminCompletedListQuery,
   AdminCompletedStatisticsQuery,
 } from '@/types/adminCompleted';
 import type { TFunction } from 'i18next';
@@ -73,6 +74,28 @@ export const formatAdminCompletedMissingFields = (
 
     return field;
   });
+
+/**
+ * 목록 query → 상세 앞뒤 조회 query.
+ * page/pageSize는 빼고 검색·이사 유형·기간·정렬만 남긴다.
+ */
+export const toAdminCompletedDetailQuery = ({
+  id,
+  userName,
+  phoneNumber,
+  moveType,
+  startDate,
+  endDate,
+  sort,
+}: AdminCompletedListQuery): AdminCompletedDetailQuery => ({
+  ...(id ? { id } : {}),
+  ...(userName ? { userName } : {}),
+  ...(phoneNumber ? { phoneNumber } : {}),
+  ...(moveType ? { moveType } : {}),
+  ...(startDate ? { startDate } : {}),
+  ...(startDate && endDate ? { endDate } : {}),
+  ...(sort ? { sort } : {}),
+});
 
 /**
  * 목록 기간 필터 → 통계 query.

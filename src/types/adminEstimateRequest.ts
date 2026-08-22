@@ -34,6 +34,15 @@ export interface AdminEstimateRequestListQuery {
   sort?: AdminListSortDirection;
 }
 
+/**
+ * 상세 앞뒤 조회 query.
+ * BE adminEstimateRequestDetailQuerySchema와 동일하며 목록에서 page/pageSize만 제외한다.
+ */
+export type AdminEstimateRequestDetailQuery = Omit<
+  AdminEstimateRequestListQuery,
+  'page' | 'pageSize'
+>;
+
 export interface AdminEstimateRequestListItem {
   id: number;
   userName: string;
@@ -110,6 +119,10 @@ export interface AdminEstimateRequestDetail {
   deletedQuotesCount: number;
   activeQuotes: AdminEstimateQuote[];
   deletedQuotes: AdminEstimateQuote[];
+  /** 목록 필터·정렬 기준 이전 건. 없으면 null */
+  prevId: number | null;
+  /** 목록 필터·정렬 기준 다음 건. 없으면 null */
+  nextId: number | null;
   /** 상태 불변식상 있어야 하지만 null인 필드명. 정상이면 빈 배열 */
   missingFields: AdminEstimateRequestDetailMissingField[];
 }

@@ -41,6 +41,15 @@ export interface AdminCompletedListQuery {
   sort?: AdminListSortDirection;
 }
 
+/**
+ * 상세 앞뒤 조회 query.
+ * BE adminCompletedDetailQuerySchema와 동일하며 목록에서 page/pageSize만 제외한다.
+ */
+export type AdminCompletedDetailQuery = Omit<
+  AdminCompletedListQuery,
+  'page' | 'pageSize'
+>;
+
 export interface AdminCompletedListItem {
   id: number;
   userName: string;
@@ -109,6 +118,10 @@ export interface AdminCompletedDetail {
   /** ISO date-time. 누락 시 null */
   moveDate: string | null;
   confirmedQuote: AdminConfirmedQuote | null;
+  /** 목록 필터·정렬 기준 이전 건. 없으면 null */
+  prevId: number | null;
+  /** 목록 필터·정렬 기준 다음 건. 없으면 null */
+  nextId: number | null;
   missingFields: AdminCompletedDetailMissingField[];
 }
 

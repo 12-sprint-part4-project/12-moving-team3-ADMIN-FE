@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { AdminDetailQueryBody } from '@/components/AdminDetailQueryBody/AdminDetailQueryBody';
 import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
+import { DetailNavigation } from '@/components/DetailNavigation/DetailNavigation';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { useAdminEstimateRequestDetail } from '@/hooks/useAdminEstimateRequestDetail';
@@ -19,15 +20,20 @@ import {
   formatAdminEstimateRequestSubmittedAt,
   hasAdminEstimateRequestMissingFields,
 } from '@/utils/adminEstimateRequest';
+import { isDetailNeighborId } from '@/utils/detailNavigation';
 
 import type {
   AdminEstimateQuote,
   AdminEstimateRequestDetail,
+  AdminEstimateRequestDetailQuery,
 } from '@/types/adminEstimateRequest';
 
 export interface EstimateDetailDrawerProps {
   /** 목록에서 선택한 견적 요청 ID. null이면 Drawer를 닫는다. */
   estimateRequestId: number | null;
+  /** 목록과 동일한 필터·정렬. page/pageSize는 포함하지 않는다. */
+  detailQuery: AdminEstimateRequestDetailQuery;
+  onNavigate: (estimateRequestId: number) => void;
   onClose: () => void;
 }
 
@@ -223,24 +229,57 @@ const EstimateDetailContent = ({ detail }: EstimateDetailContentProps) => {
  * 견적 요청 상세 Drawer.
  * 열림 여부는 estimateRequestId로 계산한다. 조회와 본문 상태 분기는 AdminDetailQueryBody에 맡긴다.
  * 필수값 누락 건은 500이 아니라 missingFields로 내려오므로 본문에서 원인을 표시한다.
+ * 상세 응답의 prevId/nextId로 목록 필터 기준 이전·다음 건으로 이동한다.
  */
 export const EstimateDetailDrawer = ({
   estimateRequestId,
+  detailQuery,
+  onNavigate,
   onClose,
 }: EstimateDetailDrawerProps) => {
   const { t } = useTranslation();
+  const detailQueryResult = useAdminEstimateRequestDetail(estimateRequestId, {
+    query: detailQuery,
+  });
+  const currentDetail =
+    detailQueryResult.isSuccess &&
+    detailQueryResult.data?.data.id === estimateRequestId
+      ? detailQueryResult.data.data
+      : null;
+  const handleNavigate = (id: number) => {
+    if (!isDetailNeighborId(id, currentDetail)) {
+      return;
+    }
+
+    onNavigate(id);
+  };
+  // 같은 조회 결과를 본문과 footer가 공유하도록, 훅은 여기서 한 번만 호출한다.
+  const useDetail = () => detailQueryResult;
+
   return (
     <DetailDrawer
       open={estimateRequestId != null}
       title={t('estimates.detail.title')}
       onClose={onClose}
       size="md"
+      footer={
+        estimateRequestId != null ? (
+          <DetailNavigation
+            prevId={currentDetail?.prevId ?? null}
+            nextId={currentDetail?.nextId ?? null}
+            previousLabel={t('estimates.detail.previous')}
+            nextLabel={t('estimates.detail.next')}
+            disabled={currentDetail == null}
+            onNavigate={handleNavigate}
+          />
+        ) : undefined
+      }
     >
       {estimateRequestId != null ? (
         // id가 있을 때만 본문을 마운트해서 estimateRequestId를 number로 좁힌다.
         <AdminDetailQueryBody
           id={estimateRequestId}
-          useDetail={useAdminEstimateRequestDetail}
+          useDetail={useDetail}
           notFoundTitle={t('estimates.detail.notFound')}
           errorTitle={t('estimates.detail.error')}
           errorDescription={t('estimates.common.retry')}

@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
 import { useDraftSearchFields } from '@/hooks/useDraftSearchFields';
 import {
   toAdminEstimateRequestApiDate,
+  toAdminEstimateRequestDetailQuery,
   toAdminEstimateRequestStatisticsQuery,
 } from '@/utils/adminEstimateRequest';
 import {
@@ -26,7 +27,7 @@ import type { AdminEstimateRequestUrlFilters } from '@/utils/adminListSearchPara
 export type AdminEstimateRequestListFilters = AdminEstimateRequestUrlFilters;
 
 /**
- * UI 필터 → API query.
+ * UI 필터 → 목록 API query.
  * undefined·빈 값은 객체에 넣지 않아 axios query string에서 빠진다.
  */
 const toListQuery = (
@@ -34,13 +35,7 @@ const toListQuery = (
 ): AdminEstimateRequestListQuery => ({
   page: filters.page,
   pageSize: filters.pageSize,
-  sort: filters.sort,
-  ...(filters.id ? { id: filters.id } : {}),
-  ...(filters.userName ? { userName: filters.userName } : {}),
-  ...(filters.phoneNumber ? { phoneNumber: filters.phoneNumber } : {}),
-  ...(filters.status ? { status: filters.status } : {}),
-  ...(filters.startDate ? { startDate: filters.startDate } : {}),
-  ...(filters.startDate && filters.endDate ? { endDate: filters.endDate } : {}),
+  ...toAdminEstimateRequestDetailQuery(filters),
 });
 
 /**
@@ -72,6 +67,10 @@ export const useAdminEstimateRequestListFilters = () => {
     useState<EstimateRequestSearchFieldErrors>({});
 
   const listQuery = useMemo(() => toListQuery(filters), [filters]);
+  const detailQuery = useMemo(
+    () => toAdminEstimateRequestDetailQuery(filters),
+    [filters]
+  );
   const statisticsQuery = useMemo(
     () =>
       toAdminEstimateRequestStatisticsQuery(filters.startDate, filters.endDate),
@@ -80,11 +79,11 @@ export const useAdminEstimateRequestListFilters = () => {
 
   const hasActiveFilters = Boolean(
     filters.id ||
-      filters.userName ||
-      filters.phoneNumber ||
-      filters.status ||
-      filters.startDate ||
-      filters.endDate
+    filters.userName ||
+    filters.phoneNumber ||
+    filters.status ||
+    filters.startDate ||
+    filters.endDate
   );
 
   const dateRangeValue = useMemo<DateRangePopoverProps['value']>(() => {
@@ -226,6 +225,7 @@ export const useAdminEstimateRequestListFilters = () => {
     searchDrafts: drafts,
     searchFieldErrors,
     listQuery,
+    detailQuery,
     statisticsQuery,
     hasActiveFilters,
     dateRangeValue,

@@ -6,7 +6,9 @@ import type { StatusBadgeProps } from '@/components/StatusBadge/StatusBadge';
 import type {
   AdminEstimateQuoteStatus,
   AdminEstimateRequestDetailMissingField,
+  AdminEstimateRequestDetailQuery,
   AdminEstimateRequestListMissingField,
+  AdminEstimateRequestListQuery,
   AdminEstimateRequestMoveType,
   AdminEstimateRequestStatisticsQuery,
   AdminEstimateRequestStatus,
@@ -181,6 +183,28 @@ export const formatAdminEstimateRequestMissingFields = (
 
     return field;
   });
+
+/**
+ * 목록 query → 상세 앞뒤 조회 query.
+ * page/pageSize는 빼고 검색·상태·기간·정렬만 남긴다.
+ */
+export const toAdminEstimateRequestDetailQuery = ({
+  id,
+  userName,
+  phoneNumber,
+  status,
+  startDate,
+  endDate,
+  sort,
+}: AdminEstimateRequestListQuery): AdminEstimateRequestDetailQuery => ({
+  ...(id ? { id } : {}),
+  ...(userName ? { userName } : {}),
+  ...(phoneNumber ? { phoneNumber } : {}),
+  ...(status ? { status } : {}),
+  ...(startDate ? { startDate } : {}),
+  ...(startDate && endDate ? { endDate } : {}),
+  ...(sort ? { sort } : {}),
+});
 
 /**
  * 목록 기간 필터 → 통계 query.

@@ -1,4 +1,5 @@
 import type {
+  AdminCompletedDetailQuery,
   AdminCompletedListQuery,
   AdminCompletedStatisticsQuery,
 } from '@/types/adminCompleted';
@@ -11,6 +12,13 @@ export const ADMIN_COMPLETED_QUERY_KEYS = {
   statistics: (params?: AdminCompletedStatisticsQuery) =>
     [...ADMIN_COMPLETED_QUERY_KEYS.all, 'statistics', params] as const,
   details: () => [...ADMIN_COMPLETED_QUERY_KEYS.all, 'detail'] as const,
-  detail: (estimateRequestId: number | null) =>
-    [...ADMIN_COMPLETED_QUERY_KEYS.details(), estimateRequestId] as const,
+  detail: (
+    estimateRequestId: number | null,
+    params?: AdminCompletedDetailQuery
+  ) =>
+    [
+      ...ADMIN_COMPLETED_QUERY_KEYS.details(),
+      estimateRequestId,
+      params,
+    ] as const,
 };
