@@ -586,7 +586,9 @@
       "missingTargetContent": "The content cannot be displayed because the target does not exist.",
       "noContent": "There is no reported content.",
       "noProfile": "Profile information is unavailable.",
-      "deletedContentHint": "This content has been deleted and is no longer visible."
+      "deletedContentHint": "This content has been deleted and is no longer visible.",
+      "previous": "Previous",
+      "next": "Next"
     },
     "action": {
       "SUSPEND_TARGET_USER": "Suspend for 7 Days",

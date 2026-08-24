@@ -122,6 +122,15 @@ export interface AdminReportListQuery {
   pageSize?: number;
 }
 
+/**
+ * 상세 앞뒤 조회 query.
+ * BE adminReportDetailQuerySchema와 동일하며 목록에서 page/pageSize만 제외한다.
+ */
+export type AdminReportDetailQuery = Omit<
+  AdminReportListQuery,
+  'page' | 'pageSize'
+>;
+
 /** GET /api/admin/reports 목록 아이템 */
 export interface AdminReportListItem {
   id: number;
@@ -388,6 +397,10 @@ export interface AdminReportDetail {
    */
   reportedContent: AdminReportDetailReportedContent | null;
   availableActions: AdminReportAvailableActions;
+  /** 목록 필터·정렬 기준 이전 건. 없으면 null */
+  prevId: number | null;
+  /** 목록 필터·정렬 기준 다음 건. 없으면 null */
+  nextId: number | null;
 }
 
 /** GET /api/admin/reports/:reportId 성공 응답 */

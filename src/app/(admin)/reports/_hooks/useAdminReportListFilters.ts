@@ -7,7 +7,10 @@ import {
   createAdminReportListHref,
   parseAdminReportSearchParams,
 } from '@/utils/adminListSearchParams';
-import { toAdminReportStatisticsQuery } from '@/utils/adminReport';
+import {
+  toAdminReportDetailQuery,
+  toAdminReportStatisticsQuery,
+} from '@/utils/adminReport';
 import {
   getSearchIdFieldErrors,
   hasSearchIdFieldErrors,
@@ -70,6 +73,10 @@ export const useAdminReportListFilters = () => {
     useState<EstimateRequestSearchFieldErrors>({});
 
   const listQuery = useMemo(() => toListQuery(filters), [filters]);
+  const detailQuery = useMemo(
+    () => toAdminReportDetailQuery(listQuery),
+    [listQuery]
+  );
   const statisticsQuery = useMemo(
     () =>
       toAdminReportStatisticsQuery(filters.reportedFrom, filters.reportedTo),
@@ -208,6 +215,7 @@ export const useAdminReportListFilters = () => {
     searchDrafts: drafts,
     searchFieldErrors,
     listQuery,
+    detailQuery,
     statisticsQuery,
     dateRangeValue,
     hasActiveFilters: Boolean(

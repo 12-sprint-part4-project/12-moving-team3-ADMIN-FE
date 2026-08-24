@@ -568,7 +568,9 @@
       "missingTargetContent": "举报目标不存在，无法显示内容。",
       "noContent": "没有被举报的内容。",
       "noProfile": "没有个人资料信息。",
-      "deletedContentHint": "该内容已删除，当前不再显示。"
+      "deletedContentHint": "该内容已删除，当前不再显示。",
+      "previous": "上一项",
+      "next": "下一项"
     },
     "action": {
       "SUSPEND_TARGET_USER": "停用 7 天",

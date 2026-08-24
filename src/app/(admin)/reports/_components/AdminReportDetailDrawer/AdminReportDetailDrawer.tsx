@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/Button/Button';
 import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
+import { DetailNavigation } from '@/components/DetailNavigation/DetailNavigation';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import {
@@ -12,6 +13,7 @@ import {
   useResolveAdminReport,
 } from '@/hooks/useAdminReportDecisionMutation';
 import { useAdminReportDetail } from '@/hooks/useAdminReportDetail';
+import { isDetailNeighborId } from '@/utils/detailNavigation';
 
 import { AdminReportDecisionSuccessToast } from './AdminReportDecisionSuccessToast';
 import { AdminReportRejectConfirmModal } from './AdminReportRejectConfirmModal';
@@ -28,6 +30,7 @@ import { ReportTargetInfoSection } from './ReportTargetInfoSection';
 
 import type {
   AdminReportDetail,
+  AdminReportDetailQuery,
   AdminReportProcessAction,
 } from '@/types/adminReport';
 
@@ -35,6 +38,9 @@ export interface AdminReportDetailDrawerProps {
   open: boolean;
   /** 목록에서 선택한 신고 ID. null이면 상세 요청을 하지 않는다. */
   reportId: number | null;
+  /** 목록과 동일한 필터·정렬. prevId/nextId 계산에 넘긴다. */
+  detailQuery: AdminReportDetailQuery;
+  onNavigate: (reportId: number) => void;
   onClose: () => void;
 }
 
@@ -105,6 +111,7 @@ interface ReportDetailDrawerChromeProps {
   error: unknown;
   onClose: () => void;
   onRetry: () => void;
+  onNavigate: (reportId: number) => void;
 }
 
 /**
@@ -122,6 +129,7 @@ const ReportDetailDrawerChrome = ({
   error,
   onClose,
   onRetry,
+  onNavigate,
 }: ReportDetailDrawerChromeProps) => {
   const { t } = useTranslation();
   const [selectedActions, setSelectedActions] = useState<
@@ -298,8 +306,27 @@ const ReportDetailDrawerChrome = ({
     );
   };
 
-  // PENDING 상세가 있을 때만 footer를 둔다. 처리·반려 후에는 숨겨 Action 재실행을 막는다.
-  const footer =
+  const handleNavigate = (id: number) => {
+    if (!isDetailNeighborId(id, detail)) {
+      return;
+    }
+
+    onNavigate(id);
+  };
+
+  const navigation =
+    displayReportId != null ? (
+      <DetailNavigation
+        prevId={detail?.prevId ?? null}
+        nextId={detail?.nextId ?? null}
+        previousLabel={t('reports.detail.previous')}
+        nextLabel={t('reports.detail.next')}
+        disabled={detail == null}
+        onNavigate={handleNavigate}
+      />
+    ) : null;
+
+  const actionFooter =
     detail && isReportPending ? (
       <div className="flex gap-2">
         <Button
@@ -319,6 +346,14 @@ const ReportDetailDrawerChrome = ({
           {t('reports.resolve.action')}
         </Button>
       </div>
+    ) : null;
+
+  const footer =
+    navigation || actionFooter ? (
+      <>
+        {actionFooter}
+        {navigation}
+      </>
     ) : undefined;
 
   return (
@@ -372,6 +407,8 @@ const ReportDetailDrawerChrome = ({
 export const AdminReportDetailDrawer = ({
   open,
   reportId,
+  detailQuery,
+  onNavigate,
   onClose,
 }: AdminReportDetailDrawerProps) => {
   // 닫기 시 reportId=null이 되어도 직전 선택을 유지한다. 새 선택이 있을 때만 갱신한다.
@@ -386,6 +423,7 @@ export const AdminReportDetailDrawer = ({
 
   const { data, error, isPending, isFetching, isError, refetch } =
     useAdminReportDetail(activeReportId, {
+      query: detailQuery,
       // 실제로 열려 있고 목록 선택이 있을 때만 조회한다. 닫힌 동안은 refetch하지 않는다.
       enabled: open && reportId != null,
     });
@@ -410,6 +448,7 @@ export const AdminReportDetailDrawer = ({
       onRetry={() => {
         void refetch();
       }}
+      onNavigate={onNavigate}
     />
   );
 };
