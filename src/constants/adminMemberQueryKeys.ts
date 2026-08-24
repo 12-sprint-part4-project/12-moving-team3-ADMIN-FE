@@ -1,4 +1,7 @@
-import type { AdminMemberListQuery } from '@/types/adminMember';
+import type {
+  AdminMemberDetailQuery,
+  AdminMemberListQuery,
+} from '@/types/adminMember';
 
 /**
  * 관리자 회원 조회용 queryKey.
@@ -10,6 +13,6 @@ export const ADMIN_MEMBER_QUERY_KEYS = {
   list: (params?: AdminMemberListQuery) =>
     [...ADMIN_MEMBER_QUERY_KEYS.lists(), params] as const,
   details: () => [...ADMIN_MEMBER_QUERY_KEYS.all, 'detail'] as const,
-  detail: (memberId: string) =>
-    [...ADMIN_MEMBER_QUERY_KEYS.details(), memberId] as const,
+  detail: (memberId: string | null, params?: AdminMemberDetailQuery) =>
+    [...ADMIN_MEMBER_QUERY_KEYS.details(), memberId, params] as const,
 };

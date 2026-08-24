@@ -1,10 +1,16 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 
 import { AdminMemberListView } from '@/components/AdminMemberListView/AdminMemberListView';
 import { useDetailSearchParam } from '@/hooks/useDetailSearchParam';
+import {
+  buildAdminMemberListQuery,
+  toAdminMemberDetailQuery,
+} from '@/utils/adminMember';
+import { parseAdminMemberListSearchParams } from '@/utils/adminMemberListSearchParams';
 import { parseUuidDetailId } from '@/utils/detailSearchParams';
 
 import { AdminCustomerDetailDrawer } from './AdminCustomerDetailDrawer';
@@ -16,6 +22,18 @@ import { getMemberListColumns } from './getMemberListColumns';
  */
 export const MemberManagementContent = () => {
   const { t, i18n } = useTranslation();
+  const searchParams = useSearchParams();
+  const filters = useMemo(
+    () =>
+      parseAdminMemberListSearchParams(
+        new URLSearchParams(searchParams.toString())
+      ),
+    [searchParams]
+  );
+  const detailQuery = useMemo(
+    () => toAdminMemberDetailQuery(buildAdminMemberListQuery('CUSTOMER', filters)),
+    [filters]
+  );
   const { detailId, setDetailId: updateSelectedMember } =
     useDetailSearchParam('memberId');
   const selectedMemberId = parseUuidDetailId(detailId);
@@ -29,6 +47,10 @@ export const MemberManagementContent = () => {
         i18n.resolvedLanguage ?? 'ko'
       ),
     [i18n.resolvedLanguage, updateSelectedMember, t]
+  );
+  const handleNavigateDetail = useCallback(
+    (memberId: string) => updateSelectedMember(memberId, { replace: true }),
+    [updateSelectedMember]
   );
 
   return (
@@ -45,6 +67,8 @@ export const MemberManagementContent = () => {
       <AdminCustomerDetailDrawer
         memberId={selectedMemberId}
         open={selectedMemberId !== null}
+        detailQuery={detailQuery}
+        onNavigate={handleNavigateDetail}
         onClose={() => updateSelectedMember(null)}
       />
     </>

@@ -25,7 +25,10 @@ import { SearchResetButton } from '@/components/SearchResetButton/SearchResetBut
 import { useAdminMemberList } from '@/hooks/useAdminMemberList';
 import { useClampListPage } from '@/hooks/useClampListPage';
 import { useDraftSearchFields } from '@/hooks/useDraftSearchFields';
-import { toAdminMemberApiDate } from '@/utils/adminMember';
+import {
+  buildAdminMemberListQuery,
+  toAdminMemberApiDate,
+} from '@/utils/adminMember';
 import {
   createAdminMemberListHref,
   INITIAL_ADMIN_MEMBER_LIST_FILTERS,
@@ -62,18 +65,7 @@ const parseMemberStatusFilter = (value: string): MemberStatus | undefined => {
 const toListQuery = (
   userType: MemberUserType,
   filters: AdminMemberListFilters
-): AdminMemberListQuery => ({
-  userType,
-  page: filters.page,
-  pageSize: filters.pageSize,
-  sort: filters.sort,
-  ...(filters.userName ? { userName: filters.userName } : {}),
-  ...(filters.email ? { email: filters.email } : {}),
-  ...(filters.phoneNumber ? { phoneNumber: filters.phoneNumber } : {}),
-  ...(filters.status ? { status: filters.status } : {}),
-  ...(filters.startDate ? { startDate: filters.startDate } : {}),
-  ...(filters.endDate ? { endDate: filters.endDate } : {}),
-});
+): AdminMemberListQuery => buildAdminMemberListQuery(userType, filters);
 
 export interface AdminMemberListColumnsContext {
   page: number;

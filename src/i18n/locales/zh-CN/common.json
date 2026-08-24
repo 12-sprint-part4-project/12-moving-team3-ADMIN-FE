@@ -171,7 +171,9 @@
     "detail": {
       "basicInfo": "基本信息",
       "accountStatus": "账号状态",
-      "notFoundDescription": "找不到所选会员。"
+      "notFoundDescription": "找不到所选会员。",
+      "previous": "上一项",
+      "next": "下一项"
     },
     "action": {
       "suspend": {
