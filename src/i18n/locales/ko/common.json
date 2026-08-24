@@ -685,7 +685,13 @@
       "title": "리뷰 상세",
       "reviewInfo": "리뷰 정보",
       "peopleInfo": "작성자·기사 정보",
-      "originalContent": "리뷰 원문"
+      "originalContent": "리뷰 원문",
+      "noSelection": "선택한 리뷰 정보가 없습니다.",
+      "error": "리뷰 상세를 불러오지 못했습니다.",
+      "empty": "리뷰 정보가 없습니다.",
+      "notFound": "선택한 리뷰를 찾을 수 없습니다.",
+      "previous": "이전",
+      "next": "다음"
     },
     "delete": {
       "action": "리뷰 삭제",

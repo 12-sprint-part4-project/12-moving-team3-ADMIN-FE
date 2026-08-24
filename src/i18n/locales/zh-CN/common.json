@@ -687,7 +687,13 @@
       "title": "评价详情",
       "reviewInfo": "评价信息",
       "peopleInfo": "发布者和搬家师傅信息",
-      "originalContent": "评价原文"
+      "originalContent": "评价原文",
+      "noSelection": "未选择评价。",
+      "error": "无法加载评价详情。",
+      "empty": "没有评价信息。",
+      "notFound": "找不到所选评价。",
+      "previous": "上一项",
+      "next": "下一项"
     },
     "delete": {
       "action": "删除评价",

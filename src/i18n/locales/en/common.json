@@ -705,7 +705,13 @@
       "title": "Review Details",
       "reviewInfo": "Review Information",
       "peopleInfo": "Author and Mover Information",
-      "originalContent": "Original Review"
+      "originalContent": "Original Review",
+      "noSelection": "No review is selected.",
+      "error": "Failed to load review details.",
+      "empty": "Review information is unavailable.",
+      "notFound": "The selected review could not be found.",
+      "previous": "Previous",
+      "next": "Next"
     },
     "delete": {
       "action": "Delete Review",

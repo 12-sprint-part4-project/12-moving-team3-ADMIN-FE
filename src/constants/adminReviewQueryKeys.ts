@@ -1,4 +1,5 @@
 import type {
+  AdminReviewDetailQuery,
   AdminReviewListQuery,
   AdminReviewStatisticsQuery,
 } from '@/types/adminReview';
@@ -16,4 +17,7 @@ export const ADMIN_REVIEW_QUERY_KEYS = {
   statisticses: () => [...ADMIN_REVIEW_QUERY_KEYS.all, 'statistics'] as const,
   statistics: (params?: AdminReviewStatisticsQuery) =>
     [...ADMIN_REVIEW_QUERY_KEYS.statisticses(), params] as const,
+  details: () => [...ADMIN_REVIEW_QUERY_KEYS.all, 'detail'] as const,
+  detail: (reviewId: number | null, params?: AdminReviewDetailQuery) =>
+    [...ADMIN_REVIEW_QUERY_KEYS.details(), reviewId, params] as const,
 };
