@@ -467,7 +467,9 @@
       "noSelection": "No chat room is selected.",
       "error": "Failed to load chat room details.",
       "empty": "Chat room information is unavailable.",
-      "notFound": "The selected chat room could not be found."
+      "notFound": "The selected chat room could not be found.",
+      "previous": "Previous",
+      "next": "Next"
     },
     "messages": {
       "title": "Message History",

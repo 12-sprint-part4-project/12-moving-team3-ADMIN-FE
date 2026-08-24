@@ -6,6 +6,7 @@ import {
 import { axiosInstance } from '@/api/axiosInstance';
 
 import type {
+  AdminChatDetailQuery,
   AdminChatDetailResponse,
   AdminChatListQuery,
   AdminChatListResponse,
@@ -33,10 +34,12 @@ export const getAdminChatList = async (
  * Access Token은 axiosInstance Request Interceptor가 Authorization에 첨부한다.
  */
 export const getAdminChatDetail = async (
-  roomId: number
+  roomId: number,
+  params?: AdminChatDetailQuery
 ): Promise<AdminChatDetailResponse> => {
   const response = await axiosInstance.get<AdminChatDetailResponse>(
-    getAdminChatDetailPath(roomId)
+    getAdminChatDetailPath(roomId),
+    { params }
   );
 
   return response.data;

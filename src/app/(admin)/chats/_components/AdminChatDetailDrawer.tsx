@@ -7,21 +7,26 @@ import {
   formatNullableDateTime,
 } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
 import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
+import { DetailNavigation } from '@/components/DetailNavigation/DetailNavigation';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { StatusBadge } from '@/components/StatusBadge/StatusBadge';
 import { useAdminChatDetail } from '@/hooks/useAdminChatDetail';
 import { formatAdminMemberJoinedAt } from '@/utils/adminMember';
+import { isDetailNeighborId } from '@/utils/detailNavigation';
 
 import { AdminChatMessageList } from './AdminChatMessageList';
 
-import type { AdminChatDetail, AdminChatParticipant } from '@/types/adminChat';
+import type { AdminChatDetail, AdminChatDetailQuery, AdminChatParticipant } from '@/types/adminChat';
 
 export interface AdminChatDetailDrawerProps {
   open: boolean;
   /** 목록에서 선택한 채팅방 ID. null이면 상세 요청을 하지 않는다. */
   roomId: number | null;
+  /** 목록과 동일한 필터. prevId/nextId 계산에 사용한다. */
+  detailQuery: AdminChatDetailQuery;
+  onNavigate: (roomId: number) => void;
   onClose: () => void;
 }
 
@@ -237,6 +242,8 @@ const ChatDetailContent = ({
 export const AdminChatDetailDrawer = ({
   open,
   roomId,
+  detailQuery,
+  onNavigate,
   onClose,
 }: AdminChatDetailDrawerProps) => {
   const { t } = useTranslation();
@@ -244,6 +251,7 @@ export const AdminChatDetailDrawer = ({
     roomId ?? undefined,
     {
       enabled: open && Boolean(roomId),
+      query: detailQuery,
     }
   );
 
@@ -286,12 +294,33 @@ export const AdminChatDetailDrawer = ({
     return <ChatDetailContent detail={detail} roomId={roomId} open={open} />;
   };
 
+  const handleNavigate = (id: number) => {
+    if (!isDetailNeighborId(id, detail)) {
+      return;
+    }
+
+    onNavigate(id);
+  };
+
+  const navigation =
+    roomId != null ? (
+      <DetailNavigation
+        prevId={detail?.prevId ?? null}
+        nextId={detail?.nextId ?? null}
+        previousLabel={t('chats.detail.previous')}
+        nextLabel={t('chats.detail.next')}
+        disabled={detail == null}
+        onNavigate={handleNavigate}
+      />
+    ) : null;
+
   return (
     <DetailDrawer
       open={open}
       title={t('chats.detail.title')}
       size="lg"
       onClose={onClose}
+      footer={navigation ?? undefined}
     >
       {renderBody()}
     </DetailDrawer>

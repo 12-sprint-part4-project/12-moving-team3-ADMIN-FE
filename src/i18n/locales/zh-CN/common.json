@@ -452,7 +452,9 @@
       "noSelection": "未选择聊天室。",
       "error": "无法加载聊天室详情。",
       "empty": "没有聊天室信息。",
-      "notFound": "找不到所选聊天室。"
+      "notFound": "找不到所选聊天室。",
+      "previous": "上一项",
+      "next": "下一项"
     },
     "messages": {
       "title": "消息记录",
