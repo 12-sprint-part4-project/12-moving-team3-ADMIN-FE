@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useDetailSearchParam } from '@/hooks/useDetailSearchParam';

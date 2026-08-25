@@ -142,12 +142,9 @@ export const AdminReviewDetailDrawer = ({
   const detail = data?.data ?? null;
   const isDetailForSelection =
     detail != null && reviewId != null && detail.id === reviewId;
+  const selectedDetail = isDetailForSelection ? detail : null;
 
   const renderBody = () => {
-    if (detail) {
-      return <ReviewDetailContent detail={detail} />;
-    }
-
     if (reviewId == null) {
       return (
         <p className="text-md-regular text-gray-500">
@@ -169,7 +166,7 @@ export const AdminReviewDetailDrawer = ({
       );
     }
 
-    if (!isSuccess || !isDetailForSelection) {
+    if (!isSuccess || selectedDetail == null) {
       return (
         <EmptyState
           title={t('reviews.detail.empty')}
@@ -178,11 +175,11 @@ export const AdminReviewDetailDrawer = ({
       );
     }
 
-    return null;
+    return <ReviewDetailContent detail={selectedDetail} />;
   };
 
   const handleNavigate = (id: number) => {
-    if (!isDetailNeighborId(id, detail)) {
+    if (!isDetailNeighborId(id, selectedDetail)) {
       return;
     }
 
@@ -190,12 +187,12 @@ export const AdminReviewDetailDrawer = ({
   };
 
   const actionFooter =
-    detail && detail.deletedAt == null ? (
+    selectedDetail && selectedDetail.deletedAt == null ? (
       <Button
         variant="danger"
         className="w-full"
         loading={isDeletePending}
-        onClick={() => onRequestDelete(detail.id)}
+        onClick={() => onRequestDelete(selectedDetail.id)}
       >
         {t('reviews.delete.action')}
       </Button>
@@ -204,11 +201,11 @@ export const AdminReviewDetailDrawer = ({
   const navigation =
     reviewId != null ? (
       <DetailNavigation
-        prevId={detail?.prevId ?? null}
-        nextId={detail?.nextId ?? null}
+        prevId={selectedDetail?.prevId ?? null}
+        nextId={selectedDetail?.nextId ?? null}
         previousLabel={t('reviews.detail.previous')}
         nextLabel={t('reviews.detail.next')}
-        disabled={detail == null}
+        disabled={selectedDetail == null}
         onNavigate={handleNavigate}
       />
     ) : null;
