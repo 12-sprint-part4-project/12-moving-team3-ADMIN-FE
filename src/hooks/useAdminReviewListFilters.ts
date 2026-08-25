@@ -7,7 +7,9 @@ import {
   parseAdminReviewSearchParams,
 } from '@/utils/adminListSearchParams';
 import {
+  buildAdminReviewListQuery,
   toAdminReviewApiDate,
+  toAdminReviewDetailQuery,
   toAdminReviewStatisticsQuery,
 } from '@/utils/adminReview';
 import {
@@ -18,10 +20,7 @@ import {
 import { navigateSearchHref } from '@/utils/navigateSearchHref';
 
 import type { DateRangePopoverProps } from '@/components/DateRangePopover/DateRangePopover';
-import type {
-  AdminReviewDeletionStatus,
-  AdminReviewListQuery,
-} from '@/types/adminReview';
+import type { AdminReviewDeletionStatus } from '@/types/adminReview';
 import type { AdminReviewUrlFilters } from '@/utils/adminListSearchParams';
 
 export type AdminReviewListFilters = AdminReviewUrlFilters;
@@ -53,25 +52,6 @@ const parseDeletionStatusFilter = (
 };
 
 /**
- * UI 필터 → API query.
- * undefined·빈 값은 객체에 넣지 않아 axios query string에서 빠진다.
- */
-const toListQuery = (
-  filters: AdminReviewListFilters
-): AdminReviewListQuery => ({
-  page: filters.page,
-  pageSize: filters.pageSize,
-  sort: filters.sort,
-  ...(filters.id ? { id: filters.id } : {}),
-  ...(filters.userName ? { userName: filters.userName } : {}),
-  ...(filters.moverName ? { moverName: filters.moverName } : {}),
-  ...(filters.rating !== undefined ? { rating: filters.rating } : {}),
-  ...(filters.deletionStatus ? { deletionStatus: filters.deletionStatus } : {}),
-  ...(filters.startDate ? { startDate: filters.startDate } : {}),
-  ...(filters.startDate && filters.endDate ? { endDate: filters.endDate } : {}),
-});
-
-/**
  * 관리자 리뷰 목록 필터 상태·query 생성.
  * 검색·별점·삭제상태·작성일·페이지와 통계 기간 query를 함께 만든다.
  * page 보정(setFilters)은 목록 응답을 아는 호출부에서 처리한다.
@@ -99,7 +79,11 @@ export const useAdminReviewListFilters = () => {
   const [searchFieldErrors, setSearchFieldErrors] =
     useState<EstimateRequestSearchFieldErrors>({});
 
-  const listQuery = useMemo(() => toListQuery(filters), [filters]);
+  const listQuery = useMemo(() => buildAdminReviewListQuery(filters), [filters]);
+  const detailQuery = useMemo(
+    () => toAdminReviewDetailQuery(listQuery),
+    [listQuery]
+  );
   const statisticsQuery = useMemo(
     () => toAdminReviewStatisticsQuery(filters.startDate, filters.endDate),
     [filters.startDate, filters.endDate]
@@ -257,6 +241,7 @@ export const useAdminReviewListFilters = () => {
     searchDrafts: drafts,
     searchFieldErrors,
     listQuery,
+    detailQuery,
     statisticsQuery,
     hasActiveFilters,
     dateRangeValue,

@@ -2,6 +2,14 @@ import { format } from 'date-fns';
 
 import { formatLocalizedDateTime } from './formatLocalizedDate.ts';
 
+import type {
+  AdminMemberDetailQuery,
+  AdminMemberListQuery,
+  AdminMemberListQueryWithUserType,
+  MemberUserType,
+} from '@/types/adminMember';
+import type { AdminMemberListFilters } from '@/utils/adminMemberListSearchParams';
+
 /** API 쿼리용 YYYY-MM-DD */
 export const toAdminMemberApiDate = (date: Date) => format(date, 'yyyy-MM-dd');
 
@@ -37,3 +45,44 @@ export const getAdminMemberRowNumber = (
   pageSize: number,
   index: number
 ) => totalCount - (page - 1) * pageSize - index;
+
+/** URL 필터 → 목록 API query */
+export const buildAdminMemberListQuery = (
+  userType: MemberUserType,
+  filters: AdminMemberListFilters
+): AdminMemberListQueryWithUserType => ({
+  userType,
+  page: filters.page,
+  pageSize: filters.pageSize,
+  sort: filters.sort,
+  ...(filters.userName ? { userName: filters.userName } : {}),
+  ...(filters.email ? { email: filters.email } : {}),
+  ...(filters.phoneNumber ? { phoneNumber: filters.phoneNumber } : {}),
+  ...(filters.status ? { status: filters.status } : {}),
+  ...(filters.startDate ? { startDate: filters.startDate } : {}),
+  ...(filters.endDate ? { endDate: filters.endDate } : {}),
+});
+
+/**
+ * 목록 query → 상세 앞뒤 조회 query.
+ * page/pageSize는 빼고 검색·상태·기간·정렬과 userType을 남긴다.
+ */
+export const toAdminMemberDetailQuery = ({
+  userName,
+  email,
+  phoneNumber,
+  status,
+  startDate,
+  endDate,
+  sort,
+  userType,
+}: AdminMemberListQueryWithUserType): AdminMemberDetailQuery => ({
+  userType,
+  ...(userName ? { userName } : {}),
+  ...(email ? { email } : {}),
+  ...(phoneNumber ? { phoneNumber } : {}),
+  ...(status ? { status } : {}),
+  ...(startDate ? { startDate } : {}),
+  ...(startDate && endDate ? { endDate } : {}),
+  ...(sort ? { sort } : {}),
+});

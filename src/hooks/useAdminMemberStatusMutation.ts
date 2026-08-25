@@ -10,16 +10,13 @@ import {
   suspendAdminMember,
 } from '@/services/adminMemberApi';
 
-/** 상태 변경 성공 후 목록·해당 상세 캐시를 함께 무효화한다. */
-const invalidateAdminMemberQueries = (
-  queryClient: QueryClient,
-  memberId: string
-) => {
+/** 상태 변경 성공 후 목록·상세 캐시를 함께 무효화한다. */
+const invalidateAdminMemberQueries = (queryClient: QueryClient) => {
   void queryClient.invalidateQueries({
     queryKey: ADMIN_MEMBER_QUERY_KEYS.lists(),
   });
   void queryClient.invalidateQueries({
-    queryKey: ADMIN_MEMBER_QUERY_KEYS.detail(memberId),
+    queryKey: ADMIN_MEMBER_QUERY_KEYS.details(),
   });
 };
 
@@ -29,8 +26,8 @@ export const useSuspendAdminMember = () => {
 
   return useMutation({
     mutationFn: suspendAdminMember,
-    onSuccess: (_data, memberId) => {
-      invalidateAdminMemberQueries(queryClient, memberId);
+    onSuccess: () => {
+      invalidateAdminMemberQueries(queryClient);
     },
   });
 };
@@ -41,8 +38,8 @@ export const useActivateAdminMember = () => {
 
   return useMutation({
     mutationFn: activateAdminMember,
-    onSuccess: (_data, memberId) => {
-      invalidateAdminMemberQueries(queryClient, memberId);
+    onSuccess: () => {
+      invalidateAdminMemberQueries(queryClient);
     },
   });
 };

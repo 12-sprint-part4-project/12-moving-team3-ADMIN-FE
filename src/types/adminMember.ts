@@ -52,6 +52,16 @@ export interface AdminMemberListQuery {
   pageSize?: number;
 }
 
+/** userType이 항상 포함된 목록 query (화면별로 고정) */
+export type AdminMemberListQueryWithUserType = AdminMemberListQuery & {
+  userType: MemberUserType;
+};
+
+export type AdminMemberDetailQuery = Omit<
+  AdminMemberListQueryWithUserType,
+  'page' | 'pageSize'
+>;
+
 /** 목록 페이지네이션 */
 export interface AdminMemberPagination {
   page: number;
@@ -137,6 +147,10 @@ export interface AdminMemberDetail {
   averageRating: number | null;
   reviewCount: number;
   confirmedQuoteCount: number;
+  /** 목록 필터·정렬 기준 이전 건. 없으면 null */
+  prevId: string | null;
+  /** 목록 필터·정렬 기준 다음 건. 없으면 null */
+  nextId: string | null;
 }
 
 /** GET /api/admin/members/:memberId 성공 응답 */

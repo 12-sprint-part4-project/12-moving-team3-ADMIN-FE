@@ -4,7 +4,33 @@ import test from 'node:test';
 import {
   formatAdminMemberPhoneNumber,
   getAdminMemberRowNumber,
+  toAdminMemberDetailQuery,
 } from './adminMember.ts';
+
+test('상세 앞뒤 query는 목록 필터를 유지하고 page/pageSize는 제외한다', () => {
+  assert.deepEqual(
+    toAdminMemberDetailQuery({
+      userType: 'CUSTOMER',
+      page: 2,
+      pageSize: 10,
+      userName: '홍길동',
+      email: 'user@example.com',
+      status: 'ACTIVE',
+      startDate: '2026-08-01',
+      endDate: '2026-08-31',
+      sort: 'ASC',
+    }),
+    {
+      userType: 'CUSTOMER',
+      userName: '홍길동',
+      email: 'user@example.com',
+      status: 'ACTIVE',
+      startDate: '2026-08-01',
+      endDate: '2026-08-31',
+      sort: 'ASC',
+    }
+  );
+});
 
 test('전체 개수를 기준으로 페이지의 행 번호를 역순 계산한다', () => {
   assert.equal(getAdminMemberRowNumber(25, 1, 10, 0), 25);

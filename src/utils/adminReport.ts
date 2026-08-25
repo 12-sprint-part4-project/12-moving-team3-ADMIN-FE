@@ -11,6 +11,8 @@ import type {
   AdminReportStatus,
   AdminReportTarget,
   AdminReportTargetInfo,
+  AdminReportDetailQuery,
+  AdminReportListQuery,
   AdminReportUserType,
 } from '@/types/adminReport';
 import type { TFunction } from 'i18next';
@@ -351,3 +353,25 @@ export const toAdminReportStatisticsQuery = (
     ...(reportedTo ? { endDate: reportedTo } : {}),
   };
 };
+
+/**
+ * 목록 query → 상세 앞뒤 조회 query.
+ * page/pageSize는 빼고 검색·상태·대상·기간·정렬만 남긴다.
+ */
+export const toAdminReportDetailQuery = ({
+  status,
+  target,
+  id,
+  userName,
+  reportedFrom,
+  reportedTo,
+  sort,
+}: AdminReportListQuery): AdminReportDetailQuery => ({
+  ...(status ? { status } : {}),
+  ...(target ? { target } : {}),
+  ...(id ? { id } : {}),
+  ...(userName ? { userName } : {}),
+  ...(reportedFrom ? { reportedFrom } : {}),
+  ...(reportedFrom && reportedTo ? { reportedTo } : {}),
+  ...(sort ? { sort } : {}),
+});

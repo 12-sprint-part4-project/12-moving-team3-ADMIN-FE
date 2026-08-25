@@ -183,7 +183,9 @@
     "detail": {
       "basicInfo": "Basic Information",
       "accountStatus": "Account Status",
-      "notFoundDescription": "The selected member could not be found."
+      "notFoundDescription": "The selected member could not be found.",
+      "previous": "Previous",
+      "next": "Next"
     },
     "action": {
       "suspend": {
@@ -465,7 +467,9 @@
       "noSelection": "No chat room is selected.",
       "error": "Failed to load chat room details.",
       "empty": "Chat room information is unavailable.",
-      "notFound": "The selected chat room could not be found."
+      "notFound": "The selected chat room could not be found.",
+      "previous": "Previous",
+      "next": "Next"
     },
     "messages": {
       "title": "Message History",
@@ -586,7 +590,9 @@
       "missingTargetContent": "The content cannot be displayed because the target does not exist.",
       "noContent": "There is no reported content.",
       "noProfile": "Profile information is unavailable.",
-      "deletedContentHint": "This content has been deleted and is no longer visible."
+      "deletedContentHint": "This content has been deleted and is no longer visible.",
+      "previous": "Previous",
+      "next": "Next"
     },
     "action": {
       "SUSPEND_TARGET_USER": "Suspend for 7 Days",
@@ -699,7 +705,13 @@
       "title": "Review Details",
       "reviewInfo": "Review Information",
       "peopleInfo": "Author and Mover Information",
-      "originalContent": "Original Review"
+      "originalContent": "Original Review",
+      "noSelection": "No review is selected.",
+      "error": "Failed to load review details.",
+      "empty": "Review information is unavailable.",
+      "notFound": "The selected review could not be found.",
+      "previous": "Previous",
+      "next": "Next"
     },
     "delete": {
       "action": "Delete Review",

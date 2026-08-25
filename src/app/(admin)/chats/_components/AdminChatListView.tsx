@@ -21,6 +21,7 @@ import { SearchResetButton } from '@/components/SearchResetButton/SearchResetBut
 import { useAdminChatList } from '@/hooks/useAdminChatList';
 import { useClampListPage } from '@/hooks/useClampListPage';
 import { useDraftSearchFields } from '@/hooks/useDraftSearchFields';
+import { buildAdminChatListQuery } from '@/utils/adminChat';
 import {
   createAdminChatListHref,
   parseAdminChatSearchParams,
@@ -34,7 +35,6 @@ import { navigateSearchHref } from '@/utils/navigateSearchHref';
 
 import type {
   AdminChatListItem,
-  AdminChatListQuery,
   AdminChatRoomType,
 } from '@/types/adminChat';
 import type { AdminChatUrlFilters } from '@/utils/adminListSearchParams';
@@ -49,18 +49,6 @@ const parseRoomTypeFilter = (value: string): AdminChatRoomType | undefined => {
 
   return undefined;
 };
-
-/**
- * UI 필터 → API query.
- * undefined·빈 값은 객체에 넣지 않아 axios query string에서 빠진다.
- */
-const toListQuery = (filters: AdminChatListFilters): AdminChatListQuery => ({
-  page: filters.page,
-  pageSize: filters.pageSize,
-  ...(filters.id ? { id: filters.id } : {}),
-  ...(filters.userName ? { userName: filters.userName } : {}),
-  ...(filters.roomType ? { roomType: filters.roomType } : {}),
-});
 
 export interface AdminChatListColumnsContext {
   page: number;
@@ -99,7 +87,7 @@ export const AdminChatListView = ({ getColumns }: AdminChatListViewProps) => {
   const [searchFieldErrors, setSearchFieldErrors] =
     useState<EstimateRequestSearchFieldErrors>({});
 
-  const listQuery = useMemo(() => toListQuery(filters), [filters]);
+  const listQuery = useMemo(() => buildAdminChatListQuery(filters), [filters]);
   const { data, isPending, isError } = useAdminChatList(listQuery);
 
   const items = data?.data.items ?? [];

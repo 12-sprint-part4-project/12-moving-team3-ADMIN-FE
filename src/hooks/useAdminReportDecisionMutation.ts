@@ -20,14 +20,12 @@ export type ResolveAdminReportVariables = {
 
 /**
  * 처리·반려 성공 후 상세·목록·대시보드(미처리 신고 수·최근 신고)를 함께 무효화한다.
+ * 상세 queryKey에 필터 params가 붙으므로 prefix(details)로 해당 신고의 모든 상세 캐시를 맞춘다.
  * Query Key는 기존 팩토리만 재사용한다.
  */
-const invalidateAdminReportDecisionQueries = (
-  queryClient: QueryClient,
-  reportId: number
-) => {
+const invalidateAdminReportDecisionQueries = (queryClient: QueryClient) => {
   void queryClient.invalidateQueries({
-    queryKey: ADMIN_REPORT_QUERY_KEYS.detail(reportId),
+    queryKey: ADMIN_REPORT_QUERY_KEYS.details(),
   });
   void queryClient.invalidateQueries({
     queryKey: ADMIN_REPORT_QUERY_KEYS.lists(),
@@ -48,8 +46,8 @@ export const useResolveAdminReport = () => {
   return useMutation({
     mutationFn: ({ reportId, body }: ResolveAdminReportVariables) =>
       resolveAdminReport(reportId, body),
-    onSuccess: (_data, { reportId }) => {
-      invalidateAdminReportDecisionQueries(queryClient, reportId);
+    onSuccess: () => {
+      invalidateAdminReportDecisionQueries(queryClient);
     },
   });
 };
@@ -60,8 +58,8 @@ export const useRejectAdminReport = () => {
 
   return useMutation({
     mutationFn: (reportId: number) => rejectAdminReport(reportId),
-    onSuccess: (_data, reportId) => {
-      invalidateAdminReportDecisionQueries(queryClient, reportId);
+    onSuccess: () => {
+      invalidateAdminReportDecisionQueries(queryClient);
     },
   });
 };

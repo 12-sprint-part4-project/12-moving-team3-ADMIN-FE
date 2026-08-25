@@ -23,6 +23,12 @@ export interface AdminChatListQuery {
   pageSize?: number;
 }
 
+/** GET /api/admin/chats/:roomId 쿼리 파라미터 (목록 필터, page/pageSize 제외) */
+export type AdminChatDetailQuery = Omit<
+  AdminChatListQuery,
+  'page' | 'pageSize'
+>;
+
 /**
  * 목록 페이지네이션.
  * 공통 Pagination 타입이 없어 회원/신고와 동일 필드로 도메인별 정의한다.
@@ -91,6 +97,10 @@ export interface AdminChatDetail {
   lastMessageAt: string | null;
   createdAt: string;
   updatedAt: string;
+  /** 목록 필터·정렬 기준 이전 채팅방 ID. 없으면 null */
+  prevId: number | null;
+  /** 목록 필터·정렬 기준 다음 채팅방 ID. 없으면 null */
+  nextId: number | null;
   participants: AdminChatParticipant[];
 }
 

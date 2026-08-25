@@ -30,6 +30,7 @@ export const ReportManagementContent = () => {
     searchDrafts,
     searchFieldErrors,
     listQuery,
+    detailQuery,
     statisticsQuery,
     dateRangeValue,
     hasActiveFilters,
@@ -64,6 +65,10 @@ export const ReportManagementContent = () => {
 
   const handleOpenDetail = useCallback(
     (reportId: number) => setDetailId(String(reportId)),
+    [setDetailId]
+  );
+  const handleNavigateDetail = useCallback(
+    (reportId: number) => setDetailId(String(reportId), { replace: true }),
     [setDetailId]
   );
   const columns = useMemo(
@@ -122,6 +127,8 @@ export const ReportManagementContent = () => {
       <AdminReportDetailDrawer
         open={selectedReportId !== null}
         reportId={selectedReportId}
+        detailQuery={detailQuery}
+        onNavigate={handleNavigateDetail}
         onClose={() => setDetailId(null)}
       />
     </>

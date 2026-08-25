@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/Button/Button';
 import { ConfirmModal } from '@/components/ConfirmModal/ConfirmModal';
 import { DetailDrawer } from '@/components/DetailDrawer/DetailDrawer';
+import { DetailNavigation } from '@/components/DetailNavigation/DetailNavigation';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { LoadingState } from '@/components/LoadingState/LoadingState';
@@ -20,9 +21,11 @@ import {
   formatAdminMemberJoinedAt,
   formatAdminMemberPhoneNumber,
 } from '@/utils/adminMember';
+import { isDetailNeighborId } from '@/utils/detailNavigation';
 
 import type {
   AdminMemberDetail,
+  AdminMemberDetailQuery,
   MemberMoveType,
   MemberRegion,
   MemberStatus,
@@ -258,6 +261,9 @@ export interface AdminMemberDetailDrawerShellProps {
   memberId: string | null;
   open: boolean;
   onClose: () => void;
+  /** 목록과 동일한 필터·정렬. prevId/nextId 계산에 넘긴다. */
+  detailQuery: AdminMemberDetailQuery;
+  onNavigate: (memberId: string) => void;
   title: string;
   errorTitle: string;
   emptyTitle: string;
@@ -273,6 +279,8 @@ export const AdminMemberDetailDrawerShell = ({
   memberId,
   open,
   onClose,
+  detailQuery,
+  onNavigate,
   title,
   errorTitle,
   emptyTitle,
@@ -287,7 +295,10 @@ export const AdminMemberDetailDrawerShell = ({
 
   const { data, isPending, isError, isSuccess } = useAdminMemberDetail(
     memberId,
-    { enabled: open && Boolean(memberId) }
+    {
+      query: detailQuery,
+      enabled: open && Boolean(memberId),
+    }
   );
   const suspendMutation = useSuspendAdminMember();
   const activateMutation = useActivateAdminMember();
@@ -371,13 +382,40 @@ export const AdminMemberDetailDrawerShell = ({
     return renderContent(detail);
   };
 
-  // 상세가 있을 때만 footer를 내려 로딩·에러·빈 상태에서는 액션을 숨긴다.
-  const footer =
+  const handleNavigate = (id: string) => {
+    if (!isDetailNeighborId(id, detail ?? null)) {
+      return;
+    }
+
+    onNavigate(id);
+  };
+
+  const navigation =
+    memberId != null ? (
+      <DetailNavigation
+        prevId={detail?.prevId ?? null}
+        nextId={detail?.nextId ?? null}
+        previousLabel={t('members.detail.previous')}
+        nextLabel={t('members.detail.next')}
+        disabled={detail == null}
+        onNavigate={handleNavigate}
+      />
+    ) : null;
+
+  const actionFooter =
     isSuccess && detail ? (
       <AdminMemberStatusActionFooter
         status={status}
         onRequestStatusChange={handleRequestStatusChange}
       />
+    ) : null;
+
+  const footer =
+    navigation || actionFooter ? (
+      <>
+        {actionFooter}
+        {navigation}
+      </>
     ) : undefined;
 
   return (

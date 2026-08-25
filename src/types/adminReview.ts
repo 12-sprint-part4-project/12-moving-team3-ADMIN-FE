@@ -64,6 +64,12 @@ export interface AdminReviewListQuery {
   pageSize?: number;
 }
 
+/** GET /api/admin/reviews/:reviewId 쿼리 파라미터 (목록 필터, page/pageSize 제외) */
+export type AdminReviewDetailQuery = Omit<
+  AdminReviewListQuery,
+  'page' | 'pageSize'
+>;
+
 /** 목록 페이지네이션 */
 export interface AdminReviewPagination {
   page: number;
@@ -86,6 +92,19 @@ export interface AdminReviewListItem {
   author: AdminReviewAuthor;
   /** Quote.moverId가 없으면 null */
   mover: AdminReviewMover | null;
+}
+
+/** GET /api/admin/reviews/:reviewId 상세 */
+export interface AdminReviewDetail extends AdminReviewListItem {
+  /** 목록 필터·정렬 기준 이전 리뷰 ID. 없으면 null */
+  prevId: number | null;
+  /** 목록 필터·정렬 기준 다음 리뷰 ID. 없으면 null */
+  nextId: number | null;
+}
+
+/** GET /api/admin/reviews/:reviewId 성공 응답 */
+export interface AdminReviewDetailResponse {
+  data: AdminReviewDetail;
 }
 
 /** 목록 조회 성공 시 data 필드 */

@@ -16,7 +16,7 @@ import type { TFunction } from 'i18next';
  * 상세 열기 핸들러만 외부에서 주입한다.
  */
 export const getReviewListColumns = (
-  onOpenDetail: (review: AdminReviewListItem) => void,
+  onOpenDetail: (reviewId: number) => void,
   sort: AdminListSortDirection,
   onSortToggle: () => void,
   t: TFunction,
@@ -126,7 +126,7 @@ export const getReviewListColumns = (
         variant="secondary"
         className="px-3 py-1.5 text-sm-medium"
         aria-label={t('reviews.viewDetailLabel', { id: row.id })}
-        onClick={() => onOpenDetail(row)}
+        onClick={() => onOpenDetail(row.id)}
       >
         {t('reviews.viewDetail')}
       </Button>

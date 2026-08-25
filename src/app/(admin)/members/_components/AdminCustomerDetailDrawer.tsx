@@ -12,11 +12,13 @@ import {
 } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 
-import type { AdminMemberDetail } from '@/types/adminMember';
+import type { AdminMemberDetail, AdminMemberDetailQuery } from '@/types/adminMember';
 
 export interface AdminCustomerDetailDrawerProps {
   memberId: string | null;
   open: boolean;
+  detailQuery: AdminMemberDetailQuery;
+  onNavigate: (memberId: string) => void;
   onClose: () => void;
 }
 
@@ -58,6 +60,8 @@ const CustomerDetailContent = ({ detail }: CustomerDetailContentProps) => {
 export const AdminCustomerDetailDrawer = ({
   memberId,
   open,
+  detailQuery,
+  onNavigate,
   onClose,
 }: AdminCustomerDetailDrawerProps) => {
   const { t } = useTranslation();
@@ -65,6 +69,8 @@ export const AdminCustomerDetailDrawer = ({
     <AdminMemberDetailDrawerShell
       memberId={memberId}
       open={open}
+      detailQuery={detailQuery}
+      onNavigate={onNavigate}
       onClose={onClose}
       title={t('members.customer.detailTitle')}
       errorTitle={t('members.customer.detailError')}
