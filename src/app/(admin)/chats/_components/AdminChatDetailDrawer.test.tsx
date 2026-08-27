@@ -66,10 +66,6 @@ const defaultProps = {
 };
 
 describe('AdminChatDetailDrawer', () => {
-  afterEach(() => {
-    vi.resetModules();
-  });
-
   beforeEach(() => {
     capturedDetailHookArgs = {};
     detailHookReturn = {

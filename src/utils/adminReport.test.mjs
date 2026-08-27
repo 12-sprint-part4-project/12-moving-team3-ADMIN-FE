@@ -5,6 +5,7 @@ import {
   formatAdminReportContentMetadataValue,
   getMetadataLabel,
   toAdminReportDetailQuery,
+  toAdminReportStatisticsQuery,
 } from './adminReport.ts';
 
 test('상세 앞뒤 query는 목록 필터를 유지하고 page/pageSize는 제외한다', () => {
@@ -40,6 +41,69 @@ test('검색·필터가 없으면 정렬만 남기고 빈 값은 제외한다', 
       sort: 'DESC',
     }),
     { sort: 'DESC' }
+  );
+});
+
+test('toAdminReportStatisticsQuery는 reportedFrom이 없으면 undefined를 반환한다', () => {
+  assert.equal(
+    toAdminReportStatisticsQuery(undefined, '2026-08-31'),
+    undefined
+  );
+});
+
+test('toAdminReportStatisticsQuery는 reportedFrom만 있으면 startDate만 포함한다', () => {
+  assert.deepEqual(toAdminReportStatisticsQuery('2026-08-01'), {
+    startDate: '2026-08-01',
+  });
+});
+
+test('toAdminReportStatisticsQuery는 reportedFrom과 reportedTo를 변환한다', () => {
+  assert.deepEqual(toAdminReportStatisticsQuery('2026-08-01', '2026-08-31'), {
+    startDate: '2026-08-01',
+    endDate: '2026-08-31',
+  });
+});
+
+test('toAdminReportDetailQuery는 reportedFrom 없이 reportedTo를 제외한다', () => {
+  assert.deepEqual(
+    toAdminReportDetailQuery({
+      page: 1,
+      pageSize: 10,
+      reportedTo: '2026-08-31',
+      sort: 'DESC',
+    }),
+    { sort: 'DESC' }
+  );
+});
+
+test('REVIEW metadata rating을 포맷한다', () => {
+  assert.equal(
+    formatAdminReportContentMetadataValue('rating', 4, undefined, 'ko'),
+    '★4'
+  );
+});
+
+test('MESSAGE metadata messageType을 한글로 포맷한다', () => {
+  assert.equal(
+    formatAdminReportContentMetadataValue(
+      'messageType',
+      'IMAGE',
+      undefined,
+      'ko'
+    ),
+    '이미지'
+  );
+});
+
+test('ARTICLE metadata category를 한글로 포맷한다', () => {
+  assert.equal(
+    formatAdminReportContentMetadataValue(
+      'category',
+      'QUESTION',
+      undefined,
+      'ko'
+    ),
+    '질문'
   );
 });
 

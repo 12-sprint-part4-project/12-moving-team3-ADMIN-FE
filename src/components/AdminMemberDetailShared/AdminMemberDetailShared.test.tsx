@@ -115,10 +115,6 @@ const defaultShellProps = {
 };
 
 describe('AdminMemberDetailDrawerShell', () => {
-  afterEach(() => {
-    vi.resetModules();
-  });
-
   beforeEach(() => {
     capturedDetailHookArgs = {};
     mutationState.suspendPending = false;

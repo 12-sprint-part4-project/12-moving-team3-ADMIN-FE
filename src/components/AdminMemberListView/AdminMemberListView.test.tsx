@@ -1,7 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { AdminMemberListView } from '@/components/AdminMemberListView/AdminMemberListView';
 import type { AdminMemberListColumnsContext } from '@/components/AdminMemberListView/AdminMemberListView';
 import type { AdminMemberListItem } from '@/types/adminMember';
 
@@ -47,7 +48,16 @@ vi.mock('@/hooks/useAdminMemberList', () => ({
 }));
 
 vi.mock('@/utils/navigateSearchHref', () => ({
-  navigateSearchHref: (...args: unknown[]) => mockNavigateSearchHref(...args),
+  navigateSearchHref: (href: string, options?: { replace?: boolean }) => {
+    mockNavigateSearchHref(href, options);
+
+    if (options?.replace) {
+      window.history.replaceState(null, '', href);
+      return;
+    }
+
+    window.history.pushState(null, '', href);
+  },
 }));
 
 const listItem: AdminMemberListItem = {
@@ -73,10 +83,6 @@ const defaultProps = {
 };
 
 describe('AdminMemberListView', () => {
-  afterEach(() => {
-    vi.resetModules();
-  });
-
   let capturedColumnsContext: AdminMemberListColumnsContext | undefined;
   const getColumns = vi.fn((context: AdminMemberListColumnsContext) => {
     capturedColumnsContext = context;
@@ -101,23 +107,19 @@ describe('AdminMemberListView', () => {
     };
   });
 
-  const renderView = async (userType: 'CUSTOMER' | 'MOVER' = 'CUSTOMER') => {
-    const { AdminMemberListView } =
-      await import('@/components/AdminMemberListView/AdminMemberListView');
-
-    return render(
+  const renderView = (userType: 'CUSTOMER' | 'MOVER' = 'CUSTOMER') =>
+    render(
       <AdminMemberListView
         userType={userType}
         {...defaultProps}
         getColumns={getColumns}
       />
     );
-  };
 
   it('CUSTOMER userType으로 목록 query를 구성한다', async () => {
     listHookReturn = { isPending: true, isError: false };
 
-    await renderView('CUSTOMER');
+    renderView('CUSTOMER');
 
     expect(capturedListQuery).toEqual({
       userType: 'CUSTOMER',
@@ -130,7 +132,7 @@ describe('AdminMemberListView', () => {
   it('MOVER userType으로 목록 query를 구성한다', async () => {
     listHookReturn = { isPending: true, isError: false };
 
-    await renderView('MOVER');
+    renderView('MOVER');
 
     expect(capturedListQuery).toEqual({
       userType: 'MOVER',
@@ -143,7 +145,7 @@ describe('AdminMemberListView', () => {
   it('로딩 상태를 표시한다', async () => {
     listHookReturn = { isPending: true, isError: false };
 
-    await renderView();
+    renderView();
 
     expect(screen.getAllByRole('status')[0]).toBeInTheDocument();
   });
@@ -151,7 +153,7 @@ describe('AdminMemberListView', () => {
   it('API 오류 상태를 표시한다', async () => {
     listHookReturn = { isPending: false, isError: true };
 
-    await renderView();
+    renderView();
 
     expect(screen.getByRole('heading', { name: 'error' })).toBeInTheDocument();
   });
@@ -168,7 +170,7 @@ describe('AdminMemberListView', () => {
       },
     };
 
-    await renderView();
+    renderView();
 
     expect(screen.getByRole('heading', { name: 'empty' })).toBeInTheDocument();
   });
@@ -185,7 +187,7 @@ describe('AdminMemberListView', () => {
       },
     };
 
-    await renderView();
+    renderView();
 
     expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByText('홍길동')).toBeInTheDocument();
@@ -203,7 +205,7 @@ describe('AdminMemberListView', () => {
       },
     };
 
-    await renderView();
+    renderView();
 
     await userEvent.click(screen.getByText('2'));
 
@@ -225,7 +227,7 @@ describe('AdminMemberListView', () => {
       },
     };
 
-    await renderView();
+    renderView();
 
     const statusSelect = screen.getAllByLabelText(
       'members.list.statusLabel'
@@ -250,7 +252,7 @@ describe('AdminMemberListView', () => {
       },
     };
 
-    await renderView();
+    renderView();
 
     await waitFor(() => {
       expect(mockNavigateSearchHref).toHaveBeenCalled();
@@ -276,7 +278,7 @@ describe('AdminMemberListView', () => {
     };
     window.history.replaceState(null, '', '/members?page=2');
 
-    await renderView();
+    renderView();
 
     expect(getColumns).toHaveBeenCalled();
     expect(capturedColumnsContext).toEqual({

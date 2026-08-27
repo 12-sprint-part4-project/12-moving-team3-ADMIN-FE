@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockSetDetailId = vi.fn();
 
@@ -66,10 +66,6 @@ vi.mock('./getChatListColumns', () => ({
 }));
 
 describe('ChatManagementContent', () => {
-  afterEach(() => {
-    vi.resetModules();
-  });
-
   beforeEach(() => {
     mockSetDetailId.mockReset();
     mockListView.mockClear();

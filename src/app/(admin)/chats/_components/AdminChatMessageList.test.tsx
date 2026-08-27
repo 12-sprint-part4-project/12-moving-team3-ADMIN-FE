@@ -171,7 +171,6 @@ describe('AdminChatMessageList', () => {
 
   afterEach(() => {
     queryClient.clear();
-    vi.resetModules();
   });
 
   const renderList = async (enabled = true) => {
