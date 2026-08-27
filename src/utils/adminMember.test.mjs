@@ -2,10 +2,67 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  buildAdminMemberListQuery,
   formatAdminMemberPhoneNumber,
   getAdminMemberRowNumber,
   toAdminMemberDetailQuery,
 } from './adminMember.ts';
+import { INITIAL_ADMIN_MEMBER_LIST_FILTERS } from './adminMemberListSearchParams.ts';
+
+test('CUSTOMER 목록 query를 userType과 함께 구성한다', () => {
+  assert.deepEqual(
+    buildAdminMemberListQuery('CUSTOMER', {
+      ...INITIAL_ADMIN_MEMBER_LIST_FILTERS,
+      userName: '홍길동',
+      email: 'user@example.com',
+      status: 'ACTIVE',
+      startDate: '2026-08-01',
+      endDate: '2026-08-31',
+      sort: 'ASC',
+      page: 2,
+    }),
+    {
+      userType: 'CUSTOMER',
+      page: 2,
+      pageSize: 10,
+      userName: '홍길동',
+      email: 'user@example.com',
+      status: 'ACTIVE',
+      startDate: '2026-08-01',
+      endDate: '2026-08-31',
+      sort: 'ASC',
+    }
+  );
+});
+
+test('MOVER 목록 query를 userType과 함께 구성한다', () => {
+  assert.deepEqual(
+    buildAdminMemberListQuery('MOVER', INITIAL_ADMIN_MEMBER_LIST_FILTERS),
+    {
+      userType: 'MOVER',
+      page: 1,
+      pageSize: 10,
+      sort: 'DESC',
+    }
+  );
+});
+
+test('빈 검색값은 API query에서 제외한다', () => {
+  assert.deepEqual(
+    buildAdminMemberListQuery('CUSTOMER', {
+      ...INITIAL_ADMIN_MEMBER_LIST_FILTERS,
+      userName: '',
+      email: '',
+      phoneNumber: '',
+    }),
+    {
+      userType: 'CUSTOMER',
+      page: 1,
+      pageSize: 10,
+      sort: 'DESC',
+    }
+  );
+});
 
 test('상세 앞뒤 query는 목록 필터를 유지하고 page/pageSize는 제외한다', () => {
   assert.deepEqual(
