@@ -3,9 +3,13 @@ import { useQuery } from '@tanstack/react-query';
 import { ADMIN_REPORT_QUERY_KEYS } from '@/constants/adminReportQueryKeys';
 import { getAdminReportDetail } from '@/services/adminReportApi';
 
+import type { AdminReportDetailQuery } from '@/types/adminReport';
+
 interface UseAdminReportDetailOptions {
   /** false면 상세를 호출하지 않는다. reportId가 없으면 기본으로 비활성이다. */
   enabled?: boolean;
+  /** 목록과 동일한 필터·정렬. prevId/nextId 계산에 사용한다. */
+  query?: AdminReportDetailQuery;
 }
 
 /**
@@ -18,13 +22,13 @@ export const useAdminReportDetail = (
   options?: UseAdminReportDetailOptions
 ) =>
   useQuery({
-    queryKey: ADMIN_REPORT_QUERY_KEYS.detail(reportId ?? 0),
+    queryKey: ADMIN_REPORT_QUERY_KEYS.detail(reportId ?? null, options?.query),
     queryFn: () => {
       if (reportId == null) {
         return Promise.reject(new Error('reportId is required'));
       }
 
-      return getAdminReportDetail(reportId);
+      return getAdminReportDetail(reportId, options?.query);
     },
     // Drawer가 열려 있고 신고가 선택된 경우에만 호출한다.
     enabled: (options?.enabled ?? true) && reportId != null,

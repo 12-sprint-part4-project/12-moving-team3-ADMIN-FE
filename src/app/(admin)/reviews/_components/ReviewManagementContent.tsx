@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useMemo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AdminListLayout } from '@/components/AdminListLayout/AdminListLayout';
@@ -13,17 +13,18 @@ import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { MultiFieldSearch } from '@/components/MultiFieldSearch/MultiFieldSearch';
 import { SearchResetButton } from '@/components/SearchResetButton/SearchResetButton';
 import { useAdminReviewDeleteConfirm } from '@/hooks/useAdminReviewDeleteConfirm';
+import { useAdminReviewDetail } from '@/hooks/useAdminReviewDetail';
 import { useAdminReviewList } from '@/hooks/useAdminReviewList';
 import { useAdminReviewListFilters } from '@/hooks/useAdminReviewListFilters';
 import { useAdminReviewStatistics } from '@/hooks/useAdminReviewStatistics';
 import { useClampListPage } from '@/hooks/useClampListPage';
+import { useDetailSearchParam } from '@/hooks/useDetailSearchParam';
+import { parseNumericDetailId } from '@/utils/detailSearchParams';
 
 import { AdminReviewDetailDrawer } from './AdminReviewDetailDrawer';
 import { getReviewListColumns } from './getReviewListColumns';
 import { ReviewDeleteConfirmModal } from './ReviewDeleteConfirmModal';
 import { ReviewStatistics } from './ReviewStatistics';
-
-import type { AdminReviewListItem } from '@/types/adminReview';
 
 /**
  * 관리자 리뷰 관리 화면 본문.
@@ -31,13 +32,14 @@ import type { AdminReviewListItem } from '@/types/adminReview';
  */
 export const ReviewManagementContent = () => {
   const { t, i18n } = useTranslation();
-  const [selectedReview, setSelectedReview] =
-    useState<AdminReviewListItem | null>(null);
+  const { detailId, setDetailId } = useDetailSearchParam('reviewId');
+  const selectedReviewId = parseNumericDetailId(detailId);
   const {
     filters,
     searchDrafts,
     searchFieldErrors,
     listQuery,
+    detailQuery,
     statisticsQuery,
     hasActiveFilters,
     dateRangeValue,
@@ -53,6 +55,11 @@ export const ReviewManagementContent = () => {
   } = useAdminReviewListFilters();
 
   const { data, isPending, isError } = useAdminReviewList(listQuery);
+  const { data: detailData } = useAdminReviewDetail(selectedReviewId, {
+    enabled: selectedReviewId !== null,
+    query: detailQuery,
+  });
+  const detail = detailData?.data ?? null;
   const {
     data: statisticsData,
     isPending: isStatisticsPending,
@@ -79,9 +86,14 @@ export const ReviewManagementContent = () => {
     onPageClamp: replacePage,
   });
 
-  const handleOpenDetail = useCallback((review: AdminReviewListItem) => {
-    setSelectedReview(review);
-  }, []);
+  const handleOpenDetail = useCallback(
+    (reviewId: number) => setDetailId(String(reviewId)),
+    [setDetailId]
+  );
+  const handleNavigateDetail = useCallback(
+    (reviewId: number) => setDetailId(String(reviewId), { replace: true }),
+    [setDetailId]
+  );
   const columns = useMemo(
     () =>
       getReviewListColumns(
@@ -108,13 +120,21 @@ export const ReviewManagementContent = () => {
   ];
 
   const handleConfirmReviewDelete = async () => {
+    const navigationTarget = detail?.nextId ?? detail?.prevId ?? null;
     const isDeleted = await handleConfirmDelete();
-    if (isDeleted) {
-      setSelectedReview(null);
+
+    if (!isDeleted) {
+      return;
     }
+
+    if (navigationTarget != null) {
+      setDetailId(String(navigationTarget), { replace: true });
+      return;
+    }
+
+    setDetailId(null);
   };
 
-  // 회원/신고 목록과 동일: loading → error → empty → table
   const renderListBody = (): ReactNode => {
     if (isPending) {
       return <LoadingState />;
@@ -235,12 +255,14 @@ export const ReviewManagementContent = () => {
       </AdminListLayout>
 
       <AdminReviewDetailDrawer
-        review={selectedReview}
-        open={selectedReview !== null}
+        reviewId={selectedReviewId}
+        open={selectedReviewId !== null}
+        detailQuery={detailQuery}
         isDeletePending={isDeletePending}
         isDeleteConfirmOpen={pendingReviewId != null}
+        onNavigate={handleNavigateDetail}
         onRequestDelete={handleRequestDelete}
-        onClose={() => setSelectedReview(null)}
+        onClose={() => setDetailId(null)}
       />
 
       <ReviewDeleteConfirmModal

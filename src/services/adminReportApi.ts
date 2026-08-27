@@ -8,6 +8,7 @@ import {
 import { axiosInstance } from '@/api/axiosInstance';
 
 import type {
+  AdminReportDetailQuery,
   AdminReportDetailResponse,
   AdminReportListQuery,
   AdminReportListResponse,
@@ -53,13 +54,16 @@ export const getAdminReportStatistics = async (
 
 /**
  * 관리자 신고 상세 조회.
+ * params는 목록과 동일한 필터·정렬이며 page/pageSize는 보내지 않는다.
  * Access Token은 axiosInstance Request Interceptor가 Authorization에 첨부한다.
  */
 export const getAdminReportDetail = async (
-  reportId: number
+  reportId: number,
+  params?: AdminReportDetailQuery
 ): Promise<AdminReportDetailResponse> => {
   const response = await axiosInstance.get<AdminReportDetailResponse>(
-    getAdminReportDetailPath(reportId)
+    getAdminReportDetailPath(reportId),
+    params ? { params } : undefined
   );
 
   return response.data;

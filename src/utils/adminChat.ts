@@ -1,9 +1,11 @@
 import type {
   AdminChatLastMessage,
+  AdminChatListQuery,
   AdminChatParticipant,
   AdminChatRoomType,
   AdminChatUserType,
 } from '@/types/adminChat';
+import type { AdminChatUrlFilters } from '@/utils/adminListSearchParams';
 import type { TFunction } from 'i18next';
 
 /** 발신자·참여자 공통 표시명에 필요한 최소 필드 */
@@ -82,3 +84,31 @@ export const formatAdminChatLastMessagePreview = (
 
   return content.length > 0 ? content : '-';
 };
+
+/**
+ * UI 필터 → 목록 API query.
+ * undefined·빈 값은 객체에 넣지 않아 axios query string에서 빠진다.
+ */
+export const buildAdminChatListQuery = (
+  filters: AdminChatUrlFilters
+): AdminChatListQuery => ({
+  page: filters.page,
+  pageSize: filters.pageSize,
+  ...(filters.id ? { id: filters.id } : {}),
+  ...(filters.userName ? { userName: filters.userName } : {}),
+  ...(filters.roomType ? { roomType: filters.roomType } : {}),
+});
+
+/**
+ * 목록 query → 상세 앞뒤 조회 query.
+ * page/pageSize는 빼고 검색·유형 필터만 남긴다.
+ */
+export const toAdminChatDetailQuery = ({
+  id,
+  userName,
+  roomType,
+}: AdminChatListQuery) => ({
+  ...(id ? { id } : {}),
+  ...(userName ? { userName } : {}),
+  ...(roomType ? { roomType } : {}),
+});

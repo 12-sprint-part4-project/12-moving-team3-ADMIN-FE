@@ -18,6 +18,9 @@ const invalidateAdminReviewQueries = (queryClient: QueryClient) => {
   void queryClient.invalidateQueries({
     queryKey: ADMIN_REVIEW_QUERY_KEYS.statisticses(),
   });
+  void queryClient.invalidateQueries({
+    queryKey: ADMIN_REVIEW_QUERY_KEYS.details(),
+  });
 };
 
 /** 관리자 리뷰 삭제 mutation. 성공 시 목록·통계를 갱신한다. */

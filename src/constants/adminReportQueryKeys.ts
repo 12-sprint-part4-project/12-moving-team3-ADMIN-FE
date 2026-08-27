@@ -1,4 +1,5 @@
 import type {
+  AdminReportDetailQuery,
   AdminReportListQuery,
   AdminReportStatisticsQuery,
 } from '@/types/adminReport';
@@ -15,6 +16,6 @@ export const ADMIN_REPORT_QUERY_KEYS = {
   statistics: (params?: AdminReportStatisticsQuery) =>
     [...ADMIN_REPORT_QUERY_KEYS.all, 'statistics', params] as const,
   details: () => [...ADMIN_REPORT_QUERY_KEYS.all, 'detail'] as const,
-  detail: (reportId: number) =>
-    [...ADMIN_REPORT_QUERY_KEYS.details(), reportId] as const,
+  detail: (reportId: number | null, params?: AdminReportDetailQuery) =>
+    [...ADMIN_REPORT_QUERY_KEYS.details(), reportId, params] as const,
 };

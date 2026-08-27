@@ -11,11 +11,13 @@ import {
 } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 
-import type { AdminMemberDetail, MoverProfile } from '@/types/adminMember';
+import type { AdminMemberDetail, AdminMemberDetailQuery, MoverProfile } from '@/types/adminMember';
 
 export interface AdminMoverDetailDrawerProps {
   memberId: string | null;
   open: boolean;
+  detailQuery: AdminMemberDetailQuery;
+  onNavigate: (memberId: string) => void;
   onClose: () => void;
 }
 
@@ -128,6 +130,8 @@ const MoverDetailContent = ({ detail }: MoverDetailContentProps) => {
 export const AdminMoverDetailDrawer = ({
   memberId,
   open,
+  detailQuery,
+  onNavigate,
   onClose,
 }: AdminMoverDetailDrawerProps) => {
   const { t } = useTranslation();
@@ -135,6 +139,8 @@ export const AdminMoverDetailDrawer = ({
     <AdminMemberDetailDrawerShell
       memberId={memberId}
       open={open}
+      detailQuery={detailQuery}
+      onNavigate={onNavigate}
       onClose={onClose}
       title={t('members.mover.detailTitle')}
       errorTitle={t('members.mover.detailError')}

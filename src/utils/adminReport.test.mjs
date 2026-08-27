@@ -4,7 +4,44 @@ import test from 'node:test';
 import {
   formatAdminReportContentMetadataValue,
   getMetadataLabel,
+  toAdminReportDetailQuery,
 } from './adminReport.ts';
+
+test('상세 앞뒤 query는 목록 필터를 유지하고 page/pageSize는 제외한다', () => {
+  assert.deepEqual(
+    toAdminReportDetailQuery({
+      page: 2,
+      pageSize: 10,
+      id: '26',
+      userName: '김민수',
+      status: 'PENDING',
+      target: 'REVIEW',
+      reportedFrom: '2026-08-01',
+      reportedTo: '2026-08-31',
+      sort: 'ASC',
+    }),
+    {
+      id: '26',
+      userName: '김민수',
+      status: 'PENDING',
+      target: 'REVIEW',
+      reportedFrom: '2026-08-01',
+      reportedTo: '2026-08-31',
+      sort: 'ASC',
+    }
+  );
+});
+
+test('검색·필터가 없으면 정렬만 남기고 빈 값은 제외한다', () => {
+  assert.deepEqual(
+    toAdminReportDetailQuery({
+      page: 1,
+      pageSize: 10,
+      sort: 'DESC',
+    }),
+    { sort: 'DESC' }
+  );
+});
 
 const createTranslation = (resources) => (key, options) =>
   resources[key] ?? options?.defaultValue ?? key;

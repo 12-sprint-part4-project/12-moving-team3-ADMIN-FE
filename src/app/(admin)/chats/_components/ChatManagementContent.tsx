@@ -1,9 +1,15 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useDetailSearchParam } from '@/hooks/useDetailSearchParam';
+import {
+  buildAdminChatListQuery,
+  toAdminChatDetailQuery,
+} from '@/utils/adminChat';
+import { parseAdminChatSearchParams } from '@/utils/adminListSearchParams';
 import { parseNumericDetailId } from '@/utils/detailSearchParams';
 
 import { AdminChatDetailDrawer } from './AdminChatDetailDrawer';
@@ -16,10 +22,24 @@ import { getChatListColumns } from './getChatListColumns';
  */
 export const ChatManagementContent = () => {
   const { t, i18n } = useTranslation();
+  const searchParams = useSearchParams();
+  const filters = useMemo(
+    () =>
+      parseAdminChatSearchParams(new URLSearchParams(searchParams.toString())),
+    [searchParams]
+  );
+  const detailQuery = useMemo(
+    () => toAdminChatDetailQuery(buildAdminChatListQuery(filters)),
+    [filters]
+  );
   const { detailId, setDetailId } = useDetailSearchParam('roomId');
   const selectedRoomId = parseNumericDetailId(detailId);
   const handleOpenDetail = useCallback(
     (roomId: number) => setDetailId(String(roomId)),
+    [setDetailId]
+  );
+  const handleNavigateDetail = useCallback(
+    (roomId: number) => setDetailId(String(roomId), { replace: true }),
     [setDetailId]
   );
   const getColumns = useCallback(
@@ -34,6 +54,8 @@ export const ChatManagementContent = () => {
       <AdminChatDetailDrawer
         roomId={selectedRoomId}
         open={selectedRoomId !== null}
+        detailQuery={detailQuery}
+        onNavigate={handleNavigateDetail}
         onClose={() => setDetailId(null)}
       />
     </>

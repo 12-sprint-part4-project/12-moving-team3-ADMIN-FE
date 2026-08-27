@@ -6,6 +6,8 @@ import {
 import { axiosInstance } from '@/api/axiosInstance';
 
 import type {
+  AdminReviewDetailQuery,
+  AdminReviewDetailResponse,
   AdminReviewListQuery,
   AdminReviewListResponse,
   AdminReviewStatisticsQuery,
@@ -22,6 +24,22 @@ export const getAdminReviewList = async (
 ): Promise<AdminReviewListResponse> => {
   const response = await axiosInstance.get<AdminReviewListResponse>(
     ADMIN_REVIEW_LIST_PATH,
+    { params }
+  );
+
+  return response.data;
+};
+
+/**
+ * 관리자 리뷰 상세 조회.
+ * Access Token은 axiosInstance Request Interceptor가 Authorization에 첨부한다.
+ */
+export const getAdminReviewDetail = async (
+  reviewId: number,
+  params?: AdminReviewDetailQuery
+): Promise<AdminReviewDetailResponse> => {
+  const response = await axiosInstance.get<AdminReviewDetailResponse>(
+    getAdminReviewPath(reviewId),
     { params }
   );
 

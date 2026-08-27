@@ -1,4 +1,5 @@
 import type {
+  AdminChatDetailQuery,
   AdminChatListQuery,
   AdminChatMessagesQuery,
 } from '@/types/adminChat';
@@ -13,8 +14,8 @@ export const ADMIN_CHAT_QUERY_KEYS = {
   list: (params?: AdminChatListQuery) =>
     [...ADMIN_CHAT_QUERY_KEYS.lists(), params] as const,
   details: () => [...ADMIN_CHAT_QUERY_KEYS.all, 'detail'] as const,
-  detail: (roomId: number) =>
-    [...ADMIN_CHAT_QUERY_KEYS.details(), roomId] as const,
+  detail: (roomId: number | null, params?: AdminChatDetailQuery) =>
+    [...ADMIN_CHAT_QUERY_KEYS.details(), roomId, params] as const,
   messages: () => [...ADMIN_CHAT_QUERY_KEYS.all, 'messages'] as const,
   messageList: (roomId: number, params?: AdminChatMessagesQuery) =>
     [...ADMIN_CHAT_QUERY_KEYS.messages(), roomId, params] as const,
