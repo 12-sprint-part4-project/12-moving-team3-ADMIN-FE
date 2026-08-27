@@ -1,9 +1,9 @@
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { ChangeEvent } from 'react';
-
 import { useAdminReportListFilters } from './useAdminReportListFilters';
+
+import type { ChangeEvent } from 'react';
 
 const mockNavigateSearchHref = vi.fn();
 
