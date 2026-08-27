@@ -9,12 +9,26 @@ import {
   type ReactNode,
 } from 'react';
 
-import { DetailField } from '@/components/AdminMemberDetailShared/AdminMemberDetailShared';
 import { DetailSection } from '@/components/DetailSection/DetailSection';
 
 import { DetailDrawer } from './DetailDrawer';
 
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+
+interface StoryDetailFieldProps {
+  label: string;
+  value: string | number;
+}
+
+/** 스토리 전용 행. 회원 상세 모듈(API/Query)을 끌어오지 않는다. */
+const StoryDetailField = ({ label, value }: StoryDetailFieldProps) => (
+  <div className="flex min-w-0 justify-between gap-4">
+    <dt className="shrink-0 text-gray-500">{label}</dt>
+    <dd className="min-w-0 flex-1 break-all text-right text-black-400">
+      {value}
+    </dd>
+  </div>
+);
 
 interface DetailDrawerDemoProps extends ComponentProps<typeof DetailDrawer> {
   open: boolean;
@@ -183,14 +197,14 @@ export const LongEmail: Story = {
     children: (
       <DetailSection title="기본 정보">
         <dl className="flex flex-col gap-2 text-md-medium">
-          <DetailField label="이름" value="김무빙" />
-          <DetailField label="닉네임" value="안전한이사" />
-          <DetailField
+          <StoryDetailField label="이름" value="김무빙" />
+          <StoryDetailField label="닉네임" value="안전한이사" />
+          <StoryDetailField
             label="이메일"
             value="very-long-email-address-without-spaces-for-drawer-layout-verification@example-domain.com"
           />
-          <DetailField label="가입일" value="2026. 08. 13." />
-          <DetailField label="신고 횟수" value={12} />
+          <StoryDetailField label="가입일" value="2026. 08. 13." />
+          <StoryDetailField label="신고 횟수" value={12} />
         </dl>
       </DetailSection>
     ),
