@@ -6,7 +6,7 @@
 
 ## Team
 
-|                     [추명근](https://github.com/hogu-giriboy)                     |                   [김남진](https://github.com/knj980425)                   |
+|                     [추명곤](https://github.com/hogu-giriboy)                     |                   [김남진](https://github.com/knj980425)                   |
 | :-------------------------------------------------------------------------------: | :------------------------------------------------------------------------: |
 |            <img src="https://github.com/hogu-giriboy.png" width="80"/>            |          <img src="https://github.com/knj980425.png" width="80"/>          |
 | **관리자 인증**<br/>**회원·기사·채팅·신고·리뷰 관리**<br/>**다국어·공통 목록 UX** | **대시보드·통계**<br/>**견적 요청·완료 건 관리**<br/>**공통 상세 탐색 UX** |
