@@ -1,0 +1,733 @@
+{
+  "common": {
+    "login": "登录",
+    "logout": "退出登录",
+    "search": "搜索",
+    "confirm": "确认",
+    "cancel": "取消",
+    "loading": "加载中...",
+    "noData": "暂无数据。",
+    "searchReset": "重置搜索"
+  },
+  "auth": {
+    "brand": "Moving",
+    "title": "管理员登录",
+    "description": "请使用管理员账号登录以访问管理后台。",
+    "checking": "正在验证身份...",
+    "email": {
+      "label": "邮箱",
+      "placeholder": "请输入邮箱"
+    },
+    "password": {
+      "label": "密码",
+      "placeholder": "请输入密码",
+      "show": "显示密码",
+      "hide": "隐藏密码"
+    },
+    "validation": {
+      "emailRequired": "请输入邮箱。",
+      "emailInvalid": "请输入有效的邮箱地址。",
+      "passwordRequired": "请输入密码。"
+    },
+    "error": {
+      "invalidCredentials": "登录失败，请检查邮箱和密码。",
+      "unexpected": "登录失败，请稍后重试。"
+    }
+  },
+  "pagination": {
+    "label": "分页导航",
+    "first": "第一页",
+    "previous": "上一页",
+    "page": "第{{page}}页",
+    "next": "下一页",
+    "last": "最后一页"
+  },
+  "dateRange": {
+    "select": "选择日期范围",
+    "allPeriod": "全部日期"
+  },
+  "dashboard": {
+    "title": "仪表盘",
+    "description": "管理员，今天也请与 Moving 一起高效管理。",
+    "units": { "people": "人", "items": "项", "count": "{{count}}项" },
+    "kpi": {
+      "title": "核心指标",
+      "users": "用户数",
+      "estimateRequests": "报价请求数",
+      "quotes": "报价数",
+      "completed": "已完成订单",
+      "pendingReports": "待处理举报"
+    },
+    "period": { "day": "今天", "week": "最近7天", "month": "最近30天" },
+    "trend": {
+      "title": "报价请求趋势",
+      "periodLabel": "趋势统计周期",
+      "series": "报价请求",
+      "accessibleLabel": "按日期统计的报价请求数",
+      "count": "{{label}}：{{count}}项"
+    },
+    "status": {
+      "title": "报价请求状态",
+      "period": "（最近30天）",
+      "description": "以最近30天内提交的报价请求为基准统计。"
+    },
+    "requestStatus": {
+      "submitted": "已提交",
+      "confirmed": "已匹配",
+      "completed": "搬家完成",
+      "expired": "已过期",
+      "canceled": "已取消",
+      "total": "请求总数"
+    },
+    "error": {
+      "kpi": "无法加载核心指标。",
+      "trend": "无法加载报价请求趋势。",
+      "status": "无法加载报价请求状态。",
+      "recent": "无法加载最近活动。",
+      "retry": "请稍后重试。"
+    },
+    "recent": {
+      "viewAll": "查看全部",
+      "period": "（最近7天）",
+      "reports": "最近举报",
+      "members": "最近注册会员",
+      "completed": "最近完成订单",
+      "emptyReports": "暂无最近举报。",
+      "emptyMembers": "暂无最近注册会员。",
+      "emptyCompleted": "暂无最近完成订单。"
+    },
+    "columns": {
+      "reportedAt": "举报日期",
+      "reportTarget": "举报对象",
+      "reportReason": "举报原因",
+      "status": "状态",
+      "nickname": "昵称",
+      "email": "邮箱",
+      "joinedAt": "注册日期",
+      "requestId": "请求编号",
+      "customerName": "客户姓名",
+      "moveDate": "搬家日期",
+      "driverName": "搬家师傅"
+    },
+    "reportTarget": {
+      "USER": "会员",
+      "REVIEW": "评价",
+      "MESSAGE": "消息",
+      "ARTICLE": "帖子",
+      "COMMENT": "评论"
+    },
+    "reportCategory": {
+      "INAPPROPRIATE_PROFILE": "不当个人资料",
+      "ABUSIVE_LANGUAGE": "辱骂或诽谤"
+    },
+    "reportStatus": {
+      "PENDING": "待处理",
+      "RESOLVED": "已处理",
+      "REJECTED": "已驳回"
+    }
+  },
+  "members": {
+    "common": { "retry": "请稍后重试。" },
+    "status": { "all": "全部状态", "active": "正常", "suspended": "已停用" },
+    "list": {
+      "noResults": "没有搜索结果。",
+      "changeFilters": "请更改搜索条件后重试。",
+      "resetFilters": "重置筛选",
+      "searchPlaceholder": "搜索姓名、邮箱或手机号",
+      "statusLabel": "状态",
+      "allJoinDates": "全部注册日期"
+    },
+    "filter": {
+      "userName": "姓名及昵称",
+      "phoneNumberInvalid": "手机号需包含数字。"
+    },
+    "columns": {
+      "number": "编号",
+      "status": "状态",
+      "actions": "管理",
+      "viewDetail": "查看详情"
+    },
+    "fields": {
+      "name": "姓名",
+      "nickname": "昵称",
+      "email": "邮箱",
+      "phone": "手机号",
+      "joinedAt": "注册日期",
+      "rating": "评分",
+      "suspendedAt": "停用开始日期",
+      "suspendedUntil": "停用结束日期",
+      "reportCount": "被举报次数",
+      "preferredRegion": "期望地区",
+      "services": "使用服务",
+      "serviceTypes": "服务类型",
+      "serviceRegions": "服务地区",
+      "career": "从业经验",
+      "shortDescription": "一句话介绍",
+      "description": "详细介绍",
+      "averageRating": "平均评分",
+      "reviewCount": "评价数",
+      "confirmedQuotes": "已确认报价数"
+    },
+    "detail": {
+      "basicInfo": "基本信息",
+      "accountStatus": "账号状态",
+      "notFoundDescription": "找不到所选会员。",
+      "previous": "上一项",
+      "next": "下一项"
+    },
+    "action": {
+      "suspend": {
+        "title": "将该会员停用7天？",
+        "description": "停用期间该会员的服务使用将受到限制。",
+        "confirm": "停用7天"
+      },
+      "activate": {
+        "title": "启用该会员账号？",
+        "description": "启用后该会员可重新使用服务。",
+        "confirm": "启用账号"
+      },
+      "error": "状态更改失败，请稍后重试。"
+    },
+    "customer": {
+      "title": "会员管理",
+      "description": "查看、搜索和筛选普通会员。",
+      "caption": "普通会员列表",
+      "searchLabel": "搜索会员",
+      "empty": "暂无已注册会员。",
+      "error": "无法加载会员列表。",
+      "profile": "会员资料",
+      "detailTitle": "会员详情",
+      "detailError": "无法加载会员详情。",
+      "detailEmpty": "暂无会员信息。"
+    },
+    "mover": {
+      "title": "搬家师傅管理",
+      "description": "查看、搜索和筛选搬家师傅。",
+      "caption": "搬家师傅列表",
+      "searchLabel": "搜索搬家师傅",
+      "empty": "暂无已注册搬家师傅。",
+      "error": "无法加载搬家师傅列表。",
+      "profile": "搬家师傅资料",
+      "statistics": "搬家师傅统计",
+      "careerValue": "{{career}}年",
+      "detailTitle": "搬家师傅详情",
+      "detailError": "无法加载搬家师傅详情。",
+      "detailEmpty": "暂无搬家师傅信息。"
+    },
+    "moveType": {
+      "SMALL": "小型搬家",
+      "HOME": "家庭搬家",
+      "OFFICE": "办公室搬家"
+    },
+    "region": {
+      "SEOUL": "首尔",
+      "GYEONGGI": "京畿道",
+      "INCHEON": "仁川",
+      "GANGWON": "江原道",
+      "CHUNGBUK": "忠清北道",
+      "CHUNGNAM": "忠清南道",
+      "SEJONG": "世宗",
+      "DAEJEON": "大田",
+      "JEONBUK": "全罗北道",
+      "GWANGJU_JEONNAM": "光州·全罗南道",
+      "GYEONGBUK": "庆尚北道",
+      "DAEGU": "大邱",
+      "ULSAN": "蔚山",
+      "GYEONGNAM": "庆尚南道",
+      "BUSAN": "釜山",
+      "JEJU": "济州"
+    }
+  },
+  "estimates": {
+    "title": "报价请求管理",
+    "description": "查看已提交的报价请求。",
+    "unit": "项",
+    "price": "{{price}}韩元",
+    "common": { "retry": "请稍后重试。" },
+    "filter": {
+      "label": "报价请求筛选",
+      "searchPlaceholder": "搜索请求编号、申请人或手机号",
+      "searchLabel": "搜索报价请求",
+      "statusLabel": "报价请求状态",
+      "allDates": "全部日期",
+      "idInvalid": "请求编号只能输入数字。",
+      "phoneNumberInvalid": "手机号至少需要包含一个数字。"
+    },
+    "status": {
+      "all": "全部状态",
+      "SUBMITTED": "待处理",
+      "CONFIRMED": "已匹配",
+      "EXPIRED": "已过期",
+      "CANCELED": "已取消"
+    },
+    "quoteStatus": {
+      "PENDING": "待处理",
+      "CONFIRMED": "已确认",
+      "REJECTED": "已拒绝",
+      "DELETED": "已删除"
+    },
+    "moveType": {
+      "SMALL": "小型搬家",
+      "HOME": "家庭搬家",
+      "OFFICE": "办公室搬家"
+    },
+    "fields": {
+      "id": "请求编号",
+      "userName": "申请人姓名",
+      "userNickname": "申请人昵称",
+      "phoneNumber": "手机号",
+      "moveType": "搬家类型",
+      "departureAddress": "出发地",
+      "departureDetailAddress": "出发地详细地址",
+      "departureZipCode": "出发地邮编",
+      "arrivalAddress": "目的地",
+      "arrivalDetailAddress": "目的地详细地址",
+      "arrivalZipCode": "目的地邮编",
+      "submittedAt": "提交日期",
+      "status": "状态",
+      "estimateCount": "报价数",
+      "mover": "已匹配师傅",
+      "actions": "操作"
+    },
+    "statistics": {
+      "label": "报价请求统计",
+      "error": "无法加载报价请求统计。",
+      "description": "以提交日期为基准，仅应用日期筛选。"
+    },
+    "list": {
+      "label": "报价请求列表",
+      "error": "无法加载报价请求列表。",
+      "retry": "重试",
+      "noResults": "没有搜索结果。",
+      "empty": "暂无报价请求。",
+      "changeFilters": "请更改搜索条件后重试。",
+      "resetFilters": "重置筛选"
+    },
+    "missing": {
+      "title": "缺失：{{fields}}",
+      "badge": "信息缺失",
+      "fields": "缺失字段：{{fields}}",
+      "description": "缺少必填信息。缺失字段：{{fields}}"
+    },
+    "detail": {
+      "title": "报价请求详情",
+      "basicInfo": "基本信息",
+      "activeQuotes": "有效报价（{{count}}项）",
+      "deletedQuotes": "已删除报价（{{count}}项）",
+      "noActiveQuotes": "暂无有效报价。",
+      "noDeletedQuotes": "暂无已删除报价。",
+      "notFound": "找不到报价请求。",
+      "error": "无法加载报价请求详情。",
+      "empty": "暂无报价请求信息。",
+      "emptyDescription": "找不到所选报价请求。",
+      "previous": "上一项",
+      "next": "下一项"
+    },
+    "viewDetail": "查看详情"
+  },
+  "completed": {
+    "title": "已完成订单管理",
+    "description": "查看已完成的报价请求。",
+    "common": { "retry": "请稍后重试。" },
+    "unit": { "items": "项", "currency": "韩元" },
+    "moveType": { "all": "全部搬家类型" },
+    "filter": {
+      "label": "已完成订单筛选",
+      "searchPlaceholder": "搜索请求编号、申请人或手机号",
+      "searchLabel": "搜索已完成订单",
+      "moveTypeLabel": "搬家类型",
+      "allMoveDates": "全部搬家日期",
+      "idInvalid": "请求编号只能输入数字。",
+      "phoneNumberInvalid": "手机号至少需要包含一个数字。"
+    },
+    "statistics": {
+      "label": "已完成订单统计",
+      "totalCount": "已完成订单数",
+      "averagePrice": "平均完成报价金额",
+      "totalPrice": "完成报价总金额",
+      "rounded": "平均金额四舍五入至整数。",
+      "description": "以搬家日期为基准，仅应用日期筛选。",
+      "error": "无法加载已完成订单统计。"
+    },
+    "fields": {
+      "moveType": "搬家类型",
+      "departureAddress": "出发地",
+      "departureDetailAddress": "出发地详细地址",
+      "departureZipCode": "出发地邮编",
+      "arrivalAddress": "目的地",
+      "arrivalDetailAddress": "目的地详细地址",
+      "arrivalZipCode": "目的地邮编",
+      "moveDate": "搬家日期",
+      "mover": "已匹配师傅",
+      "price": "报价金额",
+      "confirmedQuote": "已确认报价",
+      "confirmedQuote_moverName": "确认报价师傅",
+      "confirmedQuote_moverNickname": "确认报价师傅昵称",
+      "confirmedQuote_price": "确认报价金额",
+      "confirmedQuote_createdAt": "确认报价创建日期",
+      "data": "数据",
+      "moverName": "搬家师傅",
+      "moverNickname": "师傅昵称",
+      "comment": "备注",
+      "quoteCreatedAt": "报价创建日期"
+    },
+    "list": {
+      "label": "已完成订单列表",
+      "error": "无法加载已完成订单列表。",
+      "retry": "重试",
+      "noResults": "没有搜索结果。",
+      "empty": "暂无已完成订单。",
+      "changeFilters": "请更改搜索条件后重试。",
+      "resetFilters": "重置筛选"
+    },
+    "detail": {
+      "title": "已完成订单详情",
+      "confirmedQuote": "已确认报价",
+      "noConfirmedQuote": "暂无已确认报价信息。",
+      "notFound": "找不到已完成订单。",
+      "error": "无法加载已完成订单详情。",
+      "empty": "暂无已完成订单信息。",
+      "emptyDescription": "找不到所选已完成订单。",
+      "previous": "上一项",
+      "next": "下一项"
+    }
+  },
+  "chats": {
+    "title": "聊天管理",
+    "description": "查看、搜索和筛选聊天室。",
+    "common": { "retry": "请稍后重试。", "retryAction": "重试" },
+    "roomType": {
+      "GENERAL": "普通",
+      "DESIGNATED": "指定报价",
+      "COMMUNITY": "社区"
+    },
+    "userType": { "CUSTOMER": "客户", "MOVER": "搬家师傅" },
+    "participant": {
+      "active": "参与中",
+      "left": "已离开",
+      "withdrawn": "已注销"
+    },
+    "filter": {
+      "allTypes": "全部",
+      "searchPlaceholder": "搜索姓名、昵称、邮箱或手机号",
+      "searchLabel": "搜索聊天参与者",
+      "idInvalid": "聊天室 ID 只能输入数字。",
+      "userName": "参与者姓名及昵称"
+    },
+    "fields": {
+      "roomId": "聊天室 ID",
+      "participants": "参与者",
+      "roomType": "聊天室类型",
+      "lastMessage": "最后消息",
+      "lastMessageAt": "最后消息时间",
+      "createdAt": "创建日期",
+      "actions": "操作",
+      "estimateRequestId": "报价请求 ID",
+      "quoteId": "报价 ID",
+      "designatedMoverId": "指定搬家师傅 ID",
+      "communityPostId": "社区帖子 ID",
+      "name": "姓名",
+      "nickname": "昵称",
+      "email": "邮箱",
+      "userType": "用户类型",
+      "joinedAt": "加入时间",
+      "leftStatus": "参与状态",
+      "leftAt": "离开时间",
+      "withdrawnStatus": "注销状态"
+    },
+    "list": {
+      "label": "聊天室列表",
+      "error": "无法加载聊天室列表。",
+      "noResults": "没有搜索结果。",
+      "empty": "暂无聊天室。",
+      "changeFilters": "请修改筛选条件后重试。",
+      "resetFilters": "重置筛选"
+    },
+    "detail": {
+      "title": "聊天室详情",
+      "basicInfo": "聊天室基本信息",
+      "linkedInfo": "关联信息",
+      "participantInfo": "参与者信息",
+      "noParticipants": "暂无参与者。",
+      "noSelection": "未选择聊天室。",
+      "error": "无法加载聊天室详情。",
+      "empty": "没有聊天室信息。",
+      "notFound": "找不到所选聊天室。",
+      "previous": "上一项",
+      "next": "下一项"
+    },
+    "messages": {
+      "title": "消息记录",
+      "none": "暂无消息",
+      "imageMessage": "图片消息",
+      "filtered": "已过滤",
+      "imageAlt": "聊天图片",
+      "imageError": "无法加载图片。",
+      "loading": "正在加载消息...",
+      "error": "无法加载消息。",
+      "empty": "暂无消息记录。",
+      "loadOlder": "加载更早消息",
+      "loadOlderError": "无法加载更早消息。",
+      "refresh": "刷新消息"
+    },
+    "viewDetail": "查看详情"
+  },
+  "reports": {
+    "title": "举报管理",
+    "description": "查看举报列表和处理状态。",
+    "common": { "retry": "请稍后重试。", "retryAction": "重试" },
+    "unit": { "items": "条" },
+    "status": {
+      "PENDING": "待处理",
+      "RESOLVED": "已处理",
+      "REJECTED": "已驳回"
+    },
+    "target": {
+      "USER": "用户",
+      "REVIEW": "评价",
+      "MESSAGE": "消息",
+      "ARTICLE": "帖子",
+      "COMMENT": "评论"
+    },
+    "category": {
+      "INAPPROPRIATE_PROFILE": "不当个人资料",
+      "ABUSIVE_LANGUAGE": "辱骂或诽谤"
+    },
+    "userType": { "CUSTOMER": "普通用户", "MOVER": "搬家师傅" },
+    "account": {
+      "active": "正常",
+      "suspended": "已停用",
+      "withdrawn": "已注销"
+    },
+    "presence": {
+      "active": "正常",
+      "deleted": "已删除",
+      "missing": "目标不存在"
+    },
+    "presenceHint": {
+      "deleted": "该目标已删除，当前不再显示。",
+      "missing": "无法确认举报目标。"
+    },
+    "filter": {
+      "searchPlaceholder": "搜索目标姓名、昵称或邮箱",
+      "searchLabel": "搜索被举报用户",
+      "allStatuses": "全部",
+      "allTargets": "全部",
+      "allDates": "全部举报日期",
+      "idInvalid": "举报 ID 只能输入数字。",
+      "userName": "目标姓名及昵称"
+    },
+    "fields": {
+      "reportId": "举报 ID",
+      "status": "举报状态",
+      "targetType": "目标类型",
+      "targetId": "目标 ID",
+      "category": "举报类别",
+      "reporter": "举报人",
+      "target": "举报目标",
+      "createdAt": "举报日期",
+      "actions": "操作",
+      "admin": "处理管理员",
+      "name": "姓名",
+      "nickname": "昵称",
+      "email": "邮箱",
+      "userType": "用户类型",
+      "accountStatus": "账号状态",
+      "withdrawnAt": "注销日期",
+      "targetStatus": "目标状态",
+      "deletedAt": "删除日期",
+      "reportCount": "被举报次数",
+      "title": "标题",
+      "body": "正文",
+      "contentCreatedAt": "创建日期"
+    },
+    "statistics": {
+      "label": "举报统计",
+      "total": "举报总数",
+      "error": "无法加载举报统计。",
+      "description": "按举报日期统计，仅应用日期范围筛选。"
+    },
+    "list": {
+      "label": "举报列表",
+      "error": "无法加载举报列表。",
+      "noResults": "没有搜索结果。",
+      "empty": "暂无举报。",
+      "changeFilters": "请修改筛选条件后重试。",
+      "resetFilters": "重置筛选"
+    },
+    "detail": {
+      "title": "举报详情",
+      "basicInfo": "举报基本信息",
+      "reporterInfo": "举报人信息",
+      "targetInfo": "举报目标信息",
+      "contentInfo": "被举报内容信息",
+      "noSelection": "未选择举报。",
+      "empty": "没有举报信息。",
+      "notFound": "找不到所选举报。",
+      "error": "无法加载举报详情。",
+      "noAdmin": "尚未分配",
+      "unexpectedProfileTarget": "此个人资料举报的目标不是用户，请检查目标类型和 ID。",
+      "suspendDisabled": "已处理或已驳回的举报无法选择停用操作。",
+      "deleteDisabled": "已处理或已驳回的举报无法选择删除内容。",
+      "missingTargetContent": "举报目标不存在，无法显示内容。",
+      "noContent": "没有被举报的内容。",
+      "noProfile": "没有个人资料信息。",
+      "deletedContentHint": "该内容已删除，当前不再显示。",
+      "previous": "上一项",
+      "next": "下一项"
+    },
+    "action": {
+      "SUSPEND_TARGET_USER": "停用 7 天",
+      "DELETE_REPORTED_CONTENT": "删除内容"
+    },
+    "resolve": {
+      "action": "处理举报",
+      "title": "要处理此举报吗？",
+      "selectedActions": "已选操作",
+      "noActions": "未选择操作。",
+      "warning": "处理结果难以撤销，请仔细确认。",
+      "confirm": "确认处理",
+      "success": "举报已处理。"
+    },
+    "reject": {
+      "action": "驳回举报",
+      "title": "要驳回此举报吗？",
+      "description": "驳回不会对用户或内容采取其他措施，只会更改举报状态。",
+      "confirm": "确认驳回",
+      "success": "举报已驳回。"
+    },
+    "contentDeletionSupported": "支持删除",
+    "viewDetail": "查看详情",
+    "decisionError": "请求失败，请稍后重试。",
+    "profileImageAlt": "{{name}}的个人资料图片",
+    "metadata": {
+      "rating": "评分",
+      "estimateRequestId": "报价请求 ID",
+      "quoteId": "报价 ID",
+      "lastMessageAt": "最后消息",
+      "messageType": "消息类型",
+      "roomId": "聊天室 ID",
+      "category": "帖子类别",
+      "postId": "原帖 ID",
+      "postTitle": "原帖标题",
+      "postDeletedAt": "原帖删除日期",
+      "userType": "用户类型"
+    },
+    "metadataValue": {
+      "userType": { "CUSTOMER": "普通用户", "MOVER": "搬家师傅" },
+      "messageType": { "TEXT": "文本", "IMAGE": "图片" },
+      "category": {
+        "MOVING_TIP": "搬家技巧",
+        "QUESTION": "问题",
+        "REVIEW": "评价",
+        "ETC": "其他",
+        "FURNITURE_SHARE": "家具分享"
+      }
+    },
+    "summary": {
+      "review": "评价",
+      "reviewWithRating": "评价 · ★{{rating}}",
+      "comment": "评论",
+      "commentWithPost": "评论 · 原帖：{{postTitle}}",
+      "message": "消息 · {{type}}",
+      "article": "帖子 · {{category}}"
+    }
+  },
+  "reviews": {
+    "title": "评价管理",
+    "description": "查看评价列表以及发布者和搬家师傅信息。",
+    "common": { "retry": "请稍后重试。" },
+    "unit": { "items": "条", "points": "分" },
+    "status": { "active": "有效", "deleted": "已删除" },
+    "filter": {
+      "searchPlaceholder": "搜索内容、发布者或搬家师傅",
+      "searchLabel": "搜索评价",
+      "allRatings": "全部评分",
+      "ratingOption": "{{rating}}分",
+      "allStatuses": "全部",
+      "deletionStatus": "删除状态",
+      "allCreatedDates": "全部创建日期",
+      "idInvalid": "评价 ID 只能输入数字。",
+      "userName": "发布者姓名及昵称",
+      "moverName": "搬家师傅姓名及昵称"
+    },
+    "fields": {
+      "reviewId": "评价 ID",
+      "quoteId": "报价 ID",
+      "author": "发布者",
+      "authorEmail": "发布者邮箱",
+      "mover": "搬家师傅",
+      "moverEmail": "搬家师傅邮箱",
+      "rating": "评分",
+      "content": "评价内容",
+      "createdAt": "创建日期",
+      "updatedAt": "修改日期",
+      "deletedAt": "删除日期",
+      "status": "状态",
+      "actions": "操作"
+    },
+    "statistics": {
+      "label": "评价统计",
+      "total": "评价总数",
+      "averageRating": "平均评分",
+      "deleted": "已删除评价",
+      "excludesDeleted": "不包括已删除的评价。",
+      "description": "按创建日期统计，仅应用日期范围筛选。",
+      "error": "无法加载评价统计。"
+    },
+    "list": {
+      "label": "评价列表",
+      "error": "无法加载评价列表。",
+      "noResults": "没有搜索结果。",
+      "empty": "暂无评价。",
+      "changeFilters": "请修改筛选条件后重试。",
+      "resetFilters": "重置筛选"
+    },
+    "detail": {
+      "title": "评价详情",
+      "reviewInfo": "评价信息",
+      "peopleInfo": "发布者和搬家师傅信息",
+      "originalContent": "评价原文",
+      "noSelection": "未选择评价。",
+      "error": "无法加载评价详情。",
+      "empty": "没有评价信息。",
+      "notFound": "找不到所选评价。",
+      "previous": "上一项",
+      "next": "下一项"
+    },
+    "delete": {
+      "action": "删除评价",
+      "title": "要删除此评价吗？",
+      "description": "已删除的评价将从列表中排除。",
+      "confirm": "删除"
+    },
+    "viewDetail": "查看详情",
+    "viewDetailLabel": "查看评价 {{id}} 的详情"
+  },
+  "language": {
+    "selectorLabel": "选择语言"
+  },
+  "header": {
+    "title": "管理后台",
+    "logoAlt": "Moving",
+    "goToDashboard": "前往仪表盘",
+    "adminMenu": "管理员菜单",
+    "userMenu": "{{userName}}的菜单",
+    "loggingOut": "正在退出..."
+  },
+  "sidebar": {
+    "navigationLabel": "管理员菜单",
+    "expand": "展开侧边栏",
+    "collapse": "收起侧边栏"
+  },
+  "navigation": {
+    "dashboard": "仪表盘",
+    "members": "会员管理",
+    "drivers": "搬家师傅管理",
+    "estimateRequests": "报价请求管理",
+    "completed": "已完成订单",
+    "chats": "聊天管理",
+    "reports": "举报管理",
+    "reviews": "评价管理"
+  }
+}
